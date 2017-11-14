@@ -1,0 +1,8 @@
+*.out
+build_vs
+CMakeFiles
+CMakeCache.txt
+Makefile
+ext/glfw
+ext/glm
+ext/glew
