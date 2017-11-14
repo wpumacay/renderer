@@ -1,8 +1,5 @@
 
-#cmake_minimum_required( VERSION 3.5.0 )
-#project( cat1_tests )
-
-message( "making tests" )
+message( "generating tests project" )
 
 if( WIN32 )
 
@@ -14,6 +11,16 @@ elseif( UNIX )
 
 	add_executable( test_glfw.out
 					test_glfw.cpp )
-	target_link_libraries( test_glfw.out ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} GLEW::GLEW )
+	target_link_libraries( test_glfw.out 
+                           ${OPENGL_LIBRARIES} 
+                           ${GLFW_LIBRARIES} 
+                           GLEW::GLEW 
+                           ${X11_LIBRARIES} 
+                           ${CMAKE_THREAD_LIBS_INIT}
+                           dl )
+
+elseif( APPLE )
+
+    # TODO: Define executable properties here
 
 endif()

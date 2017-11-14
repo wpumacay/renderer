@@ -1,6 +1,12 @@
 
 cmake_minimum_required( VERSION 3.5.0 )
-project( cat1 )
+project( cat1 C CXX )
+
+set( CMAKE_BUILD_TYPE Debug )
+
+set( CMAKE_CXX_STANDARD 11 )
+set( CMAKE_CXX_FLAGS_DEBUG "-g -Wno-unused-parameter" )
+set( CMAKE_CXX_FLAGS_RELEASE "-O3 -Wno-unused-parameter" )
 
 if( WIN32 )
 
@@ -16,14 +22,16 @@ if( WIN32 )
 
 elseif( UNIX )
 
+	message( "making cat1 project for linux" )
+
 	find_package( OpenGL REQUIRED )
 	find_package( GLEW REQUIRED )
+	find_package( X11 REQUIRED )
+	find_package( Threads REQUIRED )
 	find_package( PkgConfig REQUIRED )
 	pkg_search_module( GLFW REQUIRED glfw3 )
 
-	include_directories( engine )
-
-	link_directories( usr/lib usr/lib64 usr/local/lib )
+	include_directories( engine ${GLFW_INCLUDE_DIRS} )
 
 elseif( APPLE )
 
