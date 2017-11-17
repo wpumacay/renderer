@@ -1,17 +1,17 @@
 
-message( "generating test_glfw project" )
+message( "generating test_gl project" )
+
+include_directories( ../../engine/include )
 
 if( WIN32 )
 
-	add_executable( test_glfw
-					test_glfw.cpp )
-	target_link_libraries( test_glfw glew32s glfw3 opengl32 )
+    add_executable( test_gl_ch2_1 test_gl_ch2_1.cpp )
+    target_link_libraries( test_gl_ch2_1 glew32s glfw3 opengl32 )
 
 elseif( UNIX )
 
-	add_executable( test_glfw.out
-					test_glfw.cpp )
-	target_link_libraries( test_glfw.out 
+    add_executable( test_gl_ch2_1.out test_gl_ch2_1.cpp )
+    target_link_libraries( test_gl_ch2_1.out cat1gl
                            ${OPENGL_LIBRARIES} 
                            ${GLFW_LIBRARIES} 
                            GLEW::GLEW 

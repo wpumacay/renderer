@@ -11,3 +11,4 @@ Makefile
 ext/glfw
 ext/glm
 ext/glew
+*.a
