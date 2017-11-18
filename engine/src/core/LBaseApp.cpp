@@ -49,7 +49,7 @@ namespace engine
             glfwInit();
             glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, ENGINE_GL_CONTEXT_VERSION_MAJOR );
             glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, ENGINE_GL_CONTEXT_VERSION_MINOR );
-            glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+            glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE );
             glfwWindowHint( GLFW_RESIZABLE, ENGINE_WINDOW_RESIZABLE );
 
             m_window = glfwCreateWindow( ENGINE_APP_WIDTH, 
@@ -60,7 +60,7 @@ namespace engine
             if ( m_window == NULL )
             {
                 glfwTerminate();
-                ENGINE_ERROR( "LBaseApp::init> could initialize GLFW" );
+                ENGINE_ERROR( "LBaseApp::init> could not initialize GLFW" );
                 return false;
             }
 
@@ -71,7 +71,7 @@ namespace engine
             if ( glewInit() != GLEW_OK )
             {
                 glfwTerminate();
-                ENGINE_ERROR( "LBaseApp::init> could initialize GLEW" );
+                ENGINE_ERROR( "LBaseApp::init> could not initialize GLEW" );
                 return false;
             }
 
@@ -84,6 +84,8 @@ namespace engine
             glViewport( 0, 0, m_width, m_height );
 
             m_initialized = true;
+
+            onStartup();
 
             return true;
         }

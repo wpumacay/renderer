@@ -1,0 +1,27 @@
+
+message( "generating test_gl project" )
+
+include_directories( ../../engine/include )
+
+if( WIN32 )
+
+    add_executable( hw1 hw1.cpp )
+    target_link_libraries( hw1 glew32s glfw3 opengl32 )
+
+elseif( UNIX )
+
+    add_executable( hw1.out hw1.cpp )
+    target_link_libraries( hw1.out cat1gl
+                           ${OPENGL_LIBRARIES} 
+                           ${GLFW_LIBRARIES} 
+                           GLEW::GLEW 
+                           ${X11_LIBRARIES} 
+                           ${CMAKE_THREAD_LIBS_INIT}
+                           dl
+                           GLU )
+
+elseif( APPLE )
+
+    # TODO: Define executable properties here
+
+endif()

@@ -49,6 +49,11 @@ namespace engine
             void loop();
             void finalize();
 
+            virtual void onStartup()
+            {
+                // Override this
+            }
+
             virtual void render() 
             {
                 // Override this
