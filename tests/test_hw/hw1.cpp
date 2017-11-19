@@ -11,11 +11,12 @@ using namespace std;
 
 #define NUMVTX 18
 
-GLfloat g_mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat g_mat_specular[] = { 1.0, 1.0, 1.0 };
 GLfloat g_mat_shininess = 20.0f;
-GLfloat g_mat_emmision[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-GLfloat g_ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-GLfloat g_lightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat g_mat_emmision[] = { 0.0f, 0.0f, 0.0f };
+
+GLfloat g_ambientLight[] = { 0.2f, 0.2f, 0.2f };
+GLfloat g_lightColor[] = { 1.0f, 1.0f, 1.0f };
 
 template<class T>
 struct Hw1Vec3T
@@ -235,10 +236,12 @@ class Hw1Cube
 
         glBegin( GL_TRIANGLES );
 
-        glColor3f( m_color.x, m_color.y, m_color.z );
-        glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_colorArr );
+        //glColor3f( m_color.x, m_color.y, m_color.z );
+        //glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_colorArr );
+        glMaterialfv( GL_FRONT, GL_AMBIENT, m_colorArr );
+        glMaterialfv( GL_FRONT, GL_DIFFUSE, m_colorArr );
         glMaterialfv( GL_FRONT, GL_SPECULAR, g_mat_specular );
-        glMaterialfv( GL_FRONT, GL_EMISSION, g_mat_emmision );
+        //glMaterialfv( GL_FRONT, GL_EMISSION, g_mat_emmision );
         glMaterialf( GL_FRONT, GL_SHININESS, g_mat_shininess );
 
         for ( int q = 0; q < m_triFaces.size(); q++ )
@@ -621,7 +624,7 @@ class Hw1App : public engine::core::LBaseApp
     {
         ENGINE_LOG( "Loading letters from file" );
 
-        ifstream _filehandle( "letters.txt" );
+        ifstream _filehandle( "res/letters.txt" );
 
         string _line;
         vector<string> _params;
@@ -718,8 +721,8 @@ class Hw1App : public engine::core::LBaseApp
 
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
-        //gluLookAt( 4.0f, 4.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
-        gluLookAt( 0.0f, 2.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
+        gluLookAt( 4.0f, 4.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
+        //gluLookAt( 0.0f, 2.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
 
         loadLetters();
 
@@ -753,14 +756,14 @@ class Hw1App : public engine::core::LBaseApp
 
         m_testCube.rot.x = 0.0f;//180.0f * cos( 0.5 * m_timeNow );
         m_testCube.rot.y = 0.0f;//180.0f * sin( 0.5 * m_timeNow );
-        //m_testCube.render();
+        m_testCube.render();
 
         for ( int q = 0; q < m_letters.size(); q++ )
         {
             m_letters[q].rot.x = _rotX;
             m_letters[q].rot.y = _rotY;
 
-            m_letters[q].render();
+            //m_letters[q].render();
         }
 
         glDisable( GL_LIGHTING );
