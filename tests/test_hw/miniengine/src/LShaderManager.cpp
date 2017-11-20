@@ -34,15 +34,17 @@ namespace miniengine
 
     void LShaderManager::initialize()
     {
-        cout << "initializing shader manager" << endl;
-
         // Load base shaders
-        GLuint _id = createProgram( "res/shaders/baseVertexShader3d_no_lighting.glsl",
-                                    "res/shaders/baseFragmentShader3d_no_lighting.glsl" );
-
-        cout << "finished initializing shader manager" << endl;
+        GLuint _id;
+        _id = createProgram( "res/shaders/baseVertexShader3d_no_lighting.glsl",
+                             "res/shaders/baseFragmentShader3d_no_lighting.glsl" );
 
         shaderTable[shaders::BASE_SHADER_3D_NO_LIGHTING] = _id;
+
+        _id = createProgram( "res/shaders/baseVertexShader3d_with_lighting.glsl",
+                             "res/shaders/baseFragmentShader3d_with_lighting.glsl" );
+
+        shaderTable[shaders::BASE_SHADER_3D_WITH_LIGHTING] = _id;
     }
 
     void LShaderManager::create()

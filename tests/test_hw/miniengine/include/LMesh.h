@@ -21,6 +21,9 @@ namespace miniengine
 
         bool m_lightingEnabled;
 
+        LVec3 _computeFaceNormal( LInd3 pTri );
+        void _computeNormals();
+
         public :
 
         LVec3 scale;
@@ -31,14 +34,17 @@ namespace miniengine
 
         GLuint m_vao;
         GLuint m_vbo;
+        GLuint m_vbo_normals;
         GLuint m_ebo;
         GLuint m_programIndx;
         
         LVec3* m_vertices;
         LInd3* m_indices;
+        LVec3* m_normals;
 
         GLuint m_numVertices;
         GLuint m_numIndices;
+        GLuint m_numTris;
 
         //#endif
 
@@ -48,6 +54,7 @@ namespace miniengine
 
         void enableLighting() { m_lightingEnabled = true; }
         void disableLighting() { m_lightingEnabled = false; }
+        LMaterial& material() { return m_material; }
 
         void render( const LRenderInfo& rInfo );
 
@@ -59,6 +66,14 @@ namespace miniengine
             cout << "x: " << pos.x << " - y: " << pos.y << " - z: " << pos.z << endl;
             cout << "sx: " << scale.x << " - sy: " << scale.y << " - sz: " << scale.z << endl;
             cout << "mr: " << m_material.ambient.x << " - mg: " << m_material.ambient.y << " - mb: " << m_material.ambient.z << endl;
+
+            // normals
+            for ( int q = 0; q < m_numVertices; q++ )
+            {
+                cout << "n.x: " << m_normals[q].x << " - "
+                     << "n.y: " << m_normals[q].y << " - "
+                     << "n.z: " << m_normals[q].z << endl;
+            }
         }
 
     };

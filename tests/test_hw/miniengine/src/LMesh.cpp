@@ -14,6 +14,48 @@
 namespace miniengine
 {
 
+    LVec3 LMesh::_computeFaceNormal( LInd3 pTri )
+    {
+        LVec3 _n;
+
+        // _a -> _b -> _c : are in counter clockwise fashion
+        LVec3 _a = m_vertices[pTri.buff[0]];
+        LVec3 _b = m_vertices[pTri.buff[1]];
+        LVec3 _c = m_vertices[pTri.buff[2]];
+
+        LVec3 _ab = _b - _a;
+        LVec3 _ac = _c - _a;
+
+        _n = LVec3::cross( _ab, _ac );
+
+        return _n;
+    }
+
+    void LMesh::_computeNormals()
+    {
+        for ( int q = 0; q < m_numVertices; q++ )
+        {
+            LVec3 _normal;
+            for ( int f = 0; f < m_numTris; f++ )
+            {
+                LInd3 _tri = m_indices[f];
+                if ( _tri.buff[0] != q &&
+                     _tri.buff[1] != q &&
+                     _tri.buff[2] != q )
+                {
+                    // vertex q not contained in this face
+                    continue;
+                }
+
+                // Calculate the contribution of the face to this normal
+                _normal = _normal + _computeFaceNormal( _tri );
+            }
+
+            _normal.normalize();
+
+            m_normals[q] = _normal;
+        }
+    }    
 
 
     LMesh::LMesh( const vector<LVec3>& vertices,
@@ -27,14 +69,18 @@ namespace miniengine
         scale.z = 1.0f;
 
         m_numVertices = vertices.size();
+        m_numTris = indices.size();
         m_numIndices  = 3 * indices.size();
         m_vertices = new LVec3[vertices.size()];
         m_indices  = new LInd3[indices.size()];
+        m_normals  = new LVec3[vertices.size()];
 
         memcpy( m_vertices, vertices.data(), sizeof( LVec3 ) * vertices.size() );
         memcpy( m_indices, indices.data(), sizeof( LInd3 ) * indices.size() );
 
-        m_lightingEnabled = false;
+        m_lightingEnabled = true;
+
+        _computeNormals();
 
         //#else
 
@@ -59,26 +105,34 @@ namespace miniengine
 
     void LMesh::init()
     {
-        cout << ":D" << endl;
 
         glGenBuffers( 1, &m_vbo );
+        glGenBuffers( 1, &m_vbo_normals );
         glGenBuffers( 1, &m_ebo );
         glGenVertexArrays( 1, &m_vao );
 
         glBindVertexArray( m_vao );
-
-        glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
-        glBufferData( GL_ARRAY_BUFFER, 
-                      sizeof( LVec3 ) * m_numVertices,
-                      m_vertices, GL_STATIC_DRAW );
 
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ebo );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER,
                       sizeof( LInd3 ) * m_numIndices,
                       m_indices, GL_STATIC_DRAW );
 
+        glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
+        glBufferData( GL_ARRAY_BUFFER, 
+                      sizeof( LVec3 ) * m_numVertices,
+                      m_vertices, GL_STATIC_DRAW );
+
         glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, ( void* ) 0 );
         glEnableVertexAttribArray( 0 );
+
+        glBindBuffer( GL_ARRAY_BUFFER, m_vbo_normals );
+        glBufferData( GL_ARRAY_BUFFER,
+                      sizeof( LVec3 ) * m_numVertices,
+                      m_normals, GL_STATIC_DRAW );
+
+        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, ( void* ) 0 );
+        glEnableVertexAttribArray( 1 );
 
         glBindVertexArray( 0 );
 
@@ -122,7 +176,34 @@ namespace miniengine
 
             if ( m_lightingEnabled )
             {
-                // TODO: Set material params
+                // TODO: Might be useful to store the locations in the initialization to ...
+                // avoid calls to opengl every render call T_T
+
+                GLuint u_light_ambient  = glGetUniformLocation( _program.id, "u_light_ambient" );
+                GLuint u_light_diffuse  = glGetUniformLocation( _program.id, "u_light_diffuse" );
+                GLuint u_light_specular = glGetUniformLocation( _program.id, "u_light_specular" );
+                GLuint u_light_position = glGetUniformLocation( _program.id, "u_light_position" );
+
+                // for now just use the first light of the render info
+
+                LLightProps _light = rInfo.lights[0];
+
+                glUniform3fv( u_light_ambient, 1, ( GLfloat* ) &_light.ambient );
+                glUniform3fv( u_light_diffuse, 1, ( GLfloat* ) &_light.diffuse );
+                glUniform3fv( u_light_specular, 1, ( GLfloat* ) &_light.specular );
+                glUniform3fv( u_light_position, 1, ( GLfloat* ) &_light.pos );
+
+                // Set material properties
+
+                GLuint u_mat_ambient   = glGetUniformLocation( _program.id, "u_mat_ambient" );
+                GLuint u_mat_diffuse   = glGetUniformLocation( _program.id, "u_mat_diffuse" );
+                GLuint u_mat_specular  = glGetUniformLocation( _program.id, "u_mat_specular" );
+                GLuint u_mat_shininess = glGetUniformLocation( _program.id, "u_mat_shininess" );
+
+                glUniform3fv( u_mat_ambient, 1, ( GLfloat* ) &m_material.ambient );
+                glUniform3fv( u_mat_diffuse, 1, ( GLfloat* ) &m_material.diffuse );
+                glUniform3fv( u_mat_specular, 1, ( GLfloat* ) &m_material.specular );
+                glUniform1f( u_mat_shininess, m_material.shininess );
             }
             else
             {

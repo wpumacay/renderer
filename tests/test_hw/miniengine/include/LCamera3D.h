@@ -8,6 +8,7 @@
 #define CAM_DEFAULT_PITCH 0.0f
 #define CAM_DEFAULT_FOV 45.0f
 #define CAM_DEFAULT_SENSITIVITY 0.1f
+#define CAM_DEFAULT_SPEED 2.5f
 
 
 namespace miniengine
@@ -16,6 +17,15 @@ namespace miniengine
 
         class LCamera3D
         {
+
+            private :
+
+            float m_lastX;
+            float m_lastY;
+
+            bool m_firstMouseMove;
+            LVec3 m_speed;
+            float m_baseSpeed;
 
             protected :
 
@@ -46,6 +56,12 @@ namespace miniengine
             virtual glm::mat4 viewMatrix();
 
             virtual void update( float dt );
+
+            virtual void onKeyDown( int pKey );
+            virtual void onKeyUp( int pKey );
+            virtual void onMouseDown( float x, float y );
+            virtual void onMouseUp( float x, float y );
+            virtual void onMouseMove( double x, double y );
         };
 
 

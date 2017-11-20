@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <string>
 #include <fstream>
 
@@ -11,6 +12,8 @@
 #include <glm/glm.hpp>
 
 #define USE_MODERN_OPENGL 1
+
+using namespace std;
 
 namespace miniengine
 {
@@ -58,6 +61,13 @@ namespace miniengine
             z = z / _len;
         }
 
+        LVec3T<T> operator*( float s )
+        {
+            return LVec3T<T>( this->x * s,
+                              this->y * s,
+                              this->z * s );
+        }
+
         static LVec3T<T> cross( const LVec3T<T>& v1,
                                 const LVec3T<T>& v2 )
         {
@@ -88,7 +98,7 @@ namespace miniengine
 
         LInd3T()
         {
-            
+
         }
 
         LInd3T( T v1, T v2, T v3 )
@@ -103,9 +113,21 @@ namespace miniengine
     typedef LVec3T<GLfloat> LVec3;
     typedef LInd3T<GLuint> LInd3;
 
+    struct LLightProps
+    {
+        LVec3 ambient;
+        LVec3 diffuse;
+        LVec3 specular;
+
+        LVec3 pos;
+        LVec3 dir;
+    };
+
     struct LRenderInfo
     {
         glm::mat4 viewMat;
         glm::mat4 projMat;
+
+        vector<LLightProps> lights;
     };
 }

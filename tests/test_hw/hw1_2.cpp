@@ -58,13 +58,91 @@ class Hw1App : public engine::core::LBaseApp
     void render() override
     {
 
+        if ( m_scene != NULL )
+        {
+            m_scene->update( m_timeDelta );
+        }
+
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_testCube->rot.x = m_timeNow;
-        m_testCube->rot.y = m_timeNow;
-        m_testCube->rot.z = m_timeNow;
+        //m_testCube->rot.x = m_timeNow;
+        //m_testCube->rot.y = m_timeNow;
+        //m_testCube->rot.z = m_timeNow;
+
+        float _x = 2 * cos( m_timeNow );
+        float _y = 2 * sin( m_timeNow );
+
+        vector<miniengine::LLightSource*> _lights = m_scene->lights();
+
+        for ( int q = 0; q < _lights.size(); q++ )
+        {
+            miniengine::LVec3 _pos = _lights[q]->getPosition();
+            _pos.x = _x;
+            _lights[q]->setPosition( _pos );
+        }
 
         m_scene->render();
+    }
+
+    void onKeyCallback( int pKey, int pScancode, 
+                        int pAction, int pMode ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+
+        if ( pAction == GLFW_PRESS )
+        {
+            m_scene->onKeyDown( pKey );
+        }
+        else if ( pAction == GLFW_RELEASE )
+        {
+            m_scene->onKeyUp( pKey );
+        }
+    }
+
+    void onMouseButtonCallback( int pButton, 
+                                int pAction, 
+                                int pMods ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+
+        double evx, evy;
+
+        glfwGetCursorPos( m_window, &evx, &evy );
+
+        if ( pAction == GLFW_PRESS )
+        {
+            m_scene->onMouseDown( (float)evx, (float)evy );
+        }
+        else if ( pAction == GLFW_RELEASE )
+        {
+            m_scene->onMouseUp( (float)evx, (float)evy );
+        }
+    }
+
+    void onCursorCallback( double x, double y ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+
+        m_scene->onMouseMove( x, y );
+    }
+
+    void onMouseScrollCallback( double xOff, double yOff ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+
+        m_scene->onMouseScroll( xOff, yOff );
     }
 
 };
