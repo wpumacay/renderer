@@ -51,6 +51,10 @@ namespace miniengine
 
         private :
 
+        static void _compueFaceNormal();
+        static void _computeNormalsSingle();
+        static void _computeNormalsAvg();
+
         static LMesh* _createBox( const LBuildParams& pParams );
         static LMesh* _createCylinder( const LBuildParams& pParams );
         static LMesh* _createSphere( const LBuildParams& pParams );

@@ -65,9 +65,9 @@ class Hw1App : public engine::core::LBaseApp
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        //m_testCube->rot.x = m_timeNow;
-        //m_testCube->rot.y = m_timeNow;
-        //m_testCube->rot.z = m_timeNow;
+        m_testCube->rot.x = m_timeNow;
+        m_testCube->rot.y = m_timeNow;
+        m_testCube->rot.z = m_timeNow;
 
         float _x = 2 * cos( m_timeNow );
         float _y = 2 * sin( m_timeNow );
@@ -77,7 +77,7 @@ class Hw1App : public engine::core::LBaseApp
         for ( int q = 0; q < _lights.size(); q++ )
         {
             miniengine::LVec3 _pos = _lights[q]->getPosition();
-            _pos.x = _x;
+            //_pos.x = _x;
             _lights[q]->setPosition( _pos );
         }
 

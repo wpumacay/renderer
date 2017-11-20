@@ -14,5 +14,5 @@ void main()
 {
     gl_Position = u_tProj * u_tView * u_tModel * vec4( position, 1.0f );
     vFragPos = vec3( u_tModel * vec4( position, 1.0f ) );
-    vNormal = normal;
+    vNormal = mat3( transpose( inverse( u_tModel ) ) ) * normal;
 }

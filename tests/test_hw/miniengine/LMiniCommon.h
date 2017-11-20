@@ -68,6 +68,11 @@ namespace miniengine
                               this->z * s );
         }
 
+        void scale( float sx, float sy, float sz )
+        {
+            x *= sx; y *= sy; z *= sz;
+        }
+
         static LVec3T<T> cross( const LVec3T<T>& v1,
                                 const LVec3T<T>& v2 )
         {

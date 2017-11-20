@@ -14,52 +14,9 @@
 namespace miniengine
 {
 
-    LVec3 LMesh::_computeFaceNormal( LInd3 pTri )
-    {
-        LVec3 _n;
-
-        // _a -> _b -> _c : are in counter clockwise fashion
-        LVec3 _a = m_vertices[pTri.buff[0]];
-        LVec3 _b = m_vertices[pTri.buff[1]];
-        LVec3 _c = m_vertices[pTri.buff[2]];
-
-        LVec3 _ab = _b - _a;
-        LVec3 _ac = _c - _a;
-
-        _n = LVec3::cross( _ab, _ac );
-
-        return _n;
-    }
-
-    void LMesh::_computeNormals()
-    {
-        for ( int q = 0; q < m_numVertices; q++ )
-        {
-            LVec3 _normal;
-            for ( int f = 0; f < m_numTris; f++ )
-            {
-                LInd3 _tri = m_indices[f];
-                if ( _tri.buff[0] != q &&
-                     _tri.buff[1] != q &&
-                     _tri.buff[2] != q )
-                {
-                    // vertex q not contained in this face
-                    continue;
-                }
-
-                // Calculate the contribution of the face to this normal
-                _normal = _normal + _computeFaceNormal( _tri );
-            }
-
-            _normal.normalize();
-
-            m_normals[q] = _normal;
-        }
-    }    
-
-
     LMesh::LMesh( const vector<LVec3>& vertices,
-                  const vector<LInd3>& indices )
+                  const vector<LInd3>& indices,
+                  const vector<LVec3>& normals )
     {
 
         //#ifdef USE_MODERN_OPENGL
@@ -73,14 +30,13 @@ namespace miniengine
         m_numIndices  = 3 * indices.size();
         m_vertices = new LVec3[vertices.size()];
         m_indices  = new LInd3[indices.size()];
-        m_normals  = new LVec3[vertices.size()];
+        m_normals  = new LVec3[normals.size()];
 
         memcpy( m_vertices, vertices.data(), sizeof( LVec3 ) * vertices.size() );
         memcpy( m_indices, indices.data(), sizeof( LInd3 ) * indices.size() );
+        memcpy( m_normals, normals.data(), sizeof( LVec3 ) * normals.size() );
 
         m_lightingEnabled = true;
-
-        _computeNormals();
 
         //#else
 
@@ -100,6 +56,12 @@ namespace miniengine
         {
             delete[] m_indices;
             m_indices = NULL;
+        }
+
+        if ( m_normals != NULL )
+        {
+            delete[] m_normals;
+            m_normals = NULL;
         }
     }
 

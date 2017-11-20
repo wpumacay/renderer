@@ -21,9 +21,6 @@ namespace miniengine
 
         bool m_lightingEnabled;
 
-        LVec3 _computeFaceNormal( LInd3 pTri );
-        void _computeNormals();
-
         public :
 
         LVec3 scale;
@@ -49,7 +46,9 @@ namespace miniengine
         //#endif
 
         LMesh( const vector<LVec3>& vertices,
-               const vector<LInd3>& indices );
+               const vector<LInd3>& indices,
+               const vector<LVec3>& normals );
+
         ~LMesh();
 
         void enableLighting() { m_lightingEnabled = true; }
