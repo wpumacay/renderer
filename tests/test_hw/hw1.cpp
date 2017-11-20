@@ -677,7 +677,7 @@ class Hw1App : public engine::core::LBaseApp
             }
 
             _letter.generateGeometry();
-            _letter.dump();
+            //_letter.dump();
 
             m_letters.push_back( _letter );
         }
@@ -734,7 +734,7 @@ class Hw1App : public engine::core::LBaseApp
 
         m_testCube.setColor( 1.0f, 0.0f, 0.0f );
 
-        //m_testCube.dump();
+        m_testCube.dump();
     }
 
     void render() override
@@ -752,10 +752,10 @@ class Hw1App : public engine::core::LBaseApp
         GLfloat _x = 2.5 * cos( 0.5 * m_timeNow );
         GLfloat _y = 2.5;// * sin( 0.5 * m_timeNow );
         GLfloat _z = 0.0f;//2.5 * cos( 0.5 * m_timeNow );
-        m_light.setLightPosition( _x, _y, _z );
+        //m_light.setLightPosition( _x, _y, _z );
 
-        m_testCube.rot.x = 0.0f;//180.0f * cos( 0.5 * m_timeNow );
-        m_testCube.rot.y = 0.0f;//180.0f * sin( 0.5 * m_timeNow );
+        m_testCube.rot.x = 180.0f * cos( 0.5 * m_timeNow );
+        m_testCube.rot.y = 180.0f * sin( 0.5 * m_timeNow );
         m_testCube.render();
 
         for ( int q = 0; q < m_letters.size(); q++ )

@@ -46,10 +46,11 @@ namespace engine
 
         bool LBaseApp::init()
         {
+        #ifdef USE_GLFW
             glfwInit();
             glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, ENGINE_GL_CONTEXT_VERSION_MAJOR );
             glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, ENGINE_GL_CONTEXT_VERSION_MINOR );
-            glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+            glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE );
             glfwWindowHint( GLFW_RESIZABLE, ENGINE_WINDOW_RESIZABLE );
 
             m_window = glfwCreateWindow( ENGINE_APP_WIDTH, 
@@ -82,6 +83,16 @@ namespace engine
 
             glfwGetFramebufferSize( m_window, &m_width, &m_height );
             glViewport( 0, 0, m_width, m_height );
+
+        #elif USE_GLUT
+
+            
+
+        #else
+
+            ENGINE_ERROR( "LBaseApp::init> wrong configuration of window system" );
+
+        #endif
 
             m_initialized = true;
 
