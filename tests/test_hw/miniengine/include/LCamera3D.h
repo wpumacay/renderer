@@ -2,6 +2,12 @@
 #include "../LMiniCommon.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <LConfig.h>
+
+#ifdef USE_GLFW
+#include <GLFW/glfw3.h>
+#endif
+
 #pragma once
 
 #define CAM_DEFAULT_YAW -90.0f

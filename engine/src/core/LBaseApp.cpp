@@ -16,13 +16,17 @@ namespace engine
 
         LBaseApp::LBaseApp()
         {
+#ifdef USE_GLFW
             m_window = NULL;
             m_initialized = false;
+#endif
         }
 
         LBaseApp::~LBaseApp()
         {
+#ifdef USE_GLFW
             m_window = NULL;
+#endif
         }
 
         void LBaseApp::create()
@@ -86,7 +90,27 @@ namespace engine
 
         #elif USE_GLUT
 
+            int _argc = 0;
+            char* _argv;
 
+            glutInit( &_argc, &_argv );
+            glutInitWindowSize( ENGINE_APP_WIDTH, ENGINE_APP_HEIGHT );
+            glutInitDisplayMode( GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH );
+            glutCreateWindow( ENGINE_APP_NAME );
+
+            glewExperimental = GL_TRUE;
+            if ( glewInit() != GLEW_OK )
+            {
+                ENGINE_ERROR( "LBaseApp::init> could not initialize GLEW" );
+                return false;
+            }
+
+            glutDisplayFunc( LBaseApp::onDisplayEvent );
+            glutMouseFunc( LBaseApp::onMouseEvent );
+            glutMotionFunc( LBaseApp::onCursorPosEvent );
+            glutKeyboardFunc( LBaseApp::onKeyDownEvent );
+            glutKeyboardUpFunc( LBaseApp::onKeyUpEvent );
+            glutIdleFunc( LBaseApp::onIdleEvent );
 
         #else
 
@@ -103,6 +127,7 @@ namespace engine
 
         void LBaseApp::loop()
         {
+#ifdef USE_GLFW
             if ( !m_initialized )
             {
                 return;
@@ -120,12 +145,19 @@ namespace engine
 
                 glfwSwapBuffers( m_window );
             }
+#else
+            glutMainLoop();
+#endif
         }
 
         void LBaseApp::finalize()
         {
+#ifdef USE_GLFW
             glfwTerminate();
+#endif
         }
+
+#ifdef USE_GLFW
 
         void LBaseApp::onKeyEvent( GLFWwindow* pWindow, int pKey, int pScancode, 
                                    int pAction, int pMode )
@@ -152,6 +184,46 @@ namespace engine
         {
             LBaseApp::instance->onMouseScrollCallback( xOff, yOff );
         }
+
+#else
+
+
+        void LBaseApp::onKeyDownEvent( unsigned char pKey, int x, int y )
+        {
+            LBaseApp::instance->onKeyCallback( (int) pKey, KEY_DOWN );
+        }
+
+        void LBaseApp::onKeyUpEvent( unsigned char pKey, int x, int y )
+        {
+            LBaseApp::instance->onKeyCallback( (int) pKey, KEY_UP );
+        }
+
+        void LBaseApp::onMouseEvent( int pButton, 
+                                     int pAction, 
+                                     int x, int y )
+        {
+            LBaseApp::instance->onMouseButtonCallback( pButton, pAction, x, y );
+        }
+
+        void LBaseApp::onCursorPosEvent( int x, int y )
+        {
+            LBaseApp::instance->onCursorCallback( x, y );
+        }        
+
+        void LBaseApp::onDisplayEvent()
+        {
+            LBaseApp::instance->render();
+
+            glutSwapBuffers();
+        }
+
+        void LBaseApp::onIdleEvent()
+        {
+            glutPostRedisplay();
+        }
+
+
+#endif
 
     }   
 }

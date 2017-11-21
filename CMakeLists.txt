@@ -25,13 +25,14 @@ elseif( UNIX )
 	message( "making cat1 project for linux" )
 
 	find_package( OpenGL REQUIRED )
+	find_package( GLUT REQUIRED )
 	find_package( GLEW REQUIRED )
 	find_package( X11 REQUIRED )
 	find_package( Threads REQUIRED )
 	find_package( PkgConfig REQUIRED )
 	pkg_search_module( GLFW REQUIRED glfw3 )
 
-	include_directories( engine ${GLFW_INCLUDE_DIRS} )
+	include_directories( engine ${GLFW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} )
 
 elseif( APPLE )
 

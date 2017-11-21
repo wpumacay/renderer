@@ -112,6 +112,13 @@ class Hw1App : public engine::core::LBaseApp
     void render() override
     {
 
+#ifndef USE_GLFW
+
+        m_timeNow += 0.02;
+        m_timeDelta = 0.02;
+
+#endif
+
         if ( m_scene != NULL )
         {
             m_scene->update( m_timeDelta );
@@ -138,6 +145,8 @@ class Hw1App : public engine::core::LBaseApp
 
         m_scene->render();
     }
+
+#ifdef USE_GLFW
 
     void onKeyCallback( int pKey, int pScancode, 
                         int pAction, int pMode ) override
@@ -199,6 +208,44 @@ class Hw1App : public engine::core::LBaseApp
 
         m_scene->onMouseScroll( xOff, yOff );
     }
+
+#else
+
+    void onKeyCallback( int pKey, int pAction ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+
+        if ( pAction == KEY_DOWN )
+        {
+            m_scene->onKeyDown( pKey );
+        }
+        else if ( pAction == KEY_UP )
+        {
+            m_scene->onKeyUp( pKey );
+        }
+    }
+
+    void onMouseButtonCallback( int pButton, int pAction, 
+                                int x, int y ) override
+    {
+        
+    }
+
+    void onCursorCallback( int x, int y ) override
+    {
+        if ( m_scene == NULL )
+        {
+            return;
+        }
+        
+        m_scene->onMouseMove( (double) x, (double) y );
+    }
+
+
+#endif
 
 };
 

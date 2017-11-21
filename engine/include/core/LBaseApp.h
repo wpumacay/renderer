@@ -4,13 +4,32 @@
 
 #include <iostream>
 
+#include "../LConfig.h"
+
 #define GLEW_STATIC
 #include <GL/glew.h>
+#ifdef USE_GLFW
 #include <GLFW/glfw3.h>
+#endif
 
-#include "../LConfig.h"
 #include "../LCommon.h"
 
+#ifdef USE_GLUT
+
+#define KEY_UP 0
+#define KEY_DOWN 1
+
+    #ifdef __APPLE__
+
+    #include "GLUT/glut.h"
+
+    #else
+
+    #include <GL/glut.h>
+
+    #endif
+
+#endif
 
 
 namespace engine
@@ -23,9 +42,9 @@ namespace engine
         {
 
             protected :
-
+#ifdef USE_GLFW
             GLFWwindow* m_window;
-
+#endif
             int m_width;
             int m_height;
 
@@ -63,6 +82,8 @@ namespace engine
             int height() { return m_height; }
             bool hasInitialized() { return m_initialized; }
 
+#ifdef USE_GLFW
+
             virtual void onKeyCallback( int pKey, int pScancode, 
                                         int pAction, int pMode )
             {
@@ -95,6 +116,45 @@ namespace engine
             static void onCursorPosEvent( GLFWwindow* pWindow, double x, double y );
 
             static void onScrollEvent( GLFWwindow* pWindow, double xOff, double yOff );
+
+#else
+
+            virtual void onKeyCallback( int pKey, int pAction )
+            {
+                // Override this
+            }
+
+            virtual void onMouseButtonCallback( int pButton, 
+                                                int pAction, 
+                                                int x, int y )
+            {
+                // Override this
+            }
+
+            virtual void onCursorCallback( int x, int y )
+            {
+                // Override this
+            }
+
+            static void onKeyDownEvent( unsigned char pKey, int x, int y );
+
+            static void onKeyUpEvent( unsigned char pKey, int x, int y );
+
+            static void onMouseEvent( int pButton, 
+                                      int pAction, 
+                                      int x, int y );
+
+            static void onCursorPosEvent( int x, int y );
+
+
+
+            static void onDisplayEvent();
+
+            static void onIdleEvent();
+
+#endif
+
+
         };
 
     }

@@ -13,7 +13,7 @@ namespace miniengine
 
     LScene::LScene()
     {
-        m_camera = new LCamera3D( LVec3( 0.0f, 0.0f, 0.0f ),
+        m_camera = new LCamera3D( LVec3( 0.0f, 0.0f, 3.0f ),
                                   LVec3( 0.0f, 1.0f, 0.0f ) );
 
         // Add a single default light

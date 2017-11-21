@@ -20,7 +20,8 @@ elseif( UNIX )
                            ${X11_LIBRARIES} 
                            ${CMAKE_THREAD_LIBS_INIT}
                            dl
-                           GLU )
+                           GLU
+                           ${GLUT_LIBRARY} )
 
 elseif( APPLE )
 

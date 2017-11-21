@@ -7,9 +7,6 @@
 * https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/camera.h
 */
 
-#include <GLFW/glfw3.h>
-#include <LConfig.h>
-
 namespace miniengine
 {
 
@@ -96,6 +93,7 @@ namespace miniengine
 
     void LCamera3D::onKeyDown( int pKey )
     {
+#ifdef USE_GLFW
         if ( pKey == GLFW_KEY_W )
         {
             m_speed.x = m_baseSpeed;
@@ -112,10 +110,29 @@ namespace miniengine
         {
             m_speed.z = -m_baseSpeed;
         }
+#else
+        if ( pKey == 119 )
+        {
+            m_speed.x = m_baseSpeed;
+        }
+        else if ( pKey == 115 )
+        {
+            m_speed.x = -m_baseSpeed;
+        }
+        else if ( pKey == 100 )
+        {
+            m_speed.z = m_baseSpeed;
+        }
+        else if ( pKey == 97 )
+        {
+            m_speed.z = -m_baseSpeed;
+        }
+#endif
     }
 
     void LCamera3D::onKeyUp( int pKey )
     {
+#ifdef USE_GLFW
         if ( pKey == GLFW_KEY_W ||
              pKey == GLFW_KEY_S )
         {
@@ -126,6 +143,18 @@ namespace miniengine
         {
             m_speed.z = 0.0f;
         }
+#else
+        if ( pKey == 119 ||
+             pKey == 115 )
+        {
+            m_speed.x = 0.0f;
+        }
+        else if ( pKey == 100 ||
+                  pKey == 97 )
+        {
+            m_speed.z = 0.0f;
+        }
+#endif
     }
 
     void LCamera3D::onMouseDown( float x, float y )
