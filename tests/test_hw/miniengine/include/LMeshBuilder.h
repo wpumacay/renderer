@@ -8,7 +8,6 @@
 namespace miniengine
 {
 
-
     namespace meshType
     {
         enum _meshType
@@ -63,6 +62,17 @@ namespace miniengine
 
         public :
 
+        static GLfloat s_letter_w_path[];
+        static GLuint s_letter_w_num;
+
+        static GLfloat s_letter_s_path[];
+        static GLuint s_letter_s_num;
+
+        static GLfloat s_letter_p_path[];
+        static GLuint s_letter_p_num;
+
+        static GLfloat s_letter_h_path[];
+        static GLuint s_letter_h_num;
 
         static LMesh* createMeshObject( meshType::_meshType pMeshType,
                                         const LBuildParams& pParams );

@@ -12,8 +12,8 @@ if( WIN32 )
 
 elseif( UNIX )
 
-    add_executable( hw1_1.out hw1.cpp )
-    target_link_libraries( hw1_1.out cat1gl
+    add_executable( hw1_2.out hw1_2.cpp )
+    target_link_libraries( hw1_2.out cat1gl miniengine
                            ${OPENGL_LIBRARIES} 
                            ${GLFW_LIBRARIES} 
                            GLEW::GLEW 
@@ -21,26 +21,6 @@ elseif( UNIX )
                            ${CMAKE_THREAD_LIBS_INIT}
                            dl
                            GLU )
-
-    add_executable( hw1_editor.out hw1_editor.cpp )
-    target_link_libraries( hw1_editor.out cat1gl
-                           ${OPENGL_LIBRARIES} 
-                           ${GLFW_LIBRARIES} 
-                           GLEW::GLEW 
-                           ${X11_LIBRARIES} 
-                           ${CMAKE_THREAD_LIBS_INIT}
-                           dl
-                           GLU )
-
-    #add_executable( hw1_2.out hw1_2.cpp )
-    #target_link_libraries( hw1_2.out cat1gl miniengine
-    #                       ${OPENGL_LIBRARIES} 
-    #                       ${GLFW_LIBRARIES} 
-    #                       GLEW::GLEW 
-    #                       ${X11_LIBRARIES} 
-    #                       ${CMAKE_THREAD_LIBS_INIT}
-    #                       dl
-    #                       GLU )
 
 elseif( APPLE )
 

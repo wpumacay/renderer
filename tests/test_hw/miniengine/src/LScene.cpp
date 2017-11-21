@@ -16,7 +16,7 @@ namespace miniengine
                                   LVec3( 0.0f, 1.0f, 0.0f ) );
 
         // Add a single default light
-        LLightSource* _defLight = new LLightSource( LVec3( 0.0f, 1.0f, 0.0f ) );
+        LLightSource* _defLight = new LLightSource( LVec3( 0.0f, 2.0f, 0.0f ) );
         m_lights.push_back( _defLight );
     }
 
