@@ -52,6 +52,16 @@ class Hw1App : public engine::core::LBaseApp
         miniengine::LShaderManager::instance->initialize();
         #endif
 
+#ifndef USE_MODERN_OPENGL
+
+        glEnable( GL_LIGHTING );
+
+        GLfloat _ambientLight[] = { 0.2f, 0.2f, 0.2f };
+
+        glLightModelfv( GL_LIGHT_MODEL_AMBIENT, _ambientLight );
+
+#endif
+
         m_scene = new miniengine::LScene();
 
         miniengine::LBuildParams _params[NUM_LETTERS];
@@ -88,9 +98,13 @@ class Hw1App : public engine::core::LBaseApp
             m_letters[q]->pos.x = _posX[q];
         }
 
+        miniengine::LBuildParams _bparams;
+        _bparams.b_width  = 1.0f;
+        _bparams.b_height = 1.0f;
+        _bparams.b_depth  = 1.0f;
 
-        //m_testCube = miniengine::LMeshBuilder::createMeshObject( miniengine::meshType::EXTRUSION,
-        //                                                         _params );
+        m_testCube = miniengine::LMeshBuilder::createMeshObject( miniengine::meshType::BOX,
+                                                                 _bparams );
 
         //m_scene->addObject( m_testCube );
     }
@@ -105,12 +119,12 @@ class Hw1App : public engine::core::LBaseApp
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        // m_testCube->rot.x = m_timeNow;
-        // m_testCube->rot.y = m_timeNow;
-        // m_testCube->rot.z = m_timeNow;
+        m_testCube->rot.x = 180.0f * cos( 0.5 * m_timeNow );;
+        m_testCube->rot.y = 180.0f * sin( 0.5 * m_timeNow );;
+        m_testCube->rot.z = 180.0f * cos( 0.5 * m_timeNow );;
 
-        float _x = 2 * cos( m_timeNow );
-        float _y = 2 * sin( m_timeNow );
+        float _x = 5 * cos( m_timeNow );
+        float _y = 5 * sin( m_timeNow );
 
         vector<miniengine::LLightSource*> _lights = m_scene->lights();
 
@@ -118,7 +132,7 @@ class Hw1App : public engine::core::LBaseApp
         {
             miniengine::LVec3 _pos = _lights[q]->getPosition();
             _pos.x = _x;
-            //_pos.y = _y;
+            _pos.z = _y;
             _lights[q]->setPosition( _pos );
         }
 

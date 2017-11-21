@@ -3,6 +3,7 @@
 #include <LConfig.h>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
@@ -68,8 +69,6 @@ namespace miniengine
     void LScene::render()
     {
 
-        // Setup lights
-
         // Setup render info
         LRenderInfo _rInfo;
         _rInfo.projMat = glm::perspective( glm::radians( m_camera->fov ),
@@ -90,10 +89,26 @@ namespace miniengine
             _rInfo.lights.push_back( _props );
         }
 
+#ifndef USE_MODERN_OPENGL
+
+        glMatrixMode( GL_PROJECTION );
+        glLoadMatrixf( glm::value_ptr( _rInfo.projMat ) );
+
+        glMatrixMode( GL_MODELVIEW );
+        glLoadMatrixf( glm::value_ptr( _rInfo.viewMat ) );
+
+#endif
+
         //cout << "projMat: " << endl;
         //cout << glm::to_string( _rInfo.projMat ) << endl;
         //cout << "viewMat: " << endl;
         //cout << glm::to_string( _rInfo.viewMat ) << endl;
+
+#ifndef USE_MODERN_OPENGL
+
+        glDisable( GL_LIGHTING );
+
+#endif
 
         // render light lamps
         for ( int q = 0; q < m_lights.size(); q++ )
@@ -101,11 +116,35 @@ namespace miniengine
             m_lights[q]->getLamp()->render( _rInfo );
         }
 
+#ifndef USE_MODERN_OPENGL
+
+        glEnable( GL_LIGHTING );
+
+        for ( int q = 0; q < m_lights.size(); q++ )
+        {
+            glEnable( GL_LIGHT0 );
+
+            LVec3 _pos = m_lights[q]->getPosition();
+            GLfloat _posArr[4] = { _pos.x, _pos.y, _pos.z, 1.0f };
+
+            glLightfv( GL_LIGHT0, GL_DIFFUSE, ( GLfloat* ) &m_lights[q]->diffuse );
+            glLightfv( GL_LIGHT0, GL_SPECULAR, ( GLfloat* ) &m_lights[q]->specular );
+            glLightfv( GL_LIGHT0, GL_POSITION, _posArr );
+        }
+
+#endif
+
         // render object
         for ( int q = 0; q < m_meshes.size(); q++ )
         {
             m_meshes[q]->render( _rInfo );
         }
+
+#ifndef USE_MODERN_OPENGL
+
+        glDisable( GL_LIGHTING );
+
+#endif
 
     }
 

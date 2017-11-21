@@ -7,7 +7,7 @@
 
 #define LIGHT_DEFAULT_AMBIENT  LVec3( 0.2f, 0.2f, 0.2f )
 #define LIGHT_DEFAULT_DIFFUSE  LVec3( 0.5f, 0.5f, 0.5f )
-#define LIGHT_DEFAULT_SPECULAR LVec3( 0.2f, 0.2f, 0.2f )
+#define LIGHT_DEFAULT_SPECULAR LVec3( 1.0f, 1.0f, 1.0f )
 
 namespace miniengine
 {

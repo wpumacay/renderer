@@ -20,7 +20,7 @@ namespace miniengine
         LMaterial()
         {
             ambient = LVec3( 1.0f, 0.0f, 0.0f );
-            diffuse = LVec3( 0.5f, 0.0f, 0.0f );
+            diffuse = LVec3( 1.0f, 0.0f, 0.0f );
             specular = LVec3( 0.5f, 0.0f, 0.0f );
             shininess = 20.0f;
         }

@@ -27,7 +27,7 @@ namespace miniengine
         LVec3 rot;
         LVec3 pos;
 
-        //#ifdef USE_MODERN_OPENGL
+        #ifdef USE_MODERN_OPENGL
 
         GLuint m_vao;
         GLuint m_vbo;
@@ -43,7 +43,13 @@ namespace miniengine
         GLuint m_numIndices;
         GLuint m_numTris;
 
-        //#endif
+        #else
+
+        vector<LVec3> m_vertices;
+        vector<LInd3> m_indices;
+        vector<LVec3> m_normals;
+
+        #endif
 
         LMesh( const vector<LVec3>& vertices,
                const vector<LInd3>& indices,
@@ -58,7 +64,9 @@ namespace miniengine
         void render( const LRenderInfo& rInfo );
 
         virtual void init();
+    #ifdef USE_MODERN_OPENGL
         virtual void draw();
+    #endif
 
         void dump()
         {
@@ -67,23 +75,28 @@ namespace miniengine
             cout << "mr: " << m_material.ambient.x << " - mg: " << m_material.ambient.y << " - mb: " << m_material.ambient.z << endl;
 
             // normals
+        #ifdef USE_MODERN_OPENGL
+
             for ( int q = 0; q < m_numVertices; q++ )
             {
                 cout << "n.x: " << m_normals[q].x << " - "
                      << "n.y: " << m_normals[q].y << " - "
                      << "n.z: " << m_normals[q].z << endl;
             }
+
+        #else
+
+            for ( int q = 0; q < m_normals.size(); q++ )
+            {
+                cout << "n.x: " << m_normals[q].x << " - "
+                     << "n.y: " << m_normals[q].y << " - "
+                     << "n.z: " << m_normals[q].z << endl;
+            }
+
+        #endif
         }
 
     };
-
-
-
-
-
-
-
-
 
 
 

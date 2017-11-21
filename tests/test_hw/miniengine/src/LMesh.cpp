@@ -1,15 +1,25 @@
 
 
 #include "../include/LMesh.h"
+
+#ifdef USE_MODERN_OPENGL
+
 #include "../include/LShaderManager.h"
 
+#endif
+
 #include <cstring>
+
+#ifdef USE_MODERN_OPENGL
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 //#include <glm/gtx/string_cast.hpp>
 //#include <glm/ext.hpp>
+
+#endif
 
 namespace miniengine
 {
@@ -25,6 +35,8 @@ namespace miniengine
         scale.y = 1.0f;
         scale.z = 1.0f;
 
+#ifdef USE_MODERN_OPENGL
+
         m_numVertices = vertices.size();
         m_numTris = indices.size();
         m_numIndices  = 3 * indices.size();
@@ -36,16 +48,20 @@ namespace miniengine
         memcpy( m_indices, indices.data(), sizeof( LInd3 ) * indices.size() );
         memcpy( m_normals, normals.data(), sizeof( LVec3 ) * normals.size() );
 
+#else
+
+        m_vertices = vertices;
+        m_indices = indices;
+        m_normals = normals;
+
+#endif
+
         m_lightingEnabled = true;
-
-        //#else
-
-        //#endif
-
     }
 
     LMesh::~LMesh()
     {
+#ifdef USE_MODERN_OPENGL
         if ( m_vertices != NULL )
         {
             delete[] m_vertices;
@@ -63,10 +79,19 @@ namespace miniengine
             delete[] m_normals;
             m_normals = NULL;
         }
+#else
+
+        m_vertices.clear();
+        m_indices.clear();
+        m_normals.clear();
+
+#endif
     }
 
     void LMesh::init()
     {
+
+#ifdef USE_MODERN_OPENGL
 
         glGenBuffers( 1, &m_vbo );
         glGenBuffers( 1, &m_vbo_normals );
@@ -98,7 +123,11 @@ namespace miniengine
 
         glBindVertexArray( 0 );
 
+#endif
+
     }
+
+#ifdef USE_MODERN_OPENGL
 
     void LMesh::render( const LRenderInfo& rInfo )
     {
@@ -127,9 +156,9 @@ namespace miniengine
 
             glm::mat4 _matModel = glm::mat4( 1.0f );
             _matModel = glm::scale( _matModel, glm::vec3( scale.x, scale.y, scale.z ) );
-            _matModel = glm::rotate( _matModel, rot.x, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-            _matModel = glm::rotate( _matModel, rot.y, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-            _matModel = glm::rotate( _matModel, rot.z, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+            _matModel = glm::rotate( _matModel, glm::radians( rot.x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+            _matModel = glm::rotate( _matModel, glm::radians( rot.y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+            _matModel = glm::rotate( _matModel, glm::radians( rot.z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
             _matModel = glm::translate( _matModel, glm::vec3( pos.x, pos.y, pos.z ) );
 
             glUniformMatrix4fv( u_tModel, 1, GL_FALSE, glm::value_ptr( _matModel ) );
@@ -189,9 +218,61 @@ namespace miniengine
         glUseProgram( 0 );
     }
 
-    void LMesh::draw()
+#else
+
+    void LMesh::render( const LRenderInfo& rInfo )
     {
+        glPushMatrix();
+
+        glTranslatef( pos.x, pos.y, pos.z );
+        glRotatef( rot.x, 1.0f, 0.0f, 0.0f );
+        glRotatef( rot.y, 0.0f, 1.0f, 0.0f );
+        glRotatef( rot.z, 0.0f, 0.0f, 1.0f );
+        glScalef( scale.x, scale.y, scale.z );
+
+        glBegin( GL_TRIANGLES );
+
+        glColor3f( m_material.ambient.x, 
+                   m_material.ambient.y,
+                   m_material.ambient.z );
+
+        glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, ( GLfloat* ) &m_material.diffuse );
+        glMaterialfv( GL_FRONT, GL_SPECULAR, ( GLfloat* ) &m_material.specular );
+        glMaterialf( GL_FRONT, GL_SHININESS, m_material.shininess );
+
+        for ( int q = 0; q < m_indices.size(); q++ )
+        {
+
+            LInd3 _tri = m_indices[q];
+
+            for ( int i = 0; i < 3; i++ )
+            {
+                GLuint _indx = _tri.buff[i];
+
+                glNormal3f( m_normals[_indx].x, 
+                            m_normals[_indx].y, 
+                            m_normals[_indx].z );
+                glVertex3f( m_vertices[_indx].x,
+                            m_vertices[_indx].y,
+                            m_vertices[_indx].z );
+            }
+        }
+
+
+        glEnd();
+
+        glPopMatrix();
+    }
+
+#endif
+
+#ifdef USE_MODERN_OPENGL
+
+    void LMesh::draw()
+    { 
         glDrawElements( GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, 0 );
     }
+
+#endif
 
 }
