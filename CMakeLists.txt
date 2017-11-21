@@ -36,7 +36,11 @@ elseif( UNIX )
 
 elseif( APPLE )
 
-	# TODO: Define project generation for xcode
+	message( "for mac, just glut support for the moment" )
+
+	find_package( OpenGL REQUIRED )
+	find_package( GLUT REQUIRED )
+	find_package( GLEW REQUIRED )
 
 endif()
 

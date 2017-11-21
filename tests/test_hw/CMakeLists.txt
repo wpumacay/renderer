@@ -25,6 +25,11 @@ elseif( UNIX )
 
 elseif( APPLE )
 
-    # TODO: Define executable properties here
+    add_executable( hw1_2.out hw1_2.cpp )
+    target_link_libraries( hw1_2.out cat1gl miniengine
+                           ${OPENGL_LIBRARIES} 
+                           ${GLUT_LIBRARY}
+                           GLEW::GLEW 
+                           GLU )
 
 endif()
