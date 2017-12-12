@@ -8,9 +8,48 @@
 
 using namespace std;
 
+engine::LVec3 g_dir;
+
+void onKeyCallback( int key, int action )
+{
+    float _val = 1.0;
+    if ( action == GLFW_RELEASE )
+    {
+        _val = 0.0;
+    }
+
+    switch ( key )
+    {
+        case GLFW_KEY_X :
+            g_dir.x = _val;
+        break;
+
+        case GLFW_KEY_Y :
+            g_dir.y = _val;
+        break;
+
+        case GLFW_KEY_Z :
+            g_dir.z = _val;
+        break;
+
+        case GLFW_KEY_LEFT :
+            g_dir.x = -_val;
+        break;
+
+        case GLFW_KEY_UP :
+            g_dir.y = -_val;
+        break;
+
+        case GLFW_KEY_DOWN :
+            g_dir.z = -_val;
+        break;
+    }
+}
+
 int main()
 {
     engine::LWindow _window;
+    _window.registerKeyCallback( onKeyCallback );
 
     engine::LShaderManager::create();
     engine::LAssetsManager::create();
@@ -44,6 +83,14 @@ int main()
     {
         _window.clear();
         _window.pollEvents();
+
+        auto _cpos = _camera->getPosition();
+
+        _cpos.x += 0.02 * g_dir.x;
+        _cpos.y += 0.02 * g_dir.y;
+        _cpos.z += 0.02 * g_dir.z;
+
+        _camera->setPosition( _cpos );
 
         GLuint _shader = engine::LShaderManager::INSTANCE->currentShader;
 
