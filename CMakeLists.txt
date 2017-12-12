@@ -5,48 +5,45 @@ project( cat1 C CXX )
 set( CMAKE_BUILD_TYPE Debug )
 
 set( CMAKE_CXX_STANDARD 11 )
-set( CMAKE_CXX_FLAGS_DEBUG "-g -Wno-unused-parameter" )
-set( CMAKE_CXX_FLAGS_RELEASE "-O3 -Wno-unused-parameter" )
+set( CMAKE_CXX_FLAGS_DEBUG "-g" )
+set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
 
 if( WIN32 )
 
-	message( "making cat1 project for windows" )
-
-	include_directories( engine 
-						 ext/glew/include 
-						 ext/glfw/include 
-						 glm/ )
-	
-	link_directories( ext/glew/lib/Release/x64 
-					  ext/glfw/lib-vc2015 )
-
-elseif( UNIX )
-
-	message( "making cat1 project for linux" )
+	message( "GENERATING SOLUTIONS FOR WINDOWS" )
 
 	find_package( OpenGL REQUIRED )
-	find_package( GLUT REQUIRED )
-	find_package( GLEW REQUIRED )
-	find_package( X11 REQUIRED )
-	find_package( Threads REQUIRED )
-	find_package( PkgConfig REQUIRED )
-	pkg_search_module( GLFW REQUIRED glfw3 )
+	include_directories( engine )
 
-	include_directories( engine ${GLFW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} )
+
+elseif( UNIX AND NOT APPLE )
+
+	message( "GENERATING MAKEFILES/PROJECTS FOR LINUX" )
+
+	find_package( OpenGL REQUIRED )
+    find_package( GLEW REQUIRED )
+	include_directories( engine )
 
 elseif( APPLE )
 
-	message( "for mac, just glut support for the moment" )
+	message( "GENERATING MAKEFILES/PROJECTS FOR MACOS" )
 
 	find_package( OpenGL REQUIRED )
-	find_package( GLUT REQUIRED )
-	find_package( GLEW REQUIRED )
+	include_directories( engine )
 
 endif()
 
+#add_subdirectory( ext/glew )
+add_subdirectory( ext/glfw )
+add_subdirectory( ext/glm )
+
+include_directories( ext/stb_image )
+#include_directories( ext/glew/include )
+include_directories( ext/glfw/include )
+include_directories( ext/glm/ )
 
 add_subdirectory( engine )
-add_subdirectory( tests )
+add_subdirectory( tutorials )
 
 
 

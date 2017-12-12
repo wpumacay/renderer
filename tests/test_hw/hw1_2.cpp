@@ -3,9 +3,7 @@
 #include <core/LBaseApp.h>
 
 #include "miniengine/include/LScene.h"
-#ifdef USE_MODERN_OPENGL
 #include "miniengine/include/LShaderManager.h"
-#endif
 #include "miniengine/include/LMeshBuilder.h"
 
 using namespace std;
@@ -23,9 +21,7 @@ class Hw1App : public engine::core::LBaseApp
 
     Hw1App() : engine::core::LBaseApp()
     {
-        #ifdef USE_MODERN_OPENGL
         miniengine::LShaderManager::create();
-        #endif
     }
 
     public :
@@ -48,29 +44,11 @@ class Hw1App : public engine::core::LBaseApp
         glEnable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
 
-        #ifdef USE_MODERN_OPENGL
         miniengine::LShaderManager::instance->initialize();
-        #endif
-
-#ifndef USE_MODERN_OPENGL
-
-        glEnable( GL_LIGHTING );
-
-        GLfloat _ambientLight[] = { 0.2f, 0.2f, 0.2f };
-
-        glLightModelfv( GL_LIGHT_MODEL_AMBIENT, _ambientLight );
-
-#endif
 
         m_scene = new miniengine::LScene();
 
         miniengine::LBuildParams _params[NUM_LETTERS];
-        //_params.b_width  = 1.0f;
-        //_params.b_height = 1.0f;
-        //_params.b_depth  = 1.0f;
-
-        /// m_testCube = miniengine::LMeshBuilder::createMeshObject( miniengine::meshType::BOX,
-        ///                                                          _params );
 
         _params[0].e_pPoints = miniengine::LMeshBuilder::s_letter_w_path;
         _params[0].e_nPoints = miniengine::LMeshBuilder::s_letter_w_num;

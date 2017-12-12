@@ -11,8 +11,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-//#define USE_MODERN_OPENGL 1
-
 using namespace std;
 
 namespace miniengine

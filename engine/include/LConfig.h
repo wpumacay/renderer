@@ -9,9 +9,8 @@
 #define ENGINE_GL_CONTEXT_VERSION_MINOR 3
 #define ENGINE_WINDOW_RESIZABLE 0
 
-#define USE_GLUT 1
-//#define USE_GLFW 1
-
-
 #define ENGINE_ENABLE_LOGS 1
 #define ENGINE_ENABLE_ERRORS 1
+
+#define ENGINE_SHADERS_PATH "../res/shaders/"
+#define ENGINE_IMGS_PATH "../res/imgs/"

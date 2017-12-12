@@ -8,7 +8,8 @@ build_vs
 CMakeFiles
 CMakeCache.txt
 Makefile
+ext/glew
 ext/glfw
 ext/glm
-ext/glew
 *.a
+*.in
