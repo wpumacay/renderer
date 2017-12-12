@@ -27,6 +27,14 @@ elseif( UNIX AND NOT APPLE )
                            GLEW::GLEW
                            ${OPENGL_LIBRARIES} )
 
+    add_executable( tut_env_mapping tut_env_mapping.cpp )
+    target_link_libraries( tut_env_mapping 
+                           cat1gl 
+                           glfw 
+                           #glewd
+                           GLEW::GLEW
+                           ${OPENGL_LIBRARIES} )
+
 elseif( APPLE )
 
     add_executable( tut_texture tut_texture.cpp )

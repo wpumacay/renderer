@@ -47,6 +47,12 @@ namespace engine
         _program = createProgram( _vShader, _fShader );
 
         programs["basic3d_skybox"] = _program;
+
+        _vShader = createShader( "basic3d_env_mapping_reflection_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "basic3d_env_mapping_reflection_fs.glsl", GL_FRAGMENT_SHADER );
+        _program = createProgram( _vShader, _fShader );
+
+        programs["basic3d_env_mapping_reflection"] = _program;
     }
 
     LShaderManager::~LShaderManager()

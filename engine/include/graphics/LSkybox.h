@@ -29,7 +29,7 @@ namespace engine
 
         void render();
 
-
+        LCubeTexture* getCubeTexture() { return m_cubeTexture; }
 
     };
 
