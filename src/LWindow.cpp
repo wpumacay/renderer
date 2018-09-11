@@ -11,12 +11,18 @@ namespace engine
 
     LWindow* LWindow::INSTANCE = NULL;
 
+    LWindow* LWindow::GetInstance()
+    {
+        if ( LWindow::INSTANCE == NULL )
+        {
+            LWindow::INSTANCE = new LWindow();
+        }
+
+        return LWindow::INSTANCE;
+    }
+
     LWindow::LWindow()
     {
-        if ( LWindow::INSTANCE != NULL )
-        {
-            delete LWindow::INSTANCE;
-        }
 
         LWindow::INSTANCE = this;
         m_keyCallback = NULL;
@@ -30,8 +36,8 @@ namespace engine
         glfwWindowHint( GLFW_RESIZABLE, APP_RESIZABLE );
 
         m_window = glfwCreateWindow( APP_WIDTH,
-            APP_HEIGHT,
-            APP_NAME, NULL, NULL );
+                                     APP_HEIGHT,
+                                     APP_NAME, NULL, NULL );
 
         if ( m_window == NULL )
         {
@@ -67,11 +73,6 @@ namespace engine
 
 
     LWindow::~LWindow()
-    {
-        release();
-    }
-
-    void LWindow::release()
     {
         m_window = NULL;
         glfwTerminate();

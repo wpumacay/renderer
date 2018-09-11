@@ -12,9 +12,6 @@
 // Special purpose shaders
 #include <shaders/LShaderEntitiesLighting.h>
 #include <shaders/LShaderEntitiesLightingShadows.h>
-#include <shaders/LShaderTerrain1DVoxelsLighting.h>
-#include <shaders/LShaderTerrain1DVoxelsLightingShadows.h>
-#include <shaders/LShaderTerrainLighting.h>
 
 using namespace std;
 
@@ -71,7 +68,7 @@ namespace engine
         // *****************************************************************
         // Specific rendering shaders **************************************
 
-        // We have separate entities - terrain shaders in case there is the need ...
+        // We have separate entities shaders in case there is the need ...
         // to do something different in for each case
 
         _vShader = createShader( "entities/lighting_entities_vs.glsl", GL_VERTEX_SHADER );
@@ -87,20 +84,6 @@ namespace engine
 
         programs["lighting_entities_shadows"] = _program;
         programObjs["lighting_entities_shadows"] = new LShaderEntitiesLightingShadows( _program );
-
-        _vShader = createShader( "terrain/terrain1DVoxels_lighting_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "terrain/terrain1DVoxels_lighting_fs.glsl", GL_FRAGMENT_SHADER );
-        _program = createProgram( _vShader, _fShader );
-
-        programs["terrain1DVoxels_lighting"] = _program;
-        programObjs["terrain1DVoxels_lighting"] = new LShaderTerrain1DVoxelsLighting( _program );
-
-        _vShader = createShader( "terrain/terrain1DVoxels_lighting_shadows_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "terrain/terrain1DVoxels_lighting_shadows_fs.glsl", GL_FRAGMENT_SHADER );
-        _program = createProgram( _vShader, _fShader );
-
-        programs["terrain1DVoxels_lighting_shadows"] = _program;
-        programObjs["terrain1DVoxels_lighting_shadows"] = new LShaderTerrain1DVoxelsLightingShadows( _program );
 
         // *****************************************************************
     }

@@ -22,6 +22,7 @@ namespace engine
         static LWindow* INSTANCE;
 
         GLFWwindow* m_window;
+        LWindow();
 
         int m_width;
         int m_height;
@@ -34,9 +35,8 @@ namespace engine
 
         public :
 
-        LWindow();
+        static LWindow* GetInstance();
         ~LWindow();
-        void release();
 
         static void onKeyCallback( GLFWwindow* pWindow, int key, 
                                    int scancode, int action, int mode );
