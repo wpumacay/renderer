@@ -1,50 +1,41 @@
 
-cmake_minimum_required( VERSION 3.5.0 )
-project( cat1 C CXX )
+message( "Configuring gl engine ..." )
 
-set( CMAKE_BUILD_TYPE Debug )
+include_directories( ${TYSOC_INCLUDE_DIRECTORIES} )
 
-set( CMAKE_CXX_STANDARD 11 )
-set( CMAKE_CXX_FLAGS_DEBUG "-g" )
-set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
+add_library( gengine
+             src/LCommon.cpp
+             src/LComponent.cpp
+             src/LEntity.cpp
+             src/LFixedCamera3d.cpp
+             src/LFpsCamera.cpp
+             src/LInputHandler.cpp
+             src/LICamera.cpp
+             src/LIndexBuffer.cpp
+             src/LTexture.cpp
+             src/LCubeTexture.cpp
+             src/LSkybox.cpp
+             src/LFrameBuffer.cpp
+             src/LShadowMap.cpp
+             src/LMeshBuilder.cpp
+             src/LMeshComponent.cpp
+             src/LHeightmapGenerator.cpp
+             src/LTerrainPatch.cpp
+             src/LMesh.cpp
+             src/LScene.cpp
+             src/LTerrainGenerator.cpp
+             src/debug/LDebugDrawer.cpp
+             src/debug/LDebugSystem.cpp
+             src/shaders/LShader.cpp
+             src/shaders/LShaderManager.cpp
+             src/LAssetsManager.cpp
+             src/LVertexArray.cpp
+             src/LVertexBuffer.cpp
+             src/LWindow.cpp )
 
-if( WIN32 )
-
-	message( "GENERATING SOLUTIONS FOR WINDOWS" )
-
-	find_package( OpenGL REQUIRED )
-	include_directories( engine )
-
-
-elseif( UNIX AND NOT APPLE )
-
-	message( "GENERATING MAKEFILES/PROJECTS FOR LINUX" )
-
-	find_package( OpenGL REQUIRED )
-    find_package( GLEW REQUIRED )
-	include_directories( engine )
-
-elseif( APPLE )
-
-	message( "GENERATING MAKEFILES/PROJECTS FOR MACOS" )
-
-	find_package( OpenGL REQUIRED )
-	include_directories( engine )
-
-endif()
-
-#add_subdirectory( ext/glew )
-add_subdirectory( ext/glfw )
-add_subdirectory( ext/glm )
-
-include_directories( ext/stb_image )
-#include_directories( ext/glew/include )
-include_directories( ext/glfw/include )
-include_directories( ext/glm/ )
-
-add_subdirectory( engine )
-add_subdirectory( tutorials )
+target_link_libraries( gengine 
+                       glfw glad
+                       ${OPENGL_LIBRARIES} )
 
 
-
-
+message( "Configuring gl engine - done" )
