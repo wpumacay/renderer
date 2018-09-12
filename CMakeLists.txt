@@ -16,32 +16,40 @@ if( CAT1_BUILD_EXT_LIBS )
     set( CAT1_INCLUDE_DIRECTORIES
          ext/glfw/include
          ext/glad/include
-         ext/glm
-         ext/stb
-         include/ )
-    message( "include-dirs : ${CAT1_INCLUDE_DIRECTORIES}" )
+         ext/glm )
+
+    add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_SOURCE_DIR}/res/")
+    message( "Current resources path: ${CMAKE_SOURCE_DIR}/res/" )
+
 else()
     message( "USING PREBUILT EXTERNAL DEPENDENCIES" )
-    if ( NOT EXISTS CAT1_INCLUDE_DIRECTORIES )
+    if ( NOT CAT1_INCLUDE_DIRECTORIES )
         message( "WARNING: SHOULD HAVE SET THE VARIABLE CAT1_INCLUDE_DIRECTORIES FOR EXTERNAL DEPENDENCIES" )
         set( CAT1_INCLUDE_DIRECTORIES
-             ../glfw/include
-             ../glad/include
-             ext/stb
-             include/ )
+             "${CMAKE_SOURCE_DIR}/ext/glfw/include"
+             "${CMAKE_SOURCE_DIR}/ext/glad/include"
+             "${CMAKE_SOURCE_DIR}/ext/glm/" )
     endif()
+
+    if ( NOT CAT1_ENGINE_RESOURCES_PATH )
+        message( "WARNING: SHOULD HAVE SET THE VARIABLE CAT1_ENGINE_RESOURCES_PATH FOR THE RESOURCES FOLDER" )
+        set( CAT1_ENGINE_RESOURCES_PATH
+             "${CMAKE_SOURCE_DIR}/ext/cat1/res/" )
+    endif()
+
+    add_definitions( -DENGINE_RESOURCES_PATH="${CAT1_ENGINE_RESOURCES_PATH}" )
+    message( "Current resources path: ${CAT1_ENGINE_RESOURCES_PATH}" )
 endif()
 
 message( "DONE configuring external dependencies" )
 
 message( "Configuring gl engine ..." )
 
-add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_SOURCE_DIR}/res/")
-message( "Current resources path: ${CMAKE_SOURCE_DIR}/res/" )
-
+set( CAT1_INCLUDE_DIRECTORIES "${CAT1_INCLUDE_DIRECTORIES};ext/stb;include/" )
+message( "include-dirs : ${CAT1_INCLUDE_DIRECTORIES}" )
 include_directories( ${CAT1_INCLUDE_DIRECTORIES} )
 
-add_library( gengine
+add_library( gengine SHARED
              src/LCommon.cpp
              src/LFixedCamera3d.cpp
              src/LFpsCamera.cpp
