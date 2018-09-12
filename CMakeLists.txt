@@ -12,8 +12,24 @@ if( CAT1_BUILD_EXT_LIBS )
 	add_subdirectory( ext/glfw )
 	add_subdirectory( ext/glad )
     add_subdirectory( ext/glm )
+
+    set( CAT1_INCLUDE_DIRECTORIES
+         ext/glfw/include
+         ext/glad/include
+         ext/glm
+         ext/stb
+         include/ )
+    message( "include-dirs : ${CAT1_INCLUDE_DIRECTORIES}" )
 else()
     message( "USING PREBUILT EXTERNAL DEPENDENCIES" )
+    if ( NOT EXISTS CAT1_INCLUDE_DIRECTORIES )
+        message( "WARNING: SHOULD HAVE SET THE VARIABLE CAT1_INCLUDE_DIRECTORIES FOR EXTERNAL DEPENDENCIES" )
+        set( CAT1_INCLUDE_DIRECTORIES
+             ../glfw/include
+             ../glad/include
+             ext/stb
+             include/ )
+    endif()
 endif()
 
 message( "DONE configuring external dependencies" )
@@ -22,13 +38,6 @@ message( "Configuring gl engine ..." )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_SOURCE_DIR}/res/")
 message( "Current resources path: ${CMAKE_SOURCE_DIR}/res/" )
-
-set( CAT1_INCLUDE_DIRECTORIES
-     ext/glfw/include
-	 ext/glad/include
-     ext/glm
-     ext/stb
-	 include/ )
 
 include_directories( ${CAT1_INCLUDE_DIRECTORIES} )
 
