@@ -5,9 +5,16 @@ set( CMAKE_CXX_STANDARD 11 )
 
 message( "Configuring external dependencies" )
 
-add_subdirectory( ext/glfw )
-add_subdirectory( ext/glad )
-add_subdirectory( ext/glm )
+option( CAT1_BUILD_EXT_LIBS "Build external dependencies along with the project" ON )
+
+if( CAT1_BUILD_EXT_LIBS )
+    message( "BUILDING EXTERNAL DEPENDENCIES" )
+	add_subdirectory( ext/glfw )
+	add_subdirectory( ext/glad )
+    add_subdirectory( ext/glm )
+else()
+    message( "USING PREBUILT EXTERNAL DEPENDENCIES" )
+endif()
 
 message( "DONE configuring external dependencies" )
 
