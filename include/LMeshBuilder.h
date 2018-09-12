@@ -76,7 +76,7 @@ namespace engine
         static LMesh* createFromFile( const char* filename );
         static LMesh* createFromObj( const char* filename );
 
-        static LMesh* createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision );
+        // static LMesh* createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision );
     };
 
 

@@ -28,6 +28,8 @@ using namespace std;
 #define RENDERABLE_TYPE_MESH 1
 #define RENDERABLE_MAX_TYPE 2
 
+#define MAX_DELTA 0.05f
+
 namespace engine
 {
 

@@ -7,7 +7,7 @@
 #include "LICamera.h"
 #include "LILight.h"
 #include "LScene.h"
-#include <shaders/Shader.h>
+#include "shaders/LShaderManager.h"
 
 using namespace std;
 
@@ -21,9 +21,8 @@ namespace engine
 
         public :
 
-        virtual void render( LIRenderable* renderable ) = 0;
-        virtual void renderScene( LScene* pScene ) = 0;
         virtual void begin( LScene* pScene ) = 0;
+        virtual void renderScene( LScene* pScene ) = 0;
         virtual void end( LScene* pScene ) = 0;
 
     };

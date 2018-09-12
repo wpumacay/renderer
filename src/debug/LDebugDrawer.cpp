@@ -12,7 +12,7 @@ namespace engine
 
     LDebugDrawer::LDebugDrawer()
     {
-        m_shaderLinesRef = ( engine::LShaderDebug3d* ) LShaderManager::INSTANCE->programObjs[ "debug3d" ];
+        m_shaderLinesRef = ( engine::LShaderDebug3d* ) LShaderManager::getShader( "debug3d" );
 
         m_linesRenderBufferPositions = vector< LDLinePositions >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
         m_linesRenderBufferColors = vector< LDLineColors >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );

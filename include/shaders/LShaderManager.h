@@ -23,13 +23,13 @@ namespace engine
         private :
 
         LShaderManager();
+        static LShaderManager* _INSTANCE;
+
+        map< string, GLuint > m_programs;
+        map< string, LShader* > m_programObjs;
 
         public :
 
-        map< string, GLuint > programs;
-        map< string, LShader* > programObjs;
-
-        static LShaderManager* INSTANCE;
 
         static void create();
         static void release();
@@ -39,7 +39,7 @@ namespace engine
         GLuint createShader( const char* filename, int shaderType );
         GLuint createProgram( GLuint vShader, GLuint fShader );
 
-
+        static LShader* getShader( const string& shaderName );
     };
 
 }

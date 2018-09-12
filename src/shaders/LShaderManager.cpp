@@ -18,7 +18,7 @@ using namespace std;
 namespace engine
 {
 
-    LShaderManager* LShaderManager::INSTANCE = NULL;
+    LShaderManager* LShaderManager::_INSTANCE = NULL;
 
     LShaderManager::LShaderManager()
     {
@@ -34,36 +34,36 @@ namespace engine
         _fShader = createShader( "basic3d_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["basic3d"] = _program;
-        programObjs["basic3d"] = new LShaderBasic3d( _program );
+        m_programs["basic3d"] = _program;
+        m_programObjs["basic3d"] = new LShaderBasic3d( _program );
 
         _vShader = createShader( "debug/debug_3d_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "debug/debug_3d_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["debug3d"] = _program;
-        programObjs["debug3d"] = new LShaderDebug3d( _program );
+        m_programs["debug3d"] = _program;
+        m_programObjs["debug3d"] = new LShaderDebug3d( _program );
 
         _vShader = createShader( "postprocessing/framebuffer_screenrender_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "postprocessing/framebuffer_screenrender_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["pp_framebuffer_screenrender"] = _program;
-        programObjs["pp_framebuffer_screenrender"] = new LShaderFramebufferScreenRender( _program );
+        m_programs["pp_framebuffer_screenrender"] = _program;
+        m_programObjs["pp_framebuffer_screenrender"] = new LShaderFramebufferScreenRender( _program );
 
         _vShader = createShader( "postprocessing/framebuffer_screenrender_channel_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "postprocessing/framebuffer_screenrender_channel_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["pp_framebuffer_screenrender_channel"] = _program;
-        programObjs["pp_framebuffer_screenrender_channel"] = new LShaderFramebufferScreenRender( _program );
+        m_programs["pp_framebuffer_screenrender_channel"] = _program;
+        m_programObjs["pp_framebuffer_screenrender_channel"] = new LShaderFramebufferScreenRender( _program );
 
         _vShader = createShader( "shadows/shadow_mapping_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "shadows/shadow_mapping_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["shadow_mapping"] = _program;
-        programObjs["shadow_mapping"] = new LShaderShadowMap( _program );
+        m_programs["shadow_mapping"] = _program;
+        m_programObjs["shadow_mapping"] = new LShaderShadowMap( _program );
 
         // *****************************************************************
         // Specific rendering shaders **************************************
@@ -75,15 +75,15 @@ namespace engine
         _fShader = createShader( "entities/lighting_entities_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["lighting_entities"] = _program;
-        programObjs["lighting_entities"] = new LShaderEntitiesLighting( _program );
+        m_programs["lighting_entities"] = _program;
+        m_programObjs["lighting_entities"] = new LShaderEntitiesLighting( _program );
 
         _vShader = createShader( "entities/lighting_entities_shadows_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "entities/lighting_entities_shadows_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
-        programs["lighting_entities_shadows"] = _program;
-        programObjs["lighting_entities_shadows"] = new LShaderEntitiesLightingShadows( _program );
+        m_programs["lighting_entities_shadows"] = _program;
+        m_programObjs["lighting_entities_shadows"] = new LShaderEntitiesLightingShadows( _program );
 
         // *****************************************************************
     }
@@ -91,7 +91,7 @@ namespace engine
     LShaderManager::~LShaderManager()
     {
         map< string, GLuint >::iterator _it;
-        for ( _it = programs.begin(); _it != programs.end(); ++_it )
+        for ( _it = m_programs.begin(); _it != m_programs.end(); ++_it )
         {
             glDeleteProgram( _it->second );
         }
@@ -99,21 +99,21 @@ namespace engine
 
     void LShaderManager::release()
     {
-        if ( LShaderManager::INSTANCE != NULL )
+        if ( LShaderManager::_INSTANCE != NULL )
         {
-            delete LShaderManager::INSTANCE;
-            LShaderManager::INSTANCE = NULL;
+            delete LShaderManager::_INSTANCE;
+            LShaderManager::_INSTANCE = NULL;
         }
     }
 
     void LShaderManager::create()
     {
-        if ( LShaderManager::INSTANCE != NULL )
+        if ( LShaderManager::_INSTANCE != NULL )
         {
-            delete LShaderManager::INSTANCE;
+            delete LShaderManager::_INSTANCE;
         }
 
-        LShaderManager::INSTANCE = new LShaderManager();
+        LShaderManager::_INSTANCE = new LShaderManager();
     }
 
 
@@ -198,6 +198,20 @@ namespace engine
         }
 
         return _programId;
+    }
+
+    LShader* LShaderManager::getShader( const string& shaderName )
+    {
+        if ( LShaderManager::_INSTANCE->m_programObjs.find( shaderName ) == 
+             LShaderManager::_INSTANCE->m_programObjs.end() )
+        {
+            std::cout << "ERROR> The requested shader with name " 
+                      << shaderName << " is not part of the loaded shaders" 
+                      << std::endl;
+            return NULL;
+        }
+
+        return LShaderManager::_INSTANCE->m_programObjs[ shaderName ];
     }
 
 }

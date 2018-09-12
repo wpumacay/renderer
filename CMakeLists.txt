@@ -40,6 +40,8 @@ add_library( gengine
              src/LMeshBuilder.cpp
              src/LMesh.cpp
              src/LScene.cpp
+             src/LMeshRenderer.cpp
+             src/LMasterRenderer.cpp
              src/debug/LDebugDrawer.cpp
              src/debug/LDebugSystem.cpp
              src/shaders/LShader.cpp
@@ -47,7 +49,8 @@ add_library( gengine
              src/LAssetsManager.cpp
              src/LVertexArray.cpp
              src/LVertexBuffer.cpp
-             src/LWindow.cpp )
+             src/LWindow.cpp
+             src/LApp.cpp )
 
 target_link_libraries( gengine 
                        glfw glad
@@ -65,6 +68,10 @@ add_executable( test1
 target_link_libraries( test1
                        gengine )
 
+add_executable( test2
+                tests/test2.cpp )
+target_link_libraries( test2
+                       gengine )
 
 
 message( "Configuring library tests - done" )

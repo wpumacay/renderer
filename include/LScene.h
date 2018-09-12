@@ -9,6 +9,7 @@
 #include "LICamera.h"
 #include "LFog.h"
 #include "LSkybox.h"
+#include "LIRenderable.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ namespace engine
 
         protected :
 
+        vector<LIRenderable*> m_renderables;
         vector<LILight*> m_lights;
         vector<LICamera*> m_cameras;
         LFog* m_fog;
@@ -35,6 +37,7 @@ namespace engine
         LScene();
         ~LScene();
 
+        void addRenderable( LIRenderable* pRenderable );
         void addFog( LFog* pFog );
         void addLight( LILight* pLight ); 
 		void addCamera( LICamera* pCamera );
@@ -64,6 +67,7 @@ namespace engine
 
         LFog* getFog();
         LSkybox* getSkybox();
+        vector<LIRenderable*> getRenderables();
 
         virtual void update( float dt );
 

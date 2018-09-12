@@ -2,16 +2,10 @@
 #include <iostream>
 
 #include <LWindow.h>
-#include <LFixedCamera3d.h>
-#include <LFpsCamera.h>
-#include <LLightPoint.h>
-
-#include <LScene.h>
 
 
 int main()
 {
-
     auto _window = engine::LWindow::GetInstance();
 
 

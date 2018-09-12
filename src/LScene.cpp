@@ -3,6 +3,8 @@
 #include "LScene.h"
 #include "LFixedCamera3d.h"
 
+using namespace std;
+
 namespace engine
 {
 
@@ -47,6 +49,11 @@ namespace engine
         {
             _camera->update( dt );
         }
+    }
+
+    void LScene::addRenderable( LIRenderable* pRenderable )
+    {
+        m_renderables.push_back( pRenderable );
     }
 
     void LScene::addFog( LFog* pFog )
@@ -94,6 +101,10 @@ namespace engine
 		return m_skybox;
 	}
 
+    vector< LIRenderable* > LScene::getRenderables()
+    {
+        return m_renderables;
+    }
 
 }
 
