@@ -9,6 +9,12 @@ option( CAT1_BUILD_EXT_LIBS "Build external dependencies along with the project"
 
 if( CAT1_BUILD_EXT_LIBS )
     message( "BUILDING EXTERNAL DEPENDENCIES" )
+
+    # Avoid building the examples in the libraries
+    set( GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" )
+    set( GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" )
+    set( GLM_TEST_ENABLE OFF CACHE BOOL "Build unit tests" )
+
 	add_subdirectory( ext/glfw )
 	add_subdirectory( ext/glad )
     add_subdirectory( ext/glm )
@@ -96,6 +102,5 @@ add_executable( test2
                 tests/test2.cpp )
 target_link_libraries( test2
                        gengine )
-
 
 message( "Configuring library tests - done" )
