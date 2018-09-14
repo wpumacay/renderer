@@ -7,3 +7,6 @@
 	url = https://github.com/g-truc/glm.git
 
 
+[submodule "ext/glad"]
+	path = ext/glad
+	url = https://github.com/wpumacay/glad.git
