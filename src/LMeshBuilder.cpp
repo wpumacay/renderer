@@ -243,10 +243,23 @@ namespace engine
                 _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
                 _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
 
+            #if AXIS_X == 1
+                auto _upOffset = LVec3( 0.5 * height, 0, 0 );
+                _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _upOffset );
+                _normals.push_back( LVec3( _y, _z, _x ) );
+            #elif AXIS_Y == 1
                 auto _upOffset = LVec3( 0, 0.5 * height, 0 );
-
                 _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
                 _normals.push_back( LVec3( _x, _y, _z ) );
+            #elif AXIS_Z == 1
+                auto _upOffset = LVec3( 0, 0, 0.5 * height );
+                _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _upOffset );
+                _normals.push_back( LVec3( _z, _x, _y ) );
+            #else
+                auto _upOffset = LVec3( 0, 0.5 * height, 0 );
+                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
+                _normals.push_back( LVec3( _x, _y, _z ) );
+            #endif
             }
         }
 
@@ -279,8 +292,15 @@ namespace engine
         {
             float _x = radius * cos( q * _stepSectionAngle );
             float _z = radius * sin( q * _stepSectionAngle );
-
+        #if AXIS_X == 1
+            _sectionXZ.push_back( LVec3( 0, _z, _x ) );
+        #elif AXIS_Y == 1
             _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+        #elif AXIS_Z == 1
+            _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
+        #else
+            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+        #endif
         }
 
         // body surface
@@ -288,10 +308,27 @@ namespace engine
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
             // quad vertices
+        #if AXIS_X == 1
+            auto _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
+            auto _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
+        #elif AXIS_Y == 1
             auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
             auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
             auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
             auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+        #elif AXIS_Z == 1
+            auto _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
+            auto _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
+        #else
+            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+        #endif
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
@@ -300,9 +337,15 @@ namespace engine
 
             float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
             float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
-
+        #if AXIS_X == 1
+            auto _nQuad = LVec3( 0, _nz, _nx );
+        #elif AXIS_Y == 1
             auto _nQuad = LVec3( _nx, 0, _nz );
-
+        #elif AXIS_Z == 1
+            auto _nQuad = LVec3( _nz, _nx, 0 );
+        #else
+            auto _nQuad = LVec3( _nx, 0, _nz );
+        #endif
             _normals.push_back( _nQuad );
             _normals.push_back( _nQuad );
             _normals.push_back( _nQuad );
@@ -328,11 +371,23 @@ namespace engine
                 _r = sqrt( 1.0f - _y * _y );
                 _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
                 _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
-
+            #if AXIS_X == 1
+                auto _downOffset = LVec3( -0.5 * height, 0, 0 );
+                _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _downOffset );
+                _normals.push_back( LVec3( _y, _z, _x ) );
+            #elif AXIS_Y == 1
                 auto _downOffset = LVec3( 0, -0.5 * height, 0 );
-
                 _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
                 _normals.push_back( LVec3( _x, _y, _z ) );
+            #elif AXIS_Z == 1
+                auto _downOffset = LVec3( 0, 0, -0.5 * height );
+                _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _downOffset );
+                _normals.push_back( LVec3( _z, _x, _y ) );
+            #else
+                auto _downOffset = LVec3( 0, -0.5 * height, 0 );
+                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
+                _normals.push_back( LVec3( _x, _y, _z ) );
+            #endif
             }
         }
 

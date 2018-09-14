@@ -23,6 +23,9 @@ using namespace std;
 #define OBJ_MATERIAL_ID string( "usemtl" )
 #define OBJ_SMOOTH_SHADING string( "s" )
 
+#define AXIS_X 0
+#define AXIS_Y 0
+#define AXIS_Z 1
 
 namespace engine
 {
