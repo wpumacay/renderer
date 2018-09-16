@@ -88,8 +88,19 @@ namespace engine
             LVec3 _n = _normalsSource[q];
 
             // form a tri perpendicular right hand system
+        // #if AXIS_X == 1
+        //     LVec3 _s1 = LVec3( _n.z, _n.x, _n.y );
+        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
+        // #elif AXIS_Y == 1
+        //     LVec3 _s1 = LVec3( _n.y, _n.z, _n.x );
+        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
+        // #elif AXIS_Z == 1
+        //     LVec3 _s1 = LVec3( _n.x, _n.y, _n.z );
+        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
+        // #else
             LVec3 _s1 = LVec3( _n.y, _n.z, _n.x );
             LVec3 _s2 = LVec3::cross( _n, _s1 );
+        // #endif
 
             // Add the indices accordingly
             _indices.push_back( LInd3( _vertices.size(),
@@ -339,22 +350,47 @@ namespace engine
             _vertices.push_back( _p1 );
             _vertices.push_back( _p2 );
             _vertices.push_back( _p3 );
+        //     // For "flat" normals
+        //     float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
+        //     float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
+        // #if AXIS_X == 1
+        //     auto _nQuad = LVec3( 0, _nz, _nx );
+        // #elif AXIS_Y == 1
+        //     auto _nQuad = LVec3( _nx, 0, _nz );
+        // #elif AXIS_Z == 1
+        //     auto _nQuad = LVec3( _nz, _nx, 0 );
+        // #else
+        //     auto _nQuad = LVec3( _nx, 0, _nz );
+        // #endif
+        //     _normals.push_back( _nQuad );
+        //     _normals.push_back( _nQuad );
+        //     _normals.push_back( _nQuad );
+        //     _normals.push_back( _nQuad );
 
-            float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
-            float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
+            // For "smooth" normals
+            float _nx1 = cos( ( q ) * _stepSectionAngle );
+            float _nz1 = sin( ( q ) * _stepSectionAngle );
+
+            float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
+            float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
+
         #if AXIS_X == 1
-            auto _nQuad = LVec3( 0, _nz, _nx );
+            auto _nQuad1 = LVec3( 0, _nz1, _nx1 );
+            auto _nQuad2 = LVec3( 0, _nz2, _nx2 );
         #elif AXIS_Y == 1
-            auto _nQuad = LVec3( _nx, 0, _nz );
+            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
+            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
         #elif AXIS_Z == 1
-            auto _nQuad = LVec3( _nz, _nx, 0 );
+            auto _nQuad1 = LVec3( _nz1, _nx1, 0 );
+            auto _nQuad2 = LVec3( _nz2, _nx2, 0 );
         #else
-            auto _nQuad = LVec3( _nx, 0, _nz );
+            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
+            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
         #endif
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
+            _normals.push_back( _nQuad1 );
+            _normals.push_back( _nQuad2 );
+            _normals.push_back( _nQuad2 );
+            _normals.push_back( _nQuad1 );
 
             _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
             _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
