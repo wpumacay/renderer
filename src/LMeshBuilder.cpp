@@ -226,6 +226,11 @@ namespace engine
         vector<LVec3> _normals;
         vector<LInd3> _indices;
 
+        /* Capsule format
+        *
+        *   |-- radius --|-- height --|-- radius --|
+        */
+        
         // Tessellate using cap-surface-cap approach
 
         // Build up cap *********************************
@@ -422,12 +427,27 @@ namespace engine
         vector<LVec3> _normals;
         vector<LInd3> _indices;
 
-
+    #if AXIS_X == 1
+        LVec3 _n = LVec3( 1.0f, 0.0f, 0.0f );
+        LVec3 _s1 = LVec3( 0.0f, 1.0f, 0.0f );
+        LVec3 _s2 = LVec3( 0.0f, 0.0f, 1.0f );
+        LVec3 _scale = LVec3( 0.0f, 0.5 * depth, 0.5 * width );
+    #elif AXIS_Y == 1
         LVec3 _n = LVec3( 0.0f, 1.0f, 0.0f );
         LVec3 _s1 = LVec3( 0.0f, 0.0f, 1.0f );
         LVec3 _s2 = LVec3( 1.0f, 0.0f, 0.0f );
-
         LVec3 _scale = LVec3( 0.5 * width, 0.0f, 0.5 * depth );
+    #elif AXIS_Z == 1
+        LVec3 _n = LVec3( 0.0f, 0.0f, 1.0f );
+        LVec3 _s1 = LVec3( 1.0f, 0.0f, 0.0f );
+        LVec3 _s2 = LVec3( 0.0f, 1.0f, 0.0f );
+        LVec3 _scale = LVec3( 0.5 * depth, 0.5 * width, 0.0f );
+    #else
+        LVec3 _n = LVec3( 0.0f, 1.0f, 0.0f );
+        LVec3 _s1 = LVec3( 0.0f, 0.0f, 1.0f );
+        LVec3 _s2 = LVec3( 1.0f, 0.0f, 0.0f );
+        LVec3 _scale = LVec3( 0.5 * width, 0.0f, 0.5 * depth );
+    #endif
 
         _indices.push_back( LInd3( _vertices.size(),
                                    _vertices.size() + 1,

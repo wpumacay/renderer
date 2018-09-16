@@ -2,7 +2,7 @@
 #pragma once
 
 #include "LICamera.h"
-#include "LInputHandler.h"
+#include <input/LInputSystem.h>
 
 #define CAM_DEFAULT_YAW -90.0f
 #define CAM_DEFAULT_PITCH 0.0f

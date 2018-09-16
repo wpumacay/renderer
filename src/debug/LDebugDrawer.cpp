@@ -8,7 +8,7 @@ using namespace std;
 namespace engine
 {
 
-    LDebugDrawer* LDebugDrawer::INSTANCE = NULL;
+    LDebugDrawer* LDebugDrawer::_INSTANCE = NULL;
 
     LDebugDrawer::LDebugDrawer()
     {
@@ -31,27 +31,26 @@ namespace engine
         m_linesVAO->addBuffer( m_linesColorsVBO, 1 );
     }
 
-    void LDebugDrawer::create()
+    LDebugDrawer* LDebugDrawer::GetInstance()
     {
-        if ( LDebugDrawer::INSTANCE != NULL )
+        if ( LDebugDrawer::_INSTANCE == NULL )
         {
-            cout << "LDebugDrawer::create> already created" << endl;
-            return;
+            LDebugDrawer::_INSTANCE = new LDebugDrawer();
         }
 
-        LDebugDrawer::INSTANCE = new LDebugDrawer();
+        return LDebugDrawer::_INSTANCE;
     }
 
-    void LDebugDrawer::release()
+    void LDebugDrawer::Release()
     {
-        if ( LDebugDrawer::INSTANCE == NULL )
+        if ( LDebugDrawer::_INSTANCE == NULL )
         {
             cout << "LDebugDrawer::release> already released" << endl;
             return;
         }
 
-        delete LDebugDrawer::INSTANCE;
-        LDebugDrawer::INSTANCE = NULL;
+        delete LDebugDrawer::_INSTANCE;
+        LDebugDrawer::_INSTANCE = NULL;
     }
 
     LDebugDrawer::~LDebugDrawer()

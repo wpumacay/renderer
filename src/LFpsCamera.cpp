@@ -45,36 +45,35 @@ namespace engine
     {
         m_speed.x = m_speed.z = 0.0f;
 
-        if ( LInputHandler::INSTANCE->isKeyPressed( GLFW_KEY_W ) )
+        if ( InputSystem::isKeyDown( GLFW_KEY_W ) )
         {
             m_speed.x = m_baseSpeed;
         }
-        else if ( LInputHandler::INSTANCE->isKeyPressed( GLFW_KEY_S ) )
+        else if ( InputSystem::isKeyDown( GLFW_KEY_S ) )
         {
             m_speed.x = -m_baseSpeed;
         }
-        else if ( LInputHandler::INSTANCE->isKeyPressed( GLFW_KEY_D ) )
+        else if ( InputSystem::isKeyDown( GLFW_KEY_D ) )
         {
             m_speed.z = m_baseSpeed;
         }
-        else if ( LInputHandler::INSTANCE->isKeyPressed( GLFW_KEY_A ) )
+        else if ( InputSystem::isKeyDown( GLFW_KEY_A ) )
         {
             m_speed.z = -m_baseSpeed;
         }
 
 
         // Update the camera angles
-        float x, y;
-        LInputHandler::INSTANCE->getMousePosition( x, y );
+        LVec2 _pos = InputSystem::getCursorPosition();
 
-        float _xOff = x - m_lastX;
-        float _yOff = m_lastY - y;
+        float _xOff = _pos.x - m_lastX;
+        float _yOff = m_lastY - _pos.y;
 
         _xOff = ( _xOff > CAM_MAX_DELTA ? CAM_MAX_DELTA : ( _xOff < -CAM_MAX_DELTA ? -CAM_MAX_DELTA : _xOff ) );
         _yOff = ( _yOff > CAM_MAX_DELTA ? CAM_MAX_DELTA : ( _yOff < -CAM_MAX_DELTA ? -CAM_MAX_DELTA : _yOff ) );
 
-        m_lastX = x;
-        m_lastY = y;
+        m_lastX = _pos.x;
+        m_lastY = _pos.y;
 
         _xOff *= m_sensitivity;
         _yOff *= m_sensitivity;

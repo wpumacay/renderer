@@ -23,8 +23,9 @@ namespace engine
         m_scene = new LScene();
         m_window = LWindow::GetInstance();
 
-        engine::LInputHandler::create( m_window );
         engine::LShaderManager::create();
+        engine::InputSystem::init();
+        engine::DebugSystem::init();
 
         m_tBef = 0.0f;
         m_tNow = 0.0f;
@@ -45,7 +46,8 @@ namespace engine
             m_window = NULL;
         }
 
-        engine::LInputHandler::release();
+        engine::DebugSystem::release();
+        engine::InputSystem::release();
         engine::LShaderManager::release();
     }
 
@@ -62,6 +64,11 @@ namespace engine
         {
             m_scene->update( m_tDelta );
             m_masterRenderer->render( m_scene );
+
+            auto _camera = m_scene->getCurrentCamera();
+            engine::DebugSystem::setupMatrices( _camera->getViewMatrix(),
+                                                _camera->getProjectionMatrix() );
+            engine::DebugSystem::render();
         }
 
         m_window->swapBuffers();

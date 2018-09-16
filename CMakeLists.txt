@@ -59,7 +59,6 @@ add_library( gengine SHARED
              src/LCommon.cpp
              src/LFixedCamera3d.cpp
              src/LFpsCamera.cpp
-             src/LInputHandler.cpp
              src/LICamera.cpp
              src/LIndexBuffer.cpp
              src/LTexture.cpp
@@ -72,6 +71,8 @@ add_library( gengine SHARED
              src/LScene.cpp
              src/LMeshRenderer.cpp
              src/LMasterRenderer.cpp
+             src/input/LInputHandler.cpp
+             src/input/LInputSystem.cpp
              src/debug/LDebugDrawer.cpp
              src/debug/LDebugSystem.cpp
              src/shaders/LShader.cpp

@@ -3,9 +3,11 @@
 
 #include "LScene.h"
 #include "LFpsCamera.h"
-#include "LInputHandler.h"
-#include "shaders/LShaderManager.h"
+#include "LFixedCamera3d.h"
 #include "LMasterRenderer.h"
+#include "shaders/LShaderManager.h"
+#include "debug/LDebugSystem.h"
+#include "input/LInputSystem.h"
 
 namespace engine
 {
@@ -34,7 +36,5 @@ namespace engine
         LScene* scene();
         bool isActive();
     };
-
-
 
 }

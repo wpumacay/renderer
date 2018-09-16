@@ -50,13 +50,13 @@ namespace engine
         void _renderLinesBatch( int countLines );
         void _renderLines();
 
+        static LDebugDrawer* _INSTANCE;
         LDebugDrawer();
 
         public :
 
-        static LDebugDrawer* INSTANCE;
-        static void create();
-        static void release();
+        static LDebugDrawer* GetInstance();
+        static void Release();
         ~LDebugDrawer();
 
 
