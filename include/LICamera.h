@@ -15,6 +15,7 @@ namespace engine
         protected :
 
         LVec3 m_pos;
+        LVec3 m_targetPoint;
         LVec3 m_targetDir;
         LVec3 m_worldUp;
         int m_worldUpVectorId;
@@ -41,7 +42,7 @@ namespace engine
 
         LICamera( const string& name,
                   const LVec3& pos,
-                  const LVec3& targetDir,
+                  const LVec3& targetPoint,
                   int worldUpId,
                   float fov = 45.0f,
                   float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
@@ -49,11 +50,11 @@ namespace engine
 
         ~LICamera();
 
-        static string getStaticType() { return string( "base" ); }
+        static string GetStaticType() { return string( "base" ); }
         string type() { return m_type; }
         string name() { return m_name; }
 
-        void setTargetDir( const LVec3& target ) { m_targetDir = target; }
+        LVec3 getTargetPoint() const { return m_targetPoint; }
         LVec3 getTargetDir() const { return m_targetDir; }
 
         void setPosition( const LVec3& pos );

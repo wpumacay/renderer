@@ -51,13 +51,13 @@ namespace engine
 
         LFpsCamera( const string& name,
                     const LVec3& pos,
-                    const LVec3& targetDir,
+                    const LVec3& targetPoint,
                     int worldUpId,
                     float fov = 45.0f,
                     float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
                     float zNear = 0.1f, float zFar = 100.0f );
 
-        static string getStaticType() { return string( "fps" ); }
+        static string GetStaticType() { return string( "fps" ); }
 
         glm::mat4 getViewMatrix() override;
 

@@ -1,6 +1,5 @@
 
 
-#include <LApp.h>
 #include <LFpsCamera.h>
 
 // TODO: Port the camera to a more intuitive implementation, e.g. speed.x should be speed.z
@@ -12,12 +11,12 @@ namespace engine
 
     LFpsCamera::LFpsCamera( const string& name,
                             const LVec3& pos,
-                            const LVec3& targetDir,
+                            const LVec3& targetPoint,
                             int worldUpId,
                             float fov,
                             float aspectRatio,
                             float zNear, float zFar ) 
-        : LICamera( name, pos, targetDir, worldUpId, fov, aspectRatio, zNear, zFar )
+        : LICamera( name, pos, targetPoint, worldUpId, fov, aspectRatio, zNear, zFar )
     {
         m_roll = 0.0f;
         m_pitch = CAM_DEFAULT_PITCH;
@@ -33,7 +32,7 @@ namespace engine
 
         m_sensitivity = CAM_DEFAULT_SENSITIVITY;
 
-        m_type = LFpsCamera::getStaticType();
+        m_type = LFpsCamera::GetStaticType();
 
         _updateCamera();
     }
@@ -100,17 +99,6 @@ namespace engine
         LVec3 _dRight = m_right * ( m_speed.z * dt );
 
         m_pos = m_pos + _dFront + _dRight;
-
-
-        //std::cout << "pitch: " << m_pitch << std::endl;
-        //std::cout << "yaw: " << m_yaw << std::endl;
-
-        // std::cout << "cy: " << m_pos.y << std::endl;
-        // std::cout << "cx: " << m_pos.x << std::endl;
-
-
-
-        // std::cout << "cz: " << m_pos.z << std::endl;
     }
 
     void LFpsCamera::_updateCamera()

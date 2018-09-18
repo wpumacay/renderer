@@ -60,8 +60,6 @@ namespace engine
         glfwSetMouseButtonCallback( m_window, LWindow::onMouseCallback );
         glfwSetCursorPosCallback( m_window, LWindow::onMouseMoveCallback );
 
-        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
-
         glfwGetFramebufferSize( m_window, &m_width, &m_height );
         glViewport( 0, 0, m_width, m_height );
 
@@ -73,11 +71,20 @@ namespace engine
         m_initialized = true;
     }
 
-
     LWindow::~LWindow()
     {
         m_window = NULL;
         glfwTerminate();
+    }
+
+    void LWindow::enableCursor()
+    {
+        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+    }
+
+    void LWindow::disableCursor()
+    {
+        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
     }
 
     void LWindow::onKeyCallback( GLFWwindow* pWindow, int key,

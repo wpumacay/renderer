@@ -49,6 +49,9 @@ namespace engine
         void registerMouseCallback( FnPtr_mouse_callback callback );
         void registerMouseMoveCallback( FnPtr_mousemove_callback callback );
 
+        void enableCursor();
+        void disableCursor();
+
         void clear() 
         {
             glClearColor( CLEAR_COLOR ); 

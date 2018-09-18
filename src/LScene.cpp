@@ -1,7 +1,7 @@
 
-
-#include "LScene.h"
-#include "LFixedCamera3d.h"
+#include <LApp.h>
+#include <LScene.h>
+#include <LFixedCamera3d.h>
 
 using namespace std;
 
@@ -86,10 +86,12 @@ namespace engine
 		if ( m_currentCamera == NULL )
 		{
 			m_currentCamera = pCamera;
+
+            _checkCameraType();
 		}
 	}
 
-    void LScene::changeToCameraById( const string& cameraId )
+    void LScene::changeToCameraByName( const string& cameraId )
     {
         if ( m_cameras.find( cameraId ) == m_cameras.end() )
         {
@@ -98,8 +100,26 @@ namespace engine
         }
 
         m_currentCamera = m_cameras[ cameraId ];
+
+        _checkCameraType();
     }
 	
+    void LScene::_checkCameraType()
+    {
+        // check the type of camera, so that we can toggle the cursor mode
+        auto _window = LApp::GetInstance()->window();
+        if ( m_currentCamera->type() == LFpsCamera::GetStaticType() )
+        {
+            std::cout << "INFO> Disabling cursor for fps camera" << std::endl;
+            _window->disableCursor();
+        }
+        else
+        {
+            std::cout << "INFO> Enabling cursor for non-fps camera" << std::endl;
+            _window->enableCursor();
+        }
+    }
+
 	void LScene::addSkybox( LSkybox* pSkybox )
 	{	
 		if ( m_skybox != NULL )

@@ -8,17 +8,16 @@ namespace engine
 
     LFixedCamera3d::LFixedCamera3d( const string& name,
                                     const LVec3& pos,
-                                    const LVec3& targetDir,
+                                    const LVec3& targetPoint,
                                     int worldUpId,
                                     float fov,
                                     float aspectRatio,
                                     float zNear, float zFar ) 
-        : LICamera( name, pos, targetDir, worldUpId, fov, aspectRatio, zNear, zFar )
+        : LICamera( name, pos, targetPoint, worldUpId, fov, aspectRatio, zNear, zFar )
     {
-        m_movSpeed = 0.0f;
-        m_movDirection = LVec3( 0, 0, 0 );
+        m_type = LFixedCamera3d::GetStaticType();
 
-        m_type = LFixedCamera3d::getStaticType();
+        dumpInfo();
     }
 
     glm::mat4 LFixedCamera3d::getViewMatrix()
@@ -76,12 +75,5 @@ namespace engine
 
 #endif
         return glm::lookAt( _cameraPos, _cameraTarget, _worldUp );
-    }
-
-    void LFixedCamera3d::update( float dt )
-    {
-        m_pos.x += m_movDirection.x * m_movSpeed * dt;
-        m_pos.y += m_movDirection.y * m_movSpeed * dt;
-        m_pos.z += m_movDirection.z * m_movSpeed * dt;
     }
 }

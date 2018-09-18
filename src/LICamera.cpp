@@ -9,7 +9,7 @@ namespace engine
 
     LICamera::LICamera( const string& name,
                         const LVec3& pos,
-                        const LVec3& targetDir,
+                        const LVec3& targetPoint,
                         int worldUpId,
                         float fov,
                         float aspectRatio,
@@ -17,7 +17,8 @@ namespace engine
     {
         m_name = name;
         m_pos = pos;
-        m_targetDir = targetDir;
+        m_targetPoint = targetPoint;
+        m_targetDir = LVec3::normalize( m_targetPoint - m_pos );
         m_worldUpVectorId = worldUpId;
 
         if ( worldUpId == UP_X ) 
@@ -26,7 +27,7 @@ namespace engine
         }
         else if ( worldUpId == UP_Y ) 
         { 
-            m_worldUp = LVec3( 0.0f, 1.0f, 0.0f ); 
+            m_worldUp = LVec3( 0.0f, 1.0f, 0.0f );
         }
         else if ( worldUpId == UP_Z ) 
         { 

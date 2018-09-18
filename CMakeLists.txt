@@ -57,9 +57,10 @@ include_directories( ${CAT1_INCLUDE_DIRECTORIES} )
 
 add_library( gengine SHARED
              src/LCommon.cpp
+             src/LICamera.cpp
              src/LFixedCamera3d.cpp
              src/LFpsCamera.cpp
-             src/LICamera.cpp
+             src/LFollowCamera.cpp
              src/LIndexBuffer.cpp
              src/LTexture.cpp
              src/LCubeTexture.cpp

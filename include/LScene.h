@@ -31,6 +31,8 @@ namespace engine
 
         glm::mat4 m_projMatrix;
 
+        void _checkCameraType();
+
         public :
 
 
@@ -43,7 +45,7 @@ namespace engine
 		void addCamera( LICamera* pCamera );
         void addSkybox( LSkybox* pSkybox );
 
-        void changeToCameraById( const string& cameraId );
+        void changeToCameraByName( const string& cameraId );
 
         glm::mat4 getProjMatrix() { return m_projMatrix; }
         LICamera* getCurrentCamera() { return m_currentCamera; }
