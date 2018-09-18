@@ -1,7 +1,10 @@
 
 #pragma once
 
-#include "LMeshRenderer.h"
+#include <LILight.h>
+#include <LLightDirectional.h>
+#include <LShadowMap.h>
+#include <LMeshRenderer.h>
 
 namespace engine
 {
@@ -11,6 +14,10 @@ namespace engine
     {
 
         private :
+
+        // shadow resources
+        LShadowMap* m_shadowMap;
+        bool m_shadowsEnabled;
 
         LMeshRenderer* m_meshRenderer;
 
@@ -23,6 +30,14 @@ namespace engine
         ~LMasterRenderer();
 
         void render( LScene* pScene );
+        void _renderScene( LScene* pScene );
+        bool _renderToShadowMap( LScene* pScene );
+        void _renderSceneWithShadowMap( LScene* pScene );
+
+        void enableShadows();
+        void disableShadows();
+
+        bool areShadowsEnabled() { return m_shadowsEnabled; }
 
     };
 

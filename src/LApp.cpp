@@ -19,9 +19,9 @@ namespace engine
 
     LApp::LApp()
     {
+        m_window = LWindow::GetInstance();
         m_masterRenderer = LMasterRenderer::GetInstance();
         m_scene = new LScene();
-        m_window = LWindow::GetInstance();
 
         engine::LShaderManager::create();
         engine::InputSystem::init();
