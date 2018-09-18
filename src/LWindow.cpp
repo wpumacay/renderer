@@ -60,6 +60,8 @@ namespace engine
         glfwSetMouseButtonCallback( m_window, LWindow::onMouseCallback );
         glfwSetCursorPosCallback( m_window, LWindow::onMouseMoveCallback );
 
+        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+
         glfwGetFramebufferSize( m_window, &m_width, &m_height );
         glViewport( 0, 0, m_width, m_height );
 

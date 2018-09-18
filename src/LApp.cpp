@@ -84,4 +84,8 @@ namespace engine
         return m_window->isActive();
     }
 
+    LWindow* LApp::window()
+    {
+        return m_window;
+    }
 }

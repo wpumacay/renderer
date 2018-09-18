@@ -35,6 +35,8 @@ namespace engine
         void update();
         LScene* scene();
         bool isActive();
+
+        LWindow* window();
     };
 
 }

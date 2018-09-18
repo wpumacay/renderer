@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <map>
 #include <cmath>
 
 #ifndef GLM_ENABLE_EXPERIMENTAL

@@ -6,13 +6,14 @@
 namespace engine
 {
 
-    LFixedCamera3d::LFixedCamera3d( const LVec3& pos,
+    LFixedCamera3d::LFixedCamera3d( const string& name,
+                                    const LVec3& pos,
                                     const LVec3& targetDir,
-                                    const LVec3& worldUp,
+                                    int worldUpId,
                                     float fov,
                                     float aspectRatio,
                                     float zNear, float zFar ) 
-        : LICamera( pos, targetDir, worldUp, fov, aspectRatio, zNear, zFar )
+        : LICamera( name, pos, targetDir, worldUpId, fov, aspectRatio, zNear, zFar )
     {
         m_movSpeed = 0.0f;
         m_movDirection = LVec3( 0, 0, 0 );

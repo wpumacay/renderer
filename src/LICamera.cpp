@@ -1,23 +1,42 @@
 
 #include "LICamera.h"
 
-
-
+using namespace std;
 
 namespace engine
 {
 
 
-    LICamera::LICamera( const LVec3& pos,
+    LICamera::LICamera( const string& name,
+                        const LVec3& pos,
                         const LVec3& targetDir,
-                        const LVec3& worldUp,
+                        int worldUpId,
                         float fov,
                         float aspectRatio,
                         float zNear, float zFar )
     {
+        m_name = name;
         m_pos = pos;
         m_targetDir = targetDir;
-        m_worldUp = worldUp;
+        m_worldUpVectorId = worldUpId;
+
+        if ( worldUpId == UP_X ) 
+        { 
+            m_worldUp = LVec3( 1.0f, 0.0f, 0.0f ); 
+        }
+        else if ( worldUpId == UP_Y ) 
+        { 
+            m_worldUp = LVec3( 0.0f, 1.0f, 0.0f ); 
+        }
+        else if ( worldUpId == UP_Z ) 
+        { 
+            m_worldUp = LVec3( 0.0f, 0.0f, 1.0f ); 
+        }
+        else 
+        { 
+            m_worldUp = LVec3( 0.0f, 1.0f, 0.0f ); 
+            m_worldUpVectorId = UP_Y; 
+        }
 
         m_fov = fov;
         m_aspectRatio = aspectRatio;

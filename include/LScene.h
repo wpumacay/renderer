@@ -23,7 +23,7 @@ namespace engine
 
         vector<LIRenderable*> m_renderables;
         vector<LILight*> m_lights;
-        vector<LICamera*> m_cameras;
+        map<string, LICamera*> m_cameras;
         LFog* m_fog;
         LSkybox* m_skybox;
         
@@ -42,6 +42,8 @@ namespace engine
         void addLight( LILight* pLight ); 
 		void addCamera( LICamera* pCamera );
         void addSkybox( LSkybox* pSkybox );
+
+        void changeToCameraById( const string& cameraId );
 
         glm::mat4 getProjMatrix() { return m_projMatrix; }
         LICamera* getCurrentCamera() { return m_currentCamera; }

@@ -7,9 +7,9 @@
 #define CAM_DEFAULT_YAW -90.0f
 #define CAM_DEFAULT_PITCH 0.0f
 #define CAM_DEFAULT_FOV 45.0f
-#define CAM_DEFAULT_SENSITIVITY 0.1f
+#define CAM_DEFAULT_SENSITIVITY 0.25f
 #define CAM_DEFAULT_SPEED 5.0f
-#define CAM_MAX_DELTA 20
+#define CAM_MAX_DELTA 10
 
 using namespace std;
 
@@ -26,6 +26,9 @@ namespace engine
         float m_pitch;
         float m_yaw;
 
+        float m_rAngRot;// small delta around the camera's right axis
+        float m_uAngRot;// small delta around the camera's up axis
+
         float m_sensitivity;
 
         LVec3 m_front;
@@ -38,14 +41,18 @@ namespace engine
         float m_lastX;
         float m_lastY;
 
+        void _computeAngles();
+
         protected :
 
         void _updateCamera() override;
 
         public :
 
-        LFpsCamera( const LVec3& pos,
-                    const LVec3& worldUp,
+        LFpsCamera( const string& name,
+                    const LVec3& pos,
+                    const LVec3& targetDir,
+                    int worldUpId,
                     float fov = 45.0f,
                     float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
                     float zNear = 0.1f, float zFar = 100.0f );

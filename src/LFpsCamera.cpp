@@ -1,6 +1,7 @@
 
 
-#include "LFpsCamera.h"
+#include <LApp.h>
+#include <LFpsCamera.h>
 
 // TODO: Port the camera to a more intuitive implementation, e.g. speed.x should be speed.z
 
@@ -9,16 +10,21 @@ using namespace std;
 namespace engine
 {
 
-    LFpsCamera::LFpsCamera( const LVec3& pos,
-                            const LVec3& worldUp,
+    LFpsCamera::LFpsCamera( const string& name,
+                            const LVec3& pos,
+                            const LVec3& targetDir,
+                            int worldUpId,
                             float fov,
                             float aspectRatio,
                             float zNear, float zFar ) 
-        : LICamera( pos, LVec3(), worldUp, fov, aspectRatio, zNear, zFar )
+        : LICamera( name, pos, targetDir, worldUpId, fov, aspectRatio, zNear, zFar )
     {
         m_roll = 0.0f;
         m_pitch = CAM_DEFAULT_PITCH;
         m_yaw = CAM_DEFAULT_YAW;
+
+        m_rAngRot = 0.0f;
+        m_uAngRot = 0.0f;
 
         m_baseSpeed = CAM_DEFAULT_SPEED;
 
@@ -30,6 +36,11 @@ namespace engine
         m_type = LFpsCamera::getStaticType();
 
         _updateCamera();
+    }
+
+    void LFpsCamera::_computeAngles()
+    {
+        
     }
 
     glm::mat4 LFpsCamera::getViewMatrix()
@@ -96,14 +107,33 @@ namespace engine
 
         // std::cout << "cy: " << m_pos.y << std::endl;
         // std::cout << "cx: " << m_pos.x << std::endl;
+
+
+
         // std::cout << "cz: " << m_pos.z << std::endl;
     }
 
     void LFpsCamera::_updateCamera()
     {
-        m_front.x = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
-        m_front.y = sin( glm::radians( m_pitch ) );
-        m_front.z = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+        if ( m_worldUpVectorId == UP_X )
+        {
+            m_front.z = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.x = sin( glm::radians( m_pitch ) );
+            m_front.y = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+        }
+        else if ( m_worldUpVectorId == UP_Y )
+        {
+            m_front.x = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.y = sin( glm::radians( m_pitch ) );
+            m_front.z = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+        }
+        else if ( m_worldUpVectorId == UP_Z )
+        {
+            m_front.y = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.z = sin( glm::radians( m_pitch ) );
+            m_front.x = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+        }
+
         m_front.normalize();
 
         m_right = LVec3::cross( m_front, m_worldUp );
@@ -115,7 +145,7 @@ namespace engine
 
     void LFpsCamera::dumpInfo()
     {
-        cout << "Camera base information for camera < " << m_cameraId << " > *******" << endl;
+        cout << "Camera base information for camera < " << m_name << " > *******" << endl;
 
         cout << "pos: " << m_pos.toString() << endl;
         cout << "targetDir: " << m_front.toString() << endl;

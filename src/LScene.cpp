@@ -18,15 +18,18 @@ namespace engine
 
     LScene::~LScene()
     {
-        for ( LICamera* _cam : m_cameras )
+        map<string, LICamera*>::iterator _it;
+        for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {
-            delete _cam;
+            delete _it->second;
         }
+        m_cameras.clear();
 
         for ( LILight* _light : m_lights )
         {
             delete _light;
         }
+        m_lights.clear();
 
         if ( m_fog != NULL )
         {
@@ -45,9 +48,14 @@ namespace engine
 
     void LScene::update( float dt )
     {
-        for ( LICamera* _camera : m_cameras )
+        map<string, LICamera*>::iterator _it;
+        for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {
-            _camera->update( dt );
+            auto _camera = _it->second;
+            if ( _camera != NULL )
+            {
+                _camera->update( dt );
+            }
         }
     }
 
@@ -74,12 +82,23 @@ namespace engine
 
 	void LScene::addCamera( LICamera* pCamera )
 	{
-		m_cameras.push_back( pCamera );
+		m_cameras[ pCamera->name() ] = pCamera;
 		if ( m_currentCamera == NULL )
 		{
 			m_currentCamera = pCamera;
 		}
 	}
+
+    void LScene::changeToCameraById( const string& cameraId )
+    {
+        if ( m_cameras.find( cameraId ) == m_cameras.end() )
+        {
+            std::cout << "WARNING> Tried to change to a non-existent camera" << std::endl;
+            return;
+        }
+
+        m_currentCamera = m_cameras[ cameraId ];
+    }
 	
 	void LScene::addSkybox( LSkybox* pSkybox )
 	{	

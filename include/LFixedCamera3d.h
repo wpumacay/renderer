@@ -18,14 +18,15 @@ namespace engine
 
         public :
 
-        LFixedCamera3d( const LVec3& pos,
+        LFixedCamera3d( const string& name,
+                        const LVec3& pos,
                         const LVec3& targetDir,
-                        const LVec3& worldUp,
+                        int worldUpId,
                         float fov = 45.0f,
                         float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
                         float zNear = 1.0f, float zFar = 20.0f );
 
-        static string getStaticType() { return string( "fixec3d" ); }
+        static string getStaticType() { return string( "fixed3d" ); }
 
         glm::mat4 getViewMatrix() override;
 

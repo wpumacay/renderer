@@ -17,6 +17,7 @@ namespace engine
         LVec3 m_pos;
         LVec3 m_targetDir;
         LVec3 m_worldUp;
+        int m_worldUpVectorId;
 
         string m_type;
 
@@ -25,15 +26,23 @@ namespace engine
         float m_zNear;
         float m_zFar;
 
-        string m_cameraId;
+        string m_name;
 
         virtual void _updateCamera();
 
         public :
 
-        LICamera( const LVec3& pos,
+        enum WorldUpVector
+        {
+            UP_X = 0,
+            UP_Y = 1,
+            UP_Z = 2
+        };
+
+        LICamera( const string& name,
+                  const LVec3& pos,
                   const LVec3& targetDir,
-                  const LVec3& worldUp,
+                  int worldUpId,
                   float fov = 45.0f,
                   float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
                   float zNear = 10.0f, float zFar = 40.0f );
@@ -42,6 +51,7 @@ namespace engine
 
         static string getStaticType() { return string( "base" ); }
         string type() { return m_type; }
+        string name() { return m_name; }
 
         void setTargetDir( const LVec3& target ) { m_targetDir = target; }
         LVec3 getTargetDir() const { return m_targetDir; }
@@ -63,7 +73,7 @@ namespace engine
 
         virtual void dumpInfo()
         {
-            cout << "Camera base information for camera < " << m_cameraId << " > *******" << endl;
+            cout << "Camera base information for camera < " << m_name << " > *******" << endl;
 
             cout << "pos: " << m_pos.toString() << endl;
             cout << "targetDir: " << m_targetDir.toString() << endl;
