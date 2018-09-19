@@ -59,7 +59,7 @@ namespace engine
         _shader->setViewMatrix( _camera->getViewMatrix() );
         _shader->setProjectionMatrix( _camera->getProjectionMatrix() );
         _shader->setViewPosition( _camera->getPosition() );
-        _shader->setGlobalAmbientLight( LVec3( 0.25f, 0.25f, 0.25f ) );
+        _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
 
         // render all meshes
         for ( LMesh* _mesh : m_renderList )
@@ -121,7 +121,7 @@ namespace engine
         _shader->setViewMatrix( _camera->getViewMatrix() );
         _shader->setProjectionMatrix( _camera->getProjectionMatrix() );
         _shader->setViewPosition( _camera->getPosition() );
-        _shader->setGlobalAmbientLight( LVec3( 0.25f, 0.25f, 0.25f ) );
+        _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
         _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
         _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );
         _shader->setLightPosition( shadowMap->getLightPosition() );
