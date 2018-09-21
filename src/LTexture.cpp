@@ -1,37 +1,17 @@
 
 
-#include "LTexture.h"
-
+#include <LTexture.h>
 
 
 namespace engine
 {
 
-    LTexture::LTexture()
+    LTexture::LTexture( const LTextureData& textureData )
     {
-        this->enabled = true;
         glGenTextures( 1, &m_textureId );
-    }
 
-    LTexture::~LTexture()
-    {
-        glDeleteTextures( 1, &m_textureId );
-    }
-
-
-    void LTexture::setData( u8* pData, GLuint type, int width, int height, GLuint textureIndx )
-    {
-        //cout << "width: " << width << endl;
-        //cout << "height: " << height << endl;
-        //cout << "textureIndx: " << textureIndx << endl;
-        //if ( pData == NULL )
-        //{
-        //    cout << "??" << endl;
-        //}
-
-        m_width = width;
-        m_height = height;
-        m_textureIndx = textureIndx;
+        m_textureData = textureData;
+        m_textureIndx = 0;
 
         glBindTexture( GL_TEXTURE_2D, m_textureId );
 
@@ -41,8 +21,15 @@ namespace engine
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-        glTexImage2D( GL_TEXTURE_2D, 0, type, m_width, m_height, 0, type, GL_UNSIGNED_BYTE, pData );
+        glTexImage2D( GL_TEXTURE_2D, 0, 
+                      m_textureData.ftype, m_textureData.width, m_textureData.height, 0, 
+                      m_textureData.ftype, GL_UNSIGNED_BYTE, m_textureData.data );
         glGenerateMipmap( GL_TEXTURE_2D );
+    }
+
+    LTexture::~LTexture()
+    {
+        glDeleteTextures( 1, &m_textureId );
     }
 
     void LTexture::bind()
@@ -53,6 +40,6 @@ namespace engine
 
     void LTexture::unbind()
     {
-        //glBindTexture( GL_TEXTURE_2D, 0 );
+        glBindTexture( GL_TEXTURE_2D, 0 );
     }
 }

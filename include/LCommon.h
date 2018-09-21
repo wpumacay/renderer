@@ -261,6 +261,7 @@ namespace engine
         int width;
         int height;
         int channels;
+        int ftype;
     };
 
     struct LCubeTextureData
@@ -269,9 +270,8 @@ namespace engine
         int width;
         int height;
         int channels;
+        int ftype;
     };
-
-
 
     struct LLDirUniforms
     {

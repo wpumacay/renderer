@@ -21,6 +21,7 @@ namespace engine
     LMasterRenderer::LMasterRenderer()
     {
         m_meshRenderer = new LMeshRenderer();
+        m_skyboxRenderer = new LSkyboxRenderer();
 
         m_shadowMap = new LShadowMap();
         m_shadowsEnabled = true;
@@ -40,11 +41,18 @@ namespace engine
             m_meshRenderer = NULL;
         }
 
+        if ( m_skyboxRenderer != NULL )
+        {
+            delete m_skyboxRenderer;
+            m_skyboxRenderer = NULL;
+        }
+
         LMasterRenderer::_INSTANCE = NULL;
     }
 
     void LMasterRenderer::render( LScene* pScene )
     {
+        // render geometries from the scene
         m_meshRenderer->begin( pScene );
 
         bool _success = false;
@@ -70,6 +78,11 @@ namespace engine
         }
 
         m_meshRenderer->end( pScene );
+
+        // render the skybox first
+        m_skyboxRenderer->begin( pScene );
+        m_skyboxRenderer->renderScene( pScene );
+        m_skyboxRenderer->end( pScene );
     }
 
     void LMasterRenderer::_renderScene( LScene* pScene )

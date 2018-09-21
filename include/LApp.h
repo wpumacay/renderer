@@ -5,6 +5,7 @@
 #include "LFpsCamera.h"
 #include "LFixedCamera3d.h"
 #include "LMasterRenderer.h"
+#include "LAssetsManager.h"
 #include "shaders/LShaderManager.h"
 #include "debug/LDebugSystem.h"
 #include "input/LInputSystem.h"

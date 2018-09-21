@@ -1,12 +1,11 @@
 #pragma once
 
-#include "LCommon.h"
-#include "LVertexBuffer.h"
-#include "LVertexArray.h"
-#include "LCubeTexture.h"
+#include <LCommon.h>
+#include <LVertexBuffer.h>
+#include <LVertexArray.h>
+#include <LCubeTexture.h>
 
 using namespace std;
-
 
 namespace engine
 {
@@ -14,21 +13,17 @@ namespace engine
 
     class LSkybox
     {
-
         private : 
 
         LVertexArray* m_vertexArray;
-        LCubeTexture* m_cubeTexture;
+        LCubeTexture* m_cubeTextureRef;
 
         public :
 
-        LSkybox( string skyboxResId );
+        LSkybox( const string& skyboxResId );
         ~LSkybox();
 
         void render();
-
-        LCubeTexture* getCubeTexture() { return m_cubeTexture; }
-
     };
 
 

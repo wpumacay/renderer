@@ -110,12 +110,12 @@ namespace engine
         auto _window = LApp::GetInstance()->window();
         if ( m_currentCamera->type() == LFpsCamera::GetStaticType() )
         {
-            std::cout << "INFO> Disabling cursor for fps camera" << std::endl;
+            // std::cout << "INFO> Disabling cursor for fps camera" << std::endl;
             _window->disableCursor();
         }
         else
         {
-            std::cout << "INFO> Enabling cursor for non-fps camera" << std::endl;
+            // std::cout << "INFO> Enabling cursor for non-fps camera" << std::endl;
             _window->enableCursor();
         }
     }

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <LCommon.h>
 
 namespace engine
 {
@@ -14,24 +14,20 @@ namespace engine
 
         GLuint m_textureId;
         GLuint m_textureIndx;
-        int m_width;
-        int m_height;
+        LTextureData m_textureData;
 
         public :
 
-        bool enabled;
-
-        LTexture();
+        LTexture( const LTextureData& textureData );
         ~LTexture();
 
-        void setData( u8* pData, GLuint type, int width, int height, GLuint textureIndx );
         void bind();
         void unbind();
 
-        int width() { return m_width; }
-        int height() { return m_height; }
+        LTextureData data() { return m_textureData; }
 
-        GLuint getTextureIndx() { return m_textureIndx; }
+        void setTextureIndex( GLuint textureIndx ) { m_textureIndx = textureIndx; }
+        GLuint getTextureIndex() { return m_textureIndx; }
 
     };
 

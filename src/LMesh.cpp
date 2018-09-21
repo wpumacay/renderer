@@ -8,7 +8,6 @@ using namespace std;
 namespace engine
 {
 
-
     LMesh::LMesh( const vector<LVec3>& vertices, 
                   const vector<LVec3>& normals )
     {
@@ -82,8 +81,8 @@ namespace engine
 
     LMesh::LMesh( const vector<LVec3>& vertices, 
                   const vector<LVec3>& normals,
-                  const vector<LInd3>& indices,
-                  const vector<LVec2>& texCoords )
+                  const vector<LVec2>& texCoords,
+                  const vector<LInd3>& indices )
     {
         m_usesIndices = true;
 
@@ -186,10 +185,16 @@ namespace engine
         return _model;
     }
 
+    /* @TODO: Implement another way of using the textures. Currently we ...
+              are binding each texture for each render call :( */
     void LMesh::render()
     {
         if ( m_usesIndices )
         {
+            for ( LTexture* _texture : m_textures )
+            {
+                _texture->bind();
+            }
             m_vertexArray->bind();
             m_indexBuffer->bind();
 
@@ -199,11 +204,17 @@ namespace engine
 
             m_indexBuffer->unbind();
             m_vertexArray->unbind();
+            for ( LTexture* _texture : m_textures )
+            {
+                _texture->unbind();
+            }
         }
         else
         {
-            // cout << "drawing?? " << m_vertices.size() << endl;
-
+            for ( LTexture* _texture : m_textures )
+            {
+                _texture->bind();
+            }
             m_vertexArray->bind();
 
             glDrawArrays( GL_TRIANGLES, 
@@ -211,6 +222,10 @@ namespace engine
                           m_vertices.size() );
 
             m_vertexArray->unbind();
+            for ( LTexture* _texture : m_textures )
+            {
+                _texture->unbind();
+            }
         }
 
     }

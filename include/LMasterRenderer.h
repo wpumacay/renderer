@@ -5,6 +5,7 @@
 #include <LLightDirectional.h>
 #include <LShadowMap.h>
 #include <LMeshRenderer.h>
+#include <LSkyboxRenderer.h>
 
 namespace engine
 {
@@ -20,6 +21,7 @@ namespace engine
         bool m_shadowsEnabled;
 
         LMeshRenderer* m_meshRenderer;
+        LSkyboxRenderer* m_skyboxRenderer;
 
         static LMasterRenderer* _INSTANCE;
         LMasterRenderer();

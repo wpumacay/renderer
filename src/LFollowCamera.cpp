@@ -19,7 +19,7 @@ namespace engine
 
         m_type = LFollowCamera::GetStaticType();
 
-        dumpInfo();
+        // dumpInfo();
     }
 
     LFollowCamera::~LFollowCamera()

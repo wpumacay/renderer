@@ -56,28 +56,27 @@ namespace engine
         private :
 
         static vector<string> _split( const string &txt, char separator = ';' );
+        static LVec3 _computeFaceNormal( LVec3 v1, LVec3 v2, LVec3 v3, bool normalize = false );
 
         //static void _computeNormalsSingle();
         //static void _computeNormalsAvg();
 
-        static void _parseObj( ifstream& fileHandle,
-                               LObjInfo& obj );
+        // static void _parseObj( ifstream& fileHandle,
+        //                        LObjInfo& obj );
 
 
 
 
         public :
 
-        static LVec3 _computeFaceNormal( LVec3 v1, LVec3 v2, LVec3 v3, bool normalize = false );
-
         static LMesh* createSphere( GLfloat radius, int levelDivision = 10, int numLevels = 10 );
         static LMesh* createBox( GLfloat width, GLfloat height, GLfloat depth );
         static LMesh* createCylinder( GLfloat radius, GLfloat height, int sectionDivision = 10 );
         static LMesh* createCapsule( GLfloat radius, GLfloat height, int sectionDivision = 10, int capLevels = 10 );
+        static LMesh* createPlane( GLfloat width, GLfloat depth, float texRangeWidth = 10.0f, float texRangeDepth = 10.0f );
 
-        static LMesh* createPlane( GLfloat width, GLfloat depth );
-        static LMesh* createFromFile( const char* filename );
-        static LMesh* createFromObj( const char* filename );
+        // static LMesh* createFromFile( const char* filename );
+        // static LMesh* createFromObj( const char* filename );
 
         // static LMesh* createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision );
     };

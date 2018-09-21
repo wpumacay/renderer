@@ -37,17 +37,11 @@ namespace engine
             m_material = pMaterial;
         }
 
-        LMaterial* getMaterial() 
-        { 
-            return m_material; 
-        }
+        LMaterial* getMaterial() { return m_material; }
 
-        void addTexture( LTexture* pTexture )
-        {
-            m_textures.push_back( pTexture );
-        }
-
-        int hasTextures() { return m_textures.size(); }
+        void addTexture( LTexture* pTexture ) { m_textures.push_back( pTexture ); }
+        bool hasTextures() { return m_textures.size() > 0; }
+        vector< LTexture* > textures() { return m_textures; }
 
         virtual void render() = 0;
     };

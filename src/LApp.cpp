@@ -24,6 +24,7 @@ namespace engine
         m_scene = new LScene();
 
         engine::LShaderManager::create();
+        engine::LAssetsManager::create();
         engine::InputSystem::init();
         engine::DebugSystem::init();
 

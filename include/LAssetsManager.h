@@ -1,40 +1,53 @@
 #pragma once
 
-#include "LCommon.h"
+#include <LCommon.h>
 #include "../Config.h"
 
-#include <string>
-#include <map>
+#include <LTexture.h>
+#include <LCubeTexture.h>
 
 using namespace std;
 
 namespace engine
 {
 
-    struct LAssetsManager
+    class LAssetsManager
     {
-
         private :
 
         LAssetsManager();
 
-        static string s_cubeVariations[6];
+        static string CUBE_VARIATIONS[6];
+        
+        map< string, LTexture* > m_textures;
+        map< string, LCubeTexture* > m_cubeTextures;
+        map< string, LTexture* > m_builtInTextures;
+
+        static LAssetsManager* _INSTANCE;
+
+        void _createBuiltInTextures();
 
         public :
 
-        map< string, LTextureData* > texturesData;
-        map< string, LCubeTextureData* > cubeTexturesData;
-
-        static LAssetsManager* INSTANCE;
-
         static void create();
+        static void release();
+
         ~LAssetsManager();
-        void release();
 
-        LTextureData* loadTexture( const char* filename, const char* ftype = ".jpg" );
+        static LTextureData _loadTextureData( const string& filename,
+                                              const string& ftype = ".jpg" );
+        static LCubeTextureData _loadCubeTextureData( const string& basename,
+                                                  const string& ftype = ".jpg" );
 
-        LCubeTextureData* loadCubeTexture( const char* basename, const char* ftype = ".jpg" );
-};
+        static LTexture* loadTexture( const string& filename, 
+                                      const string& ftype = ".jpg" );
+        static LCubeTexture* loadCubeTexture( const string& basename, 
+                                              const string& ftype = ".jpg" );
+        static LTexture* getTexture( const string& textureId );
+        static LCubeTexture* getCubeTexture( const string& cubeTextureId );
+
+        static LTexture* getBuiltInTexture( const string& textureId );
+    };
 
 
 

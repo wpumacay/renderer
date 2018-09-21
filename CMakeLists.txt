@@ -67,9 +67,10 @@ add_library( gengine SHARED
              src/LSkybox.cpp
              src/LFrameBuffer.cpp
              src/LShadowMap.cpp
-             src/LMeshBuilder.cpp
              src/LMesh.cpp
+             src/LMeshBuilder.cpp
              src/LScene.cpp
+             src/LSkyboxRenderer.cpp
              src/LMeshRenderer.cpp
              src/LMasterRenderer.cpp
              src/input/LInputHandler.cpp

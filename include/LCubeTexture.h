@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LCommon.h"
+#include <LCommon.h>
 
 namespace engine
 {
@@ -10,23 +10,33 @@ namespace engine
 
         private :
 
-        GLuint m_textureId;
-        GLuint m_textureIndx;
-        int m_width;
-        int m_height;
+        GLuint m_cubeTextureId;
+        GLuint m_cubeTextureIndx;
+        LCubeTextureData m_cubeTextureData;
 
         public :
 
-        LCubeTexture();
+        LCubeTexture( const LCubeTextureData& cubeTextureData );
         ~LCubeTexture();
 
-        void setData( LCubeTextureData* pCubeData, GLuint type, GLuint textureIndx );
         void bind();
         void unbind();
 
-        int width() { return m_width; }
-        int height() { return m_height; }
+        LCubeTextureData data() { return m_cubeTextureData; }
+        
+        void setTextureIndex( GLuint cubeTextureIndx ) { m_cubeTextureIndx = cubeTextureIndx; }
+        GLuint getTextureIndex() { return m_cubeTextureIndx; }
 
+        void log()
+        {
+            std::cout << "CUBEMAP ********************" << std::endl;
+            std::cout << "width: " << m_cubeTextureData.width << std::endl;
+            std::cout << "height: " << m_cubeTextureData.height << std::endl;
+            std::cout << "channels: " << m_cubeTextureData.channels << std::endl;
+            std::cout << "ftype: " << m_cubeTextureData.ftype << std::endl;
+            std::cout << "textureindx: " << m_cubeTextureIndx << std::endl;
+            std::cout << "****************************" << std::endl;
+        }
     };
 
 

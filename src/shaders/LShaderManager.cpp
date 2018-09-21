@@ -7,6 +7,7 @@
 #include <shaders/LShaderBasic3d.h>
 #include <shaders/LShaderDebug3d.h>
 #include <shaders/LShaderFramebufferScreenRender.h>
+#include <shaders/LShaderSkybox.h>
 #include <shaders/LShaderShadowMap.h>
 
 // Special purpose shaders
@@ -26,7 +27,7 @@ namespace engine
 
         GLuint _vShader, _fShader, _program;
 
-        cout << "LShaderManager-> using glsl 330 core shaders" << endl;
+        // cout << "LShaderManager-> using glsl 330 core shaders" << endl;
 
         // Common shaders **************************************************
 
@@ -65,6 +66,13 @@ namespace engine
         m_programs["shadow_mapping"] = _program;
         m_programObjs["shadow_mapping"] = new LShaderShadowMap( _program );
 
+        _vShader = createShader( "basic3d_skybox_vs_120.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "basic3d_skybox_fs_120.glsl", GL_FRAGMENT_SHADER );
+        _program = createProgram( _vShader, _fShader );
+
+        m_programs["skybox"] = _program;
+        m_programObjs["skybox"] = new LShaderSkybox( _program );
+
         // *****************************************************************
         // Specific rendering shaders **************************************
 
@@ -78,12 +86,26 @@ namespace engine
         m_programs["lighting_entities"] = _program;
         m_programObjs["lighting_entities"] = new LShaderEntitiesLighting( _program );
 
+        _vShader = createShader( "entities/lighting_entities_textured_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "entities/lighting_entities_textured_fs.glsl", GL_FRAGMENT_SHADER );
+        _program = createProgram( _vShader, _fShader );
+
+        m_programs["lighting_entities_textured"] = _program;
+        m_programObjs["lighting_entities_textured"] = new LShaderEntitiesLighting( _program );
+
         _vShader = createShader( "entities/lighting_entities_shadows_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "entities/lighting_entities_shadows_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["lighting_entities_shadows"] = _program;
         m_programObjs["lighting_entities_shadows"] = new LShaderEntitiesLightingShadows( _program );
+
+        _vShader = createShader( "entities/lighting_entities_textured_shadows_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "entities/lighting_entities_textured_shadows_fs.glsl", GL_FRAGMENT_SHADER );
+        _program = createProgram( _vShader, _fShader );
+
+        m_programs["lighting_entities_textured_shadows"] = _program;
+        m_programObjs["lighting_entities_textured_shadows"] = new LShaderEntitiesLightingShadows( _program );
 
         // *****************************************************************
     }
@@ -127,7 +149,7 @@ namespace engine
 		_fullFilePath += "shaders/";
         _fullFilePath += filename;
 
-        cout << "file: " << _fullFilePath << endl;
+        // cout << "file: " << _fullFilePath << endl;
 
         _shaderFile.exceptions( ifstream::badbit );
 

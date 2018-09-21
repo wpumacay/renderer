@@ -2,7 +2,6 @@
 #pragma once
 
 #include <LMesh.h>
-#include <LICamera.h>
 #include <LIRenderer.h>
 #include <LShadowMap.h>
 
@@ -16,6 +15,17 @@ namespace engine
         private :
 
         std::vector< LMesh* > m_renderList;
+        std::vector< LMesh* > m_texturedList;
+        std::vector< LMesh* > m_nonTexturedList;
+
+        // void _renderSceneTexturedMeshes( LScene* pScene );
+        // void _renderSceneNonTexturedMeshes( LScene* pScene );
+
+        // void _renderSceneWithShadowMapTexturedMeshes( LScene* pScene );
+        // void _renderSceneWithShadowMapNonTexturedMeshes( LScene* pScene );
+
+        void _renderScene( LScene* pScene, bool textured );
+        void _renderSceneWithShadowMap( LScene* pScene, LShadowMap* shadowMap, bool textured );
 
         public :
 

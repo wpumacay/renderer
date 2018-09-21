@@ -17,7 +17,7 @@ namespace engine
     {
         m_type = LFixedCamera3d::GetStaticType();
 
-        dumpInfo();
+        // dumpInfo();
     }
 
     glm::mat4 LFixedCamera3d::getViewMatrix()
