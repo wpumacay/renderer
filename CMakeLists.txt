@@ -55,35 +55,19 @@ set( CAT1_INCLUDE_DIRECTORIES "${CAT1_INCLUDE_DIRECTORIES};ext/stb;include/" )
 message( "include-dirs : ${CAT1_INCLUDE_DIRECTORIES}" )
 include_directories( ${CAT1_INCLUDE_DIRECTORIES} )
 
-add_library( gengine SHARED
-             src/LCommon.cpp
-             src/LICamera.cpp
-             src/LFixedCamera3d.cpp
-             src/LFpsCamera.cpp
-             src/LFollowCamera.cpp
-             src/LIndexBuffer.cpp
-             src/LTexture.cpp
-             src/LCubeTexture.cpp
-             src/LSkybox.cpp
-             src/LFrameBuffer.cpp
-             src/LShadowMap.cpp
-             src/LMesh.cpp
-             src/LMeshBuilder.cpp
-             src/LScene.cpp
-             src/LSkyboxRenderer.cpp
-             src/LMeshRenderer.cpp
-             src/LMasterRenderer.cpp
-             src/input/LInputHandler.cpp
-             src/input/LInputSystem.cpp
-             src/debug/LDebugDrawer.cpp
-             src/debug/LDebugSystem.cpp
-             src/shaders/LShader.cpp
-             src/shaders/LShaderManager.cpp
-             src/LAssetsManager.cpp
-             src/LVertexArray.cpp
-             src/LVertexBuffer.cpp
-             src/LWindow.cpp
-             src/LApp.cpp )
+file( GLOB_RECURSE SRCS "src/*.cpp" )
+
+if( BUILD_SHARED_LIBS )
+    message( "Building engine as SHARED library" )
+    set( CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}" )
+    message( "Flags: ${CMAKE_CXX_FLAGS}" )
+    add_library( gengine SHARED
+                ${SRCS} )
+else()
+    message( "Building engine as STATIC library" )
+    add_library( gengine
+                ${SRCS} )
+endif()
 
 target_link_libraries( gengine 
                        glfw glad

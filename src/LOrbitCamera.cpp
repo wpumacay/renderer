@@ -6,11 +6,11 @@
 namespace engine
 {
 
-    LOrbitCamera::LOrbitCamera()
-    {
+    // LOrbitCamera::LOrbitCamera()
+    // {
 
 
-    }
+    // }
 
     
 
