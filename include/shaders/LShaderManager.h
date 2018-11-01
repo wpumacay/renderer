@@ -5,12 +5,8 @@
 #include "../Common.h"
 #include <shaders/LShader.h>
 
-#include <glad/glad.h>
-#include <iostream>
-#include <string>
 #include <fstream>
 #include <sstream>
-#include <map>
 
 using namespace std;
 

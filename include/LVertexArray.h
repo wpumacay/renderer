@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <vector>
-
-#include "LVertexBuffer.h"
+#include <LCommon.h>
+#include <LVertexBuffer.h>
 
 using namespace std;
 

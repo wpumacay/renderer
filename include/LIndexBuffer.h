@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <glad/glad.h>
+#include <LCommon.h>
 
 namespace engine
 {

@@ -5,7 +5,7 @@
 #include "../Config.h"
 #include "../Common.h"
 
-#include <glad/glad.h>
+#include <LCommon.h>
 #include <GLFW/glfw3.h>
 
 #define CLEAR_COLOR 0.6f, 0.659f, 0.690f, 1.0f
