@@ -34,21 +34,7 @@ namespace engine
 
         m_type = LFpsCamera::GetStaticType();
 
-        _updateCamera();
-    }
-
-    void LFpsCamera::_computeAngles()
-    {
-        
-    }
-
-    glm::mat4 LFpsCamera::getViewMatrix()
-    {
-        return glm::lookAt( glm::vec3( m_pos.x, m_pos.y, m_pos.z ),
-                            glm::vec3( m_pos.x + m_front.x, 
-                                       m_pos.y + m_front.y,
-                                       m_pos.z + m_front.z ),
-                            glm::vec3( m_up.x, m_up.y, m_up.z ) );
+        _updateCameraVectors();
     }
 
     void LFpsCamera::update( float dt )
@@ -93,7 +79,7 @@ namespace engine
 
         m_pitch = min( max( m_pitch, -89.0f ), 89.0f );
 
-        _updateCamera();
+        _updateCameraVectors();
 
         LVec3 _dFront = m_front * ( m_speed.x * dt );
         LVec3 _dRight = m_right * ( m_speed.z * dt );
@@ -101,25 +87,25 @@ namespace engine
         m_pos = m_pos + _dFront + _dRight;
     }
 
-    void LFpsCamera::_updateCamera()
+    void LFpsCamera::_updateCameraVectors()
     {
         if ( m_worldUpVectorId == UP_X )
         {
-            m_front.z = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
-            m_front.x = sin( glm::radians( m_pitch ) );
-            m_front.y = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.z = cos( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
+            m_front.x = sin( toRadians( m_pitch ) );
+            m_front.y = sin( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
         }
         else if ( m_worldUpVectorId == UP_Y )
         {
-            m_front.x = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
-            m_front.y = sin( glm::radians( m_pitch ) );
-            m_front.z = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.x = cos( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
+            m_front.y = sin( toRadians( m_pitch ) );
+            m_front.z = sin( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
         }
         else if ( m_worldUpVectorId == UP_Z )
         {
-            m_front.y = cos( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
-            m_front.z = sin( glm::radians( m_pitch ) );
-            m_front.x = sin( glm::radians( m_yaw ) ) * cos( glm::radians( m_pitch ) );
+            m_front.y = cos( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
+            m_front.z = sin( toRadians( m_pitch ) );
+            m_front.x = sin( toRadians( m_yaw ) ) * cos( toRadians( m_pitch ) );
         }
 
         m_front.normalize();
@@ -129,6 +115,8 @@ namespace engine
 
         m_up = LVec3::cross( m_right, m_front );
         m_up.normalize();
+
+        _buildViewMatrix();
     }
 
     void LFpsCamera::dumpInfo()

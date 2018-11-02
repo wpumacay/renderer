@@ -28,17 +28,17 @@ namespace engine
             unbind();
         }
 
-        void setModelMatrix( const glm::mat4& mat )
+        void setModelMatrix( const LMat4& mat )
         {
             _setMat4( m_uModelMatrix, mat );
         }
 
-        void setLightSpaceViewMatrix( const glm::mat4& mat )
+        void setLightSpaceViewMatrix( const LMat4& mat )
         {
             _setMat4( m_uLightSpaceViewMatrix, mat );
         }
 
-        void setLightSpaceProjectionMatrix( const glm::mat4& mat )
+        void setLightSpaceProjectionMatrix( const LMat4& mat )
         {
             _setMat4( m_uLightSpaceProjMatrix, mat );
         }

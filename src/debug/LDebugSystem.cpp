@@ -18,7 +18,7 @@ namespace engine { namespace DebugSystem {
         LDebugDrawer::GetInstance()->drawArrow( start, end, color );
     }
 
-    void drawClipVolume( const glm::mat4& clipMatrix, const LVec3& color )
+    void drawClipVolume( const LMat4& clipMatrix, const LVec3& color )
     {
         LDebugDrawer::GetInstance()->drawClipVolume( clipMatrix, color );
     }
@@ -33,7 +33,7 @@ namespace engine { namespace DebugSystem {
 
     }
 
-    void setupMatrices( glm::mat4 viewMatrix, glm::mat4 projectionMatrix )
+    void setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix )
     {
         LDebugDrawer::GetInstance()->setupMatrices( viewMatrix, projectionMatrix );
     }

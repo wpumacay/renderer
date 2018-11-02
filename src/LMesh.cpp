@@ -37,7 +37,6 @@ namespace engine
         m_material = new LMaterial();
 
         scale = LVec3( 1.0f, 1.0f, 1.0f );
-        rotation = glm::mat4( 1.0f );
     }
 
     LMesh::LMesh( const vector<LVec3>& vertices, 
@@ -75,8 +74,6 @@ namespace engine
         m_material = new LMaterial();
 
         scale = LVec3( 1.0f, 1.0f, 1.0f );
-
-        rotation = glm::mat4( 1.0f );
     }
 
     LMesh::LMesh( const vector<LVec3>& vertices, 
@@ -118,8 +115,6 @@ namespace engine
         m_material = new LMaterial();
 
         scale = LVec3( 1.0f, 1.0f, 1.0f );
-
-        rotation = glm::mat4( 1.0f );
     }
 
     LMesh::LMesh( const vector<LVec3>& vertices, 
@@ -156,8 +151,6 @@ namespace engine
         m_material = new LMaterial();
 
         scale = LVec3( 1.0f, 1.0f, 1.0f );
-
-        rotation = glm::mat4( 1.0f );
     }
 
     LMesh::~LMesh()
@@ -174,13 +167,15 @@ namespace engine
         }
     }
 
-    glm::mat4 LMesh::getModelMatrix()
+    LMat4 LMesh::getModelMatrix()
     {
-        glm::mat4 _model = glm::mat4( 1.0f );
+        LMat4 _model;
 
-        _model = glm::scale( glm::vec3( scale.x, scale.y, scale.z ) ) * _model;
+        _model = LMat4::scale( scale ) * _model;
         _model = rotation * _model;
-        _model = glm::translate( glm::vec3( pos.x, pos.y, pos.z ) ) * _model;
+        _model = LMat4::translate( pos ) * _model;
+
+        // std::cout << _model.toString() << std::endl;
 
         return _model;
     }

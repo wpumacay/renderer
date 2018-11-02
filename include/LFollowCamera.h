@@ -14,8 +14,6 @@ namespace engine
         LMesh* m_meshRef;
         float m_distToRef;
 
-        void _applyConstraints();
-
         public :
 
         LFollowCamera( const string& name,
@@ -30,7 +28,6 @@ namespace engine
         static string GetStaticType() { return string( "follow" ); }
 
         void setMeshReference( LMesh* pMesh );
-        glm::mat4 getViewMatrix() override;
         void update( float dt ) override;
 
     };

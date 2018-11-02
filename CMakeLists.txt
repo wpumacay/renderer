@@ -5,8 +5,6 @@ set( CMAKE_CXX_STANDARD 11 )
 
 message( "Configuring external dependencies" )
 
-set( GLM_TEST_ENABLE OFF CACHE BOOL "Build unit tests" )
-
 find_package( OpenGL REQUIRED )
 find_package( GLEW REQUIRED )
 find_package( PkgConfig REQUIRED )
@@ -19,12 +17,9 @@ pkg_search_module( GLFW REQUIRED glfw3 )
 message( "GLEW_INCLUDE_DIRS: ${GLEW_INCLUDE_DIRS}" )
 message( "GLEW_LIBRARIES: ${GLEW_LIBRARIES}" )
 
-add_subdirectory( ext/glm )
-
 include_directories( ${GLFW_INCLUDE_DIRS} )
 include_directories( ${GLEW_INCLUDE_DIRS} )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/ext/glm" )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb" )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_SOURCE_DIR}/res/")

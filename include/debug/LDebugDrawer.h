@@ -44,8 +44,8 @@ namespace engine
 
         LShaderDebug3d* m_shaderLinesRef;
 
-        glm::mat4 m_viewMat;
-        glm::mat4 m_projMat;
+        LMat4 m_viewMat;
+        LMat4 m_projMat;
 
         void _renderLinesBatch( int countLines );
         void _renderLines();
@@ -62,10 +62,10 @@ namespace engine
 
         void drawLine( const LVec3& start, const LVec3& end, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
         void drawArrow( const LVec3& start, const LVec3& end, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawClipVolume( const glm::mat4& clipMatrix, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawClipVolume( const LMat4& clipMatrix, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
         void drawTrailPoints( const vector< LVec3 >& trailpoints, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
 
-        void setupMatrices( const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix );
+        void setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix );
         void render();
     };
 

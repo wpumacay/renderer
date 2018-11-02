@@ -22,7 +22,7 @@ namespace engine
         void _setVec2( GLuint uniform, const LVec2& vec );
         void _setVec3( GLuint uniform, const LVec3& vec );
         void _setVec4( GLuint uniform, const LVec4& vec );
-        void _setMat4( GLuint uniform, const glm::mat4& mat );
+        void _setMat4( GLuint uniform, const LMat4& mat );
 
         public :
 
@@ -39,7 +39,7 @@ namespace engine
         void setVec2( const string& uName, const LVec2& vec );
         void setVec3( const string& uName, const LVec3& vec );
         void setVec4( const string& uName, const LVec4& vec );
-        void setMat4( const string& uName, const glm::mat4& mat );
+        void setMat4( const string& uName, const LMat4& mat );
 
 
     };

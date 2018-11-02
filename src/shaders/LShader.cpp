@@ -53,9 +53,9 @@ namespace engine
         glUniform4fv( glGetUniformLocation( m_id, uName.c_str() ), 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::setMat4( const string& uName, const glm::mat4& mat )
+    void LShader::setMat4( const string& uName, const LMat4& mat )
     {
-        glUniformMatrix4fv( glGetUniformLocation( m_id, uName.c_str() ), 1, GL_FALSE, glm::value_ptr( mat ) );
+        glUniformMatrix4fv( glGetUniformLocation( m_id, uName.c_str() ), 1, GL_FALSE, mat.buff );
     }
 
 
@@ -84,9 +84,9 @@ namespace engine
         glUniform4fv( uniform, 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::_setMat4( GLuint uniform, const glm::mat4& mat )
+    void LShader::_setMat4( GLuint uniform, const LMat4& mat )
     {
-        glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( mat ) );
+        glUniformMatrix4fv( uniform, 1, GL_FALSE, mat.buff );
     }
 
 

@@ -29,7 +29,7 @@ namespace engine
         
 		LICamera* m_currentCamera;
 
-        glm::mat4 m_projMatrix;
+        LMat4 m_projMatrix;
 
         void _checkCameraType();
 
@@ -47,7 +47,7 @@ namespace engine
 
         void changeToCameraByName( const string& cameraId );
 
-        glm::mat4 getProjMatrix() { return m_projMatrix; }
+        LMat4 getProjMatrix() { return m_projMatrix; }
         LICamera* getCurrentCamera() { return m_currentCamera; }
         vector<LILight*>& getLights() { return m_lights; }
 

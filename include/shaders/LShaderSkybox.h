@@ -27,12 +27,12 @@ namespace engine
             unbind();
         }
 
-        void setViewMatrix( const glm::mat4& mat )
+        void setViewMatrix( const LMat4& mat )
         {
-            _setMat4( m_uView, glm::mat4( glm::mat3( mat ) ) );
+            _setMat4( m_uView, mat.extractRotation() );
         }
 
-        void setProjectionMatrix( const glm::mat4& mat )
+        void setProjectionMatrix( const LMat4& mat )
         {
             _setMat4( m_uProj, mat );
         }

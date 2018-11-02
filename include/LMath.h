@@ -1,7 +1,7 @@
 
 #pragma once
 
-// TODO: Port stuff in common and add matrix functionality to replace glm calls
+// TODO: Port stuff in common and add matrix functionality
 
 namespace engine
 {

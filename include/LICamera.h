@@ -15,10 +15,18 @@ namespace engine
         protected :
 
         LVec3 m_pos;
+        LVec3 m_worldUp;
+
         LVec3 m_targetPoint;
         LVec3 m_targetDir;
-        LVec3 m_worldUp;
+        
+        LVec3 m_front;
+        LVec3 m_up;
+        LVec3 m_right;
+        
         int m_worldUpVectorId;
+        LMat4 m_viewMat;
+        LMat4 m_projMat;
 
         string m_type;
 
@@ -29,7 +37,7 @@ namespace engine
 
         string m_name;
 
-        virtual void _updateCamera();
+        void _buildViewMatrix();
 
         public :
 
@@ -46,7 +54,7 @@ namespace engine
                   int worldUpId,
                   float fov = 45.0f,
                   float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
-                  float zNear = 10.0f, float zFar = 40.0f );
+                  float zNear = 0.1f, float zFar = 100.0f );
 
         ~LICamera();
 
@@ -64,13 +72,10 @@ namespace engine
         float getZNear() { return m_zNear; }
         float getZFar() { return m_zFar; }
 
-        virtual glm::mat4 getViewMatrix() = 0;
-        glm::mat4 getProjectionMatrix();
+        LMat4 getViewMatrix() { return m_viewMat; }
+        LMat4 getProjectionMatrix() { return m_projMat; }
 
-        virtual void update( float dt ) 
-        {
-            // Override this
-        }
+        virtual void update( float dt ) = 0;
 
         virtual void dumpInfo()
         {

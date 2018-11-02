@@ -63,7 +63,7 @@ namespace engine
         m_linesColorsVBO = NULL;
     }
 
-    void LDebugDrawer::setupMatrices( const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix )
+    void LDebugDrawer::setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix )
     {
         m_viewMat = viewMatrix;
         m_projMat = projectionMatrix;
@@ -167,30 +167,32 @@ namespace engine
         drawLine( end, _p3, color );
     }
 
-    void LDebugDrawer::drawClipVolume( const glm::mat4& clipMatrix, const LVec3& color )
+    void LDebugDrawer::drawClipVolume( const LMat4& clipMatrix, const LVec3& color )
     {
-        glm::mat4 _invClipMatrix = glm::inverse( clipMatrix );
+        LMat4 _invClipMatrix = clipMatrix.inverse();
 
-        glm::vec3 _frustumPointsClipSpace[8] = {
+        LVec3 _frustumPointsClipSpace[8] = {
             // near plane
-            { -1.0f, -1.0f, -1.0f },{ 1.0f, -1.0f, -1.0f },
-            { 1.0f,  1.0f, -1.0f },{ -1.0f,  1.0f, -1.0f },
+            LVec3( -1.0f, -1.0f, -1.0f ), 
+            LVec3( 1.0f, -1.0f, -1.0f ),
+            LVec3( 1.0f,  1.0f, -1.0f ),
+            LVec3( -1.0f,  1.0f, -1.0f ),
             // far plane
-            { -1.0f, -1.0f,  1.0f },{ 1.0f, -1.0f,  1.0f },
-            { 1.0f,  1.0f,  1.0f },{ -1.0f,  1.0f,  1.0f }
+            LVec3( -1.0f, -1.0f, 1.0f ), 
+            LVec3( 1.0f, -1.0f, 1.0f ),
+            LVec3( 1.0f,  1.0f, 1.0f ),
+            LVec3( -1.0f,  1.0f, 1.0f )
         };
 
         vector< engine::LVec3 > _points3d;
         for ( int q = 0; q < 8; q++ )
         {
-            glm::vec4 _pointFrustum = _invClipMatrix * glm::vec4( _frustumPointsClipSpace[q], 1.0f );
-            glm::vec3 _pointFrustumNormalized = glm::vec3( _pointFrustum.x / _pointFrustum.w,
-                                                           _pointFrustum.y / _pointFrustum.w,
-                                                           _pointFrustum.z / _pointFrustum.w );
+            LVec4 _pointFrustum = _invClipMatrix * LVec4( _frustumPointsClipSpace[q], 1.0f );
+            LVec3 _pointFrustumNormalized = LVec3( _pointFrustum.x / _pointFrustum.w,
+                                                   _pointFrustum.y / _pointFrustum.w,
+                                                   _pointFrustum.z / _pointFrustum.w );
 
-            _points3d.push_back( engine::LVec3( _pointFrustumNormalized.x, 
-                                                _pointFrustumNormalized.y, 
-                                                _pointFrustumNormalized.z ) );
+            _points3d.push_back( _pointFrustumNormalized );
         }
 
         // near face

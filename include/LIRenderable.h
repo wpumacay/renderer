@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "LCommon.h"
-#include "LMaterial.h"
-#include "LTexture.h"
+#include <LCommon.h>
+#include <LMaterial.h>
+#include <LTexture.h>
 
 using namespace std;
 
@@ -22,7 +22,7 @@ namespace engine
         public :
 
         LVec3 pos;
-        glm::mat4 rotation;
+        LMat4 rotation;
         LVec3 scale;
 
         int getType() { return m_type; }

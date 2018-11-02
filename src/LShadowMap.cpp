@@ -53,14 +53,13 @@ namespace engine
         float _width  = 20.0f;
         float _height = 20.0f;
 
-        m_projMat = glm::ortho<float>( -0.5f * _width, 0.5f * _width, -0.5 * _height, 0.5 * _height, _zNear, _zFar );
+        m_projMat = LMat4::ortho( _width, _height, _zNear, _zFar );
 
         auto _vpos = pLight->getVirtualPosition();
-        glm::vec3 _virtualPosition = glm::vec3( _vpos.x, _vpos.y, _vpos.z );
-        glm::vec3 _virtualTarget = _virtualPosition + glm::vec3( pLight->direction.x, pLight->direction.y, pLight->direction.z );
+        auto _vtarget = _vpos + pLight->direction;
 
-        m_viewMat = glm::lookAt( _virtualPosition, _virtualTarget, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-        m_virtualLightPosition = LVec3( _virtualPosition.x, _virtualPosition.y, _virtualPosition.z );
+        m_viewMat = LMat4::lookAt( _vpos, _vtarget, LVec3( 0.0f, 1.0f, 0.0f ) );
+        m_virtualLightPosition = _vpos;
     }
 
     void LShadowMap::bind()

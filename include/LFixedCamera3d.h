@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "LICamera.h"
+#include <LICamera.h>
 
 using namespace std;
 
@@ -19,11 +19,11 @@ namespace engine
                         int worldUpId,
                         float fov = 45.0f,
                         float aspectRatio = ( (float)APP_WIDTH ) / APP_HEIGHT,
-                        float zNear = 1.0f, float zFar = 20.0f );
+                        float zNear = 0.1f, float zFar = 100.0f );
 
         static string GetStaticType() { return string( "fixed3d" ); }
 
-        glm::mat4 getViewMatrix() override;
+        void update( float dt ) override;
     };
 
 

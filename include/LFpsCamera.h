@@ -31,21 +31,15 @@ namespace engine
 
         float m_sensitivity;
 
-        LVec3 m_front;
-        LVec3 m_up;
-        LVec3 m_right;
-
         LVec3 m_speed;
         float m_baseSpeed;
 
         float m_lastX;
         float m_lastY;
 
-        void _computeAngles();
-
         protected :
 
-        void _updateCamera() override;
+        void _updateCameraVectors();
 
         public :
 
@@ -58,8 +52,6 @@ namespace engine
                     float zNear = 0.1f, float zFar = 100.0f );
 
         static string GetStaticType() { return string( "fps" ); }
-
-        glm::mat4 getViewMatrix() override;
 
         void update( float dt ) override;
 
