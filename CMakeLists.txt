@@ -42,12 +42,12 @@ target_link_libraries( gengine
                        ${OPENGL_LIBRARIES} 
                        ${GLEW_LIBRARIES} )
 
-add_executable( test1
+add_executable( glengine_test1
                 tests/test1.cpp )
-target_link_libraries( test1
+target_link_libraries( glengine_test1
                        gengine )
 
-add_executable( test2
+add_executable( glengine_test2
                 tests/test2.cpp )
-target_link_libraries( test2
+target_link_libraries( glengine_test2
                        gengine )
