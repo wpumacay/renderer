@@ -41,7 +41,17 @@ namespace engine
         }
 
         LVec3 getColor() { return this->ambient; }
-
+        void setColor( const LVec3& color )
+        {
+            this->ambient = color;
+            this->diffuse = color;
+            this->specular = color;
+        }
+        void setColor( float r, float g, float b )
+        {
+            LVec3 _color( r, g, b );
+            setColor( _color );
+        }
     };
 
 }

@@ -22,6 +22,8 @@ include_directories( ${GLEW_INCLUDE_DIRS} )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb" )
 
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable" )
+
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
 
 file( GLOB_RECURSE SRCS "src/*.cpp" )

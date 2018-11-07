@@ -61,7 +61,14 @@ namespace engine
 
     void LScene::addRenderable( LIRenderable* pRenderable )
     {
-        m_renderables.push_back( pRenderable );
+        if ( pRenderable )
+        {
+            m_renderables.push_back( pRenderable );
+        }
+        else
+        {
+            std::cout << "WARNING> Tried to pass a NULL reference" << std::endl;
+        }
     }
 
     void LScene::addFog( LFog* pFog )
