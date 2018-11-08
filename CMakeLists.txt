@@ -17,10 +17,15 @@ pkg_search_module( GLFW REQUIRED glfw3 )
 message( "GLEW_INCLUDE_DIRS: ${GLEW_INCLUDE_DIRS}" )
 message( "GLEW_LIBRARIES: ${GLEW_LIBRARIES}" )
 
-include_directories( ${GLFW_INCLUDE_DIRS} )
-include_directories( ${GLEW_INCLUDE_DIRS} )
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb" )
+set( GLENGINE_INCLUDE_DIRS
+     "${GLFW_INCLUDE_DIRS}"
+     "${GLEW_INCLUDE_DIRS}"
+     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+     "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb" )
+
+set( GLENGINE_INCLUDE_DIRS "${GLENGINE_INCLUDE_DIRS}" CACHE INTERNAL "" )
+
+include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable" )
 
