@@ -64,6 +64,8 @@ namespace engine
         bool isActive() { return glfwWindowShouldClose( m_window ) == 0; }
         bool isInitialized() { return m_initialized; }
 
+        void requestClose() { glfwSetWindowShouldClose( m_window, 1 ); }
+
         int width() { return m_width; }
         int height() { return m_height; }
 

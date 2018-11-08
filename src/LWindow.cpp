@@ -68,7 +68,6 @@ namespace engine
 
         glClearColor( CLEAR_COLOR );
 
-
         m_initialized = true;
     }
 
