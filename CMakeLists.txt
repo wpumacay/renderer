@@ -27,7 +27,7 @@ set( GLENGINE_INCLUDE_DIRS "${GLENGINE_INCLUDE_DIRS}" CACHE INTERNAL "" )
 
 include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable -g" )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
 
