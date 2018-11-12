@@ -181,8 +181,15 @@ namespace engine
         {
             float _x = radius * cos( q * _stepSectionAngle );
             float _z = radius * sin( q * _stepSectionAngle );
-
+        #if AXIS_X == 1
+            _sectionXZ.push_back( LVec3( 0, _z, _x ) );
+        #elif AXIS_Y == 1
             _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+        #elif AXIS_Z == 1
+            _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
+        #else
+            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+        #endif
         }
 
         // calculate cylinder geometry
@@ -190,8 +197,20 @@ namespace engine
         // up base
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
+        #if AXIS_X == 1
+            _vertices.push_back( _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 ) );
+            _normals.push_back( LVec3( 1, 0, 0 ) );
+        #elif AXIS_Y == 1
             _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
             _normals.push_back( LVec3( 0, 1, 0 ) );
+        #elif AXIS_Z == 1
+            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, 0.5 * height ) );
+            _normals.push_back( LVec3( 0, 0, 1 ) );
+        #else
+            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
+            _normals.push_back( LVec3( 0, 1, 0 ) );
+        #endif
+            // @TODO: Check this part, there might be something wrong with the texture coordinates
             _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
                                          0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
         }
@@ -204,16 +223,34 @@ namespace engine
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
             // quad vertices
+        #if AXIS_X == 1
+            auto _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
+            auto _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
+        #elif AXIS_Y == 1
             auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
             auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
             auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
             auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+        #elif AXIS_Z == 1
+            auto _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
+            auto _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
+        #else
+            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+        #endif
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
             _vertices.push_back( _p2 );
             _vertices.push_back( _p3 );
 
+            // @TODO: Check this part, there might be something wrong with the texture coordinates
             _texCoords.push_back( LVec2( 0.5 + ( atan2( _p0.z, _p0.x ) / ( 2 * _PI ) ), 
                                   0.5 + _p0.y / height ) );
             _texCoords.push_back( LVec2( 0.5 + ( atan2( _p1.z, _p1.x ) / ( 2 * _PI ) ), 
@@ -223,15 +260,40 @@ namespace engine
             _texCoords.push_back( LVec2( 0.5 + ( atan2( _p3.z, _p3.x ) / ( 2 * _PI ) ), 
                                   0.5 + _p3.y / height ) );
 
-            float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
-            float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
+            // float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
+            // float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
 
-            auto _nQuad = LVec3( _nx, 0, _nz );
+            // auto _nQuad = LVec3( _nx, 0, _nz );
 
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
-            _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+
+            // For "smooth" normals
+            float _nx1 = cos( ( q ) * _stepSectionAngle );
+            float _nz1 = sin( ( q ) * _stepSectionAngle );
+
+            float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
+            float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
+
+        #if AXIS_X == 1
+            auto _nQuad1 = LVec3( 0, _nz1, _nx1 );
+            auto _nQuad2 = LVec3( 0, _nz2, _nx2 );
+        #elif AXIS_Y == 1
+            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
+            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
+        #elif AXIS_Z == 1
+            auto _nQuad1 = LVec3( _nz1, _nx1, 0 );
+            auto _nQuad2 = LVec3( _nz2, _nx2, 0 );
+        #else
+            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
+            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
+        #endif
+            _normals.push_back( _nQuad1 );
+            _normals.push_back( _nQuad2 );
+            _normals.push_back( _nQuad2 );
+            _normals.push_back( _nQuad1 );
 
             _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
             _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
@@ -241,8 +303,20 @@ namespace engine
         // down base
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
+        #if AXIS_X == 1
+            _vertices.push_back( _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 ) );
+            _normals.push_back( LVec3( -1, 0, 0 ) );
+        #elif AXIS_Y == 1
             _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
             _normals.push_back( LVec3( 0, -1, 0 ) );
+        #elif AXIS_Z == 1
+            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, -0.5 * height ) );
+            _normals.push_back( LVec3( 0, 0, -1 ) );
+        #else
+            _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
+            _normals.push_back( LVec3( 0, -1, 0 ) );
+        #endif
+            // @TODO: Check this part, there might be something wrong with the texture coordinates
             _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
                                          0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
         }
