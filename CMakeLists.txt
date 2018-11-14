@@ -23,8 +23,6 @@ set( GLENGINE_INCLUDE_DIRS
      "${CMAKE_CURRENT_SOURCE_DIR}/include"
      "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb" )
 
-set( GLENGINE_INCLUDE_DIRS "${GLENGINE_INCLUDE_DIRS}" CACHE INTERNAL "" )
-
 include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable -g" )
@@ -36,15 +34,15 @@ file( GLOB_RECURSE SRCS "src/*.cpp" )
 if( BUILD_SHARED_LIBS )
     message( "Building engine as SHARED library" )
     set( CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}" )
-    add_library( gengine SHARED
+    add_library( cat1 SHARED
                 ${SRCS} )
 else()
     message( "Building engine as STATIC library" )
-    add_library( gengine
+    add_library( cat1
                 ${SRCS} )
 endif()
 
-target_link_libraries( gengine 
+target_link_libraries( cat1 
                        ${GLFW_LIBRARIES} 
                        ${OPENGL_LIBRARIES} 
                        ${GLEW_LIBRARIES} )
@@ -52,9 +50,9 @@ target_link_libraries( gengine
 add_executable( glengine_test1
                 tests/test1.cpp )
 target_link_libraries( glengine_test1
-                       gengine )
+                       cat1 )
 
 add_executable( glengine_test2
                 tests/test2.cpp )
 target_link_libraries( glengine_test2
-                       gengine )
+                       cat1 )
