@@ -25,6 +25,11 @@ namespace engine
         auto _renderables = pScene->getRenderables();
         for ( LIRenderable* _renderable : _renderables )
         {
+            if ( !_renderable->isVisible() )
+            {
+                continue;
+            }
+
             if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
             {
                 m_renderList.push_back( ( LMesh* )_renderable );

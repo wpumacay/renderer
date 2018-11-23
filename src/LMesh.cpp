@@ -10,6 +10,7 @@ namespace engine
 
     LMesh::LMesh( const vector<LVec3>& vertices, 
                   const vector<LVec3>& normals )
+        : LIRenderable()
     {
         m_usesIndices = false;
 
@@ -42,6 +43,7 @@ namespace engine
     LMesh::LMesh( const vector<LVec3>& vertices, 
                   const vector<LVec3>& normals,
                   const vector<LVec2>& texCoords )
+        : LIRenderable()
     {
         m_usesIndices = false;
 
@@ -80,6 +82,7 @@ namespace engine
                   const vector<LVec3>& normals,
                   const vector<LVec2>& texCoords,
                   const vector<LInd3>& indices )
+        : LIRenderable()
     {
         m_usesIndices = true;
 
@@ -120,6 +123,7 @@ namespace engine
     LMesh::LMesh( const vector<LVec3>& vertices, 
                   const vector<LVec3>& normals,
                   const vector<LInd3>& indices )
+        : LIRenderable()
     {
         m_usesIndices = true;
 
