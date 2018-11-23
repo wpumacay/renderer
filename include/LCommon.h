@@ -153,6 +153,12 @@ namespace engine
     LVec3 operator+ ( const LVec3& v1, const LVec3& v2 );
     LVec3 operator- ( const LVec3& v1, const LVec3& v2 );
 
+    struct LLine
+    {
+        LVec3 start;
+        LVec3 end;
+    };
+
     struct LMat4
     {
 

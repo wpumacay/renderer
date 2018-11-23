@@ -15,7 +15,7 @@ namespace engine
         m_shaderLinesRef = ( engine::LShaderDebug3d* ) LShaderManager::getShader( "debug3d" );
 
         m_linesRenderBufferPositions = vector< LDLinePositions >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
-        m_linesRenderBufferColors = vector< LDLineColors >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
+        m_linesRenderBufferColors = vector< LDLinePositionsColors >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
 
         m_linesVAO = new LVertexArray();
 
@@ -24,7 +24,7 @@ namespace engine
                                       3, ( GLfloat* ) m_linesRenderBufferPositions.data() );
 
         m_linesColorsVBO = new LVertexBuffer( GL_STREAM_DRAW );
-        m_linesColorsVBO->setData( sizeof( LDLineColors ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
+        m_linesColorsVBO->setData( sizeof( LDLinePositionsColors ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
                                    3, (GLfloat*)m_linesRenderBufferColors.data() );
 
         m_linesVAO->addBuffer( m_linesPositionsVBO, 0 );
@@ -77,7 +77,7 @@ namespace engine
     void LDebugDrawer::_renderLines()
     {
 
-        for ( int q = 0; q < m_linesPositions.size(); q++ )
+        for ( size_t q = 0; q < m_linesPositions.size(); q++ )
         {
             m_linesRenderBufferPositions[ q % 1024 ] = m_linesPositions[q];
             m_linesRenderBufferColors[ q % 1024 ] = m_linesColors[q];
@@ -107,10 +107,10 @@ namespace engine
         m_linesVAO->bind();
 
         m_linesPositionsVBO->updateData( count * sizeof( LDLinePositions ), ( GLfloat* ) m_linesRenderBufferPositions.data() );
-        m_linesColorsVBO->updateData( count * sizeof( LDLineColors ), ( GLfloat* ) m_linesRenderBufferColors.data() );
+        m_linesColorsVBO->updateData( count * sizeof( LDLinePositionsColors ), ( GLfloat* ) m_linesRenderBufferColors.data() );
 
         //m_linesPositionsVBO->setData( count * sizeof( LDLinePositions ), 3, ( GLfloat* ) m_linesRenderBufferPositions.data() );
-        //m_linesColorsVBO->setData( count * sizeof( LDLineColors ), 3, ( GLfloat* ) m_linesRenderBufferColors.data() );
+        //m_linesColorsVBO->setData( count * sizeof( LDLinePositionsColors ), 3, ( GLfloat* ) m_linesRenderBufferColors.data() );
 
         m_shaderLinesRef->bind();
         m_shaderLinesRef->setViewMatrix( m_viewMat );
@@ -131,7 +131,7 @@ namespace engine
 
         m_linesPositions.push_back( _linePos );
 
-        LDLineColors _lineCol;
+        LDLinePositionsColors _lineCol;
         _lineCol.cStart = color;
         _lineCol.cEnd = color;
 
@@ -185,7 +185,7 @@ namespace engine
         };
 
         vector< engine::LVec3 > _points3d;
-        for ( int q = 0; q < 8; q++ )
+        for ( size_t q = 0; q < 8; q++ )
         {
             LVec4 _pointFrustum = _invClipMatrix * LVec4( _frustumPointsClipSpace[q], 1.0f );
             LVec3 _pointFrustumNormalized = LVec3( _pointFrustum.x / _pointFrustum.w,
@@ -221,9 +221,22 @@ namespace engine
             return;
         }
 
-        for ( int q = 0; q < trailpoints.size() - 1; q++ )
+        for ( size_t q = 0; q < trailpoints.size() - 1; q++ )
         {
             drawLine( trailpoints[q], trailpoints[ q + 1 ], color );
+        }
+    }
+
+    void LDebugDrawer::drawLinesBatch( const vector< LLine >& linesBatch, const LVec3& color )
+    {
+        if ( linesBatch.size() < 1 )
+        {
+            return;
+        }
+
+        for ( size_t q = 0; q < linesBatch.size(); q++ )
+        {
+            drawLine( linesBatch[q].start, linesBatch[q].end, color );
         }
     }
 }

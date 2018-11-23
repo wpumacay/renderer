@@ -23,9 +23,14 @@ namespace engine { namespace DebugSystem {
         LDebugDrawer::GetInstance()->drawClipVolume( clipMatrix, color );
     }
 
-    void drawTrailPoints( const vector< LVec3 >& trailpoints, const LVec3& color )
+    void drawTrailPoints( const std::vector< LVec3 >& trailpoints, const LVec3& color )
     {
         LDebugDrawer::GetInstance()->drawTrailPoints( trailpoints, color );
+    }
+
+    void drawLinesBatch( const std::vector< LLine >& linesBatch, const LVec3& color )
+    {
+        LDebugDrawer::GetInstance()->drawLinesBatch( linesBatch, color );
     }
 
     void renderView( const LVec2& pos, const LVec2& size, GLuint textureID )
