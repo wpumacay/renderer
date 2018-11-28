@@ -1,7 +1,6 @@
 
 
 #include "LMesh.h"
-#include "LMeshBuilder.h"
 
 using namespace std;
 
@@ -169,19 +168,6 @@ namespace engine
         {
             delete m_indexBuffer;
         }
-    }
-
-    LMat4 LMesh::getModelMatrix()
-    {
-        LMat4 _model;
-
-        _model = LMat4::scale( scale ) * _model;
-        _model = rotation * _model;
-        _model = LMat4::translate( pos ) * _model;
-
-        // std::cout << _model.toString() << std::endl;
-
-        return _model;
     }
 
     /* @TODO: Implement another way of using the textures. Currently we ...

@@ -7,8 +7,11 @@ message( "Configuring external dependencies" )
 
 find_package( OpenGL REQUIRED )
 find_package( GLEW REQUIRED )
+find_package( assimp REQUIRED )
 find_package( PkgConfig REQUIRED )
 pkg_search_module( GLFW REQUIRED glfw3 )
+
+message( "ASSIMP_INCLUDE_DIRS: ${ASSIMP_INCLUDE_DIRS}" )
 
 # message( "GLFW_INCLUDE_DIRS: ${GLFW_INCLUDE_DIRS}" )
 # message( "GLFW_LIBRARIES: ${GLFW_LIBRARIES}" )
@@ -45,7 +48,8 @@ endif()
 target_link_libraries( cat1 
                        ${GLFW_LIBRARIES} 
                        ${OPENGL_LIBRARIES} 
-                       ${GLEW_LIBRARIES} )
+                       ${GLEW_LIBRARIES}
+                       assimp )
 
 add_executable( glengine_test1
                 tests/test1.cpp )
@@ -55,4 +59,18 @@ target_link_libraries( glengine_test1
 add_executable( glengine_test2
                 tests/test2.cpp )
 target_link_libraries( glengine_test2
+                       cat1 )
+
+find_package( GLUT REQUIRED )
+
+add_executable( test_assimp
+                tests/test3.cpp )
+target_link_libraries( test_assimp
+                       ${OPENGL_LIBRARIES}
+                       ${GLUT_LIBRARIES}
+                       assimp )
+
+add_executable( glengine_test4
+                tests/test4.cpp )
+target_link_libraries( glengine_test4
                        cat1 )

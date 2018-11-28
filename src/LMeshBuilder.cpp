@@ -657,6 +657,92 @@ namespace engine
     }
 
 
+    LModel* LMeshBuilder::createModelFromFile( const std::string& filename,
+                                               const std::string& modelName )
+    {
+        auto _assimpScenePtr = aiImportFile( filename.c_str(),
+                                             aiProcessPreset_TargetRealtime_MaxQuality );
+
+        if ( !_assimpScenePtr )
+        {
+            return NULL;
+        }
+
+        // Create a temporary holder to place the processes data from assimp
+        auto _model = new LModel( modelName );
+        // recursively copy the data from assimp to our data structure
+        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr );
+
+        // make sure we release the assimp resources
+        // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
+        aiReleaseImport( _assimpScenePtr );
+
+        return _model;
+    }
+
+
+    void LMeshBuilder::_processAssimpNode( LModel* modelPtr, 
+                                           aiNode* assimpNodePtr, 
+                                           const aiScene* assimpScenePtr )
+    {
+        for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
+        {
+            aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
+            modelPtr->addMesh( _processAssimpMesh( _assimpMeshPtr ) );
+        }
+
+        for ( size_t i = 0; i < assimpNodePtr->mNumChildren; i++ )
+        {
+            _processAssimpNode( modelPtr,
+                                assimpNodePtr->mChildren[i],
+                                assimpScenePtr );
+        }
+    }
+
+    LMesh* LMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
+    {
+        vector<LVec3> _vertices;
+        vector<LVec3> _normals;
+        vector<LVec2> _texCoords;
+        vector<LInd3> _indices;
+
+        for ( size_t i = 0; i < assimpMeshPtr->mNumVertices; i++ )
+        {
+            _vertices.push_back( LVec3( assimpMeshPtr->mVertices[i].x,
+                                        assimpMeshPtr->mVertices[i].y,
+                                        assimpMeshPtr->mVertices[i].z ) );
+
+            _normals.push_back( LVec3( assimpMeshPtr->mNormals[i].x,
+                                       assimpMeshPtr->mNormals[i].y,
+                                       assimpMeshPtr->mNormals[i].z ) );
+
+            if ( assimpMeshPtr->mTextureCoords[0] )
+            {
+                _texCoords.push_back( LVec2( assimpMeshPtr->mTextureCoords[0][i].x,
+                                             assimpMeshPtr->mTextureCoords[0][i].y ) );
+            }
+            else
+            {
+                _texCoords.push_back( LVec2( 0.0f, 0.0f ) );
+            }
+        }
+
+        for ( size_t i = 0; i < assimpMeshPtr->mNumFaces; i++ )
+        {
+            aiFace _assimpFace = assimpMeshPtr->mFaces[i];
+            // grab only in tris. we are assuming it comes this way
+            // @TODO: Check this part as may have to support quads
+            for ( size_t j = 0; j < _assimpFace.mNumIndices / 3; j++ )
+            {
+                _indices.push_back( LInd3( _assimpFace.mIndices[ 3 * j + 0 ],
+                                           _assimpFace.mIndices[ 3 * j + 1 ],
+                                           _assimpFace.mIndices[ 3 * j + 2 ] ) );
+            }
+        }
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
+    }
+
     // LMesh* LMeshBuilder::createFromFile( const char* filename )
     // {
     //     LMesh* _mesh = NULL;
@@ -795,7 +881,7 @@ namespace engine
     // {
     //     cout << "parsing geometry" << endl;
 
-    //     map<string, LObjGeometryInfo> _objects;
+    //     map<string, LGeometryInfo> _objects;
 
     //     string _currentObjectName;
 
@@ -818,7 +904,7 @@ namespace engine
     //         else if ( _vStr[0] == OBJ_OBJECT_NAME )
     //         {
     //             _currentObjectName = _vStr[1];
-    //             _objects[_currentObjectName] = LObjGeometryInfo();
+    //             _objects[_currentObjectName] = LGeometryInfo();
     //         }
     //         else if ( _vStr[0] == OBJ_GROUP_NAME )
     //         {
@@ -831,7 +917,7 @@ namespace engine
     //             if ( _currentObjectName == "" )
     //             {
     //                 _currentObjectName = "default";
-    //                 _objects[_currentObjectName] = LObjGeometryInfo();
+    //                 _objects[_currentObjectName] = LGeometryInfo();
     //             }
 
     //             LVec3 _v( stof( _vStr[1] ), stof( _vStr[2] ), stof( _vStr[3] ) );

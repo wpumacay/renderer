@@ -30,20 +30,20 @@ namespace engine
                 continue;
             }
 
-            if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
-            {
-                m_renderList.push_back( ( LMesh* )_renderable );
+            // if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
+            // {
+                m_renderList.push_back( _renderable );
 
                 // add it to the appropiate texture-list
                 if ( _renderable->hasTextures() )
                 {
-                    m_texturedList.push_back( ( LMesh* ) _renderable );
+                    m_texturedList.push_back( _renderable );
                 }
                 else
                 {
-                    m_nonTexturedList.push_back( ( LMesh* ) _renderable );
+                    m_nonTexturedList.push_back( _renderable );
                 }
-            }
+            // }
         }
     }
 
@@ -83,7 +83,7 @@ namespace engine
         // render all meshes
         if ( textured )
         {
-            for ( LMesh* _mesh : m_texturedList )
+            for ( auto _mesh : m_texturedList )
             {
                 _shader->setModelMatrix( _mesh->getModelMatrix() );
                 _shader->setMaterial( _mesh->getMaterial() );
@@ -93,7 +93,7 @@ namespace engine
         }
         else
         {
-            for ( LMesh* _mesh : m_nonTexturedList )
+            for ( auto _mesh : m_nonTexturedList )
             {
                 _shader->setModelMatrix( _mesh->getModelMatrix() );
                 _shader->setMaterial( _mesh->getMaterial() );
@@ -130,7 +130,7 @@ namespace engine
         _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
         _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );
 
-        for ( LMesh* _mesh : m_renderList )
+        for ( auto _mesh : m_renderList )
         {
             _shader->setModelMatrix( _mesh->getModelMatrix() );
             _mesh->render();
@@ -180,7 +180,7 @@ namespace engine
         // render all meshes
         if ( textured )
         {
-            for ( LMesh* _mesh : m_texturedList )
+            for ( auto _mesh : m_texturedList )
             {
                 _shader->setModelMatrix( _mesh->getModelMatrix() );
                 _shader->setMaterial( _mesh->getMaterial() );
@@ -190,7 +190,7 @@ namespace engine
         }
         else
         {
-            for ( LMesh* _mesh : m_nonTexturedList )
+            for ( auto _mesh : m_nonTexturedList )
             {
                 _shader->setModelMatrix( _mesh->getModelMatrix() );
                 _shader->setMaterial( _mesh->getMaterial() );

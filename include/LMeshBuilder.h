@@ -4,11 +4,17 @@
 #include "LCommon.h"
 
 #include "LMesh.h"
+#include "LModel.h"
 
 #include <fstream>
 #include <string>
 #include <vector>
 #include <cmath>
+
+// Assimp helper functionality
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 using namespace std;
 
@@ -40,14 +46,12 @@ namespace engine
         string materialFile;
     };
 
-    struct LObjGeometryInfo
+    struct LGeometryInfo
     {
         vector<LVec3> vertices;
         vector<LVec3> normals;
         vector<LVec2> texCoords;
-        vector<LInd3> indices;        
-
-
+        vector<LInd3> indices;
     };
 
     struct LMeshBuilder
@@ -64,8 +68,10 @@ namespace engine
         // static void _parseObj( ifstream& fileHandle,
         //                        LObjInfo& obj );
 
-
-
+        static LMesh* _processAssimpMesh( aiMesh* assimpMeshPtr );
+        static void _processAssimpNode( LModel* modelPtr, 
+                                        aiNode* assimpNodePtr, 
+                                        const aiScene* assimpScenePtr );
 
         public :
 
@@ -74,6 +80,10 @@ namespace engine
         static LMesh* createCylinder( GLfloat radius, GLfloat height, int sectionDivision = 10 );
         static LMesh* createCapsule( GLfloat radius, GLfloat height, int sectionDivision = 10, int capLevels = 10 );
         static LMesh* createPlane( GLfloat width, GLfloat depth, float texRangeWidth = 10.0f, float texRangeDepth = 10.0f );
+
+        // Use assimp importer to load meshes
+        static LModel* createModelFromFile( const std::string& filename,
+                                            const std::string& modelName );
 
         // static LMesh* createFromFile( const char* filename );
         // static LMesh* createFromObj( const char* filename );

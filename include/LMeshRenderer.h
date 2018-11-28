@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <LMesh.h>
+#include <LIRenderable.h>
 #include <LIRenderer.h>
 #include <LShadowMap.h>
 
@@ -14,9 +14,9 @@ namespace engine
 
         private :
 
-        std::vector< LMesh* > m_renderList;
-        std::vector< LMesh* > m_texturedList;
-        std::vector< LMesh* > m_nonTexturedList;
+        std::vector< LIRenderable* > m_renderList;
+        std::vector< LIRenderable* > m_texturedList;
+        std::vector< LIRenderable* > m_nonTexturedList;
 
         // void _renderSceneTexturedMeshes( LScene* pScene );
         // void _renderSceneNonTexturedMeshes( LScene* pScene );

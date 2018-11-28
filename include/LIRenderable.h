@@ -42,6 +42,17 @@ namespace engine
 
         LMaterial* getMaterial() { return m_material; }
 
+        LMat4 getModelMatrix()
+        {
+            LMat4 _model;
+
+            _model = LMat4::scale( scale ) * _model;
+            _model = rotation * _model;
+            _model = LMat4::translate( pos ) * _model;
+
+            return _model;
+        }
+
         void addTexture( LTexture* pTexture ) { m_textures.push_back( pTexture ); }
         bool hasTextures() { return m_textures.size() > 0; }
         vector< LTexture* > textures() { return m_textures; }

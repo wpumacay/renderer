@@ -374,6 +374,42 @@ namespace engine
             return _res;
         }
 
+        static LMat4 rotationX( float theta )
+        {
+            LMat4 _res;
+
+            _res.buff[5] = cos( theta );
+            _res.buff[6] = sin( theta );
+            _res.buff[9] = -sin( theta );
+            _res.buff[10] = cos( theta );
+
+            return _res;
+        }
+
+        static LMat4 rotationY( float theta )
+        {
+            LMat4 _res;
+
+            _res.buff[0] = cos( theta );
+            _res.buff[2] = -sin( theta );
+            _res.buff[8] = sin( theta );
+            _res.buff[10] = cos( theta );
+
+            return _res;
+        }
+
+        static LMat4 rotationZ( float theta )
+        {
+            LMat4 _res;
+
+            _res.buff[0] = cos( theta );
+            _res.buff[1] = sin( theta );
+            _res.buff[4] = -sin( theta );
+            _res.buff[5] = cos( theta );
+
+            return _res;
+        }
+
         string toString()
         {
             string _res;

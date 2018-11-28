@@ -55,8 +55,6 @@ namespace engine
 
         ~LMesh();
 
-        LMat4 getModelMatrix();
-
         LVertexArray* getVertexArray() const { return m_vertexArray; }
         LIndexBuffer* getIndexBuffer() const { return m_indexBuffer; }
 
