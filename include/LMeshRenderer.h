@@ -2,6 +2,8 @@
 #pragma once
 
 #include <LIRenderable.h>
+#include <LMesh.h>
+#include <LModel.h>
 #include <LIRenderer.h>
 #include <LShadowMap.h>
 

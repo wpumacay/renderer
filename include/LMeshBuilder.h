@@ -80,6 +80,8 @@ namespace engine
         static LMesh* createCylinder( GLfloat radius, GLfloat height, int sectionDivision = 10 );
         static LMesh* createCapsule( GLfloat radius, GLfloat height, int sectionDivision = 10, int capLevels = 10 );
         static LMesh* createPlane( GLfloat width, GLfloat depth, float texRangeWidth = 10.0f, float texRangeDepth = 10.0f );
+        static LMesh* createArrow( GLfloat length, const std::string& axis );
+        static LModel* createAxes( GLfloat length );
 
         // Use assimp importer to load meshes
         static LModel* createModelFromFile( const std::string& filename,

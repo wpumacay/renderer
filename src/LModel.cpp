@@ -9,6 +9,8 @@ namespace engine
     {
         m_name = name;
 
+        m_type = RENDERABLE_TYPE_MODEL;
+
         m_material = new LMaterial();
         
         scale = LVec3( 1.0f, 1.0f, 1.0f );

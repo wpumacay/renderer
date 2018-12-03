@@ -4,6 +4,8 @@
 #include <shaders/LShaderShadowMap.h>
 #include <shaders/LShaderEntitiesLightingShadows.h>
 
+// @TODO: Modify the rendering process of models, as the texture check is done via the parent, not children
+
 namespace engine
 {
 
@@ -85,20 +87,46 @@ namespace engine
         {
             for ( auto _mesh : m_texturedList )
             {
-                _shader->setModelMatrix( _mesh->getModelMatrix() );
-                _shader->setMaterial( _mesh->getMaterial() );
+                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                {
+                    auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
 
-                _mesh->render();
+                    for ( auto _child : _children )
+                    {
+                        _shader->setModelMatrix( _mesh->getModelMatrix() );
+                        _shader->setMaterial( _child->getMaterial() );
+                        _child->render();
+                    }
+                }
+                else
+                {
+                    _shader->setModelMatrix( _mesh->getModelMatrix() );
+                    _shader->setMaterial( _mesh->getMaterial() );
+                    _mesh->render();
+                }
             }
         }
         else
         {
             for ( auto _mesh : m_nonTexturedList )
             {
-                _shader->setModelMatrix( _mesh->getModelMatrix() );
-                _shader->setMaterial( _mesh->getMaterial() );
+                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                {
+                    auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
 
-                _mesh->render();
+                    for ( auto _child : _children )
+                    {
+                        _shader->setModelMatrix( _mesh->getModelMatrix() );
+                        _shader->setMaterial( _child->getMaterial() );
+                        _child->render();
+                    }
+                }
+                else
+                {
+                    _shader->setModelMatrix( _mesh->getModelMatrix() );
+                    _shader->setMaterial( _mesh->getMaterial() );
+                    _mesh->render();
+                }
             }
         }
 
@@ -182,20 +210,47 @@ namespace engine
         {
             for ( auto _mesh : m_texturedList )
             {
-                _shader->setModelMatrix( _mesh->getModelMatrix() );
-                _shader->setMaterial( _mesh->getMaterial() );
+                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                {
+                    auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
 
-                _mesh->render();
+                    for ( auto _child : _children )
+                    {
+                        _shader->setModelMatrix( _mesh->getModelMatrix() );
+                        _shader->setMaterial( _child->getMaterial() );
+                        _child->render();
+                    }
+                }
+                else
+                {
+                    _shader->setModelMatrix( _mesh->getModelMatrix() );
+                    _shader->setMaterial( _mesh->getMaterial() );
+                    _mesh->render();
+                }
             }
         }
         else
         {
             for ( auto _mesh : m_nonTexturedList )
             {
-                _shader->setModelMatrix( _mesh->getModelMatrix() );
-                _shader->setMaterial( _mesh->getMaterial() );
+                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                {
+                    auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
 
-                _mesh->render();
+                    for ( auto _child : _children )
+                    {
+                        _shader->setModelMatrix( _mesh->getModelMatrix() );
+                        _shader->setMaterial( _child->getMaterial() );
+                        _child->render();
+                    }
+                }
+                else
+                {
+                    _shader->setModelMatrix( _mesh->getModelMatrix() );
+                    _shader->setMaterial( _mesh->getMaterial() );
+
+                    _mesh->render();
+                }
             }
         }
 

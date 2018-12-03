@@ -23,6 +23,8 @@ namespace engine
         void addMesh( LMesh* meshPtr );
         void render() override;
 
+        std::vector< LMesh* > getMeshes() { return m_meshes; }
+
     };
 
 
