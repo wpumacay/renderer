@@ -21,6 +21,7 @@ namespace engine
         ~LModel();
 
         void addMesh( LMesh* meshPtr );
+        void setWireframeMode( bool useWireframe ) override;
         void render() override;
 
         std::vector< LMesh* > getMeshes() { return m_meshes; }

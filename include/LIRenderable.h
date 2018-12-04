@@ -15,9 +15,10 @@ namespace engine
     {
         protected :
  
-        int m_type;
-        bool m_isVisible;
-        LMaterial* m_material;
+        int                 m_type;
+        bool                m_isVisible;
+        bool                m_drawAsWireframe;
+        LMaterial*          m_material;
         vector< LTexture* > m_textures;
 
         public :
@@ -26,39 +27,25 @@ namespace engine
         LMat4 rotation;
         LVec3 scale;
 
-        LIRenderable() { m_isVisible = true; }
+        LIRenderable();
+        ~LIRenderable();
 
-        int getType() { return m_type; }
+        int getType();
 
-        void setMaterial( LMaterial* pMaterial )
-        {
-            if ( m_material != NULL )
-            {
-                delete m_material;
-            }
-            
-            m_material = pMaterial;
-        }
+        void setMaterial( LMaterial* pMaterial );
+        LMaterial* getMaterial();
 
-        LMaterial* getMaterial() { return m_material; }
+        LMat4 getModelMatrix();
 
-        LMat4 getModelMatrix()
-        {
-            LMat4 _model;
+        void addTexture( LTexture* pTexture );
+        bool hasTextures();
+        vector< LTexture* > textures();
 
-            _model = LMat4::scale( scale ) * _model;
-            _model = rotation * _model;
-            _model = LMat4::translate( pos ) * _model;
+        bool isVisible();
+        void setVisibility( bool visibility );
 
-            return _model;
-        }
-
-        void addTexture( LTexture* pTexture ) { m_textures.push_back( pTexture ); }
-        bool hasTextures() { return m_textures.size() > 0; }
-        vector< LTexture* > textures() { return m_textures; }
-
-        bool isVisible() { return m_isVisible; }
-        void setVisibility( bool visibility ) { m_isVisible = visibility; }
+        virtual void setWireframeMode( bool useWireframe );
+        bool isWireframe();
 
         virtual void render() = 0;
     };

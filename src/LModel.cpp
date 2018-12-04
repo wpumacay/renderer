@@ -30,6 +30,16 @@ namespace engine
         m_meshes.push_back( meshPtr );
     }
 
+    void LModel::setWireframeMode( bool useWireframe )
+    {
+        LIRenderable::setWireframeMode( useWireframe );
+
+        for ( size_t i = 0; i < m_meshes.size(); i++ )
+        {
+            m_meshes[i]->setWireframeMode( useWireframe );
+        }
+    }
+
     void LModel::render()
     {
         for ( size_t i = 0; i < m_meshes.size(); i++ )

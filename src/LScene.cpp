@@ -18,6 +18,12 @@ namespace engine
 
     LScene::~LScene()
     {
+        for ( size_t i = 0; i < m_renderables.size(); i++ )
+        {
+            delete m_renderables[i];
+        }
+        m_renderables.clear();
+
         map<string, LICamera*>::iterator _it;
         for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {

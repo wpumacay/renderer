@@ -174,6 +174,11 @@ namespace engine
               are binding each texture for each render call :( */
     void LMesh::render()
     {
+        if ( m_drawAsWireframe )
+        {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+
         if ( m_usesIndices )
         {
             for ( LTexture* _texture : m_textures )
@@ -211,6 +216,11 @@ namespace engine
             {
                 _texture->unbind();
             }
+        }
+
+        if ( m_drawAsWireframe )
+        {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         }
 
     }

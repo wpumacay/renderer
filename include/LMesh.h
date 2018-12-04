@@ -35,8 +35,6 @@ namespace engine
 
         public :
 
-        bool drawAsWireframe;
-
         LMesh( const vector<LVec3>& vertices,
                const vector<LVec3>& normals );
 
