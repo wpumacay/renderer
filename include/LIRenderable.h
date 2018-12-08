@@ -27,6 +27,8 @@ namespace engine
         LMat4 rotation;
         LVec3 scale;
 
+        bool debug;
+
         LIRenderable();
         ~LIRenderable();
 

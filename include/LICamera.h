@@ -35,6 +35,8 @@ namespace engine
         float m_zNear;
         float m_zFar;
 
+        bool m_isActive;
+
         string m_name;
 
         void _buildViewMatrix();
@@ -92,6 +94,8 @@ namespace engine
             cout << "******************************************" << endl;
         }
 
+        void setActiveMode( bool activeMode ) { m_isActive = activeMode; }
+        bool isActive() { return m_isActive; }
     };
 
 

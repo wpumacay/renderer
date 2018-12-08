@@ -33,7 +33,9 @@ namespace engine
         static LApp* GetInstance();
         ~LApp();
 
+        void begin();
         void update();
+        void end();
         LScene* scene();
         bool isActive();
 

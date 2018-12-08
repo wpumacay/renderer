@@ -1,5 +1,6 @@
 
 #include <LMeshRenderer.h>
+#include <shaders/LShaderBasic3d.h>
 #include <shaders/LShaderEntitiesLighting.h>
 #include <shaders/LShaderShadowMap.h>
 #include <shaders/LShaderEntitiesLightingShadows.h>
@@ -32,23 +33,57 @@ namespace engine
                 continue;
             }
 
-            // if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
-            // {
-                m_renderList.push_back( _renderable );
+            if ( _renderable->debug )
+            {
+                m_debugList.push_back( _renderable );
+            }
+            else
+            {
+                // if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
+                // {
+                    m_renderList.push_back( _renderable );
 
-                // add it to the appropiate texture-list
-                if ( _renderable->hasTextures() )
-                {
-                    m_texturedList.push_back( _renderable );
-                }
-                else
-                {
-                    m_nonTexturedList.push_back( _renderable );
-                }
+                    // add it to the appropiate texture-list
+                    if ( _renderable->hasTextures() )
+                    {
+                        m_texturedList.push_back( _renderable );
+                    }
+                    else
+                    {
+                        m_nonTexturedList.push_back( _renderable );
+                    }
 
-                std::cout << "renderlist.size: " << m_renderList.size() << std::endl;
-            // }
+                    // std::cout << "renderlist.size: " << m_renderList.size() << std::endl;
+                // }
+            }
         }
+    }
+
+    void LMeshRenderer::_renderDebug( LScene* pScene )
+    {
+        auto _debugShader = ( engine::LShaderBasic3d* ) LShaderManager::getShader( "basic3d" );
+
+        auto _camera = pScene->getCurrentCamera();
+        if ( _camera == NULL )
+        {
+            std::cout << "ERROR> There is no current camera in the scene. No render executed" << std::endl;
+            return;
+        }
+
+        _debugShader->bind();
+
+        _debugShader->setViewMatrix( _camera->getViewMatrix() );
+        _debugShader->setProjectionMatrix( _camera->getProjectionMatrix() );
+
+        for ( auto _mesh : m_debugList )
+        {
+            _debugShader->setModelMatrix( _mesh->getModelMatrix() );
+            _debugShader->setColor( _mesh->getMaterial()->diffuse );
+
+            _mesh->render();
+        }
+
+        _debugShader->unbind();
     }
 
     void LMeshRenderer::_renderScene( LScene* pScene, bool textured )
@@ -146,6 +181,12 @@ namespace engine
 
     void LMeshRenderer::renderScene( LScene* pScene )
     {
+        if ( m_debugList.size() > 0 )
+        {
+            // render debug meshes
+            _renderDebug( pScene );
+        }
+
         if ( m_texturedList.size() > 0 )
         {
             // render textured meshes
@@ -277,6 +318,12 @@ namespace engine
 
     void LMeshRenderer::renderSceneWithShadowMap( LScene* pScene, LShadowMap* shadowMap )
     {
+        if ( m_debugList.size() > 0 )
+        {
+            // render debug meshes
+            _renderDebug( pScene );
+        }
+        
         if ( m_texturedList.size() > 0 )
         {
             // render textured meshes
@@ -294,5 +341,6 @@ namespace engine
         m_renderList.clear();
         m_texturedList.clear();
         m_nonTexturedList.clear();
+        m_debugList.clear();
     }
 }

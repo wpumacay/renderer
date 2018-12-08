@@ -39,6 +39,11 @@ namespace engine
 
     void LFpsCamera::update( float dt )
     {
+        if ( !m_isActive )
+        {
+            return;
+        }
+
         m_speed.x = m_speed.z = 0.0f;
 
         if ( InputSystem::isKeyDown( GLFW_KEY_W ) )

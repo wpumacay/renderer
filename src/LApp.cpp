@@ -52,7 +52,7 @@ namespace engine
         engine::LShaderManager::release();
     }
 
-    void LApp::update()
+    void LApp::begin()
     {
         m_window->clear();
         m_window->pollEvents();
@@ -61,8 +61,11 @@ namespace engine
         m_tDelta = min( m_tNow - m_tBef, MAX_DELTA );
         m_tBef = m_tNow;
 
-        std::cout << "dt: " << m_tDelta << std::endl;
+        // std::cout << "dt: " << m_tDelta << std::endl;
+    }
 
+    void LApp::update()
+    {
         if ( m_scene != NULL )
         {
             m_scene->update( m_tDelta );
@@ -73,7 +76,10 @@ namespace engine
                                                 _camera->getProjectionMatrix() );
             engine::DebugSystem::render();
         }
+    }
 
+    void LApp::end()
+    {
         m_window->swapBuffers();
     }
 

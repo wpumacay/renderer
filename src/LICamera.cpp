@@ -44,6 +44,8 @@ namespace engine
         m_zNear = zNear;
         m_zFar = zFar;
 
+        m_isActive = true;
+
         m_projMat = LMat4::perspective( m_fov, m_aspectRatio,
                                         m_zNear, m_zFar );
     }

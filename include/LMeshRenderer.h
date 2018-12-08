@@ -19,12 +19,15 @@ namespace engine
         std::vector< LIRenderable* > m_renderList;
         std::vector< LIRenderable* > m_texturedList;
         std::vector< LIRenderable* > m_nonTexturedList;
+        std::vector< LIRenderable* > m_debugList;
 
         // void _renderSceneTexturedMeshes( LScene* pScene );
         // void _renderSceneNonTexturedMeshes( LScene* pScene );
 
         // void _renderSceneWithShadowMapTexturedMeshes( LScene* pScene );
         // void _renderSceneWithShadowMapNonTexturedMeshes( LScene* pScene );
+
+        void _renderDebug( LScene* pScene );
 
         void _renderScene( LScene* pScene, bool textured );
         void _renderSceneWithShadowMap( LScene* pScene, LShadowMap* shadowMap, bool textured );

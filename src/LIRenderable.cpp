@@ -11,6 +11,7 @@ namespace engine
         m_type              = RENDERABLE_TYPE_BASE;
         m_isVisible         = true;
         m_drawAsWireframe   = false;
+        this->debug         = false;
     }
 
     LIRenderable::~LIRenderable()
