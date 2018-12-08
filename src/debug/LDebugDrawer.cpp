@@ -76,7 +76,7 @@ namespace engine
 
     void LDebugDrawer::_renderLines()
     {
-        glLineWidth( 3.0f );
+        glLineWidth( 5.0f );
 
         for ( size_t q = 0; q < m_linesPositions.size(); q++ )
         {

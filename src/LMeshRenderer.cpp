@@ -45,6 +45,8 @@ namespace engine
                 {
                     m_nonTexturedList.push_back( _renderable );
                 }
+
+                std::cout << "renderlist.size: " << m_renderList.size() << std::endl;
             // }
         }
     }
@@ -90,7 +92,7 @@ namespace engine
                 if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
-
+                    //
                     for ( auto _child : _children )
                     {
                         _shader->setModelMatrix( _mesh->getModelMatrix() );
@@ -104,6 +106,10 @@ namespace engine
                     _shader->setMaterial( _mesh->getMaterial() );
                     _mesh->render();
                 }
+
+                // _shader->setModelMatrix( _mesh->getModelMatrix() );
+                // _shader->setMaterial( _mesh->getMaterial() );
+                // _mesh->render();
             }
         }
         else
@@ -113,7 +119,7 @@ namespace engine
                 if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
-
+                    //
                     for ( auto _child : _children )
                     {
                         _shader->setModelMatrix( _mesh->getModelMatrix() );
@@ -127,6 +133,10 @@ namespace engine
                     _shader->setMaterial( _mesh->getMaterial() );
                     _mesh->render();
                 }
+
+                // _shader->setModelMatrix( _mesh->getModelMatrix() );
+                // _shader->setMaterial( _mesh->getMaterial() );
+                // _mesh->render();
             }
         }
 
@@ -213,7 +223,7 @@ namespace engine
                 if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
-
+                    //
                     for ( auto _child : _children )
                     {
                         _shader->setModelMatrix( _mesh->getModelMatrix() );
@@ -227,6 +237,10 @@ namespace engine
                     _shader->setMaterial( _mesh->getMaterial() );
                     _mesh->render();
                 }
+
+                // _shader->setModelMatrix( _mesh->getModelMatrix() );
+                // _shader->setMaterial( _mesh->getMaterial() );
+                // _mesh->render();
             }
         }
         else
@@ -236,7 +250,7 @@ namespace engine
                 if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
-
+                    //
                     for ( auto _child : _children )
                     {
                         _shader->setModelMatrix( _mesh->getModelMatrix() );
@@ -248,9 +262,12 @@ namespace engine
                 {
                     _shader->setModelMatrix( _mesh->getModelMatrix() );
                     _shader->setMaterial( _mesh->getMaterial() );
-
                     _mesh->render();
                 }
+
+                // _shader->setModelMatrix( _mesh->getModelMatrix() );
+                // _shader->setMaterial( _mesh->getMaterial() );
+                // _mesh->render();
             }
         }
 

@@ -61,6 +61,8 @@ namespace engine
         m_tDelta = min( m_tNow - m_tBef, MAX_DELTA );
         m_tBef = m_tNow;
 
+        std::cout << "dt: " << m_tDelta << std::endl;
+
         if ( m_scene != NULL )
         {
             m_scene->update( m_tDelta );
