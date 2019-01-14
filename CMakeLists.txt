@@ -51,26 +51,4 @@ target_link_libraries( cat1
                        ${GLEW_LIBRARIES}
                        assimp )
 
-add_executable( glengine_test1
-                tests/test1.cpp )
-target_link_libraries( glengine_test1
-                       cat1 )
-
-add_executable( glengine_test2
-                tests/test2.cpp )
-target_link_libraries( glengine_test2
-                       cat1 )
-
-find_package( GLUT REQUIRED )
-
-add_executable( test_assimp
-                tests/test3.cpp )
-target_link_libraries( test_assimp
-                       ${OPENGL_LIBRARIES}
-                       ${GLUT_LIBRARIES}
-                       assimp )
-
-add_executable( glengine_test4
-                tests/test4.cpp )
-target_link_libraries( glengine_test4
-                       cat1 )
+add_subdirectory( examples )
