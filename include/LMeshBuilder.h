@@ -61,7 +61,7 @@ namespace engine
 
         static vector<string> _split( const string &txt, char separator = ';' );
         static LVec3 _computeFaceNormal( LVec3 v1, LVec3 v2, LVec3 v3, bool normalize = false );
-
+        static LVec3 _createVec3WithAxis( float x, float y, float z, const std::string& axis );
         //static void _computeNormalsSingle();
         //static void _computeNormalsAvg();
 
@@ -90,7 +90,7 @@ namespace engine
         // static LMesh* createFromFile( const char* filename );
         // static LMesh* createFromObj( const char* filename );
 
-        // static LMesh* createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision );
+        static LMesh* createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision );
     };
 
 

@@ -16,6 +16,7 @@ namespace engine
     {
         // Load some Cubemap textures
         m_cubeTextures["starfield"] = loadCubeTexture( "skyboxes/starfield" );
+        // m_cubeTextures["clouds"]    = loadCubeTexture( "skyboxes/cloudtop" );
 
         _createBuiltInTextures();
     }
