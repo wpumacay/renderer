@@ -10,6 +10,7 @@ namespace engine { namespace InputSystem {
 
     // input queries to the internal handler
     bool isKeyDown( int key );
+    bool checkSingleKeyPress( int key );
     bool isMouseDown( int button );
     LVec2 getCursorPosition();
 

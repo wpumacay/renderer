@@ -13,6 +13,11 @@ namespace engine { namespace InputSystem {
         return LInputHandler::GetInstance()->isKeyDown( key );
     }
 
+    bool checkSingleKeyPress( int key )
+    {
+        return LInputHandler::GetInstance()->checkSingleKeyPress( key );
+    }
+
     bool isMouseDown( int button )
     {
         return LInputHandler::GetInstance()->isMouseDown( button );
@@ -28,5 +33,6 @@ namespace engine { namespace InputSystem {
         LInputHandler::Release();
     }
 
+    
 
 }}

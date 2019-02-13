@@ -14,6 +14,7 @@ namespace engine
 		for ( int q = 0; q < L_MAX_KEYS; q++ )
 		{
 			m_keys[q] = GLFW_RELEASE;
+            m_singleKeys[q] = false;
 		}
 
 		for ( int q = 0; q < L_MAX_BUTTONS; q++ )
@@ -75,6 +76,9 @@ namespace engine
             _callback( key, action );
         }
 
+        // std::cout << "key: " << key << std::endl;
+        // std::cout << "action: " << action << std::endl;
+
 		LInputHandler::_INSTANCE->m_keys[key] = action;
 	}
 
@@ -112,6 +116,26 @@ namespace engine
 		return m_keys[key] == GLFW_PRESS ||
 			   m_keys[key] == GLFW_REPEAT;
 	}
+
+    bool LInputHandler::checkSingleKeyPress( int key )
+    {
+        if ( !isKeyDown( key ) )
+        {
+            m_singleKeys[key] = false;
+            return false;
+        }
+
+        // Xor between the saved single state and the handler state
+        bool _singleState = m_singleKeys[key];
+        bool _handlerState = isKeyDown( key );
+        bool _res = ( _singleState && !_handlerState ) ||
+                    ( !_singleState && _handlerState );
+
+        // update the state of the singlekey
+        m_singleKeys[key] = _handlerState;
+        // and return the previous result
+        return _res;
+    }
 
 	bool LInputHandler::isMouseDown( int button )
 	{

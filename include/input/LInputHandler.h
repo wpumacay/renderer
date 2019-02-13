@@ -20,6 +20,7 @@ namespace engine
 		LWindow* m_window;
 
 		int m_keys[L_MAX_KEYS];
+        bool m_singleKeys[L_MAX_KEYS];
 		int m_buttons[L_MAX_BUTTONS];
 		float m_mouseX;
 		float m_mouseY;
@@ -44,6 +45,7 @@ namespace engine
         vector< FnPtr_keyboard_callback > getKeyboardUserCallbacks() { return m_userCallbacks; }
 
 		bool isKeyDown( int key );
+        bool checkSingleKeyPress( int key );
 		bool isMouseDown( int button );
 		LVec2 getCursorPosition();
 	};
