@@ -34,16 +34,10 @@ add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
 
 file( GLOB_RECURSE SRCS "src/*.cpp" )
 
-if( BUILD_SHARED_LIBS )
-    message( "Building engine as SHARED library" )
-    set( CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}" )
-    add_library( cat1 SHARED
-                ${SRCS} )
-else()
-    message( "Building engine as STATIC library" )
-    add_library( cat1
-                ${SRCS} )
-endif()
+message( "Building engine as SHARED library" )
+set( CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}" )
+add_library( cat1 SHARED
+             ${SRCS} )
 
 target_link_libraries( cat1 
                        ${GLFW_LIBRARIES} 
