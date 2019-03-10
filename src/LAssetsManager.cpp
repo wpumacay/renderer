@@ -25,8 +25,8 @@ namespace engine
     {
         // Create chessboard pattern
         {
-            int _w = 64;
-            int _h = 64;
+            int _w = 256;
+            int _h = 256;
 
             struct LPixel
             {
@@ -39,7 +39,7 @@ namespace engine
             {
                 for ( int j = 0; j < _w; j++ )
                 {
-                    if ( ( ( i & 0x8 ) == 0 ) ^ ( ( j & 0x8 ) == 0 ) )
+                    if ( ( ( i & 0x20 ) == 0 ) ^ ( ( j & 0x20 ) == 0 ) )
                     {
                         _imgData[ j + i * _w ].r = 255;
                         _imgData[ j + i * _w ].g = 255;
