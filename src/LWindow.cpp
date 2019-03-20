@@ -33,6 +33,10 @@ namespace engine
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, APP_CONTEXT_VERSION_MAJOR );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, APP_CONTEXT_VERSION_MINOR );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    #ifdef __APPLE__
+        std::cout << "INFO> Enabled compat mode for macOS" << std::endl;
+        glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+    #endif
         glfwWindowHint( GLFW_RESIZABLE, APP_RESIZABLE );
 
         m_window = glfwCreateWindow( APP_WIDTH,

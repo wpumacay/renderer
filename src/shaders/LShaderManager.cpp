@@ -66,8 +66,8 @@ namespace engine
         m_programs["shadow_mapping"] = _program;
         m_programObjs["shadow_mapping"] = new LShaderShadowMap( _program );
 
-        _vShader = createShader( "basic3d_skybox_vs_120.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "basic3d_skybox_fs_120.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( "basic3d_skybox_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "basic3d_skybox_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["skybox"] = _program;

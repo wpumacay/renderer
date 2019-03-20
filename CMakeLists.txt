@@ -7,18 +7,27 @@ message( "Configuring external dependencies" )
 
 find_package( OpenGL REQUIRED )
 find_package( GLEW REQUIRED )
-find_package( assimp REQUIRED )
+find_package( ASSIMP REQUIRED )
 find_package( PkgConfig REQUIRED )
 pkg_search_module( GLFW REQUIRED glfw3 )
 
+# Apple kind of needs to specify this (at least in the system I had available, ...
+# which was a brand new macbookair from a friend)
+if ( APPLE )
+    include_directories( /usr/local/include )
+    link_directories( /usr/local/lib )
+endif()
+
 message( "ASSIMP_INCLUDE_DIRS: ${ASSIMP_INCLUDE_DIRS}" )
 
-# message( "GLFW_INCLUDE_DIRS: ${GLFW_INCLUDE_DIRS}" )
-# message( "GLFW_LIBRARIES: ${GLFW_LIBRARIES}" )
-# message( "GLFW_LIBRARY_DIRS: ${GLFW_LIBRARY_DIRS}" )
+message( "GLFW_INCLUDE_DIRS: ${GLFW_INCLUDE_DIRS}" )
+message( "GLFW_LIBRARIES: ${GLFW_LIBRARIES}" )
+message( "GLFW_LIBRARY_DIRS: ${GLFW_LIBRARY_DIRS}" )
 
 message( "GLEW_INCLUDE_DIRS: ${GLEW_INCLUDE_DIRS}" )
 message( "GLEW_LIBRARIES: ${GLEW_LIBRARIES}" )
+
+message( "OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}" )
 
 set( GLENGINE_INCLUDE_DIRS
      "${GLFW_INCLUDE_DIRS}"
