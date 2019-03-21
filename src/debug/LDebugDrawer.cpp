@@ -76,7 +76,7 @@ namespace engine
 
     void LDebugDrawer::_renderLines()
     {
-        glLineWidth( 5.0f );
+        glLineWidth( 2.5f );
 
         for ( size_t q = 0; q < m_linesPositions.size(); q++ )
         {
@@ -156,13 +156,14 @@ namespace engine
 
         float _sidesLength = _length / 10.0f;
 
+        _uf.scale( _sidesLength, _sidesLength, _sidesLength );
         _ur.scale( _sidesLength, _sidesLength, _sidesLength );
         _uu.scale( _sidesLength, _sidesLength, _sidesLength );
 
-        LVec3 _p0 = LVec3::plus( end, _ur ) + _uu;
-        LVec3 _p1 = LVec3::plus( end, _ur ) - _uu;
-        LVec3 _p2 = LVec3::minus( end, _ur ) + _uu;
-        LVec3 _p3 = LVec3::minus( end, _ur ) - _uu;
+        LVec3 _p0 = LVec3::minus( LVec3::plus( end, _ur ) + _uu, _uf );
+        LVec3 _p1 = LVec3::minus( LVec3::plus( end, _ur ) - _uu, _uf );
+        LVec3 _p2 = LVec3::minus( LVec3::minus( end, _ur ) + _uu, _uf );
+        LVec3 _p3 = LVec3::minus( LVec3::minus( end, _ur ) - _uu, _uf );
 
         drawLine( end, _p0, color );
         drawLine( end, _p1, color );
