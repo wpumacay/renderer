@@ -192,6 +192,26 @@ namespace engine
             return buff[row + col * 4];
         }
 
+        LVec3 getBasisVectorX() const
+        {
+            return LVec3( buff[0], buff[1], buff[2] );
+        }
+
+        LVec3 getBasisVectorY() const
+        {
+            return LVec3( buff[4], buff[5], buff[6] );
+        }
+
+        LVec3 getBasisVectorZ() const
+        {
+            return LVec3( buff[8], buff[9], buff[10] );
+        }
+
+        LVec3 getPosition() const
+        {
+            return LVec3( buff[12], buff[13], buff[14] );
+        }
+
         LMat4 operator* ( const LMat4& other )
         {
             LMat4 _res;

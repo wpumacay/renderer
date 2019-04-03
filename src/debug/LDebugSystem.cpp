@@ -33,6 +33,11 @@ namespace engine { namespace DebugSystem {
         LDebugDrawer::GetInstance()->drawLinesBatch( linesBatch, color );
     }
 
+    void drawAABB( const LVec3& aabbMin, const LVec3& aabbMax, const LMat4& aabbWorldTransform, const LVec3& color )
+    {
+        LDebugDrawer::GetInstance()->drawAABB( aabbMin, aabbMax, aabbWorldTransform, color );
+    }
+
     void renderView( const LVec2& pos, const LVec2& size, GLuint textureID )
     {
 

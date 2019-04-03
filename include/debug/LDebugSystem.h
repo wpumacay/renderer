@@ -16,6 +16,7 @@ namespace engine { namespace DebugSystem {
     void drawClipVolume( const LMat4& clipMatrix, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
     void drawTrailPoints( const std::vector< LVec3 >& trailpoints, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
     void drawLinesBatch( const std::vector< LLine >& linesBatch, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+    void drawAABB( const LVec3& aabbMin, const LVec3& aabbMax, const LMat4& aabbWorldTransform, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
 
     // viewer calls
 

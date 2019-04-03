@@ -243,4 +243,63 @@ namespace engine
             drawLine( linesBatch[q].start, linesBatch[q].end, color );
         }
     }
+
+    void LDebugDrawer::drawAABB( const LVec3& aabbMin, 
+                                 const LVec3& aabbMax, 
+                                 const LMat4& aabbWorldTransform, 
+                                 const LVec3& color )
+    {
+        auto _vmin2max = LVec3::minus( aabbMax, aabbMin );
+        auto _dx = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorX() );
+        auto _dy = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorY() );
+        auto _dz = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorZ() );
+        auto _origin = aabbWorldTransform.getPosition();
+        auto _sidex = aabbWorldTransform.getBasisVectorX();
+        auto _sidey = aabbWorldTransform.getBasisVectorY();
+        auto _sidez = aabbWorldTransform.getBasisVectorZ();
+
+        _sidex.scale( 0.5 * _dx, 0.5 * _dx, 0.5 * _dx );
+        _sidey.scale( 0.5 * _dy, 0.5 * _dy, 0.5 * _dy );
+        _sidez.scale( 0.5 * _dz, 0.5 * _dz, 0.5 * _dz );
+
+        /*
+        *      p8 ___________ p7 -> max
+        *        /|         /|
+        *       / |        / |      z    y
+        *      /__|______ /  |      |  /
+        *     |p4 |_ _ _ |p3_|      | /
+        *     |  /p5     |  / p6    |/_ _ _ x
+        *     | /        | / 
+        *     |/_________|/ 
+        *  p1 -> min      p2
+        */
+
+        auto _p1 = _origin - _sidex - _sidey - _sidez;
+        auto _p2 = _origin + _sidex - _sidey - _sidez;
+        auto _p3 = _origin + _sidex - _sidey + _sidez;
+        auto _p4 = _origin - _sidex - _sidey + _sidez;
+
+        auto _p5 = _origin - _sidex + _sidey - _sidez;
+        auto _p6 = _origin + _sidex + _sidey - _sidez;
+        auto _p7 = _origin + _sidex + _sidey + _sidez;
+        auto _p8 = _origin - _sidex + _sidey + _sidez;
+
+        drawLine( _p1, _p2, color ); drawLine( _p2, _p3, color );
+        drawLine( _p3, _p4, color ); drawLine( _p4, _p1, color );
+
+        drawLine( _p2, _p6, color ); drawLine( _p6, _p7, color );
+        drawLine( _p7, _p3, color ); drawLine( _p3, _p2, color );
+
+        drawLine( _p4, _p3, color ); drawLine( _p3, _p7, color );
+        drawLine( _p7, _p8, color ); drawLine( _p8, _p4, color );
+
+        drawLine( _p4, _p8, color ); drawLine( _p8, _p5, color );
+        drawLine( _p5, _p1, color ); drawLine( _p1, _p4, color );
+
+        drawLine( _p1, _p2, color ); drawLine( _p2, _p6, color );
+        drawLine( _p6, _p5, color ); drawLine( _p5, _p1, color );
+
+        drawLine( _p5, _p6, color ); drawLine( _p6, _p7, color );
+        drawLine( _p7, _p8, color ); drawLine( _p8, _p5, color );
+    }
 }
