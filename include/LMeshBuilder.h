@@ -30,8 +30,10 @@ using namespace std;
 #define OBJ_SMOOTH_SHADING string( "s" )
 
 #define AXIS_X 0
-#define AXIS_Y 0
-#define AXIS_Z 1
+#define AXIS_Y 1
+#define AXIS_Z 2
+
+#define DEFAULT_AXIS AXIS_Z
 
 namespace engine
 {
@@ -77,8 +79,8 @@ namespace engine
 
         static LMesh* createSphere( GLfloat radius, int levelDivision = 10, int numLevels = 10 );
         static LMesh* createBox( GLfloat width, GLfloat height, GLfloat depth );
-        static LMesh* createCylinder( GLfloat radius, GLfloat height, int sectionDivision = 10 );
-        static LMesh* createCapsule( GLfloat radius, GLfloat height, int sectionDivision = 10, int capLevels = 10 );
+        static LMesh* createCylinder( GLfloat radius, GLfloat height, int axis = AXIS_Z, int sectionDivision = 10 );
+        static LMesh* createCapsule( GLfloat radius, GLfloat height, int axis = AXIS_Z, int sectionDivision = 10, int capLevels = 10 );
         static LMesh* createPlane( GLfloat width, GLfloat depth, float texRangeWidth = 10.0f, float texRangeDepth = 10.0f );
         static LMesh* createArrow( GLfloat length, const std::string& axis );
         static LModel* createAxes( GLfloat length );

@@ -100,13 +100,13 @@ namespace engine
             LVec3 _n = _normalsSource[q];
 
             // form a tri perpendicular right hand system
-        // #if AXIS_X == 1
+        // #if DEFAULT_AXIS == AXIS_X
         //     LVec3 _s1 = LVec3( _n.z, _n.x, _n.y );
         //     LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #elif AXIS_Y == 1
+        // #elif DEFAULT_AXIS == AXIS_Y
         //     LVec3 _s1 = LVec3( _n.y, _n.z, _n.x );
         //     LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #elif AXIS_Z == 1
+        // #elif DEFAULT_AXIS == AXIS_Z
         //     LVec3 _s1 = LVec3( _n.x, _n.y, _n.z );
         //     LVec3 _s2 = LVec3::cross( _n, _s1 );
         // #else
@@ -163,7 +163,7 @@ namespace engine
         return _mesh;
     }
 
-    LMesh* LMeshBuilder::createCylinder( GLfloat radius, GLfloat height, int sectionDivision )
+    LMesh* LMeshBuilder::createCylinder( GLfloat radius, GLfloat height, int axis, int sectionDivision )
     {
         LMesh* _mesh = NULL;
 
@@ -183,15 +183,14 @@ namespace engine
         {
             float _x = radius * cos( q * _stepSectionAngle );
             float _z = radius * sin( q * _stepSectionAngle );
-        #if AXIS_X == 1
-            _sectionXZ.push_back( LVec3( 0, _z, _x ) );
-        #elif AXIS_Y == 1
-            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-        #elif AXIS_Z == 1
-            _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
-        #else
-            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-        #endif
+            if ( axis == AXIS_X )
+                _sectionXZ.push_back( LVec3( 0, _z, _x ) );
+            else if ( axis == AXIS_Y )
+                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+            else if ( axis == AXIS_Z )
+                _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
+            else
+                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
         }
 
         // calculate cylinder geometry
@@ -199,19 +198,27 @@ namespace engine
         // up base
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
-        #if AXIS_X == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 ) );
-            _normals.push_back( LVec3( 1, 0, 0 ) );
-        #elif AXIS_Y == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
-            _normals.push_back( LVec3( 0, 1, 0 ) );
-        #elif AXIS_Z == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, 0.5 * height ) );
-            _normals.push_back( LVec3( 0, 0, 1 ) );
-        #else
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
-            _normals.push_back( LVec3( 0, 1, 0 ) );
-        #endif
+            if ( axis == AXIS_X )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 ) );
+                _normals.push_back( LVec3( 1, 0, 0 ) );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
+                _normals.push_back( LVec3( 0, 1, 0 ) );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, 0.5 * height ) );
+                _normals.push_back( LVec3( 0, 0, 1 ) );
+            }
+            else
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
+                _normals.push_back( LVec3( 0, 1, 0 ) );
+            }
+
             // @TODO: Check this part, there might be something wrong with the texture coordinates
             _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
                                          0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
@@ -225,27 +232,35 @@ namespace engine
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
             // quad vertices
-        #if AXIS_X == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
-        #elif AXIS_Y == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-        #elif AXIS_Z == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
-        #else
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-        #endif
+            LVec3 _p0, _p1, _p2, _p3;
+            if ( axis == AXIS_X )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
+                _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
+                _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
+            }
+            else
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+            }
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
@@ -279,19 +294,28 @@ namespace engine
             float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
             float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
 
-        #if AXIS_X == 1
-            auto _nQuad1 = LVec3( 0, _nz1, _nx1 );
-            auto _nQuad2 = LVec3( 0, _nz2, _nx2 );
-        #elif AXIS_Y == 1
-            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
-            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
-        #elif AXIS_Z == 1
-            auto _nQuad1 = LVec3( _nz1, _nx1, 0 );
-            auto _nQuad2 = LVec3( _nz2, _nx2, 0 );
-        #else
-            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
-            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
-        #endif
+            LVec3 _nQuad1, _nQuad2;
+            if ( axis == AXIS_X )
+            {
+                _nQuad1 = LVec3( 0, _nz1, _nx1 );
+                _nQuad2 = LVec3( 0, _nz2, _nx2 );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _nQuad1 = LVec3( _nx1, 0, _nz1 );
+                _nQuad2 = LVec3( _nx2, 0, _nz2 );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _nQuad1 = LVec3( _nz1, _nx1, 0 );
+                _nQuad2 = LVec3( _nz2, _nx2, 0 );
+            }
+            else
+            {
+                _nQuad1 = LVec3( _nx1, 0, _nz1 );
+                _nQuad2 = LVec3( _nx2, 0, _nz2 );
+            }
+
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad2 );
@@ -305,19 +329,28 @@ namespace engine
         // down base
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
-        #if AXIS_X == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 ) );
-            _normals.push_back( LVec3( -1, 0, 0 ) );
-        #elif AXIS_Y == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
-            _normals.push_back( LVec3( 0, -1, 0 ) );
-        #elif AXIS_Z == 1
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, -0.5 * height ) );
-            _normals.push_back( LVec3( 0, 0, -1 ) );
-        #else
-            _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
-            _normals.push_back( LVec3( 0, -1, 0 ) );
-        #endif
+            if ( axis == AXIS_X )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 ) );
+                _normals.push_back( LVec3( -1, 0, 0 ) );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
+                _normals.push_back( LVec3( 0, -1, 0 ) );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, -0.5 * height ) );
+                _normals.push_back( LVec3( 0, 0, -1 ) );
+            }
+            else
+            {
+                _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
+                _normals.push_back( LVec3( 0, -1, 0 ) );
+            }
+
+        
             // @TODO: Check this part, there might be something wrong with the texture coordinates
             _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
                                          0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
@@ -333,7 +366,7 @@ namespace engine
         return _mesh;
     }
 
-    LMesh* LMeshBuilder::createCapsule( GLfloat radius, GLfloat height, int sectionDivision, int capLevels )
+    LMesh* LMeshBuilder::createCapsule( GLfloat radius, GLfloat height, int axis, int sectionDivision, int capLevels )
     {
         LMesh* _mesh = NULL;
 
@@ -364,23 +397,30 @@ namespace engine
                 _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
                 _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
 
-            #if AXIS_X == 1
-                auto _upOffset = LVec3( 0.5 * height, 0, 0 );
-                _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _upOffset );
-                _normals.push_back( LVec3( _y, _z, _x ) );
-            #elif AXIS_Y == 1
-                auto _upOffset = LVec3( 0, 0.5 * height, 0 );
-                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
-                _normals.push_back( LVec3( _x, _y, _z ) );
-            #elif AXIS_Z == 1
-                auto _upOffset = LVec3( 0, 0, 0.5 * height );
-                _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _upOffset );
-                _normals.push_back( LVec3( _z, _x, _y ) );
-            #else
-                auto _upOffset = LVec3( 0, 0.5 * height, 0 );
-                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
-                _normals.push_back( LVec3( _x, _y, _z ) );
-            #endif
+                if ( axis == AXIS_X )
+                {
+                    auto _upOffset = LVec3( 0.5 * height, 0, 0 );
+                    _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _upOffset );
+                    _normals.push_back( LVec3( _y, _z, _x ) );
+                }
+                else if ( axis == AXIS_Y )
+                {
+                    auto _upOffset = LVec3( 0, 0.5 * height, 0 );
+                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
+                    _normals.push_back( LVec3( _x, _y, _z ) );
+                }
+                else if ( axis == AXIS_Z )
+                {
+                    auto _upOffset = LVec3( 0, 0, 0.5 * height );
+                    _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _upOffset );
+                    _normals.push_back( LVec3( _z, _x, _y ) );
+                }
+                else
+                {
+                    auto _upOffset = LVec3( 0, 0.5 * height, 0 );
+                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
+                    _normals.push_back( LVec3( _x, _y, _z ) );
+                }
             }
         }
 
@@ -413,15 +453,14 @@ namespace engine
         {
             float _x = radius * cos( q * _stepSectionAngle );
             float _z = radius * sin( q * _stepSectionAngle );
-        #if AXIS_X == 1
-            _sectionXZ.push_back( LVec3( 0, _z, _x ) );
-        #elif AXIS_Y == 1
-            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-        #elif AXIS_Z == 1
-            _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
-        #else
-            _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-        #endif
+            if ( axis == AXIS_X )
+                _sectionXZ.push_back( LVec3( 0, _z, _x ) );
+            else if ( axis == AXIS_Y )
+                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+            else if ( axis == AXIS_Z )
+                _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
+            else
+                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
         }
 
         // body surface
@@ -429,48 +468,57 @@ namespace engine
         for ( int q = 0; q < _sectionXZ.size(); q++ )
         {
             // quad vertices
-        #if AXIS_X == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
-        #elif AXIS_Y == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-        #elif AXIS_Z == 1
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
-        #else
-            auto _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-            auto _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-            auto _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-            auto _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-        #endif
+            LVec3 _p0, _p1, _p2, _p3;
+            if ( axis == AXIS_X )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
+                _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
+                _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
+            }
+            else
+            {
+                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
+                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
+                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
+                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
+            }
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
             _vertices.push_back( _p2 );
             _vertices.push_back( _p3 );
-        //     // For "flat" normals
-        //     float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
-        //     float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
-        // #if AXIS_X == 1
-        //     auto _nQuad = LVec3( 0, _nz, _nx );
-        // #elif AXIS_Y == 1
-        //     auto _nQuad = LVec3( _nx, 0, _nz );
-        // #elif AXIS_Z == 1
-        //     auto _nQuad = LVec3( _nz, _nx, 0 );
-        // #else
-        //     auto _nQuad = LVec3( _nx, 0, _nz );
-        // #endif
-        //     _normals.push_back( _nQuad );
-        //     _normals.push_back( _nQuad );
-        //     _normals.push_back( _nQuad );
-        //     _normals.push_back( _nQuad );
+            // // For "flat" normals
+            // float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
+            // float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
+            // LVec3 _nQuad;
+            // if ( axis == AXIS_X )
+            //     _nQuad = LVec3( 0, _nz, _nx );
+            // else if ( axis == AXIS_Y )
+            //     _nQuad = LVec3( _nx, 0, _nz );
+            // else if ( axis == AXIS_Z )
+            //     _nQuad = LVec3( _nz, _nx, 0 );
+            // else
+            //     _nQuad = LVec3( _nx, 0, _nz );
+            // 
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
+            // _normals.push_back( _nQuad );
 
             // For "smooth" normals
             float _nx1 = cos( ( q ) * _stepSectionAngle );
@@ -479,19 +527,28 @@ namespace engine
             float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
             float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
 
-        #if AXIS_X == 1
-            auto _nQuad1 = LVec3( 0, _nz1, _nx1 );
-            auto _nQuad2 = LVec3( 0, _nz2, _nx2 );
-        #elif AXIS_Y == 1
-            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
-            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
-        #elif AXIS_Z == 1
-            auto _nQuad1 = LVec3( _nz1, _nx1, 0 );
-            auto _nQuad2 = LVec3( _nz2, _nx2, 0 );
-        #else
-            auto _nQuad1 = LVec3( _nx1, 0, _nz1 );
-            auto _nQuad2 = LVec3( _nx2, 0, _nz2 );
-        #endif
+            LVec3 _nQuad1, _nQuad2;
+            if ( axis == AXIS_X )
+            {
+                _nQuad1 = LVec3( 0, _nz1, _nx1 );
+                _nQuad2 = LVec3( 0, _nz2, _nx2 );
+            }
+            else if ( axis == AXIS_Y )
+            {
+                _nQuad1 = LVec3( _nx1, 0, _nz1 );
+                _nQuad2 = LVec3( _nx2, 0, _nz2 );
+            }
+            else if ( axis == AXIS_Z )
+            {
+                _nQuad1 = LVec3( _nz1, _nx1, 0 );
+                _nQuad2 = LVec3( _nz2, _nx2, 0 );
+            }
+            else
+            {
+                _nQuad1 = LVec3( _nx1, 0, _nz1 );
+                _nQuad2 = LVec3( _nx2, 0, _nz2 );
+            }
+
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad2 );
@@ -517,23 +574,31 @@ namespace engine
                 _r = sqrt( 1.0f - _y * _y );
                 _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
                 _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
-            #if AXIS_X == 1
-                auto _downOffset = LVec3( -0.5 * height, 0, 0 );
-                _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _downOffset );
-                _normals.push_back( LVec3( _y, _z, _x ) );
-            #elif AXIS_Y == 1
-                auto _downOffset = LVec3( 0, -0.5 * height, 0 );
-                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
-                _normals.push_back( LVec3( _x, _y, _z ) );
-            #elif AXIS_Z == 1
-                auto _downOffset = LVec3( 0, 0, -0.5 * height );
-                _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _downOffset );
-                _normals.push_back( LVec3( _z, _x, _y ) );
-            #else
-                auto _downOffset = LVec3( 0, -0.5 * height, 0 );
-                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
-                _normals.push_back( LVec3( _x, _y, _z ) );
-            #endif
+
+                if ( axis == AXIS_X )
+                {
+                    auto _downOffset = LVec3( -0.5 * height, 0, 0 );
+                    _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _downOffset );
+                    _normals.push_back( LVec3( _y, _z, _x ) );
+                }
+                else if ( axis == AXIS_Y )
+                {
+                    auto _downOffset = LVec3( 0, -0.5 * height, 0 );
+                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
+                    _normals.push_back( LVec3( _x, _y, _z ) );
+                }
+                else if ( axis == AXIS_Z )
+                {
+                    auto _downOffset = LVec3( 0, 0, -0.5 * height );
+                    _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _downOffset );
+                    _normals.push_back( LVec3( _z, _x, _y ) );
+                }
+                else
+                {
+                    auto _downOffset = LVec3( 0, -0.5 * height, 0 );
+                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
+                    _normals.push_back( LVec3( _x, _y, _z ) );
+                }
             }
         }
 
@@ -593,17 +658,17 @@ namespace engine
         vector<LVec2> _texCoords;
         vector<LInd3> _indices;
 
-    #if AXIS_X == 1
+    #if DEFAULT_AXIS == AXIS_X
         LVec3 _n = LVec3( 1.0f, 0.0f, 0.0f );
         LVec3 _s1 = LVec3( 0.0f, 1.0f, 0.0f );
         LVec3 _s2 = LVec3( 0.0f, 0.0f, 1.0f );
         LVec3 _scale = LVec3( 0.0f, 0.5 * depth, 0.5 * width );
-    #elif AXIS_Y == 1
+    #elif DEFAULT_AXIS == AXIS_Y
         LVec3 _n = LVec3( 0.0f, 1.0f, 0.0f );
         LVec3 _s1 = LVec3( 0.0f, 0.0f, 1.0f );
         LVec3 _s2 = LVec3( 1.0f, 0.0f, 0.0f );
         LVec3 _scale = LVec3( 0.5 * width, 0.0f, 0.5 * depth );
-    #elif AXIS_Z == 1
+    #elif DEFAULT_AXIS == AXIS_Z
         LVec3 _n = LVec3( 0.0f, 0.0f, 1.0f );
         LVec3 _s1 = LVec3( 1.0f, 0.0f, 0.0f );
         LVec3 _s2 = LVec3( 0.0f, 1.0f, 0.0f );
@@ -1450,11 +1515,11 @@ namespace engine
         vector<LInd3> _indices;
         vector<LVec2> _texCoord;
 
-        #if AXIS_X == 1
+        #if DEFAULT_AXIS == AXIS_X
             std::string axis = "x";
-        #elif AXIS_Y == 1
+        #elif DEFAULT_AXIS == AXIS_Y
             std::string axis = "y";
-        #elif AXIS_Z == 1
+        #elif DEFAULT_AXIS == AXIS_Z
             std::string axis = "z";
         #else
             std::string axis = "y";

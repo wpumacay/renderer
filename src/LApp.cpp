@@ -50,6 +50,8 @@ namespace engine
         engine::DebugSystem::release();
         engine::InputSystem::release();
         engine::LShaderManager::release();
+
+        LApp::_INSTANCE = NULL;
     }
 
     void LApp::begin()
