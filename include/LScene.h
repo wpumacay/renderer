@@ -47,6 +47,8 @@ namespace engine
 
         void changeToCameraByName( const string& cameraId );
 
+        void cleanScene();
+
         LMat4 getProjMatrix() { return m_projMatrix; }
         LICamera* getCurrentCamera() { return m_currentCamera; }
         vector<LILight*>& getLights() { return m_lights; }

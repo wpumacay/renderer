@@ -117,6 +117,14 @@ namespace engine
         _checkCameraType();
     }
 	
+    void LScene::cleanScene()
+    {
+        for ( size_t i = 0; i < m_renderables.size(); i++ )
+            delete m_renderables[i];
+
+        m_renderables.clear();
+    }
+
     void LScene::_checkCameraType()
     {
         // check the type of camera, so that we can toggle the cursor mode
