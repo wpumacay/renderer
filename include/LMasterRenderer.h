@@ -10,25 +10,10 @@
 namespace engine
 {
 
-
     class LMasterRenderer
     {
-
-        private :
-
-        // shadow resources
-        LShadowMap* m_shadowMap;
-        bool m_shadowsEnabled;
-
-        LMeshRenderer* m_meshRenderer;
-        LSkyboxRenderer* m_skyboxRenderer;
-
-        static LMasterRenderer* _INSTANCE;
+    public :
         LMasterRenderer();
-
-        public :
-
-        static LMasterRenderer* GetInstance();
         ~LMasterRenderer();
 
         void render( LScene* pScene );
@@ -41,8 +26,14 @@ namespace engine
 
         bool areShadowsEnabled() { return m_shadowsEnabled; }
 
+    private :
+        // shadow resources
+        LShadowMap* m_shadowMap;
+        bool m_shadowsEnabled;
+
+        LMeshRenderer* m_meshRenderer;
+        LSkyboxRenderer* m_skyboxRenderer;
+
     };
-
-
 
 }

@@ -12,7 +12,7 @@ namespace engine
 
     class LICamera
     {
-        protected :
+    protected :
 
         LVec3 m_pos;
         LVec3 m_worldUp;
@@ -41,7 +41,7 @@ namespace engine
 
         void _buildViewMatrix();
 
-        public :
+    public :
 
         enum WorldUpVector
         {
@@ -97,7 +97,5 @@ namespace engine
         void setActiveMode( bool activeMode ) { m_isActive = activeMode; }
         bool isActive() { return m_isActive; }
     };
-
-
 
 }

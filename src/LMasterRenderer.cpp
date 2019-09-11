@@ -6,18 +6,6 @@ using namespace std;
 namespace engine
 {
 
-    LMasterRenderer* LMasterRenderer::_INSTANCE = NULL;
-
-    LMasterRenderer* LMasterRenderer::GetInstance()
-    {
-        if ( LMasterRenderer::_INSTANCE == NULL )
-        {
-            LMasterRenderer::_INSTANCE = new LMasterRenderer();
-        }
-
-        return LMasterRenderer::_INSTANCE;
-    }
-
     LMasterRenderer::LMasterRenderer()
     {
         m_meshRenderer = new LMeshRenderer();
@@ -29,25 +17,18 @@ namespace engine
 
     LMasterRenderer::~LMasterRenderer()
     {
-        if ( m_shadowMap != NULL )
-        {
+        if ( m_shadowMap )
             delete m_shadowMap;
-            m_shadowMap = NULL;
-        }
 
-        if ( m_meshRenderer != NULL )
-        {
+        if ( m_meshRenderer )
             delete m_meshRenderer;
-            m_meshRenderer = NULL;
-        }
 
-        if ( m_skyboxRenderer != NULL )
-        {
+        if ( m_skyboxRenderer )
             delete m_skyboxRenderer;
-            m_skyboxRenderer = NULL;
-        }
-
-        LMasterRenderer::_INSTANCE = NULL;
+        
+        m_shadowMap = NULL;
+        m_meshRenderer = NULL;
+        m_skyboxRenderer = NULL;
     }
 
     void LMasterRenderer::render( LScene* pScene )

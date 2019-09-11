@@ -2,6 +2,7 @@
 
 #include <LCommon.h>
 #include <utils/CLogger.h>
+#include <core/COpenGLContext.h>
 
 #include <GLFW/glfw3.h>
 
@@ -14,7 +15,7 @@ namespace engine
     class CImguiUi
     {
     public :
-        CImguiUi();
+        CImguiUi( COpenGLContext* context );
         virtual ~CImguiUi();
 
         void init();

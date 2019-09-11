@@ -1,13 +1,10 @@
 
-#include <LApp.h>
 #include <LScene.h>
-#include <LFixedCamera3d.h>
 
 using namespace std;
 
 namespace engine
 {
-
 
     LScene::LScene()
     {
@@ -82,27 +79,27 @@ namespace engine
         if ( m_fog != NULL )
         {
             delete m_fog;
-			std::cout << "LOG> Deleting current fog in the current scene" << std::endl;
+            std::cout << "LOG> Deleting current fog in the current scene" << std::endl;
         }
 
         m_fog = pFog;
     }
-	
-	void LScene::addLight( LILight* pLight )
-	{
-		m_lights.push_back( pLight );
-	}
+    
+    void LScene::addLight( LILight* pLight )
+    {
+        m_lights.push_back( pLight );
+    }
 
-	void LScene::addCamera( LICamera* pCamera )
-	{
-		m_cameras[ pCamera->name() ] = pCamera;
-		if ( m_currentCamera == NULL )
-		{
-			m_currentCamera = pCamera;
+    void LScene::addCamera( LICamera* pCamera )
+    {
+        m_cameras[ pCamera->name() ] = pCamera;
 
-            _checkCameraType();
-		}
-	}
+        if ( !m_currentCamera )
+        {
+            m_currentCamera = pCamera;
+            m_currentCamera->setActiveMode( true );
+        }
+    }
 
     void LScene::changeToCameraByName( const string& cameraId )
     {
@@ -113,10 +110,8 @@ namespace engine
         }
 
         m_currentCamera = m_cameras[ cameraId ];
-
-        _checkCameraType();
     }
-	
+    
     void LScene::cleanScene()
     {
         for ( size_t i = 0; i < m_renderables.size(); i++ )
@@ -125,41 +120,25 @@ namespace engine
         m_renderables.clear();
     }
 
-    void LScene::_checkCameraType()
-    {
-        // check the type of camera, so that we can toggle the cursor mode
-        auto _window = LApp::GetInstance()->window();
-        if ( m_currentCamera->type() == LFpsCamera::GetStaticType() )
+    void LScene::addSkybox( LSkybox* pSkybox )
+    {   
+        if ( m_skybox != NULL )
         {
-            // std::cout << "INFO> Disabling cursor for fps camera" << std::endl;
-            _window->disableCursor();
+            delete m_skybox;
+            std::cout << "LOG> Removing previous skybox from current scene" << std::endl;
         }
-        else
-        {
-            // std::cout << "INFO> Enabling cursor for non-fps camera" << std::endl;
-            _window->enableCursor();
-        }
+        m_skybox = pSkybox;
     }
 
-	void LScene::addSkybox( LSkybox* pSkybox )
-	{	
-		if ( m_skybox != NULL )
-		{
-			delete m_skybox;
-			std::cout << "LOG> Removing previous skybox from current scene" << std::endl;
-		}
-		m_skybox = pSkybox;
-	}
+    LFog* LScene::getFog()
+    {
+        return m_fog;
+    }
 
-	LFog* LScene::getFog()
-	{
-		return m_fog;
-	}
-
-	LSkybox* LScene::getSkybox()
-	{
-		return m_skybox;
-	}
+    LSkybox* LScene::getSkybox()
+    {
+        return m_skybox;
+    }
 
     vector< LIRenderable* > LScene::getRenderables()
     {

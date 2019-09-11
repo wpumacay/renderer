@@ -4,21 +4,32 @@
 namespace engine
 {
 
-    COpenGLContext::COpenGLContext( GLFWwindow* windowHandle )
-    {
-        m_windowHandle = windowHandle;
+    COpenGLContext* COpenGLContext::s_instance = NULL;
 
-        ENGINE_CORE_ASSERT( m_windowHandle, "Must provide valid window handle" );
+    COpenGLContext* COpenGLContext::GetInstance()
+    {
+        ENGINE_CORE_ASSERT( COpenGLContext::s_instance, "Should have initialized app's gl-context by now" );
+
+        return COpenGLContext::s_instance;
+    }
+
+    COpenGLContext::COpenGLContext( GLFWwindow* glfwWindowPtr )
+    {
+        m_glfwWindowPtr = glfwWindowPtr;
+
+        ENGINE_CORE_ASSERT( m_glfwWindowPtr, "Must provide valid window handle" );
+
+        COpenGLContext::s_instance = this;
     }
 
     COpenGLContext::~COpenGLContext()
     {
-        m_windowHandle = NULL;
+        m_glfwWindowPtr = NULL;
     }
 
     void COpenGLContext::init()
     {
-        glfwMakeContextCurrent( m_windowHandle );
+        glfwMakeContextCurrent( m_glfwWindowPtr );
 
         glewExperimental = GL_TRUE;
         ENGINE_CORE_ASSERT( glewInit() == GLEW_OK, "Failed to initialize GLEW" );
@@ -31,7 +42,7 @@ namespace engine
 
     void COpenGLContext::swapBuffers()
     {
-        glfwSwapBuffers( m_windowHandle );
+        glfwSwapBuffers( m_glfwWindowPtr );
     }
 
 }

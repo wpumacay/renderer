@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "LCommon.h"
@@ -10,6 +9,8 @@
 #include "LFog.h"
 #include "LSkybox.h"
 #include "LIRenderable.h"
+#include "LFpsCamera.h"
+#include "LFixedCamera3d.h"
 
 using namespace std;
 
@@ -18,23 +19,7 @@ namespace engine
 
     class LScene
     {
-
-        protected :
-
-        vector<LIRenderable*> m_renderables;
-        vector<LILight*> m_lights;
-        map<string, LICamera*> m_cameras;
-        LFog* m_fog;
-        LSkybox* m_skybox;
-        
-		LICamera* m_currentCamera;
-
-        LMat4 m_projMatrix;
-
-        void _checkCameraType();
-
-        public :
-
+    public :
 
         LScene();
         ~LScene();
@@ -42,7 +27,7 @@ namespace engine
         void addRenderable( LIRenderable* pRenderable );
         void addFog( LFog* pFog );
         void addLight( LILight* pLight ); 
-		void addCamera( LICamera* pCamera );
+        void addCamera( LICamera* pCamera );
         void addSkybox( LSkybox* pSkybox );
 
         void changeToCameraByName( const string& cameraId );
@@ -77,6 +62,17 @@ namespace engine
 
         virtual void update( float dt );
 
+    protected :
+
+        vector<LIRenderable*> m_renderables;
+        vector<LILight*> m_lights;
+        map<string, LICamera*> m_cameras;
+        LFog* m_fog;
+        LSkybox* m_skybox;
+        
+        LICamera* m_currentCamera;
+
+        LMat4 m_projMatrix;
     };
 
 

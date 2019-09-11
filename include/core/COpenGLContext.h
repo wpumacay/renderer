@@ -3,7 +3,6 @@
 #include <LCommon.h>
 #include <utils/CLogger.h>
 #include <GLFW/glfw3.h>
-#include <GL/glew.h>
 
 namespace engine
 {
@@ -11,16 +10,21 @@ namespace engine
     class COpenGLContext
     {
     public :
-        COpenGLContext( GLFWwindow* windowHandle );
+        static COpenGLContext* GetInstance();
+
+        COpenGLContext( GLFWwindow* glfwWindowPtr );
         ~COpenGLContext();
 
         void init();
         void swapBuffers();
 
-        GLFWwindow* window() { return m_windowHandle; }
+        GLFWwindow* window() { return m_glfwWindowPtr; }
 
     private :
-        GLFWwindow* m_windowHandle;
+        // single app-context support for now (at least our app, as imgui can have its own context)
+        static COpenGLContext* s_instance;
+
+        GLFWwindow* m_glfwWindowPtr;
 
     };
 

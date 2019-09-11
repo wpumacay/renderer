@@ -1,20 +1,19 @@
 
 #include <iostream>
 
-#include <LWindow.h>
+#include <core/COpenGLApp.h>
 #include <utils/CLogger.h>
 
 int main()
 {
-    engine::CLogger::Init();
-
-    auto _window = new engine::LWindow( { 1024, 768, "Application window" } );
+    auto _window = new engine::COpenGLApp();
 
     while( _window->isActive() )
     {
         _window->begin();
 
-        // render some stuff here
+        if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
+            break;
 
         _window->end();
     }

@@ -1,7 +1,6 @@
 
 
 #include <shaders/LShaderManager.h>
-#include "../Config.h"
 
 // General purpose shaders
 #include <shaders/LShaderBasic3d.h>

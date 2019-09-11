@@ -5,7 +5,7 @@ namespace engine { namespace InputSystem {
 
     void init()
     {
-        LInputHandler::GetInstance();
+        LInputHandler::Init();
     }
 
     bool isKeyDown( int key )

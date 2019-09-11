@@ -1,7 +1,8 @@
 
 #include <iostream>
 
-#include <LApp.h>
+#include <core/COpenGLApp.h>
+
 #include <LFpsCamera.h>
 #include <LFixedCamera3d.h>
 #include <LLightDirectional.h>
@@ -14,7 +15,7 @@
 
 int main()
 {
-    auto _app = engine::LApp::GetInstance();
+    auto _app = new engine::COpenGLApp();
     auto _scene = _app->scene();
     
     // make a sample mesh just for testing
@@ -57,6 +58,13 @@ int main()
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         _model->rotation = _model->rotation * engine::LMat4::rotationX( 0.01f );
+
+        if ( engine::InputSystem::isKeyDown( ENGINE_KEY_SPACE ) )
+            _scene->getCurrentCamera()->setActiveMode( false );
+        else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ENTER ) )
+            _scene->getCurrentCamera()->setActiveMode( true );
+        else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
+            break;
 
         _app->begin();
         _app->update();

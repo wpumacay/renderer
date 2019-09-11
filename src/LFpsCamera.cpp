@@ -1,8 +1,5 @@
 
-
 #include <LFpsCamera.h>
-
-// TODO: Port the camera to a more intuitive implementation, e.g. speed.x should be speed.z
 
 using namespace std;
 
@@ -46,19 +43,19 @@ namespace engine
 
         m_speed.x = m_speed.z = 0.0f;
 
-        if ( InputSystem::isKeyDown( GLFW_KEY_W ) )
+        if ( InputSystem::isKeyDown( ENGINE_KEY_W ) )
         {
             m_speed.x = m_baseSpeed;
         }
-        else if ( InputSystem::isKeyDown( GLFW_KEY_S ) )
+        else if ( InputSystem::isKeyDown( ENGINE_KEY_S ) )
         {
             m_speed.x = -m_baseSpeed;
         }
-        else if ( InputSystem::isKeyDown( GLFW_KEY_D ) )
+        else if ( InputSystem::isKeyDown( ENGINE_KEY_D ) )
         {
             m_speed.z = m_baseSpeed;
         }
-        else if ( InputSystem::isKeyDown( GLFW_KEY_A ) )
+        else if ( InputSystem::isKeyDown( ENGINE_KEY_A ) )
         {
             m_speed.z = -m_baseSpeed;
         }

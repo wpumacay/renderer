@@ -1,121 +1,97 @@
 
-
 #include <input/LInputHandler.h>
 
-
+#include <core/COpenGLApp.h>
 
 namespace engine
 {
 
-	LInputHandler* LInputHandler::_INSTANCE = NULL;
+    LInputHandler* LInputHandler::s_instance = NULL;
 
-	LInputHandler::LInputHandler()
-	{
-		for ( int q = 0; q < L_MAX_KEYS; q++ )
-		{
-			m_keys[q] = GLFW_RELEASE;
-            m_singleKeys[q] = false;
-		}
-
-		for ( int q = 0; q < L_MAX_BUTTONS; q++ )
-		{
-			m_buttons[q] = GLFW_RELEASE;
-		}
-
-		m_mouseX = 0.0f;
-		m_mouseY = 0.0f;
-	}
-
-	LInputHandler::~LInputHandler()
-	{
-		if ( m_window != NULL )
-		{
-			m_window->registerKeyCallback( NULL );
-			m_window->registerMouseCallback( NULL );
-		}
-	}
-
-	LInputHandler* LInputHandler::GetInstance()
-	{
-		if ( LInputHandler::_INSTANCE == NULL )
-		{
-            LInputHandler::_INSTANCE = new LInputHandler();
-
-            // get global window reference
-            auto _window = LWindow::GetInstance();
-            // register callbacks for window
-            _window->registerKeyCallback( LInputHandler::callback_key );
-            _window->registerMouseCallback( LInputHandler::callback_mouse );
-            _window->registerMouseMoveCallback( LInputHandler::callback_mouseMove );
-		}
-
-        return LInputHandler::_INSTANCE;
-	}
-
-	void LInputHandler::Release()
-	{
-		if ( LInputHandler::_INSTANCE != NULL )
-		{
-			delete LInputHandler::_INSTANCE;
-			LInputHandler::_INSTANCE = NULL;	
-		}
-	}
-
-
-	void LInputHandler::callback_key( int key, int action )
-	{
-		if ( LInputHandler::_INSTANCE == NULL )
-		{
-			return;
-		}
-
-        auto _userCallbacks = LInputHandler::_INSTANCE->getKeyboardUserCallbacks();
-
-        for ( auto _callback : _userCallbacks )
+    LInputHandler::LInputHandler()
+    {
+        for ( int q = 0; q < ENGINE_MAX_KEYS; q++ )
         {
-            _callback( key, action );
+            m_keys[q] = 0;
+            m_singleKeys[q] = false;
         }
 
-        // std::cout << "key: " << key << std::endl;
-        // std::cout << "action: " << action << std::endl;
+        for ( int q = 0; q < ENGINE_MAX_BUTTONS; q++ )
+            m_buttons[q] = 0;
 
-		LInputHandler::_INSTANCE->m_keys[key] = action;
-	}
+        m_mouseX = 0.0f;
+        m_mouseY = 0.0f;
+    }
 
-	void LInputHandler::callback_mouse( int button, int action, double x, double y )
-	{
-		if ( LInputHandler::_INSTANCE == NULL )
-		{
-			return;
-		}
-
-		LInputHandler::_INSTANCE->m_buttons[button] = action;
-		LInputHandler::_INSTANCE->m_mouseX = x;
-		LInputHandler::_INSTANCE->m_mouseY = y;
-	}
-
-    void LInputHandler::callback_mouseMove( double x, double y )
+    LInputHandler::~LInputHandler()
     {
-        if ( LInputHandler::_INSTANCE == NULL )
+        // nothing for now, as "Release" clears the instance
+    }
+
+    void LInputHandler::Init()
+    {
+        if ( LInputHandler::s_instance )
         {
+            ENGINE_CORE_WARN( "Attempting to initiliaze input handle twice" );
             return;
         }
 
-        LInputHandler::_INSTANCE->m_mouseX = x;
-        LInputHandler::_INSTANCE->m_mouseY = y;
+        LInputHandler::s_instance = new LInputHandler();
     }
 
-	bool LInputHandler::isKeyDown( int key )
-	{
-		if ( key < 0 || key >= L_MAX_KEYS )
-		{
-			std::cout << "LInputHandler::isKeyDown> wrong key requested: " << key << std::endl;
-			return false;
-		}
+    void LInputHandler::Release()
+    {
+        if ( LInputHandler::s_instance )
+            delete LInputHandler::s_instance;
 
-		return m_keys[key] == GLFW_PRESS ||
-			   m_keys[key] == GLFW_REPEAT;
-	}
+        LInputHandler::s_instance = NULL;
+    }
+
+    LInputHandler* LInputHandler::GetInstance()
+    {
+        ENGINE_CORE_ASSERT( LInputHandler::s_instance, "Must have initialized the input handler by now" );
+
+        return LInputHandler::s_instance;
+    }
+
+    void LInputHandler::callback_key( int key, int action )
+    {
+        if ( !LInputHandler::s_instance )
+            return;
+
+        LInputHandler::s_instance->m_keys[key] = action;
+    }
+
+    void LInputHandler::callback_mouse( int button, int action, double x, double y )
+    {
+        if ( !LInputHandler::s_instance )
+            return;
+
+        LInputHandler::s_instance->m_buttons[button] = action;
+        LInputHandler::s_instance->m_mouseX = x;
+        LInputHandler::s_instance->m_mouseY = y;
+    }
+
+    void LInputHandler::callback_mouseMove( double x, double y )
+    {
+        if ( !LInputHandler::s_instance )
+            return;
+
+        LInputHandler::s_instance->m_mouseX = x;
+        LInputHandler::s_instance->m_mouseY = y;
+    }
+
+    bool LInputHandler::isKeyDown( int key )
+    {
+        if ( key < 0 || key >= ENGINE_MAX_KEYS )
+        {
+            std::cout << "LInputHandler::isKeyDown> wrong key requested: " << key << std::endl;
+            return false;
+        }
+
+        return m_keys[key] == ENGINE_KEY_PRESSED ||
+               m_keys[key] == ENGINE_KEY_REPEAT;
+    }
 
     bool LInputHandler::checkSingleKeyPress( int key )
     {
@@ -137,20 +113,20 @@ namespace engine
         return _res;
     }
 
-	bool LInputHandler::isMouseDown( int button )
-	{
-		if ( button < 0 || button >= L_MAX_BUTTONS )
-		{
-			std::cout << "LInputHandler::isMouseDown> wrong button requested: " << button << std::endl;
-			return false;
-		}
+    bool LInputHandler::isMouseDown( int button )
+    {
+        if ( button < 0 || button >= ENGINE_MAX_BUTTONS )
+        {
+            std::cout << "LInputHandler::isMouseDown> wrong button requested: " << button << std::endl;
+            return false;
+        }
 
-		return m_buttons[button] == GLFW_PRESS;
-	}
+        return m_buttons[button] == ENGINE_MOUSE_BUTTON_PRESSED;
+    }
 
-	LVec2 LInputHandler::getCursorPosition()
-	{
-		return LVec2( m_mouseX, m_mouseY );
-	}
+    LVec2 LInputHandler::getCursorPosition()
+    {
+        return LVec2( m_mouseX, m_mouseY );
+    }
 
 }
