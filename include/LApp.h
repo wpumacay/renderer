@@ -9,6 +9,7 @@
 #include "shaders/LShaderManager.h"
 #include "debug/LDebugSystem.h"
 #include "input/LInputSystem.h"
+#include "utils/CLogger.h"
 
 namespace engine
 {

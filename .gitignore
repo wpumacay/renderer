@@ -1,15 +1,18 @@
-*.out
-*.exe
-*.cproject
-*.project
-*.cmake
-*.settings
-build_vs
-CMakeFiles
-CMakeCache.txt
-Makefile
-*.a
+# file-exclusions
+*.o
+*.pyc
+*.pyo
+*.swp
+*.swo
 *.so
-*.in
+*.a
+*.ini
+*.log
+
+# folder-exclusions
 build/
 .vscode/
+
+# dependencies-exclusions
+ext/imgui
+ext/spdlog

@@ -19,7 +19,10 @@ namespace engine
 
     LApp::LApp()
     {
-        m_window = LWindow::GetInstance();
+        // initialize logger first, as other resources use it
+        engine::CLogger::Init();
+
+        m_window = new LWindow( { 1024, 768, "Application window" } );
         m_masterRenderer = LMasterRenderer::GetInstance();
         m_scene = new LScene();
 
@@ -31,6 +34,8 @@ namespace engine
         m_tBef = 0.0f;
         m_tNow = 0.0f;
         m_tDelta = 0.0f;
+
+        ENGINE_CORE_INFO( "engine application started successfully" );
     }
 
     LApp::~LApp()
@@ -56,33 +61,29 @@ namespace engine
 
     void LApp::begin()
     {
-        m_window->clear();
-        m_window->pollEvents();
+        m_window->begin();
 
         m_tNow = glfwGetTime();
         m_tDelta = min( m_tNow - m_tBef, MAX_DELTA );
         m_tBef = m_tNow;
-
-        // std::cout << "dt: " << m_tDelta << std::endl;
     }
 
     void LApp::update()
     {
-        if ( m_scene != NULL )
-        {
-            m_scene->update( m_tDelta );
-            m_masterRenderer->render( m_scene );
+        assert( m_scene != NULL );
 
-            auto _camera = m_scene->getCurrentCamera();
-            engine::DebugSystem::setupMatrices( _camera->getViewMatrix(),
-                                                _camera->getProjectionMatrix() );
-            engine::DebugSystem::render();
-        }
+        m_scene->update( m_tDelta );
+        m_masterRenderer->render( m_scene );
+
+        auto _camera = m_scene->getCurrentCamera();
+        engine::DebugSystem::setupMatrices( _camera->getViewMatrix(),
+                                            _camera->getProjectionMatrix() );
+        engine::DebugSystem::render();
     }
 
     void LApp::end()
     {
-        m_window->swapBuffers();
+        m_window->end();
     }
 
     LScene* LApp::scene()

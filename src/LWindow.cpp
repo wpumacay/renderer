@@ -1,6 +1,6 @@
 
 
-#include "LWindow.h"
+#include <LWindow.h>
 
 #include <iostream>
 
@@ -9,22 +9,21 @@ using namespace std;
 namespace engine
 {
 
-    LWindow* LWindow::INSTANCE = NULL;
+    LWindow* LWindow::s_instance = NULL;
 
     LWindow* LWindow::GetInstance()
     {
-        if ( LWindow::INSTANCE == NULL )
-        {
-            LWindow::INSTANCE = new LWindow();
-        }
+        ENGINE_CORE_ASSERT( LWindow::s_instance, "Must create a window first." );
 
-        return LWindow::INSTANCE;
+        return LWindow::s_instance;
     }
 
-    LWindow::LWindow()
+    LWindow::LWindow( const CWindowProps& properties )
     {
+        LWindow::s_instance = this;
 
-        LWindow::INSTANCE = this;
+        m_properties = properties;
+
         m_keyCallback = NULL;
         m_mouseCallback = NULL;
         m_mouseMoveCallback = NULL;
@@ -34,98 +33,101 @@ namespace engine
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, APP_CONTEXT_VERSION_MINOR );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
     #ifdef __APPLE__
-        std::cout << "INFO> Enabled compat mode for macOS" << std::endl;
         glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     #endif
         glfwWindowHint( GLFW_RESIZABLE, APP_RESIZABLE );
 
-        m_window = glfwCreateWindow( APP_WIDTH,
-                                     APP_HEIGHT,
-                                     APP_NAME, NULL, NULL );
+        m_windowHandle = glfwCreateWindow( m_properties.width,
+                                           m_properties.height,
+                                           m_properties.title.c_str(),
+                                           NULL, NULL );
 
-        if ( m_window == NULL )
+        if ( !m_windowHandle )
         {
             glfwTerminate();
-            cout << "ERROR: Couldnt initialize glfw" << endl;
-            m_initialized = false;
-            return;
+            ENGINE_CORE_ASSERT( false, "ERROR: Couldnt initialize glfw" );
         }
 
-        glfwMakeContextCurrent( m_window );
+        m_glContext = new COpenGLContext( m_windowHandle );
+        m_glContext->init();
 
-        glewExperimental = GL_TRUE;
-        if ( glewInit() != GLEW_OK )
-        {
-            glfwTerminate();
-            m_initialized = false;
-            return;
-        }
+        glfwSetKeyCallback( m_windowHandle, LWindow::onKeyCallback );
+        glfwSetMouseButtonCallback( m_windowHandle, LWindow::onMouseCallback );
+        glfwSetCursorPosCallback( m_windowHandle, LWindow::onMouseMoveCallback );
 
-        glfwSetKeyCallback( m_window, LWindow::onKeyCallback );
-        glfwSetMouseButtonCallback( m_window, LWindow::onMouseCallback );
-        glfwSetCursorPosCallback( m_window, LWindow::onMouseMoveCallback );
+        glfwSetInputMode( m_windowHandle, GLFW_STICKY_KEYS, 1 );
 
-        glfwSetInputMode( m_window, GLFW_STICKY_KEYS, 1 );
-
-        glfwGetFramebufferSize( m_window, &m_width, &m_height );
-        glViewport( 0, 0, m_width, m_height );
+        glfwGetFramebufferSize( m_windowHandle, &m_properties.width, &m_properties.height );
+        glViewport( 0, 0, m_properties.width, m_properties.height );
 
         glEnable( GL_DEPTH_TEST );
-
         glClearColor( CLEAR_COLOR );
-
-        m_initialized = true;
     }
 
     LWindow::~LWindow()
     {
-        m_window = NULL;
+        m_windowHandle = NULL;
         glfwTerminate();
     }
 
     void LWindow::enableCursor()
     {
-        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+        glfwSetInputMode( m_windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
     }
 
     void LWindow::disableCursor()
     {
-        glfwSetInputMode( m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+        glfwSetInputMode( m_windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
     }
 
-    void LWindow::onKeyCallback( GLFWwindow* pWindow, int key,
-        int scancode, int action, int mode )
+    void LWindow::begin()
     {
-        if ( LWindow::INSTANCE->m_keyCallback == NULL )
-        {
-            return;
-        }
+        glClearColor( CLEAR_COLOR ); 
+        glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT ); 
 
-        LWindow::INSTANCE->m_keyCallback( key, action );
+        glfwPollEvents();
     }
 
-    void LWindow::onMouseCallback( GLFWwindow* pWindow, int button,
-        int action, int mode )
+    void LWindow::end()
     {
-        if ( LWindow::INSTANCE->m_mouseCallback == NULL )
-        {
+        m_glContext->swapBuffers();
+    }
+
+    bool LWindow::isActive()
+    { 
+        return glfwWindowShouldClose( m_windowHandle ) == 0;
+    }
+
+    void LWindow::requestClose() 
+    { 
+        glfwSetWindowShouldClose( m_windowHandle, 1 ); 
+    }
+
+    void LWindow::onKeyCallback( GLFWwindow* pWindow, int key, int scancode, int action, int mode )
+    {
+        if ( LWindow::s_instance->m_keyCallback == NULL )
             return;
-        }
+
+        LWindow::s_instance->m_keyCallback( key, action );
+    }
+
+    void LWindow::onMouseCallback( GLFWwindow* pWindow, int button, int action, int mode )
+    {
+        if ( LWindow::s_instance->m_mouseCallback == NULL )
+            return;
 
         double _x, _y;
         glfwGetCursorPos( pWindow, &_x, &_y );
 
-        LWindow::INSTANCE->m_mouseCallback( button, action, _x, _y );
+        LWindow::s_instance->m_mouseCallback( button, action, _x, _y );
     }
 
     void LWindow::onMouseMoveCallback( GLFWwindow* pWindow, double x, double y )
     {
-        if ( LWindow::INSTANCE->m_mouseMoveCallback == NULL )
-        {
+        if ( LWindow::s_instance->m_mouseMoveCallback == NULL )
             return;
-        }
 
-        LWindow::INSTANCE->m_mouseMoveCallback( ( double ) x, ( double ) y );
+        LWindow::s_instance->m_mouseMoveCallback( ( double ) x, ( double ) y );
     }
 
     void LWindow::registerKeyCallback( FnPtr_keyboard_callback callback )

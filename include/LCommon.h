@@ -4,17 +4,19 @@
 #include <GL/glew.h>
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
 #include <cmath>
+#include <memory>
+#include <csignal>
+#include <functional>
 
 using namespace std;
 
 #define _PI 3.141592653589793
-
-#define GL_TO_WORLD 1.0f
 
 #define RENDERABLE_TYPE_BASE 0
 #define RENDERABLE_TYPE_MESH 1
@@ -445,18 +447,9 @@ namespace engine
 
     };
 
-
-    struct LTri
-    {
-        GLint i1;
-        GLint i2;
-        GLint i3;
-    };
-
     union LInd3
     {
         GLint buff[3];
-        LTri tri;
 
         LInd3()
         {
@@ -476,26 +469,6 @@ namespace engine
         {
             cout << "i1: " << buff[0] << " - i2: " << buff[1] << " - i3: " << buff[2] << endl;
         }
-    };
-
-    struct LInd2
-    {
-
-        int i;
-        int j;
-
-        LInd2()
-        {
-            i = 0;
-            j = 0;
-        }
-
-        LInd2( int i, int j )
-        {
-            this->i = i;
-            this->j = j;
-        }
-
     };
 
     struct LVec2

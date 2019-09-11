@@ -11,6 +11,13 @@ using namespace std;
 namespace engine
 {
 
+    enum class eRenderableType
+    {
+        BASE = 0,
+        MESH = 1,
+        MODEL = 2
+    };
+
     class LIRenderable
     {
         protected :
