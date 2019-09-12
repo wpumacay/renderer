@@ -7,6 +7,8 @@ namespace engine
     CImguiUi::CImguiUi( COpenGLContext* context )
     {
         m_windowHandle = context->window();
+
+        ENGINE_CORE_ASSERT( m_windowHandle, "Should pass context when creating ui" );
     }
 
     CImguiUi::~CImguiUi()

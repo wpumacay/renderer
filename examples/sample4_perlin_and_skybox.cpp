@@ -16,8 +16,10 @@
 int main()
 {
     auto _app = new engine::COpenGLApp();
+    _app->init();
+
     auto _scene = _app->scene();
-    
+
     // make a sample mesh just for testing
     std::string _modelpath;
     _modelpath += ENGINE_RESOURCES_PATH;

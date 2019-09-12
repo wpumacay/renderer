@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <LCommon.h>
 
-#include "LMesh.h"
-#include "LModel.h"
+#include <LMesh.h>
+#include <LModel.h>
 
 #include <fstream>
 #include <string>
@@ -17,17 +17,6 @@
 #include <assimp/postprocess.h>
 
 using namespace std;
-
-#define OBJ_COMMENT string( "#" )
-#define OBJ_VERTEX string( "v" )
-#define OBJ_NORMAL string( "vn" )
-#define OBJ_TEXTURE string( "vt" )
-#define OBJ_FACE string( "f" )
-#define OBJ_MATERIAL_LIB string( "mtllib" )
-#define OBJ_OBJECT_NAME string( "o" )
-#define OBJ_GROUP_NAME string( "g" )
-#define OBJ_MATERIAL_ID string( "usemtl" )
-#define OBJ_SMOOTH_SHADING string( "s" )
 
 #define AXIS_X 0
 #define AXIS_Y 1

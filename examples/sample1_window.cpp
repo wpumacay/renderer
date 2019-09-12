@@ -6,16 +6,17 @@
 
 int main()
 {
-    auto _window = new engine::COpenGLApp();
+    auto _app = new engine::COpenGLApp();
+    _app->init();
 
-    while( _window->isActive() )
+    while( _app->isActive() )
     {
-        _window->begin();
+        _app->begin();
 
         if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
-        _window->end();
+        _app->end();
     }
 
     return 0;

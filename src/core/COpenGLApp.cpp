@@ -28,35 +28,10 @@ namespace engine
         // create the global reference for other systems to use
         COpenGLApp::s_instance = this;
 
-        CWindowProps _windowProperties;
-        _windowProperties.width = 1024;
-        _windowProperties.height = 768;
-        _windowProperties.title = "OpenGL Application window";
-        _windowProperties.callbackKey = nullptr;
-        _windowProperties.callbackMouse = nullptr;
-        _windowProperties.callbackMouseMove = nullptr;
-
-        m_windowPtr         = new COpenGLWindow( _windowProperties );
-        m_masterRenderer    = new LMasterRenderer();
-        m_scenePtr          = new LScene();
-        m_uiPtr             = NULL; // let the user create its own specific UI
-
-        engine::LShaderManager::create();
-        engine::LAssetsManager::create();
-        engine::InputSystem::init();
-        engine::DebugSystem::init();
-
-        m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
-        m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );
-        m_windowPtr->registerMouseMoveCallback( engine::LInputHandler::callback_mouseMove );
-
         m_timeNow = 0.0f;
         m_timeDelta = 0.0f;
 
-        // let the user initialize its own stuff
-        _initUser();
-
-        ENGINE_CORE_INFO( "GL-Application started successfully" );
+        ENGINE_CORE_INFO( "GL-Application created" );
     }
 
     COpenGLApp::~COpenGLApp()
@@ -81,6 +56,36 @@ namespace engine
         engine::DebugSystem::release();
         engine::InputSystem::release();
         engine::LShaderManager::release();
+    }
+
+    void COpenGLApp::init()
+    {
+        CWindowProps _windowProperties;
+        _windowProperties.width = 1024;
+        _windowProperties.height = 768;
+        _windowProperties.title = "OpenGL Application window";
+        _windowProperties.callbackKey = nullptr;
+        _windowProperties.callbackMouse = nullptr;
+        _windowProperties.callbackMouseMove = nullptr;
+
+        m_windowPtr         = new COpenGLWindow( _windowProperties );
+        m_masterRenderer    = new LMasterRenderer();
+        m_scenePtr          = new LScene();
+        m_uiPtr             = NULL; // let the user create its own specific UI
+
+        engine::LShaderManager::create();
+        engine::LAssetsManager::create();
+        engine::InputSystem::init();
+        engine::DebugSystem::init();
+
+        m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
+        m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );
+        m_windowPtr->registerMouseMoveCallback( engine::LInputHandler::callback_mouseMove );
+
+        // let the user initialize its own stuff
+        _initUser();
+
+        ENGINE_CORE_INFO( "GL-Application started successfully" );
     }
 
     void COpenGLApp::begin()
@@ -111,6 +116,9 @@ namespace engine
 
         m_scenePtr->update( m_timeDelta );
         m_masterRenderer->render( m_scenePtr );
+
+        if ( m_uiPtr )
+            m_uiPtr->render();
 
         engine::DebugSystem::setupMatrices( _currentCamera->getViewMatrix(),
                                             _currentCamera->getProjectionMatrix() );

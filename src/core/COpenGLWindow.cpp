@@ -17,7 +17,7 @@ namespace engine
     #ifdef __APPLE__
         glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     #endif
-        glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
+        glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
 
         m_glfwWindowPtr = glfwCreateWindow( m_properties.width,
                                             m_properties.height,
@@ -74,6 +74,8 @@ namespace engine
 
         glEnable( GL_DEPTH_TEST );
         glClearColor( CLEAR_COLOR );
+
+        ENGINE_CORE_INFO( "Successfully created opengl-window" );
     }
 
     COpenGLWindow::~COpenGLWindow()

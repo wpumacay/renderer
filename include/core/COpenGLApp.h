@@ -31,6 +31,8 @@ namespace engine
         COpenGLApp();
         virtual ~COpenGLApp();
 
+        void init();
+
         void begin();
 
         void update();
