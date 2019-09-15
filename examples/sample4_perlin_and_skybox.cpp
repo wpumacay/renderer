@@ -25,10 +25,10 @@ int main()
     _modelpath += ENGINE_RESOURCES_PATH;
     _modelpath += "models/pokemons/lizardon.obj";
 
-    auto _patch = engine::LMeshBuilder::createPerlinPatch( 20.0f, 20.0f, 50 );
+    auto _patch = engine::CMeshBuilder::createPerlinPatch( 20.0f, 20.0f, 50 );
     _patch->getMaterial()->setColor( { 0.5f, 0.5f, 0.5f } );
 
-    auto _model = engine::LMeshBuilder::createModelFromFile( _modelpath, "lizardon" );
+    auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath, "lizardon" );
     _model->scale = { 0.05f, 0.05f, 0.05f };
     _model->pos = { 0.0f, 0.0f, 3.0f };
 

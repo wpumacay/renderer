@@ -6,367 +6,332 @@
 
 using namespace std;
 
-// @TODO: Refactor this part, as some portions are being repeated over and over (common tesselations)
-
 namespace engine
 {
-    LMesh* LMeshBuilder::createSphere( GLfloat radius, int levelDivision , int numLevels )
+    LMesh* CMeshBuilder::createPlane( float sizeX, float sizeY )
     {
-        LMesh* _mesh = NULL;
+        std::vector< LVec3 > _vertices = { {  0.5f * sizeX, -0.5f * sizeY, 0.0f },
+                                           {  0.5f * sizeX,  0.5f * sizeY, 0.0f },
+                                           { -0.5f * sizeX,  0.5f * sizeY, 0.0f },
+                                           { -0.5f * sizeX, -0.5f * sizeY, 0.0f } };
 
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
+        std::vector< LVec3 > _normals = { { 0.0f, 0.0f, 1.0f }, 
+                                          { 0.0f, 0.0f, 1.0f },
+                                          { 0.0f, 0.0f, 1.0f },
+                                          { 0.0f, 0.0f, 1.0f } };
 
-        // adapted from here :
-        // https://www.opengl.org/discussion_boards/showthread.php/159584-sphere-generation
+        std::vector< LVec2 > _texCoords = { { 0.0f, 0.0f }, 
+                                            { 1.0f, 0.0f },
+                                            { 1.0f, 1.0f }, 
+                                            { 0.0f, 1.0f } };
 
-        // make vertices
-        GLfloat _x, _y, _z, _r;
+        std::vector< LInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 
-        for ( int l = -numLevels; l <= numLevels; l++ )
-        {
-            // _y = ( ( float )l ) / ( numLevels + 1 );
-            _y = sin( 0.5 * _PI * ( ( float )l ) / ( numLevels + 1 ) );
-
-            for ( int d = 0; d < levelDivision; d++ )
-            {
-                _r = sqrt( 1.0f - _y * _y );
-                _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / levelDivision );
-                _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / levelDivision );
-
-                _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) );
-                _normals.push_back( LVec3( _x, _y, _z ) );
-
-                // from here: https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
-
-                float _u = 0.5 + ( atan2( -_z, -_x ) / ( 2 * _PI ) );
-                float _v = 0.5 - ( asin( -_y ) / _PI );
-
-
-                _texCoords.push_back( LVec2( _u, _v ) );
-            }
-        }
-
-        for ( int l = 0; l < 2 * numLevels; l++ )
-        {
-            int _vl = l * levelDivision;
-            int _vlNext = ( l + 1 ) * levelDivision;
-
-            // Connect sides
-            for ( int s = 0; s < levelDivision; s++ )
-            {
-                int _p0 = _vl + s;
-                int _p1 = _vl + ( ( s + 1 ) % levelDivision );
-                int _p0n = _vlNext + s;
-                int _p1n = _vlNext + ( ( s + 1 ) % levelDivision );
-
-                _indices.push_back( LInd3( _p0, _p1n, _p0n ) );
-                _indices.push_back( LInd3( _p0, _p1, _p1n ) );
-            }
-        }
-
-        _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
-
-        return _mesh;
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
-
-    LMesh* LMeshBuilder::createBox( GLfloat width, GLfloat height, GLfloat depth )
+    LMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
     {
-        LMesh* _mesh = NULL;
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
 
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
+        std::vector< LVec3 > _normalsSource = { { 0.0f,  0.0f,  1.0f },
+                                                { 0.0f,  0.0f, -1.0f },
+                                                { 0.0f,  1.0f,  0.0f },
+                                                { 0.0f, -1.0f,  0.0f },
+                                                { 1.0f,  0.0f,  0.0f },
+                                                {-1.0f,  0.0f,  0.0f } };
 
-        vector<LVec3> _normalsSource;
+        auto _scale = LVec3( 0.5 * sizeX, 0.5 * sizeY, 0.5 * sizeZ );
 
-        _normalsSource.push_back( LVec3(  0,  0,  1 ) );
-        _normalsSource.push_back( LVec3(  0,  0, -1 ) );
-        _normalsSource.push_back( LVec3(  0,  1,  0 ) );
-        _normalsSource.push_back( LVec3(  0, -1,  0 ) );
-        _normalsSource.push_back( LVec3(  1,  0,  0 ) );
-        _normalsSource.push_back( LVec3( -1,  0,  0 ) );
-
-        LVec3 _scale( 0.5 * width, 0.5 * height, 0.5 * depth );
-
-        // for each face, compute the vertices that form ...
-        // the face perpendicular to that normal
+        // for each face, compute the vertices that form the face perpendicular to that normal
         for ( int q = 0; q < _normalsSource.size(); q++ )
         {
-            LVec3 _n = _normalsSource[q];
-
-            // form a tri perpendicular right hand system
-        // #if DEFAULT_AXIS == AXIS_X
-        //     LVec3 _s1 = LVec3( _n.z, _n.x, _n.y );
-        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #elif DEFAULT_AXIS == AXIS_Y
-        //     LVec3 _s1 = LVec3( _n.y, _n.z, _n.x );
-        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #elif DEFAULT_AXIS == AXIS_Z
-        //     LVec3 _s1 = LVec3( _n.x, _n.y, _n.z );
-        //     LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #else
-            LVec3 _s1 = LVec3( _n.y, _n.z, _n.x );
-            LVec3 _s2 = LVec3::cross( _n, _s1 );
-        // #endif
-
             // Add the indices accordingly
-            _indices.push_back( LInd3( _vertices.size(),
-                                       _vertices.size() + 1,
-                                       _vertices.size() + 2 ) );
+            _indices.push_back( { (GLint)_vertices.size(), (GLint)_vertices.size() + 1, (GLint)_vertices.size() + 2 } );
+            _indices.push_back( { (GLint)_vertices.size(), (GLint)_vertices.size() + 2, (GLint)_vertices.size() + 3 } );
 
-            _indices.push_back( LInd3( _vertices.size(),
-                                       _vertices.size() + 2,
-                                       _vertices.size() + 3 ) );
+            // Form a perpendicular right hand system based on the current normal
+            LVec3 _n = _normalsSource[q];
+            LVec3 _s1 = { _n.y, _n.z, _n.x };
+            LVec3 _s2 = LVec3::cross( _n, _s1 );
 
-            // Generate each vertex of each face ...
-            // according to these vectors
-            LVec3 _v;
+            // Generate each vertex of each face according to these vectors
+            auto _v0 = LVec3::scale( _n - _s1 - _s2, _scale );
+            auto _v1 = LVec3::scale( _n + _s1 - _s2, _scale );
+            auto _v2 = LVec3::scale( _n + _s1 + _s2, _scale );
+            auto _v3 = LVec3::scale( _n - _s1 + _s2, _scale );
 
-            _v = _n - _s1 - _s2;
-            _v.scale( _scale.x, _scale.y, _scale.z );
+            _vertices.push_back( _v0 );
+            _vertices.push_back( _v1 );
+            _vertices.push_back( _v2 );
+            _vertices.push_back( _v3 );
 
-            _vertices.push_back( _v );
+            _texCoords.push_back( { 0.0f, 0.0f } );
+            _texCoords.push_back( { 1.0f, 0.0f } );
+            _texCoords.push_back( { 1.0f, 1.0f } );
+            _texCoords.push_back( { 0.0f, 1.0f } );
+
             _normals.push_back( _n );
-            _texCoords.push_back( LVec2( 1, 1 ) );
-
-            _v = _n - _s1 + _s2;
-            _v.scale( _scale.x, _scale.y, _scale.z );
-
-            _vertices.push_back( _v );
             _normals.push_back( _n );
-            _texCoords.push_back( LVec2( 1, 0 ) );
-
-            _v = _n + _s1 + _s2;
-            _v.scale( _scale.x, _scale.y, _scale.z );
-
-            _vertices.push_back( _v );
             _normals.push_back( _n );
-            _texCoords.push_back( LVec2( 0, 0 ) );
-
-            _v = _n + _s1 - _s2;
-            _v.scale( _scale.x, _scale.y, _scale.z );
-
-            _vertices.push_back( _v );
             _normals.push_back( _n );
-            _texCoords.push_back( LVec2( 0, 1 ) );
-
         }
 
-
-        _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
-
-        return _mesh;
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* LMeshBuilder::createCylinder( GLfloat radius, GLfloat height, int axis, int sectionDivision )
+    LMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
     {
-        LMesh* _mesh = NULL;
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
 
-        vector< LVec3 > _vertices;
-        vector< LVec3 > _normals;
-        vector< LVec2 > _texCoords;
-        vector< LInd3 > _indices;
-
-        // Start cylinder tessellation
-
-        // calculate section geometry
-        vector< LVec3 > _sectionXZ;
-
-        float _stepSectionAngle = 2 * _PI / sectionDivision;
-
-        for ( int q = 0; q < sectionDivision; q++ )
+        // Construct all vertices using spherical coordinates, except the poles
+        for ( size_t i = 0; i < nDiv1; i++ )
         {
-            float _x = radius * cos( q * _stepSectionAngle );
-            float _z = radius * sin( q * _stepSectionAngle );
-            if ( axis == AXIS_X )
-                _sectionXZ.push_back( LVec3( 0, _z, _x ) );
-            else if ( axis == AXIS_Y )
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-            else if ( axis == AXIS_Z )
-                _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
-            else
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+            for ( size_t j = 1; j < nDiv2; j++ )
+            {
+                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -_PI / 2.0f + _PI * ( ( ( float ) j ) / nDiv2 );
+
+                auto _vertex = LVec3( radius * cos( _theta ) * cos( _phi ),
+                                      radius * sin( _theta ) * cos( _phi ),
+                                      radius * sin( _phi ) );
+                auto _normal = LVec3::normalize( _vertex );
+
+                _vertices.push_back( _vertex );
+                _normals.push_back( _normal );
+
+                // uvs-calculations adapted from this resource:
+                //      https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
+                float _u = 0.5 + ( atan2( -_normal.y, -_normal.x ) / ( 2 * _PI ) );
+                float _v = 0.5 - ( asin( -_normal.z ) / _PI );
+                _texCoords.push_back( { _u, _v } );
+            }
         }
 
-        // calculate cylinder geometry
-        int _baseIndx = 0;
-        // up base
-        for ( int q = 0; q < _sectionXZ.size(); q++ )
+        // add the remaining two poles to the list of vertices
+        _vertices.push_back( { 0.0f, 0.0f, radius } );
+        _normals.push_back( { 0.0f, 0.0f, 1.0f } );
+        _texCoords.push_back( { 0.5f, 1.0f } );
+
+        _vertices.push_back( { 0.0f, 0.0f, -radius } );
+        _normals.push_back( { 0.0f, 0.0f, -1.0f } );
+        _texCoords.push_back( { 0.5f, 0.0f } );
+
+        // Compute the indices for this tessellation (intermediate part without poles)
+        for ( size_t i = 0; i < nDiv1; i++ )
         {
-            if ( axis == AXIS_X )
+            for ( size_t j = 1; j < nDiv2; j++ )
             {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 ) );
-                _normals.push_back( LVec3( 1, 0, 0 ) );
+                int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 0 ) - 1;
+                int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 0 ) - 1;
+                int _ip2 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 1 ) - 1;
+                int _ip3 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 1 ) - 1;
+
+                _indices.push_back( { _ip0, _ip1, _ip2 } );
+                _indices.push_back( { _ip0, _ip2, _ip3 } );
             }
-            else if ( axis == AXIS_Y )
+        }
+
+        // add the indices for the portion corresponding to the top cap (pole +z)
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( nDiv2 - 1 + 0 ) - 1;
+            int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( nDiv2 - 1 + 0 ) - 1;
+            int _ip2 = _vertices.size() - 2;
+
+            _indices.push_back( { _ip0, _ip1, _ip2 } );
+        }
+
+        // add the indices for the portion corresponding to the bottom cap (pole -z)
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( 1 + 0 ) - 1;
+            int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( 1 + 0 ) - 1;
+            int _ip2 = _vertices.size() - 1;
+
+            _indices.push_back( { _ip0, _ip1, _ip2 } );
+        }
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
+    }
+
+    LMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
+    {
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
+
+        // Construct all vertices using spherical coordinates, except the poles
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            for ( size_t j = 1; j < nDiv2; j++ )
             {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
-                _normals.push_back( LVec3( 0, 1, 0 ) );
+                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -_PI / 2.0f + _PI * ( ( ( float ) j ) / nDiv2 );
+
+                auto _vertex = LVec3( radX * cos( _theta ) * cos( _phi ),
+                                      radY * sin( _theta ) * cos( _phi ),
+                                      radZ * sin( _phi ) );
+                auto _normal = LVec3::normalize( _vertex );
+
+                _vertices.push_back( _vertex );
+                _normals.push_back( _normal );
+
+                // uvs-calculations adapted from this resource:
+                //      https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
+                float _u = 0.5 + ( atan2( -_normal.y, -_normal.x ) / ( 2 * _PI ) );
+                float _v = 0.5 - ( asin( -_normal.z ) / _PI );
+                _texCoords.push_back( { _u, _v } );
             }
-            else if ( axis == AXIS_Z )
+        }
+
+        // add the remaining two poles to the list of vertices
+        _vertices.push_back( { 0.0f, 0.0f, radZ } );
+        _normals.push_back( { 0.0f, 0.0f, 1.0f } );
+        _texCoords.push_back( { 0.5f, 1.0f } );
+
+        _vertices.push_back( { 0.0f, 0.0f, -radZ } );
+        _normals.push_back( { 0.0f, 0.0f, -1.0f } );
+        _texCoords.push_back( { 0.5f, 0.0f } );
+
+        // Compute the indices for this tessellation (intermediate part without poles)
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            for ( size_t j = 1; j < nDiv2; j++ )
             {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, 0.5 * height ) );
-                _normals.push_back( LVec3( 0, 0, 1 ) );
+                int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 0 ) - 1;
+                int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 0 ) - 1;
+                int _ip2 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 1 ) - 1;
+                int _ip3 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( j + 1 ) - 1;
+
+                _indices.push_back( { _ip0, _ip1, _ip2 } );
+                _indices.push_back( { _ip0, _ip2, _ip3 } );
             }
-            else
-            {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 ) );
-                _normals.push_back( LVec3( 0, 1, 0 ) );
-            }
+        }
+
+        // add the indices for the portion corresponding to the top cap (pole +z)
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( nDiv2 - 1 + 0 ) - 1;
+            int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( nDiv2 - 1 + 0 ) - 1;
+            int _ip2 = _vertices.size() - 2;
+
+            _indices.push_back( { _ip0, _ip1, _ip2 } );
+        }
+
+        // add the indices for the portion corresponding to the bottom cap (pole -z)
+        for ( size_t i = 0; i < nDiv1; i++ )
+        {
+            int _ip0 = ( ( i + 0 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( 1 + 0 ) - 1;
+            int _ip1 = ( ( i + 1 ) % nDiv1 ) * ( nDiv2 - 1 ) + ( 1 + 0 ) - 1;
+            int _ip2 = _vertices.size() - 1;
+
+            _indices.push_back( { _ip0, _ip1, _ip2 } );
+        }
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
+    }
+
+    LMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
+    {
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
+
+        // Compute points in any section ***********************************************************
+        std::vector< LVec3 > _sectionXY;
+        for ( int q = 0; q < nDiv1; q++ )
+        {
+            float _x = radius * cos( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            _sectionXY.push_back( { _x, _y, 0.0f } );
+        }
+
+        // Construct cylinder geometry *************************************************************
+        int _baseIndx = 0;
+
+        ////////// Up base //////////
+        for ( int q = 0; q < _sectionXY.size(); q++ )
+        {
+            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + LVec3( 0.0f, 0.0f, 0.5f * height ), axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ) );
 
             // @TODO: Check this part, there might be something wrong with the texture coordinates
-            _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
-                                         0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * radius ) ),
+                                    0.5f + ( _sectionXY[q].y / ( 2.0f * radius ) ) } );
         }
-        for ( int q = 1; q <= _sectionXZ.size() - 2; q++ )
-        {
+
+        for ( int q = 1; q <= _sectionXY.size() - 2; q++ )
             _indices.push_back( LInd3( _baseIndx, _baseIndx + q, _baseIndx + q + 1 ) );
-        }
+
         _baseIndx += _vertices.size();
-        // body surface
-        for ( int q = 0; q < _sectionXZ.size(); q++ )
+
+        ////////// Body surface //////////
+        for ( int q = 0; q < _sectionXY.size(); q++ )
         {
             // quad vertices
-            LVec3 _p0, _p1, _p2, _p3;
-            if ( axis == AXIS_X )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
-            }
-            else if ( axis == AXIS_Y )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-            }
-            else if ( axis == AXIS_Z )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
-            }
-            else
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-            }
+            auto _p0 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p1 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p2 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p3 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.5f * height );
 
-            _vertices.push_back( _p0 );
-            _vertices.push_back( _p1 );
-            _vertices.push_back( _p2 );
-            _vertices.push_back( _p3 );
+            _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p2, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p3, axis ) );
 
             // @TODO: Check this part, there might be something wrong with the texture coordinates
-            _texCoords.push_back( LVec2( 0.5 + ( atan2( _p0.z, _p0.x ) / ( 2 * _PI ) ), 
-                                  0.5 + _p0.y / height ) );
-            _texCoords.push_back( LVec2( 0.5 + ( atan2( _p1.z, _p1.x ) / ( 2 * _PI ) ), 
-                                  0.5 + _p1.y / height ) );
-            _texCoords.push_back( LVec2( 0.5 + ( atan2( _p2.z, _p2.x ) / ( 2 * _PI ) ), 
-                                  0.5 + _p2.y / height ) );
-            _texCoords.push_back( LVec2( 0.5 + ( atan2( _p3.z, _p3.x ) / ( 2 * _PI ) ), 
-                                  0.5 + _p3.y / height ) );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p0.y, _p0.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p0.z / height } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p1.y, _p1.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p1.z / height } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p2.y, _p2.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p2.z / height } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p3.y, _p3.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p3.z / height } );
 
-            // float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
-            // float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
-
-            // auto _nQuad = LVec3( _nx, 0, _nz );
-
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
-
-            // For "smooth" normals
-            float _nx1 = cos( ( q ) * _stepSectionAngle );
-            float _nz1 = sin( ( q ) * _stepSectionAngle );
-
-            float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
-            float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
-
-            LVec3 _nQuad1, _nQuad2;
-            if ( axis == AXIS_X )
-            {
-                _nQuad1 = LVec3( 0, _nz1, _nx1 );
-                _nQuad2 = LVec3( 0, _nz2, _nx2 );
-            }
-            else if ( axis == AXIS_Y )
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
-            else if ( axis == AXIS_Z )
-            {
-                _nQuad1 = LVec3( _nz1, _nx1, 0 );
-                _nQuad2 = LVec3( _nz2, _nx2, 0 );
-            }
-            else
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
+            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad1 );
 
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+            _indices.push_back( { _baseIndx, _baseIndx + 1, _baseIndx + 2 } );
+            _indices.push_back( { _baseIndx, _baseIndx + 2, _baseIndx + 3 } );
 
             _baseIndx += 4;
         }
-        // down base
-        for ( int q = 0; q < _sectionXZ.size(); q++ )
-        {
-            if ( axis == AXIS_X )
-            {
-                _vertices.push_back( _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 ) );
-                _normals.push_back( LVec3( -1, 0, 0 ) );
-            }
-            else if ( axis == AXIS_Y )
-            {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
-                _normals.push_back( LVec3( 0, -1, 0 ) );
-            }
-            else if ( axis == AXIS_Z )
-            {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, 0, -0.5 * height ) );
-                _normals.push_back( LVec3( 0, 0, -1 ) );
-            }
-            else
-            {
-                _vertices.push_back( _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 ) );
-                _normals.push_back( LVec3( 0, -1, 0 ) );
-            }
 
-        
+        ////////// Down base //////////
+        for ( int q = 0; q < _sectionXY.size(); q++ )
+        {
+            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + LVec3( 0.0f, 0.0f, -0.5f * height ), axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+
             // @TODO: Check this part, there might be something wrong with the texture coordinates
-            _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
-                                         0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
-        }
-        _baseIndx += _sectionXZ.size();
-        for ( int q = 1; q <= _sectionXZ.size() - 2; q++ )
-        {
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * radius ) ),
+                                    0.5f + ( _sectionXY[q].y / ( 2.0f * radius ) ) } );
         }
 
-        _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
+        for ( int q = 1; q <= _sectionXY.size() - 2; q++ )
+            _indices.push_back( { _baseIndx, _baseIndx + q + 1, _baseIndx + q } );
 
-        return _mesh;
+        _baseIndx += _sectionXY.size();
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* LMeshBuilder::createCapsule( GLfloat radius, GLfloat height, int axis, int sectionDivision, int capLevels )
+    LMesh* CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
     {
         LMesh* _mesh = NULL;
 
@@ -383,59 +348,35 @@ namespace engine
         // Tessellate using cap-surface-cap approach
 
         // Build up cap *********************************
-        // make vertices
-        GLfloat _x, _y, _z, _r;
+        // make vertices and normals (uvs are computed later)
         int _baseIndx = 0;
-        for ( int l = 0; l <= capLevels; l++ )
+        for ( int l = 0; l <= nDiv2; l++ )
         {
-            // _y = ( ( float )l ) / ( numLevels + 1 );
-            _y = sin( 0.5 * _PI * ( ( float ) l ) / ( capLevels + 1 ) );
 
-            for ( int d = 0; d < sectionDivision; d++ )
+            for ( int d = 0; d < nDiv1; d++ )
             {
-                _r = sqrt( 1.0f - _y * _y );
-                _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
-                _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
+                float _z = sin( 0.5 * _PI * ( ( float ) l ) / ( nDiv2 + 1 ) );
+                float _r = sqrt( 1.0f - _z * _z );
+                float _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / nDiv1 );
+                float _y = _r * sin( 2.0f * _PI * ( ( float ) d ) / nDiv1 );
 
-                if ( axis == AXIS_X )
-                {
-                    auto _upOffset = LVec3( 0.5 * height, 0, 0 );
-                    _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _upOffset );
-                    _normals.push_back( LVec3( _y, _z, _x ) );
-                }
-                else if ( axis == AXIS_Y )
-                {
-                    auto _upOffset = LVec3( 0, 0.5 * height, 0 );
-                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
-                    _normals.push_back( LVec3( _x, _y, _z ) );
-                }
-                else if ( axis == AXIS_Z )
-                {
-                    auto _upOffset = LVec3( 0, 0, 0.5 * height );
-                    _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _upOffset );
-                    _normals.push_back( LVec3( _z, _x, _y ) );
-                }
-                else
-                {
-                    auto _upOffset = LVec3( 0, 0.5 * height, 0 );
-                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _upOffset );
-                    _normals.push_back( LVec3( _x, _y, _z ) );
-                }
+                _vertices.push_back( _rotateToMatchUpAxis( LVec3( radius * _x, radius * _y, radius * _z + 0.5f * height ), axis ) );
+                _normals.push_back( _rotateToMatchUpAxis( { _x, _y, _z }, axis ) );
             }
         }
 
-        for ( int l = 0; l < capLevels; l++ )
+        for ( int l = 0; l < nDiv2; l++ )
         {
-            int _vl = l * sectionDivision;
-            int _vlNext = ( l + 1 ) * sectionDivision;
+            int _vl = l * nDiv1;
+            int _vlNext = ( l + 1 ) * nDiv1;
 
             // Connect sides
-            for ( int s = 0; s < sectionDivision; s++ )
+            for ( int s = 0; s < nDiv1; s++ )
             {
                 int _p0 = _baseIndx + _vl + s;
-                int _p1 = _baseIndx + _vl + ( ( s + 1 ) % sectionDivision );
+                int _p1 = _baseIndx + _vl + ( ( s + 1 ) % nDiv1 );
                 int _p0n = _baseIndx + _vlNext + s;
-                int _p1n = _baseIndx + _vlNext + ( ( s + 1 ) % sectionDivision );
+                int _p1n = _baseIndx + _vlNext + ( ( s + 1 ) % nDiv1 );
 
                 _indices.push_back( LInd3( _p0, _p1n, _p0n ) );
                 _indices.push_back( LInd3( _p0, _p1, _p1n ) );
@@ -445,178 +386,73 @@ namespace engine
         // Build surface *******************************
 
         // calculate section geometry
-        vector< LVec3 > _sectionXZ;
-
-        float _stepSectionAngle = 2 * _PI / sectionDivision;
-
-        for ( int q = 0; q < sectionDivision; q++ )
+        vector< LVec3 > _sectionXY;
+        for ( int q = 0; q < nDiv1; q++ )
         {
-            float _x = radius * cos( q * _stepSectionAngle );
-            float _z = radius * sin( q * _stepSectionAngle );
-            if ( axis == AXIS_X )
-                _sectionXZ.push_back( LVec3( 0, _z, _x ) );
-            else if ( axis == AXIS_Y )
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-            else if ( axis == AXIS_Z )
-                _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
-            else
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+            float _x = radius * cos( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
-        // body surface
-        
-        for ( int q = 0; q < _sectionXZ.size(); q++ )
+        // construct cylindrical surface's vertices and normals (uvs are computed later)
+        for ( int q = 0; q < _sectionXY.size(); q++ )
         {
             // quad vertices
-            LVec3 _p0, _p1, _p2, _p3;
-            if ( axis == AXIS_X )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0.5 * height, 0, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0.5 * height, 0, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( -0.5 * height, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( -0.5 * height, 0, 0 );
-            }
-            else if ( axis == AXIS_Y )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-            }
-            else if ( axis == AXIS_Z )
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0, 0.5 * height );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0.5 * height );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, -0.5 * height );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, -0.5 * height );
-            }
-            else
-            {
-                _p0 = _sectionXZ[q] + LVec3( 0, 0.5 * height, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0.5 * height, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, -0.5 * height, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, -0.5 * height, 0 );
-            }
+            auto _p0 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p1 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p2 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p3 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.5f * height );
 
-            _vertices.push_back( _p0 );
-            _vertices.push_back( _p1 );
-            _vertices.push_back( _p2 );
-            _vertices.push_back( _p3 );
-            // // For "flat" normals
-            // float _nx = cos( ( q + 0.5 ) * _stepSectionAngle );
-            // float _nz = sin( ( q + 0.5 ) * _stepSectionAngle );
-            // LVec3 _nQuad;
-            // if ( axis == AXIS_X )
-            //     _nQuad = LVec3( 0, _nz, _nx );
-            // else if ( axis == AXIS_Y )
-            //     _nQuad = LVec3( _nx, 0, _nz );
-            // else if ( axis == AXIS_Z )
-            //     _nQuad = LVec3( _nz, _nx, 0 );
-            // else
-            //     _nQuad = LVec3( _nx, 0, _nz );
-            // 
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
-            // _normals.push_back( _nQuad );
+            _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p2, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p3, axis ) );
 
-            // For "smooth" normals
-            float _nx1 = cos( ( q ) * _stepSectionAngle );
-            float _nz1 = sin( ( q ) * _stepSectionAngle );
-
-            float _nx2 = cos( ( q + 1 ) * _stepSectionAngle );
-            float _nz2 = sin( ( q + 1 ) * _stepSectionAngle );
-
-            LVec3 _nQuad1, _nQuad2;
-            if ( axis == AXIS_X )
-            {
-                _nQuad1 = LVec3( 0, _nz1, _nx1 );
-                _nQuad2 = LVec3( 0, _nz2, _nx2 );
-            }
-            else if ( axis == AXIS_Y )
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
-            else if ( axis == AXIS_Z )
-            {
-                _nQuad1 = LVec3( _nz1, _nx1, 0 );
-                _nQuad2 = LVec3( _nz2, _nx2, 0 );
-            }
-            else
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
+            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad1 );
 
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+            _indices.push_back( { _baseIndx, _baseIndx + 1, _baseIndx + 2 } );
+            _indices.push_back( { _baseIndx, _baseIndx + 2, _baseIndx + 3 } );
 
             _baseIndx += 4;
         }
 
-
         // Build down cap ******************************
-        // make vertices
-
-        for ( int l = -capLevels; l <= 0; l++ )
+        // make vertices and normals (uvs are computed later)
+        for ( int l = -nDiv2; l <= 0; l++ )
         {
-            // _y = ( ( float )l ) / ( numLevels + 1 );
-            _y = sin( 0.5 * _PI * ( ( float ) l ) / ( capLevels + 1 ) );
-
-            for ( int d = 0; d < sectionDivision; d++ )
+            for ( int d = 0; d < nDiv1; d++ )
             {
-                _r = sqrt( 1.0f - _y * _y );
-                _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
-                _z = _r * sin( 2.0f * _PI * ( ( float ) d ) / sectionDivision );
+                float _z = sin( 0.5 * _PI * ( ( float ) l ) / ( nDiv2 + 1 ) );
+                float _r = sqrt( 1.0f - _z * _z );
+                float _x = _r * cos( 2.0f * _PI * ( ( float ) d ) / nDiv1 );
+                float _y = _r * sin( 2.0f * _PI * ( ( float ) d ) / nDiv1 );
 
-                if ( axis == AXIS_X )
-                {
-                    auto _downOffset = LVec3( -0.5 * height, 0, 0 );
-                    _vertices.push_back( LVec3( radius * _y, radius * _z, radius * _x ) + _downOffset );
-                    _normals.push_back( LVec3( _y, _z, _x ) );
-                }
-                else if ( axis == AXIS_Y )
-                {
-                    auto _downOffset = LVec3( 0, -0.5 * height, 0 );
-                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
-                    _normals.push_back( LVec3( _x, _y, _z ) );
-                }
-                else if ( axis == AXIS_Z )
-                {
-                    auto _downOffset = LVec3( 0, 0, -0.5 * height );
-                    _vertices.push_back( LVec3( radius * _z, radius * _x, radius * _y ) + _downOffset );
-                    _normals.push_back( LVec3( _z, _x, _y ) );
-                }
-                else
-                {
-                    auto _downOffset = LVec3( 0, -0.5 * height, 0 );
-                    _vertices.push_back( LVec3( radius * _x, radius * _y, radius * _z ) + _downOffset );
-                    _normals.push_back( LVec3( _x, _y, _z ) );
-                }
+                _vertices.push_back( _rotateToMatchUpAxis( LVec3( radius * _x, radius * _y, radius * _z - 0.5f * height ), axis ) );
+                _normals.push_back( _rotateToMatchUpAxis( { _x, _y, _z }, axis ) );
             }
         }
 
-        for ( int l = 0; l < capLevels; l++ )
+        for ( int l = 0; l < nDiv2; l++ )
         {
-            int _vl = l * sectionDivision;
-            int _vlNext = ( l + 1 ) * sectionDivision;
+            int _vl = l * nDiv1;
+            int _vlNext = ( l + 1 ) * nDiv1;
 
             // Connect sides
-            for ( int s = 0; s < sectionDivision; s++ )
+            for ( int s = 0; s < nDiv1; s++ )
             {
                 int _p0 = _baseIndx + _vl + s;
-                int _p1 = _baseIndx + _vl + ( ( s + 1 ) % sectionDivision );
+                int _p1 = _baseIndx + _vl + ( ( s + 1 ) % nDiv1 );
                 int _p0n = _baseIndx + _vlNext + s;
-                int _p1n = _baseIndx + _vlNext + ( ( s + 1 ) % sectionDivision );
+                int _p1n = _baseIndx + _vlNext + ( ( s + 1 ) % nDiv1 );
 
-                _indices.push_back( LInd3( _p0, _p1n, _p0n ) );
-                _indices.push_back( LInd3( _p0, _p1, _p1n ) );
+                _indices.push_back( { _p0, _p1n, _p0n } );
+                _indices.push_back( { _p0, _p1, _p1n } );
             }
         }
 
@@ -638,10 +474,10 @@ namespace engine
             float _yS = sin( _thetaS ) * sin( _yawS );
             float _zS = cos( _thetaS );
             // Extract UVs from spherical uv wrapping
-            float _u = 0.5 + ( atan2( -_zS, -_xS ) / ( 2 * _PI ) );
-            float _v = 0.5 - ( asin( -_yS ) / _PI );
+            float _u = 0.5 + ( atan2( -_yS, -_xS ) / ( 2 * _PI ) );
+            float _v = 0.5 - ( asin( -_zS ) / _PI );
 
-            _texCoords.push_back( LVec2( _u, _v ) );
+            _texCoords.push_back( { _u, _v } );
         }
 
         _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
@@ -649,283 +485,86 @@ namespace engine
         return _mesh;
     }
 
-    LMesh* LMeshBuilder::createPlane( GLfloat width, GLfloat depth, float texRangeWidth, float texRangeDepth )
-    {
-        LMesh* _mesh = NULL;
-
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
-
-    #if DEFAULT_AXIS == AXIS_X
-        LVec3 _n = LVec3( 1.0f, 0.0f, 0.0f );
-        LVec3 _s1 = LVec3( 0.0f, 1.0f, 0.0f );
-        LVec3 _s2 = LVec3( 0.0f, 0.0f, 1.0f );
-        LVec3 _scale = LVec3( 0.0f, 0.5 * depth, 0.5 * width );
-    #elif DEFAULT_AXIS == AXIS_Y
-        LVec3 _n = LVec3( 0.0f, 1.0f, 0.0f );
-        LVec3 _s1 = LVec3( 0.0f, 0.0f, 1.0f );
-        LVec3 _s2 = LVec3( 1.0f, 0.0f, 0.0f );
-        LVec3 _scale = LVec3( 0.5 * width, 0.0f, 0.5 * depth );
-    #elif DEFAULT_AXIS == AXIS_Z
-        LVec3 _n = LVec3( 0.0f, 0.0f, 1.0f );
-        LVec3 _s1 = LVec3( 1.0f, 0.0f, 0.0f );
-        LVec3 _s2 = LVec3( 0.0f, 1.0f, 0.0f );
-        LVec3 _scale = LVec3( 0.5 * depth, 0.5 * width, 0.0f );
-    #else
-        LVec3 _n = LVec3( 0.0f, 1.0f, 0.0f );
-        LVec3 _s1 = LVec3( 0.0f, 0.0f, 1.0f );
-        LVec3 _s2 = LVec3( 1.0f, 0.0f, 0.0f );
-        LVec3 _scale = LVec3( 0.5 * width, 0.0f, 0.5 * depth );
-    #endif
-
-        _indices.push_back( LInd3( _vertices.size(),
-                                   _vertices.size() + 1,
-                                   _vertices.size() + 2 ) );
-
-        _indices.push_back( LInd3( _vertices.size(),
-                                   _vertices.size() + 2,
-                                   _vertices.size() + 3 ) );
-
-        LVec3 _v;
-
-        _v = _n - _s1 - _s2;
-        _v.scale( _scale.x, _scale.y, _scale.z );
-
-        _vertices.push_back( _v );
-        _normals.push_back( _n );
-        _texCoords.push_back( LVec2( 0, 0 ) );
-
-        _v = _n - _s1 + _s2;
-        _v.scale( _scale.x, _scale.y, _scale.z );
-
-        _vertices.push_back( _v );
-        _normals.push_back( _n );
-        _texCoords.push_back( LVec2( texRangeWidth, 0 ) );
-
-        _v = _n + _s1 + _s2;
-        _v.scale( _scale.x, _scale.y, _scale.z );
-
-        _vertices.push_back( _v );
-        _normals.push_back( _n );
-        _texCoords.push_back( LVec2( texRangeWidth, texRangeDepth ) );
-
-        _v = _n + _s1 - _s2;
-        _v.scale( _scale.x, _scale.y, _scale.z );
-
-        _vertices.push_back( _v );
-        _normals.push_back( _n );
-        _texCoords.push_back( LVec2( 0, texRangeDepth ) );
-
-        _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
-
-        return _mesh;
-    }
-
-    LMesh* LMeshBuilder::createArrow( GLfloat length, const std::string& axis )
+    LMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
     {
         vector<LVec3> _vertices;
         vector<LVec3> _normals;
         vector<LVec2> _texCoords;
         vector<LInd3> _indices;
 
-        int _sectionDivision = 10;
-
-        // Arrow dimensions
-        const float _radiusCyl    = 0.05 * length;
-        const float _radiusCone   = 0.075 * length;
-        const float _lengthCyl    = 0.8 * length;
-        const float _lengthCone   = 0.2 * length;
+        // Arrow construction parameters
+        const int _nDiv1 = 10;
+        const float _radiusCyl  = 0.05 * length;
+        const float _radiusCone = 0.075 * length;
+        const float _lengthCyl  = 0.8 * length;
+        const float _lengthCone = 0.2 * length;
 
         // Tesselate cylinder ***********************************************************************
+
         // calculate section geometry
-        vector<LVec3> _sectionXZ;
-
-        float _stepSectionAngle = 2 * _PI / _sectionDivision;
-
-        for ( size_t q = 0; q < _sectionDivision; q++ )
+        vector<LVec3> _sectionXY;
+        for ( size_t q = 0; q < _nDiv1; q++ )
         {
-            float _x = _radiusCyl * std::cos( q * _stepSectionAngle );
-            float _z = _radiusCyl * std::sin( q * _stepSectionAngle );
-
-            if ( axis == "x" )
-                _sectionXZ.push_back( LVec3( 0, _z, _x ) );
-            else if ( axis == "y" )
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
-            else if ( axis == "z" )
-                _sectionXZ.push_back( LVec3( _z, _x, 0 ) );
-            else
-                _sectionXZ.push_back( LVec3( _x, 0, _z ) );
+            float _x = _radiusCyl * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _y = _radiusCyl * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
         // calculate cylinder geometry
         int _baseIndx = 0;
 
         // down base ****************************************
-        for ( size_t q = 0; q < _sectionXZ.size(); q++ )
+        for ( size_t q = 0; q < _sectionXY.size(); q++ )
         {
-            _vertices.push_back( _sectionXZ[q] );
+            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q], axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
 
-            if ( axis == "x" )
-                _normals.push_back( LVec3( -1, 0, 0 ) );
-            else if ( axis == "y" )
-                _normals.push_back( LVec3( 0, -1, 0 ) );
-            else if ( axis == "z" )
-                _normals.push_back( LVec3( 0, 0, -1 ) );
-            else
-                _normals.push_back( LVec3( 0, -1, 0 ) );
-
-            if ( axis == "x" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].y / ( 2 * _radiusCyl ) ),
-                                             0.5 + ( _sectionXZ[q].z / ( 2 * _radiusCyl ) ) ) );
-            }
-            else if ( axis == "y" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * _radiusCyl ) ),
-                                             0.5 + ( _sectionXZ[q].x / ( 2 * _radiusCyl ) ) ) );
-            }
-            else if ( axis == "z" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].x / ( 2 * _radiusCyl ) ),
-                                             0.5 + ( _sectionXZ[q].y / ( 2 * _radiusCyl ) ) ) );
-            }
-            else
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * _radiusCyl ) ),
-                                             0.5 + ( _sectionXZ[q].x / ( 2 * _radiusCyl ) ) ) );
-            }
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * _radiusCyl ) ),
+                                    0.5f + ( _sectionXY[q].y / ( 2.0f * _radiusCyl ) ) } );
         }
-        for ( size_t q = 1; q <= _sectionXZ.size() - 2; q++ )
+
+        for ( size_t q = 1; q <= _sectionXY.size() - 2; q++ )
         {
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + q, _baseIndx + q + 1 ) );
+            _indices.push_back( LInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
         }
+
         _baseIndx += _vertices.size();
         // **************************************************
 
         // body surface *************************************
-        for ( size_t q = 0; q < _sectionXZ.size(); q++ )
+        for ( size_t q = 0; q < _sectionXY.size(); q++ )
         {
             // quad vertices
-            LVec3 _p0, _p1, _p2, _p3;
+            auto _p0 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.0f );
+            auto _p1 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, 0.0f );
+            auto _p2 = _sectionXY[( q + 1 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, _lengthCyl );
+            auto _p3 = _sectionXY[( q + 0 ) % _sectionXY.size()] + LVec3( 0.0f, 0.0f, _lengthCyl );
 
-            if ( axis == "x" )
-            {
-                _p0 = _sectionXZ[q] +  LVec3( _lengthCyl, 0, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( _lengthCyl, 0, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, 0 );
-            }
-            else if ( axis == "y" )
-            {
-                _p0 = _sectionXZ[q] +  LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, 0 );
-            }
-            else if ( axis == "z" )
-            {
-                _p0 = _sectionXZ[q] +  LVec3( 0, 0, _lengthCyl );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, _lengthCyl );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, 0 );
-            }
-            else
-            {
-                _p0 = _sectionXZ[q] +  LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = _sectionXZ[( q + 1 ) % _sectionXZ.size()] + LVec3( 0, 0, 0 );
-                _p3 = _sectionXZ[q] + LVec3( 0, 0, 0 );
-            }
+            _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p2, axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _p3, axis ) );
 
-            _vertices.push_back( _p0 );
-            _vertices.push_back( _p1 );
-            _vertices.push_back( _p2 );
-            _vertices.push_back( _p3 );
+            // @TODO: Check this part, there might be something wrong with the texture coordinates
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p0.y, _p0.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p0.z / _lengthCyl } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p1.y, _p1.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p1.z / _lengthCyl } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p2.y, _p2.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p2.z / _lengthCyl } );
+            _texCoords.push_back( { 0.5f + (float) ( atan2( _p3.y, _p3.x ) / ( 2.0f * _PI ) ), 
+                                    0.5f + (float) _p3.z / _lengthCyl } );
 
-            if ( axis == "x" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p0.y, _p0.z ) / ( 2.0 * _PI ) ), 
-                                             _p0.x / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p1.y, _p1.z ) / ( 2.0 * _PI ) ), 
-                                             _p1.x / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p2.y, _p2.z ) / ( 2.0 * _PI ) ), 
-                                             _p2.x / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p3.y, _p3.z ) / ( 2.0 * _PI ) ), 
-                                             _p3.x / _lengthCyl ) );
-            }
-            else if ( axis == "y" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p0.z, _p0.x ) / ( 2.0 * _PI ) ), 
-                                             _p0.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p1.z, _p1.x ) / ( 2.0 * _PI ) ), 
-                                             _p1.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p2.z, _p2.x ) / ( 2.0 * _PI ) ), 
-                                             _p2.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p3.z, _p3.x ) / ( 2.0 * _PI ) ), 
-                                             _p3.y / _lengthCyl ) );
-            }
-            else if ( axis == "z" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p0.x, _p0.y ) / ( 2.0 * _PI ) ), 
-                                             _p0.z / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p1.x, _p1.y ) / ( 2.0 * _PI ) ), 
-                                             _p1.z / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p2.x, _p2.y ) / ( 2.0 * _PI ) ), 
-                                             _p2.z / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p3.x, _p3.y ) / ( 2.0 * _PI ) ), 
-                                             _p3.z / _lengthCyl ) );
-            }
-            else
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p0.z, _p0.x ) / ( 2.0 * _PI ) ), 
-                                             _p0.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p1.z, _p1.x ) / ( 2.0 * _PI ) ), 
-                                             _p1.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p2.z, _p2.x ) / ( 2.0 * _PI ) ), 
-                                             _p2.y / _lengthCyl ) );
-                _texCoords.push_back( LVec2( 0.5 + ( std::atan2( _p3.z, _p3.x ) / ( 2.0 * _PI ) ), 
-                                             _p3.y / _lengthCyl ) );
-            }
-
-            // For "smooth" normals
-            float _nz1 = std::sin( ( q ) * _stepSectionAngle );
-            float _nx1 = std::cos( ( q ) * _stepSectionAngle );
-
-            float _nx2 = std::cos( ( q + 1 ) * _stepSectionAngle );
-            float _nz2 = std::sin( ( q + 1 ) * _stepSectionAngle );
-
-            LVec3 _nQuad1, _nQuad2;
-
-            if ( axis == "x" )
-            {
-                _nQuad1 = LVec3( 0, _nz1, _nx1 );
-                _nQuad2 = LVec3( 0, _nz2, _nx2 );
-            }
-            else if ( axis == "y" )
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
-            else if ( axis == "z" )
-            {
-                _nQuad1 = LVec3( _nz1, _nx1, 0 );
-                _nQuad2 = LVec3( _nz2, _nx2, 0 );
-            }
-            else
-            {
-                _nQuad1 = LVec3( _nx1, 0, _nz1 );
-                _nQuad2 = LVec3( _nx2, 0, _nz2 );
-            }
+            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad2 );
             _normals.push_back( _nQuad1 );
 
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+            _indices.push_back( { _baseIndx, _baseIndx + 1, _baseIndx + 2 } );
+            _indices.push_back( { _baseIndx, _baseIndx + 2, _baseIndx + 3 } );
 
             _baseIndx += 4;
         }
@@ -934,228 +573,81 @@ namespace engine
         // Tesselate cone ***************************************************************************
 
         // Build base points
-        vector<LVec3> _sectionXZCone;
-        vector<LVec3> _sectionXZConeIn;
-
-        float _stepSectionAngleCone = 2.0 * _PI / _sectionDivision;
-
-        for ( size_t q = 0; q < _sectionDivision; q++ )
+        std::vector< LVec3 > _sectionXYConeOut;
+        std::vector< LVec3 > _sectionXYConeIn;
+        for ( size_t q = 0; q < _nDiv1; q++ )
         {
-            float _x = _radiusCone * std::cos( q * _stepSectionAngleCone );
-            float _z = _radiusCone * std::sin( q * _stepSectionAngleCone );
+            float _xOut = _radiusCone * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yOut = _radiusCone * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            _sectionXYConeOut.push_back( { _xOut, _yOut, 0.0f } );
 
-            if ( axis == "x" )
-                _sectionXZCone.push_back( LVec3( 0, _z, _x ) );
-            else if ( axis == "y" )
-                _sectionXZCone.push_back( LVec3( _x, 0, _z ) );
-            else if ( axis == "z" )
-                _sectionXZCone.push_back( LVec3( _z, _x, 0 ) );
-            else
-                _sectionXZCone.push_back( LVec3( _x, 0, _z ) );
-
-            _x = _radiusCyl * std::cos( q * _stepSectionAngleCone );
-            _z = _radiusCyl * std::sin( q * _stepSectionAngleCone );
-
-            if ( axis == "x" )
-                _sectionXZConeIn.push_back( LVec3( 0, _z, _x ) );
-            else if ( axis == "y" )
-                _sectionXZConeIn.push_back( LVec3( _x, 0, _z ) );
-            else if ( axis == "z" )
-                _sectionXZConeIn.push_back( LVec3( _z, _x, 0 ) );
-            else
-                _sectionXZConeIn.push_back( LVec3( _x, 0, _z ) );
+            float _xIn = _radiusCyl * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yIn = _radiusCyl * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            _sectionXYConeIn.push_back( { _xIn, _yIn, 0.0f } );
         }
 
         // Build surface - tesselate using strips of triangles
-        for ( size_t q = 0; q < _sectionXZCone.size(); q++ )
+        for ( size_t q = 0; q < _sectionXYConeOut.size(); q++ )
         {
-            _indices.push_back( LInd3( _vertices.size(),
-                                       _vertices.size() + 1,
-                                       _vertices.size() + 2 ) );
+            _indices.push_back( { (GLint) _vertices.size(), (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
 
-            LVec3 _p0, _p1, _p2;
-
-            if ( axis == "x" )
-            {
-                _p0 = _sectionXZCone[ q % _sectionXZCone.size() ] + LVec3( _lengthCyl, 0, 0 );
-                _p1 = _sectionXZCone[ ( q + 1 ) % _sectionXZCone.size() ] + LVec3( _lengthCyl, 0, 0 );
-                _p2 = LVec3( _lengthCyl + _lengthCone, 0, 0 );
-            }
-            else if ( axis == "y" )
-            {
-                _p0 = _sectionXZCone[ q % _sectionXZCone.size() ] + LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZCone[ ( q + 1 ) % _sectionXZCone.size() ] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = LVec3( 0, _lengthCyl + _lengthCone, 0 );
-            }
-            else if ( axis == "z" )
-            {
-                _p0 = _sectionXZCone[ q % _sectionXZCone.size() ] + LVec3( 0, 0, _lengthCyl );
-                _p1 = _sectionXZCone[ ( q + 1 ) % _sectionXZCone.size() ] + LVec3( 0, 0, _lengthCyl );
-                _p2 = LVec3( 0, 0, _lengthCyl + _lengthCone );
-            }
-            else
-            {
-                _p0 = _sectionXZCone[ q % _sectionXZCone.size() ] + LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZCone[ ( q + 1 ) % _sectionXZCone.size() ] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = LVec3( 0, _lengthCyl + _lengthCone, 0 );
-            }
+            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p2 = _rotateToMatchUpAxis( { 0, 0, _lengthCyl + _lengthCone }, axis );
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
             _vertices.push_back( _p2 );
 
-            float _nx0 = std::cos( ( q ) * _stepSectionAngleCone );
-            float _nz0 = std::sin( ( q ) * _stepSectionAngleCone );
+            auto _nQuad0 = _rotateToMatchUpAxis( _sectionXYConeOut[(q + 0) % _sectionXYConeOut.size()], axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( _sectionXYConeOut[(q + 1) % _sectionXYConeOut.size()], axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis );
 
-            float _nx1 = std::cos( ( q + 1 ) * _stepSectionAngleCone );
-            float _nz1 = std::sin( ( q + 1 ) * _stepSectionAngleCone );
+            _normals.push_back( _nQuad0 );
+            _normals.push_back( _nQuad1 );
+            _normals.push_back( _nQuad2 );
 
-            LVec3 _n0, _n1, _n2;
-
-            if ( axis == "x" )
-            {
-                _n0 = LVec3( 0, _nz0, _nx0 );
-                _n1 = LVec3( 0, _nz1, _nx1 );
-                _n2 = LVec3( 1, 0, 0 );
-            }
-            else if ( axis == "y" )
-            {
-                _n0 = LVec3( _nx0, 0, _nz0 );
-                _n1 = LVec3( _nx1, 0, _nz1 );
-                _n2 = LVec3( 0, 1, 0 );
-            }
-            else if ( axis == "z" )
-            {
-                _n0 = LVec3( _nz0, _nx0, 0 );
-                _n1 = LVec3( _nz1, _nx1, 0 );
-                _n2 = LVec3( 0, 0, 1 );
-            }
-
-            _normals.push_back( _n0 );
-            _normals.push_back( _n1 );
-            _normals.push_back( _n2 );
-
-            _texCoords.push_back( LVec2( q / _sectionXZCone.size(), 1 ) );
-            _texCoords.push_back( LVec2( ( q + 1 ) / _sectionXZCone.size(), 1 ) );
-            _texCoords.push_back( LVec2( ( q + 0.5 ) / _sectionXZCone.size(), 0 ) );
+            _texCoords.push_back( { ( q + 0.0f ) / _sectionXYConeOut.size(), 1.0f } );
+            _texCoords.push_back( { ( q + 1.0f ) / _sectionXYConeOut.size(), 1.0f } );
+            _texCoords.push_back( { ( q + 0.5f ) / _sectionXYConeOut.size(), 0.0f } );
         }
 
         // Build bottom base - strip of "kind of quads" ( ring tessellation )
         _baseIndx = _vertices.size();
 
-        for ( size_t q = 0; q < _sectionXZCone.size(); q++ )
+        for ( size_t q = 0; q < _sectionXYConeOut.size(); q++ )
         {
-            LVec3 _p0, _p1, _p2, _p3;
-
-            if ( axis == "x" )
-            {
-                _p0 = _sectionXZCone[q] + LVec3( _lengthCyl, 0, 0 );
-                _p1 = _sectionXZConeIn[q] + LVec3( _lengthCyl, 0, 0 );
-                _p2 = _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()] + LVec3( _lengthCyl, 0, 0 );
-                _p3 = _sectionXZ[( q + 1 ) % _sectionXZCone.size()] + LVec3( _lengthCyl, 0, 0 );
-            }
-            else if ( axis == "y" )
-            {
-                _p0 = _sectionXZCone[q] + LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZConeIn[q] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()] + LVec3( 0, _lengthCyl, 0 );
-                _p3 = _sectionXZ[( q + 1 ) % _sectionXZCone.size()] + LVec3( 0, _lengthCyl, 0 );
-            }
-            else if ( axis == "z" )
-            {
-                _p0 = _sectionXZCone[q] + LVec3( 0, 0, _lengthCyl );
-                _p1 = _sectionXZConeIn[q] + LVec3( 0, 0, _lengthCyl );
-                _p2 = _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()] + LVec3( 0, 0, _lengthCyl );
-                _p3 = _sectionXZ[( q + 1 ) % _sectionXZCone.size()] + LVec3( 0, 0, _lengthCyl );
-            }
-            else
-            {
-                _p0 = _sectionXZCone[q] + LVec3( 0, _lengthCyl, 0 );
-                _p1 = _sectionXZConeIn[q] + LVec3( 0, _lengthCyl, 0 );
-                _p2 = _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()] + LVec3( 0, _lengthCyl, 0 );
-                _p3 = _sectionXZ[( q + 1 ) % _sectionXZCone.size()] + LVec3( 0, _lengthCyl, 0 );
-            }
-
+            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p2 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p3 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
             _vertices.push_back( _p2 );
             _vertices.push_back( _p3 );
 
-            LVec3 _normal;
-            if ( axis == "x" )
-                _normal = LVec3( -1, 0, 0 );
-            else if ( axis == "y" )
-                _normal = LVec3( 0, -1, 0 );
-            else if ( axis == "z" )
-                _normal = LVec3( 0, 0, -1 );
-            else
-                _normal = LVec3( 0, -1, 0 );
+            auto _normal = _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis );
 
             _normals.push_back( _normal );
             _normals.push_back( _normal );
             _normals.push_back( _normal );
             _normals.push_back( _normal );
 
-            if ( axis == "x" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[q].y / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[q].z / ( 2 * _radiusCone ) ) ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[q].x / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeOut[q].y / ( 2.0f * _radiusCone ) ) } );
 
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[q].y / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZConeIn[q].z / ( 2 * _radiusCone ) ) ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[q].x / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeIn[q].y / ( 2.0f * _radiusCone ) ) } );
 
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()].y / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZConeIn.size()].z / ( 2 * _radiusCone ) ) ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].x / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].y / ( 2.0f * _radiusCone ) ) } );
 
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].y / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].z / ( 2 * _radiusCone ) ) ) );
-            }
-            else if ( axis == "y" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[q].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[q].x / ( 2 * _radiusCone ) ) ) );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].x / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].y / ( 2.0f * _radiusCone ) ) } );
 
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[q].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZConeIn[q].x / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZConeIn.size()].x / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].x / ( 2 * _radiusCone ) ) ) );
-            }
-            else if ( axis == "z" )
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[q].x / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[q].y / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[q].x / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZConeIn[q].y / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()].x / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZConeIn.size()].y / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].x / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].y / ( 2 * _radiusCone ) ) ) );
-            }
-            else
-            {
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[q].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[q].x / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[q].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZConeIn[q].x / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.size()].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZConeIn.size()].x / ( 2 * _radiusCone ) ) ) );
-
-                _texCoords.push_back( LVec2( 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].z / ( 2 * _radiusCone ) ),
-                                             0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.size()].x / ( 2 * _radiusCone ) ) ) );
-            }
-
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+            _indices.push_back( { _baseIndx, _baseIndx + 2, _baseIndx + 1 } );
+            _indices.push_back( { _baseIndx, _baseIndx + 3, _baseIndx + 2 } );
 
             _baseIndx += 4;
         }
@@ -1163,14 +655,14 @@ namespace engine
         return new LMesh( _vertices, _normals,_texCoords, _indices );
     }
 
-    LModel* LMeshBuilder::createAxes( GLfloat length )
+    LModel* CMeshBuilder::createAxes( float length )
     {
         auto _axesModel = new LModel( "" );
 
-        auto _axisX         = LMeshBuilder::createArrow( length, "x" );
-        auto _axisY         = LMeshBuilder::createArrow( length, "y" );
-        auto _axisZ         = LMeshBuilder::createArrow( length, "z" );
-        auto _axisCenter    = LMeshBuilder::createSphere( 0.2 * length );
+        auto _axisX         = CMeshBuilder::createArrow( length, eAxis::X );
+        auto _axisY         = CMeshBuilder::createArrow( length, eAxis::Y );
+        auto _axisZ         = CMeshBuilder::createArrow( length, eAxis::Z );
+        auto _axisCenter    = CMeshBuilder::createSphere( 0.2 * length );
 
         _axisX->getMaterial()->ambient  = { 1.0, 0.0, 0.0 };
         _axisX->getMaterial()->diffuse  = { 1.0, 0.0, 0.0 };
@@ -1196,7 +688,7 @@ namespace engine
         return _axesModel;
     }
 
-    LModel* LMeshBuilder::createModelFromFile( const std::string& filename,
+    LModel* CMeshBuilder::createModelFromFile( const std::string& filename,
                                                const std::string& modelName )
     {
         auto _assimpScenePtr = aiImportFile( filename.c_str(),
@@ -1219,8 +711,7 @@ namespace engine
         return _model;
     }
 
-
-    void LMeshBuilder::_processAssimpNode( LModel* modelPtr, 
+    void CMeshBuilder::_processAssimpNode( LModel* modelPtr, 
                                            aiNode* assimpNodePtr, 
                                            const aiScene* assimpScenePtr )
     {
@@ -1238,7 +729,7 @@ namespace engine
         }
     }
 
-    LMesh* LMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
+    LMesh* CMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
     {
         vector<LVec3> _vertices;
         vector<LVec3> _normals;
@@ -1282,69 +773,12 @@ namespace engine
         return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
-    /***********************************************************************
-    * HELPER FUNCTIONS
-    ************************************************************************/
-
-
-    LVec3 LMeshBuilder::_computeFaceNormal( LVec3 v1, LVec3 v2, LVec3 v3, bool normalize )
-    {
-        LVec3 _res;
-
-        LVec3 _v12 = v2 - v1;
-        LVec3 _v23 = v3 - v2;
-
-        _res = LVec3::cross( _v12, _v23 );
-        if ( normalize )
-        {
-            _res.normalize();
-        }
-
-        return _res;
-    }
-
-    vector<string> LMeshBuilder::_split( const string& txt, char separator )
-    {
-        vector<string> _res;
-                    
-        int pos = txt.find( separator );
-        if ( pos == std::string::npos )
-        {
-            _res.push_back( txt );
-            return _res;
-        }
-
-        int initpos = 0;
-
-        while ( pos != std::string::npos )
-        {
-            _res.push_back( txt.substr( initpos, pos - initpos ) );
-            initpos = pos + 1;
-
-            pos = txt.find( separator, initpos );
-        }
-
-        _res.push_back( txt.substr( initpos, std::min( pos, (int) txt.size() ) - initpos ) );
-                    
-        return _res;
-    }
-
-    LMesh* LMeshBuilder::createPerlinPatch( GLfloat width, GLfloat depth, int cellDivision )
+    LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, const eAxis& axis )
     {
         vector<LVec3> _vertices;
         vector<LVec3> _normals;
         vector<LInd3> _indices;
         vector<LVec2> _texCoord;
-
-        #if DEFAULT_AXIS == AXIS_X
-            std::string axis = "x";
-        #elif DEFAULT_AXIS == AXIS_Y
-            std::string axis = "y";
-        #elif DEFAULT_AXIS == AXIS_Z
-            std::string axis = "z";
-        #else
-            std::string axis = "y";
-        #endif
 
         LHeightmapGenerator _hmapGenerator;
 
@@ -1352,45 +786,20 @@ namespace engine
         float _dd = depth / cellDivision;
 
         float _x0 = -( cellDivision / 2.0f ) * _dw;
-        float _z0 = -( cellDivision / 2.0f ) * _dd;
-
-        // cout << "x0: " << _x0 << endl;
-        // cout << "z0: " << _z0 << endl;
-        // cout << "dw: " << _dw << endl;
-        // cout << "dd: " << _dd << endl;
+        float _y0 = -( cellDivision / 2.0f ) * _dd;
 
         for ( int i = 0; i < cellDivision; i++ )
         {
             for ( int j = 0; j < cellDivision; j++ )
             {
-                auto _p0 = _createVec3WithAxis( _x0 + j * _dw, 
-                                                2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + j * _dw, _z0 + i * _dd ),
-                                                _z0 + i * _dd,
-                                                axis );
-
-                auto _p1 = _createVec3WithAxis( _x0 + j * _dw,
-                                                2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + j * _dw, _z0 + ( i + 1 ) * _dd ),
-                                                _z0 + ( i + 1 ) * _dd,
-                                                axis );
-
-                auto _p2 = _createVec3WithAxis( _x0 + ( j + 1 ) * _dw,
-                                                2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _z0 + ( i + 1 ) * _dd ),
-                                                _z0 + ( i + 1 ) * _dd,
-                                                axis );
-
-                auto _p3 = _createVec3WithAxis( _x0 + ( j + 1 ) * _dw,
-                                                2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _z0 + i * _dd ),
-                                                _z0 + i * _dd,
-                                                axis );
+                auto _p0 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
+                auto _p1 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+                auto _p2 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+                auto _p3 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
 
                 // TODO: For now just make dummy indices for the rigid bodies :/
-                _indices.push_back( LInd3( _vertices.size() + 0,
-                                           _vertices.size() + 1,
-                                           _vertices.size() + 2 ) );
-
-                _indices.push_back( LInd3( _vertices.size() + 3,
-                                           _vertices.size() + 4,
-                                           _vertices.size() + 5 ) );
+                _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
+                _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
 
                 LVec2 _t0( 0, 0 );
                 LVec2 _t1( 0, 1 );
@@ -1407,13 +816,12 @@ namespace engine
                 _vertices.push_back( _p0 );
                 _vertices.push_back( _p1 );
                 _vertices.push_back( _p2 );
-
                 _vertices.push_back( _p0 );
                 _vertices.push_back( _p2 );
                 _vertices.push_back( _p3 );
 
-                LVec3 _nt1 = LVec3::cross( _p1 - _p0, _p2 - _p1 );
-                LVec3 _nt2 = LVec3::cross( _p2 - _p0, _p3 - _p2 );
+                auto _nt1 = LVec3::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = LVec3::cross( _p2 - _p0, _p3 - _p2 );
 
                 _normals.push_back( _nt1 );
                 _normals.push_back( _nt1 );
@@ -1437,39 +845,16 @@ namespace engine
             *   7---8---9
             */
 
-            LVec3 _pv = _vertices[q];
-            auto _p1 = _createVec3WithAxis( _pv.x - _dw,
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z - _dd ),
-                                            _pv.z - _dd,
-                                            axis );
-            auto _p2 = _createVec3WithAxis( _pv.x, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x, _pv.z - _dd ),
-                                            _pv.z - _dd,
-                                            axis );
-            auto _p3 = _createVec3WithAxis( _pv.x + _dw, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z - _dd ),
-                                            _pv.z - _dd,
-                                            axis );
-            auto _p4 = _createVec3WithAxis( _pv.x - _dw, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z ),
-                                            _pv.z,
-                                            axis );
-            auto _p6 = _createVec3WithAxis( _pv.x + _dw, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z ),
-                                            _pv.z,
-                                            axis );
-            auto _p7 = _createVec3WithAxis( _pv.x - _dw, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z + _dd ),
-                                            _pv.z + _dd,
-                                            axis );
-            auto _p8 = _createVec3WithAxis( _pv.x, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x, _pv.z + _dd ),
-                                            _pv.z + _dd,
-                                            axis );
-            auto _p9 = _createVec3WithAxis( _pv.x + _dw, 
-                                            2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z + _dd ),
-                                            _pv.z + _dd,
-                                            axis );
+            auto _pv = _vertices[q];
+
+            auto _p1 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.z - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z - _dd ) }, axis );
+            auto _p2 = _rotateToMatchUpAxis( { _pv.x      , _pv.z - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x      , _pv.z - _dd ) }, axis );
+            auto _p3 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.z - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z - _dd ) }, axis );
+            auto _p4 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.z      , 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z       ) }, axis );
+            auto _p6 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.z      , 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z       ) }, axis );
+            auto _p7 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.z + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.z + _dd ) }, axis );
+            auto _p8 = _rotateToMatchUpAxis( { _pv.x      , _pv.z + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x      , _pv.z + _dd ) }, axis );
+            auto _p9 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.z + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.z + _dd ) }, axis );
 
             LVec3 _n;
 
@@ -1490,16 +875,21 @@ namespace engine
         return new LMesh( _vertices, _normals, _texCoord, _indices );
     }
 
-    LVec3 LMeshBuilder::_createVec3WithAxis( float x, float y, float z, const std::string& axis )
-    {
-        if ( axis == "x" )
-            return LVec3( y, z, x );
-        else if ( axis == "y" )
-            return LVec3( x, y, z );
-        else if ( axis == "z" )
-            return LVec3( z, x, y );
+    /***********************************************************************
+    * HELPER FUNCTIONS
+    ************************************************************************/
 
-        return LVec3( x, y, z );
+    LVec3 CMeshBuilder::_rotateToMatchUpAxis( const LVec3& vec, const eAxis& axis )
+    {
+        if ( axis == eAxis::X )
+            return { vec.z, vec.x, vec.y };
+        else if ( axis == eAxis::Y )
+            return { vec.y, vec.z, vec.x };
+        else if ( axis == eAxis::Z )
+            return { vec.x, vec.y, vec.z };
+
+        ENGINE_CORE_ASSERT( false, "Invalid axis given for conversion, should be either x, y or z" );
+        return { vec.x, vec.y, vec.z };
     }
 
 }

@@ -24,7 +24,7 @@ int main()
     _modelpath += ENGINE_RESOURCES_PATH;
     _modelpath += "models/chassis.stl";
 
-    auto _model = engine::LMeshBuilder::createModelFromFile( _modelpath, "chassis" );
+    auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath, "chassis" );
     // make a sample camera
     auto _camera = new engine::LFpsCamera( "fixed",
                                            engine::LVec3( 1.0f, 2.0f, -1.0f ),

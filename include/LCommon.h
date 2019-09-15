@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -28,6 +29,11 @@ using namespace std;
 namespace engine
 {
 
+    enum class eAxis
+    {
+        X = 0, Y, Z
+    };
+
     typedef unsigned char u8;
 
     struct LVec3
@@ -40,7 +46,7 @@ namespace engine
         {
             this->x = 0;
             this->y = 0;
-            this->z = 0;        
+            this->z = 0;
         }
 
         LVec3( GLfloat x, GLfloat y, GLfloat z )
@@ -81,7 +87,16 @@ namespace engine
 
         void scale( float sx, float sy, float sz )
         {
-            x *= sx; y *= sy; z *= sz;
+            x *= sx;
+            y *= sy;
+            z *= sz;
+        }
+
+        void scale( const LVec3& vscale )
+        {
+            x *= vscale.x;
+            y *= vscale.y;
+            z *= vscale.z;
         }
 
         GLfloat length()
@@ -105,6 +120,24 @@ namespace engine
             LVec3 _res = v;
 
             _res.normalize();
+
+            return _res;
+        }
+
+        static LVec3 scale( const LVec3& v, float val )
+        {
+            LVec3 _res = v;
+
+            _res.scale( val, val, val );
+
+            return _res;
+        }
+
+        static LVec3 scale( const LVec3& v, const LVec3& vals )
+        {
+            LVec3 _res = v;
+
+            _res.scale( vals );
 
             return _res;
         }
