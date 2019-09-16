@@ -65,6 +65,10 @@ int main()
             _scene->getCurrentCamera()->setActiveMode( false );
         else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ENTER ) )
             _scene->getCurrentCamera()->setActiveMode( true );
+        else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_L ) )
+            _patch->setWireframeMode( true );
+        else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_N ) )
+            _patch->setWireframeMode( false );
         else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 

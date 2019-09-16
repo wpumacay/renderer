@@ -41,6 +41,8 @@ int main()
     _scene->addRenderable( _plane );
 
     auto _chessboardTex = engine::LAssetsManager::getBuiltInTexture( "chessboard" );
+    auto _containerTex = engine::LAssetsManager::getTexture( "wood_container" );
+    auto _gridTex = engine::LAssetsManager::getTexture( "grid_deepmimic" );
     // make a sample mesh just for testing
     auto _boxy      = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
     auto _sphery    = engine::CMeshBuilder::createSphere( 0.5f );
@@ -89,13 +91,27 @@ int main()
     _axy->pos       = {  0.0f,  0.0f, 1.0f };
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
-        _renderables[i]->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
+    {
+        if ( _renderables[i]->getType() == RENDERABLE_TYPE_MESH )
+            _renderables[i]->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
+    }
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
-        _renderables[i]->addTexture( _chessboardTex );
+    {
+        if ( _renderables[i]->getType() == RENDERABLE_TYPE_MESH )
+        {
+            _renderables[i]->addTexture( _chessboardTex );
+        }
+        else
+        {
+            auto _submeshes = reinterpret_cast< engine::LModel* >( _renderables[i] )->getMeshes();
+            for ( size_t j = 0; j < _submeshes.size(); j++ )
+                _submeshes[j]->addTexture( _gridTex );
 
-    for ( size_t i = 0; i < _renderables.size(); i++ )
-        _scene->addRenderable( _renderables[i] );
+            // @TODO: fix issue of requiring to add texture to model as well, even though is not used
+            _renderables[i]->addTexture( _gridTex );
+        }
+    }
 
     _scene->addRenderable( _boxy );
     _scene->addRenderable( _sphery );
@@ -121,7 +137,7 @@ int main()
     //                                            engine::LVec3( 1.0f, 2.0f, 1.0f ),
     //                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
     //                                            engine::LICamera::UP_Z );
-    
+
     // make a sample light source
     auto _light = new engine::LLightDirectional( engine::LVec3( 0.8, 0.8, 0.8 ), engine::LVec3( 0.8, 0.8, 0.8 ),
                                                  engine::LVec3( 0.3, 0.3, 0.3 ), 0, engine::LVec3( 0, 0, -1 ) );

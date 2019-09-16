@@ -18,6 +18,10 @@ namespace engine
         m_cubeTextures["starfield"] = loadCubeTexture( "skyboxes/starfield" );
         // m_cubeTextures["clouds"]    = loadCubeTexture( "skyboxes/cloudtop" );
 
+        // Load some textures
+        m_textures["wood_container"] = loadTexture( "jpgs/img_container", ".jpg" );
+        m_textures["grid_deepmimic"] = loadTexture( "pngs/img_grid", ".png" );
+
         _createBuiltInTextures();
     }
 
@@ -25,8 +29,8 @@ namespace engine
     {
         // Create chessboard pattern
         {
-            int _w = 256;
-            int _h = 256;
+            const int _w = 256;
+            const int _h = 256;
 
             struct LPixel
             {

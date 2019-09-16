@@ -47,8 +47,8 @@ namespace engine
         *   @param nDiv2    number of divisions in the phi dimension
         */
         static LMesh* createSphere( float radius, 
-                                    int nDiv1 = 10, 
-                                    int nDiv2 = 10 );
+                                    int nDiv1 = 20, 
+                                    int nDiv2 = 20 );
 
         /**
         *   Creates the geometry for an ellipsoid with given axes lengths and tessellation
@@ -61,8 +61,8 @@ namespace engine
         *   @param nDiv2    number of divisions in the phi dimension
         */
         static LMesh* createEllipsoid( float radX, float radY, float radZ,
-                                       int nDiv1 = 10,
-                                       int nDiv2 = 10 );
+                                       int nDiv1 = 20,
+                                       int nDiv2 = 20 );
 
         /**
         *   Creates the geometry for a cylinder with given radius, height, and tessellation division
@@ -74,12 +74,12 @@ namespace engine
         */
         static LMesh* createCylinder( float radius, float height, 
                                       const eAxis& axis = eAxis::Z,
-                                      int nDiv1 = 10 );
+                                      int nDiv1 = 30 );
 
         static LMesh* createCapsule( float radius, float height, 
                                      const eAxis& axis = eAxis::Z, 
-                                     int nDiv1 = 10,
-                                     int nDiv2 = 10 );
+                                     int nDiv1 = 30,
+                                     int nDiv2 = 30 );
 
 
         static LMesh* createArrow( float length, 
@@ -105,17 +105,7 @@ namespace engine
     private :
 
         static LVec3 _rotateToMatchUpAxis( const LVec3& vec, const eAxis& axis );
-
-//         static void _constructSmoothCylinderVertices( std::vector< LVec3 >& vertices,
-//                                                       std::vector< LVec3 >& normals,
-//                                                       std::vector< LVec2 >& uvs,
-//                                                       const eAxis& axis = eAxis::Z );
-// 
-//         static void _constructNonSmoothCylinderVertices( std::vector< LVec3 >& vertices,
-//                                                          std::vector< LVec3 >& normals,
-//                                                          std::vector< LVec2 >& uvs,
-//                                                          const eAxis& axis = eAxis::Z );
-
+        static LVec3 _rotateBackFromUpAxis( const LVec3& vec, const eAxis& axis );
     };
 
 
