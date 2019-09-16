@@ -25,7 +25,34 @@ int main()
     _modelpath += ENGINE_RESOURCES_PATH;
     _modelpath += "models/pokemons/lizardon.obj";
 
-    auto _patch = engine::CMeshBuilder::createPerlinPatch( 20.0f, 20.0f, 50 );
+    const int _nWidthSamples = 50;
+    const int _nDepthSamples = 50;
+    const float _widthExtent = 10.0f;
+    const float _depthExtent = 10.0f;
+    const float _centerX = _widthExtent / 2.0f;
+    const float _centerY = _depthExtent / 2.0f;
+    std::vector< float > _heightData;
+    for ( size_t i = 0; i < _nWidthSamples; i++ )
+    {
+        for ( size_t j = 0; j < _nDepthSamples; j++ )
+        {
+            float _x = _widthExtent * ( ( (float) i ) / _nWidthSamples - 0.5f );
+            float _y = _depthExtent * ( ( (float) j ) / _nDepthSamples - 0.5f );
+            
+            // float _z = 10.0f * ( _x * _x + _y * _y ) / ( _widthExtent * _widthExtent + _depthExtent * _depthExtent );
+
+            float _u = _x * 2.0f;
+            float _v = _y * 2.0f;
+            float _z = std::cos( std::sqrt( ( _u * _u + _v * _v ) ) );
+
+            _heightData.push_back( _z );
+        }
+    }
+
+    auto _patch = engine::CMeshBuilder::createHeightField( _nWidthSamples, _nDepthSamples,
+                                                           _widthExtent, _depthExtent,
+                                                           _centerX, _centerY,
+                                                           _heightData, 1.0f );
     _patch->getMaterial()->setColor( { 0.5f, 0.5f, 0.5f } );
 
     auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath, "lizardon" );

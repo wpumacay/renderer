@@ -2,11 +2,11 @@
 #include <iostream>
 
 #include <core/COpenGLApp.h>
+#include <graphics/CMeshBuilder.h>
 
 #include <LFpsCamera.h>
 #include <LFixedCamera3d.h>
 #include <LLightDirectional.h>
-#include <LMeshBuilder.h>
 
 #include <utils/CImguiUiDemo.h>
 

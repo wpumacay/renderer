@@ -1,10 +1,6 @@
 
-#include "LMeshBuilder.h"
 #include "LHeightmapGenerator.h"
-
-#include <map>
-
-using namespace std;
+#include <graphics/CMeshBuilder.h>
 
 namespace engine
 {
@@ -282,10 +278,10 @@ namespace engine
     {
         LMesh* _mesh = NULL;
 
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
 
         /* Capsule format
         *
@@ -345,7 +341,7 @@ namespace engine
         // Build surface *******************************
 
         // calculate section geometry
-        vector< LVec3 > _sectionXY;
+        std::vector< LVec3 > _sectionXY;
         for ( int q = 0; q <= nDiv1; q++ )
         {
             float _x = radius * cos( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
@@ -439,10 +435,10 @@ namespace engine
 
     LMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
     {
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
 
         // Arrow construction parameters
         const int _nDiv1 = 10;
@@ -454,7 +450,7 @@ namespace engine
         // Tesselate cylinder ***********************************************************************
 
         // calculate section geometry
-        vector<LVec3> _sectionXY;
+        std::vector< LVec3 > _sectionXY;
         for ( size_t q = 0; q <= _nDiv1; q++ )
         {
             float _x = _radiusCyl * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
@@ -636,97 +632,12 @@ namespace engine
         return _axesModel;
     }
 
-    LModel* CMeshBuilder::createModelFromFile( const std::string& filename,
-                                               const std::string& modelName )
-    {
-        auto _assimpScenePtr = aiImportFile( filename.c_str(),
-                                             aiProcessPreset_TargetRealtime_MaxQuality );
-
-        if ( !_assimpScenePtr )
-        {
-            return NULL;
-        }
-
-        // Create a temporary holder to place the processes data from assimp
-        auto _model = new LModel( modelName );
-        // recursively copy the data from assimp to our data structure
-        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr );
-
-        // make sure we release the assimp resources
-        // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
-        aiReleaseImport( _assimpScenePtr );
-
-        return _model;
-    }
-
-    void CMeshBuilder::_processAssimpNode( LModel* modelPtr, 
-                                           aiNode* assimpNodePtr, 
-                                           const aiScene* assimpScenePtr )
-    {
-        for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
-        {
-            aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
-            modelPtr->addMesh( _processAssimpMesh( _assimpMeshPtr ) );
-        }
-
-        for ( size_t i = 0; i < assimpNodePtr->mNumChildren; i++ )
-        {
-            _processAssimpNode( modelPtr,
-                                assimpNodePtr->mChildren[i],
-                                assimpScenePtr );
-        }
-    }
-
-    LMesh* CMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
-    {
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LVec2> _texCoords;
-        vector<LInd3> _indices;
-
-        for ( size_t i = 0; i < assimpMeshPtr->mNumVertices; i++ )
-        {
-            _vertices.push_back( LVec3( assimpMeshPtr->mVertices[i].x,
-                                        assimpMeshPtr->mVertices[i].y,
-                                        assimpMeshPtr->mVertices[i].z ) );
-
-            _normals.push_back( LVec3( assimpMeshPtr->mNormals[i].x,
-                                       assimpMeshPtr->mNormals[i].y,
-                                       assimpMeshPtr->mNormals[i].z ) );
-
-            if ( assimpMeshPtr->mTextureCoords[0] )
-            {
-                _texCoords.push_back( LVec2( assimpMeshPtr->mTextureCoords[0][i].x,
-                                             assimpMeshPtr->mTextureCoords[0][i].y ) );
-            }
-            else
-            {
-                _texCoords.push_back( LVec2( 0.0f, 0.0f ) );
-            }
-        }
-
-        for ( size_t i = 0; i < assimpMeshPtr->mNumFaces; i++ )
-        {
-            aiFace _assimpFace = assimpMeshPtr->mFaces[i];
-            // grab only in tris. we are assuming it comes this way
-            // @TODO: Check this part as may have to support quads
-            for ( size_t j = 0; j < _assimpFace.mNumIndices / 3; j++ )
-            {
-                _indices.push_back( LInd3( _assimpFace.mIndices[ 3 * j + 0 ],
-                                           _assimpFace.mIndices[ 3 * j + 1 ],
-                                           _assimpFace.mIndices[ 3 * j + 2 ] ) );
-            }
-        }
-
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
-    }
-
     LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, const eAxis& axis )
     {
-        vector<LVec3> _vertices;
-        vector<LVec3> _normals;
-        vector<LInd3> _indices;
-        vector<LVec2> _texCoord;
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LInd3 > _indices;
+        std::vector< LVec2 > _texCoord;
 
         LHeightmapGenerator _hmapGenerator;
 
@@ -821,6 +732,268 @@ namespace engine
         }
 
         return new LMesh( _vertices, _normals, _texCoord, _indices );
+    }
+
+    LMesh* CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
+                                            float widthExtent, float depthExtent, 
+                                            float centerX, float centerY,
+                                            const std::vector< float >& heightData, float heightBase,
+                                            const eAxis& axis )
+    {
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
+
+        ENGINE_CORE_ASSERT( heightData.size() == nWidthSamples * nDepthSamples, "Mismatch in number of heightmap samples" );
+
+        float _minNegHeight = 0.0f; // catch minimum negative heights
+        for ( size_t i = 0; i < nWidthSamples - 1; i++ )
+        {
+            for ( size_t j = 0; j < nDepthSamples - 1; j++ )
+            {
+                auto _p0 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 0 ) ) / nWidthSamples ) - centerX, 
+                                                   depthExtent * ( ( (float)( j + 0 ) ) / nDepthSamples ) - centerY, 
+                                                   heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] }, 
+                                                 axis );
+
+                auto _p1 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 1 ) ) / nWidthSamples ) - centerX, 
+                                                   depthExtent * ( ( (float)( j + 0 ) ) / nDepthSamples ) - centerY, 
+                                                   heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] }, 
+                                                 axis );
+
+                auto _p2 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 1 ) ) / nWidthSamples ) - centerX, 
+                                                   depthExtent * ( ( (float)( j + 1 ) ) / nDepthSamples ) - centerY, 
+                                                   heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] }, 
+                                                 axis );
+
+                auto _p3 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 0 ) ) / nWidthSamples ) - centerX, 
+                                                   depthExtent * ( ( (float)( j + 1 ) ) / nDepthSamples ) - centerY, 
+                                                   heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] }, 
+                                                 axis );
+
+                _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
+                _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
+
+                LVec2 _t0( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
+                LVec2 _t1( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
+                LVec2 _t2( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
+                LVec2 _t3( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
+
+                _texCoords.push_back( _t0 );
+                _texCoords.push_back( _t1 );
+                _texCoords.push_back( _t2 );
+                _texCoords.push_back( _t0 );
+                _texCoords.push_back( _t2 );
+                _texCoords.push_back( _t3 );
+
+                _vertices.push_back( _p0 );
+                _vertices.push_back( _p1 );
+                _vertices.push_back( _p2 );
+                _vertices.push_back( _p0 );
+                _vertices.push_back( _p2 );
+                _vertices.push_back( _p3 );
+
+                auto _nt1 = LVec3::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = LVec3::cross( _p2 - _p0, _p3 - _p2 );
+
+                _normals.push_back( _nt1 );
+                _normals.push_back( _nt1 );
+                _normals.push_back( _nt1 );
+
+                _normals.push_back( _nt2 );
+                _normals.push_back( _nt2 );
+                _normals.push_back( _nt2 );
+
+                // store the minimum height for later usage
+                _minNegHeight = std::min( _minNegHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] );
+                _minNegHeight = std::min( _minNegHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] );
+                _minNegHeight = std::min( _minNegHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] );
+                _minNegHeight = std::min( _minNegHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] );
+            }
+        }
+
+        struct SideInfo
+        {
+            int i0;
+            int j0;
+            int i1;
+            int j1;
+            LVec3 normal;
+        };
+
+        std::vector< SideInfo > _sides = { {         0        ,         0        , nWidthSamples - 1,         0        , {  0.0f, -1.0f, 0.0f } },
+                                           { nWidthSamples - 1,         0        , nWidthSamples - 1, nDepthSamples - 1, {  1.0f,  0.0f, 0.0f } },
+                                           { nWidthSamples - 1, nDepthSamples - 1,         0        , nDepthSamples - 1, {  0.0f,  1.0f, 0.0f } },
+                                           {         0        , nDepthSamples - 1,         0        ,         0        , { -1.0f,  0.0f, 0.0f } } };
+
+        for ( size_t s = 0; s < _sides.size(); s++ )
+        {
+            int i0 = _sides[s].i0;
+            int j0 = _sides[s].j0;
+            int i1 = _sides[s].i1;
+            int j1 = _sides[s].j1;
+
+            std::vector< int > _ii;
+            if ( i1 > i0 ) { for ( int i = i0; i <= i1; i++ ) { _ii.push_back( i ); } }
+            else           { for ( int i = i0; i >= i1; i-- ) { _ii.push_back( i ); } }
+
+            std::vector< int > _jj;
+            if ( j1 > j0 ) { for ( int j = j0; j <= j1; j++ ) { _jj.push_back( j ); } }
+            else           { for ( int j = j0; j >= j1; j-- ) { _jj.push_back( j ); } }
+
+            for ( int iind = 0; iind < _ii.size(); iind++ )
+            {
+                for ( int jind = 0; jind < _jj.size(); jind++ )
+                {
+                    if ( _ii.size() > 1 && iind >= ( _ii.size() - 1 ) )
+                        continue;
+                    if ( _jj.size() > 1 && jind >= ( _jj.size() - 1 ) )
+                        continue;
+
+                    int ii0 = _ii[iind];
+                    int jj0 = _jj[jind];
+                    int ii1 = ( _ii.size() > 1 ) ? ( _ii[iind + 1] ) : ( ii0 );
+                    int jj1 = ( _jj.size() > 1 ) ? ( _jj[jind + 1] ) : ( jj0 );
+
+                    auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj0 ) / nDepthSamples, heightData[ii0 * nDepthSamples + jj0] }, axis );
+                    auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj1 ) / nDepthSamples, heightData[ii1 * nDepthSamples + jj1] }, axis );
+                    auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj1 ) / nDepthSamples, _minNegHeight - heightBase }, axis );
+                    auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj0 ) / nDepthSamples, _minNegHeight - heightBase }, axis );
+
+                    _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
+                    _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
+
+                    _vertices.push_back( _p0 );
+                    _vertices.push_back( _p1 );
+                    _vertices.push_back( _p2 );
+                    _vertices.push_back( _p3 );
+
+                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+
+                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                }
+            }
+        }
+
+        // bottom base plane
+        {
+            auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                            , -centerY + depthExtent * 0.0f                             , _minNegHeight - heightBase }, axis );
+            auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / nWidthSamples ) , -centerY + depthExtent * 0.0f                             , _minNegHeight - heightBase }, axis );
+            auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / nWidthSamples ) , -centerY + depthExtent * ( 1.0f - 1.0f / nDepthSamples )  , _minNegHeight - heightBase }, axis );
+            auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                            , -centerY + depthExtent * ( 1.0f - 1.0f / nDepthSamples )  , _minNegHeight - heightBase }, axis );
+
+            _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
+            _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
+
+            _vertices.push_back( _p0 );
+            _vertices.push_back( _p1 );
+            _vertices.push_back( _p2 );
+            _vertices.push_back( _p3 );
+
+            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+        }
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
+    }
+
+    LModel* CMeshBuilder::createModelFromFile( const std::string& filename,
+                                               const std::string& modelName )
+    {
+        auto _assimpScenePtr = aiImportFile( filename.c_str(),
+                                             aiProcessPreset_TargetRealtime_MaxQuality );
+
+        if ( !_assimpScenePtr )
+        {
+            return NULL;
+        }
+
+        // Create a temporary holder to place the processes data from assimp
+        auto _model = new LModel( modelName );
+        // recursively copy the data from assimp to our data structure
+        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr );
+
+        // make sure we release the assimp resources
+        // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
+        aiReleaseImport( _assimpScenePtr );
+
+        return _model;
+    }
+
+    void CMeshBuilder::_processAssimpNode( LModel* modelPtr, 
+                                           aiNode* assimpNodePtr, 
+                                           const aiScene* assimpScenePtr )
+    {
+        for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
+        {
+            aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
+            modelPtr->addMesh( _processAssimpMesh( _assimpMeshPtr ) );
+        }
+
+        for ( size_t i = 0; i < assimpNodePtr->mNumChildren; i++ )
+        {
+            _processAssimpNode( modelPtr,
+                                assimpNodePtr->mChildren[i],
+                                assimpScenePtr );
+        }
+    }
+
+    LMesh* CMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
+    {
+        std::vector< LVec3 > _vertices;
+        std::vector< LVec3 > _normals;
+        std::vector< LVec2 > _texCoords;
+        std::vector< LInd3 > _indices;
+
+        for ( size_t i = 0; i < assimpMeshPtr->mNumVertices; i++ )
+        {
+            _vertices.push_back( LVec3( assimpMeshPtr->mVertices[i].x,
+                                        assimpMeshPtr->mVertices[i].y,
+                                        assimpMeshPtr->mVertices[i].z ) );
+
+            _normals.push_back( LVec3( assimpMeshPtr->mNormals[i].x,
+                                       assimpMeshPtr->mNormals[i].y,
+                                       assimpMeshPtr->mNormals[i].z ) );
+
+            if ( assimpMeshPtr->mTextureCoords[0] )
+            {
+                _texCoords.push_back( LVec2( assimpMeshPtr->mTextureCoords[0][i].x,
+                                             assimpMeshPtr->mTextureCoords[0][i].y ) );
+            }
+            else
+            {
+                _texCoords.push_back( LVec2( 0.0f, 0.0f ) );
+            }
+        }
+
+        for ( size_t i = 0; i < assimpMeshPtr->mNumFaces; i++ )
+        {
+            aiFace _assimpFace = assimpMeshPtr->mFaces[i];
+            // grab only in tris. we are assuming it comes this way
+            // @TODO: Check this part as may have to support quads
+            for ( size_t j = 0; j < _assimpFace.mNumIndices / 3; j++ )
+            {
+                _indices.push_back( LInd3( _assimpFace.mIndices[ 3 * j + 0 ],
+                                           _assimpFace.mIndices[ 3 * j + 1 ],
+                                           _assimpFace.mIndices[ 3 * j + 2 ] ) );
+            }
+        }
+
+        return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
     /***********************************************************************
