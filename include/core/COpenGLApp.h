@@ -43,6 +43,10 @@ namespace engine
 
         bool isActive();
 
+        float frametime();
+
+        float fps();
+
     protected :
 
         virtual void _initUser();

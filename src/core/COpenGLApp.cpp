@@ -154,4 +154,14 @@ namespace engine
     {
         return m_windowPtr->isActive();
     }
+
+    float COpenGLApp::frametime()
+    {
+        return m_timeDelta;
+    }
+
+    float COpenGLApp::fps()
+    {
+        return 1.0f / m_timeDelta;
+    }
 }

@@ -57,10 +57,9 @@ set( GLENGINE_INCLUDE_DIRS
      "${GLEW_INCLUDE_DIRS}"
      "${CMAKE_CURRENT_SOURCE_DIR}/include"
      "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb"
-     "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui/"
-     "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui"
-     "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui/examples"
-     "${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog/include" )
+     "${CMAKE_SOURCE_DIR}/ext/imgui"
+     "${CMAKE_SOURCE_DIR}/ext/imgui/examples"
+     "${CMAKE_SOURCE_DIR}/ext/spdlog/include" )
 
 include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
