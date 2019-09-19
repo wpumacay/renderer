@@ -28,11 +28,29 @@ namespace engine { namespace InputSystem {
         return LInputHandler::GetInstance()->getCursorPosition();
     }
 
+    float getScrollOffX()
+    {
+        return LInputHandler::GetInstance()->getScrollOffX();
+    }
+
+    float getScrollOffY()
+    {
+        return LInputHandler::GetInstance()->getScrollOffY();
+    }
+
+    float getScrollAccumValueX()
+    {
+        return LInputHandler::GetInstance()->getScrollAccumValueX();
+    }
+
+    float getScrollAccumValueY()
+    {
+        return LInputHandler::GetInstance()->getScrollAccumValueY();
+    }
+
     void release()
     {
         LInputHandler::Release();
     }
-
-    
 
 }}

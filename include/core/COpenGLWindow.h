@@ -7,6 +7,7 @@
 
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
+#include <input/CInputCallbacks.h>
 
 #include <core/COpenGLContext.h>
 #include <utils/CLogger.h>
@@ -25,6 +26,7 @@ namespace engine
         FnPtr_keyboard_callback callbackKey;
         FnPtr_mouse_callback callbackMouse;
         FnPtr_mousemove_callback callbackMouseMove;
+        FnPtr_scroll_callback callbackScroll;
 
         CWindowProps()
         {
@@ -35,6 +37,7 @@ namespace engine
             callbackKey = nullptr;
             callbackMouse = nullptr;
             callbackMouseMove = nullptr;
+            callbackScroll = nullptr;
         }
     };
 
@@ -48,6 +51,7 @@ namespace engine
         void registerKeyCallback( FnPtr_keyboard_callback callback );
         void registerMouseCallback( FnPtr_mouse_callback callback );
         void registerMouseMoveCallback( FnPtr_mousemove_callback callback );
+        void registerScrollCallback( FnPtr_scroll_callback callback );
 
         void enableCursor();
         void disableCursor();

@@ -106,16 +106,28 @@ namespace engine
 
     void CFpsCamera::_updateCameraVectors()
     {
-        m_front.x = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
-        m_front.y = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
-        m_front.z = std::sin( toRadians( m_pitch ) );
+        if ( m_upAxis == eAxis::X )
+        {
+            m_front.x = std::sin( toRadians( m_pitch ) );
+            m_front.y = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_front.z = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+        }
+        else if ( m_upAxis == eAxis::Y )
+        {
+            m_front.x = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_front.y = std::sin( toRadians( m_pitch ) );
+            m_front.z = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+        }
+        else if ( m_upAxis == eAxis::Z )
+        {
+            m_front.x = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_front.y = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_front.z = std::sin( toRadians( m_pitch ) );
+        }
 
-        m_right = LVec3::cross( m_front, m_worldUp );
-        m_up    = LVec3::cross( m_right, m_front );
-
-        m_front.normalize();
-        m_right.normalize();
-        m_up.normalize();
+        m_front = LVec3::normalize( m_front );
+        m_right = LVec3::normalize( LVec3::cross( m_front, m_worldUp ) );
+        m_up    = LVec3::normalize( LVec3::cross( m_right, m_front ) );
 
         _buildViewMatrix();
     }

@@ -12,6 +12,10 @@ namespace engine { namespace InputSystem {
     bool checkSingleKeyPress( int key );
     bool isMouseDown( int button );
     LVec2 getCursorPosition();
+    float getScrollOffX();
+    float getScrollOffY();
+    float getScrollAccumValueX();
+    float getScrollAccumValueY();
 
     void release();
 

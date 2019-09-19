@@ -68,6 +68,16 @@ namespace engine
                 _wprops.callbackMouseMove( x, y );
             } );
 
+        glfwSetScrollCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, double xOff, double yOff )
+            {
+                CWindowProps _wprops = *( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+
+                if ( !_wprops.callbackScroll )
+                    return;
+
+                _wprops.callbackScroll( xOff, yOff );
+            } );
+
         glfwSetInputMode( m_glfwWindowPtr, GLFW_STICKY_KEYS, 1 );
         glfwGetFramebufferSize( m_glfwWindowPtr, &m_properties.width, &m_properties.height );
         glViewport( 0, 0, m_properties.width, m_properties.height );
@@ -133,6 +143,11 @@ namespace engine
     void COpenGLWindow::registerMouseMoveCallback( FnPtr_mousemove_callback callback )
     {
         m_properties.callbackMouseMove = callback;
+    }
+
+    void COpenGLWindow::registerScrollCallback( FnPtr_scroll_callback callback )
+    {
+        m_properties.callbackScroll = callback;
     }
 
 }

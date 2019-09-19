@@ -6,6 +6,7 @@
 
 #include <camera/CFpsCamera.h>
 #include <camera/CFixedCamera.h>
+#include <camera/COrbitCamera.h>
 #include <LLightDirectional.h>
 
 #include <utils/CImguiUiDemo.h>
@@ -150,24 +151,32 @@ int main()
     // _cameraProjData.zNear       = 0.1f;
     // _cameraProjData.zFar        = 100.0f;
 
-    const float _cameraSensitivity  = 0.25f;
-    const float _cameraSpeed        = 5.0f;
-    const float _cameraMaxDelta     = 10.0f;
-
-    auto _camera = new engine::CFpsCamera( "fps",
-                                           engine::LVec3( 2.0f, 2.0f, 2.0f ),
-                                           engine::LVec3( 0.0f, 0.0f, 0.0f ),
-                                           engine::eAxis::Z,
-                                           _cameraProjData,
-                                           _cameraSensitivity,
-                                           _cameraSpeed,
-                                           _cameraMaxDelta );
+//     const float _cameraSensitivity  = 0.25f;
+//     const float _cameraSpeed        = 5.0f;
+//     const float _cameraMaxDelta     = 10.0f;
+// 
+//     auto _camera = new engine::CFpsCamera( "fps",
+//                                            engine::LVec3( 2.0f, 2.0f, 2.0f ),
+//                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
+//                                            engine::eAxis::Z,
+//                                            _cameraProjData,
+//                                            _cameraSensitivity,
+//                                            _cameraSpeed,
+//                                            _cameraMaxDelta );
 
     // auto _camera = new engine::CFixedCamera( "fixed",
     //                                          engine::LVec3( 2.0f, 2.0f, 2.0f ),
     //                                          engine::LVec3( 0.0f, 0.0f, 0.0f ),
     //                                          engine::eAxis::Z,
     //                                          _cameraProjData );
+
+    auto _camera = new engine::COrbitCamera( "orbit",
+                                             engine::LVec3( 2.0f, 2.0f, 2.0f ),
+                                             engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                             engine::eAxis::Z,
+                                             _cameraProjData,
+                                             engine::COpenGLApp::GetWindow()->width(),
+                                             engine::COpenGLApp::GetWindow()->height() );
 
     // make a sample light source
     auto _light = new engine::LLightDirectional( engine::LVec3( 0.8, 0.8, 0.8 ), engine::LVec3( 0.8, 0.8, 0.8 ),
@@ -198,6 +207,18 @@ int main()
                 _renderables[i]->setWireframeMode( false );
         else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
+
+//         std::cout << "cam-info *****************" << std::endl;
+//         std::cout << _camera->toString() << std::endl;
+//         std::cout << "proj-mat: " << std::endl;
+//         std::cout << _camera->matProj().toString() << std::endl;
+//         std::cout << "view-mat: " << std::endl;
+//         std::cout << _camera->matView().toString() << std::endl;
+
+//         std::cout << "scroll-off-x          : " << std::to_string( engine::InputSystem::getScrollOffX() ) << std::endl;
+//         std::cout << "scroll-off-y          : " << std::to_string( engine::InputSystem::getScrollOffY() ) << std::endl;
+//         std::cout << "scroll-accum-x        : " << std::to_string( engine::InputSystem::getScrollAccumValueX() ) << std::endl;
+//         std::cout << "scroll-accum-y        : " << std::to_string( engine::InputSystem::getScrollAccumValueY() ) << std::endl;
 
         _app->begin();
         _app->update();

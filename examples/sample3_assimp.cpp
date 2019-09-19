@@ -6,6 +6,7 @@
 
 #include <camera/CFpsCamera.h>
 #include <camera/CFixedCamera.h>
+#include <camera/COrbitCamera.h>
 #include <LLightDirectional.h>
 
 #ifndef ENGINE_RESOURCES_PATH
@@ -35,24 +36,32 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    const float _cameraSensitivity  = 0.25f;
-    const float _cameraSpeed        = 5.0f;
-    const float _cameraMaxDelta     = 10.0f;
-
-    auto _camera = new engine::CFpsCamera( "fps",
-                                           engine::LVec3( 2.0f, 2.0f, 2.0f ),
-                                           engine::LVec3( 0.0f, 0.0f, 0.0f ),
-                                           engine::eAxis::Z,
-                                           _cameraProjData,
-                                           _cameraSensitivity,
-                                           _cameraSpeed,
-                                           _cameraMaxDelta );
+//     const float _cameraSensitivity  = 0.25f;
+//     const float _cameraSpeed        = 5.0f;
+//     const float _cameraMaxDelta     = 10.0f;
+// 
+//     auto _camera = new engine::CFpsCamera( "fps",
+//                                            engine::LVec3( 2.0f, 2.0f, 2.0f ),
+//                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
+//                                            engine::eAxis::Z,
+//                                            _cameraProjData,
+//                                            _cameraSensitivity,
+//                                            _cameraSpeed,
+//                                            _cameraMaxDelta );
 
     // auto _camera = new engine::CFixedCamera( "fixed",
     //                                          engine::LVec3( 1.0f, 2.0f, 1.0f ),
     //                                          engine::LVec3( 0.0f, 0.0f, 0.0f ),
     //                                          engine::eAxis::Z,
     //                                          _cameraProjData );
+
+    auto _camera = new engine::COrbitCamera( "orbit",
+                                             engine::LVec3( 2.0f, 2.0f, 2.0f ),
+                                             engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                             engine::eAxis::Z,
+                                             _cameraProjData,
+                                             engine::COpenGLApp::GetWindow()->width(),
+                                             engine::COpenGLApp::GetWindow()->height() );
 
     // make a sample light source
     auto _light = new engine::LLightDirectional( engine::LVec3( 0.2, 0.2, 0.2 ), engine::LVec3( 0.8, 0.8, 0.8 ),

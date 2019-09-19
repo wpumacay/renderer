@@ -1,8 +1,5 @@
 #pragma once
 
-typedef void ( *FnPtr_mouse_callback )( int button, int action, double x, double y );
-typedef void ( *FnPtr_mousemove_callback )( double x, double y );
-
 // Copied from cherno's hazel engine: 
 //      https://github.com/TheCherno/Hazel/blob/55fc4392f4bb44d94a54f09522d5545a86dfc48a/Hazel/src/Hazel/MouseButtonCodes.h
 

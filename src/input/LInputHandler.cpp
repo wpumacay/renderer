@@ -21,6 +21,11 @@ namespace engine
 
         m_mouseX = 0.0f;
         m_mouseY = 0.0f;
+
+        m_scrollOffX = 0.0f;
+        m_scrollOffY = 0.0f;
+        m_scrollAccumValueX = 0.0f;
+        m_scrollAccumValueY = 0.0f;
     }
 
     LInputHandler::~LInputHandler()
@@ -81,6 +86,18 @@ namespace engine
         LInputHandler::s_instance->m_mouseY = y;
     }
 
+    void LInputHandler::callback_scroll( double xOff, double yOff )
+    {
+        if ( !LInputHandler::s_instance )
+            return;
+
+        LInputHandler::s_instance->m_scrollOffX = xOff;
+        LInputHandler::s_instance->m_scrollOffY = yOff;
+
+        LInputHandler::s_instance->m_scrollAccumValueX += xOff;
+        LInputHandler::s_instance->m_scrollAccumValueY += yOff;
+    }
+
     bool LInputHandler::isKeyDown( int key )
     {
         if ( key < 0 || key >= ENGINE_MAX_KEYS )
@@ -127,6 +144,26 @@ namespace engine
     LVec2 LInputHandler::getCursorPosition()
     {
         return LVec2( m_mouseX, m_mouseY );
+    }
+
+    float LInputHandler::getScrollOffX()
+    {
+        return m_scrollOffX;
+    }
+
+    float LInputHandler::getScrollOffY()
+    {
+        return m_scrollOffY;
+    }
+
+    float LInputHandler::getScrollAccumValueX()
+    {
+        return m_scrollAccumValueX;
+    }
+
+    float LInputHandler::getScrollAccumValueY()
+    {
+        return m_scrollAccumValueY;
     }
 
 }

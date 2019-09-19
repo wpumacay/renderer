@@ -1,7 +1,5 @@
 #pragma once
 
-typedef void ( *FnPtr_keyboard_callback )( int key, int action );
-
 // Copied from cherno's hazel engine: 
 //      https://github.com/TheCherno/Hazel/blob/55fc4392f4bb44d94a54f09522d5545a86dfc48a/Hazel/src/Hazel/KeyCodes.h
 

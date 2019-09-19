@@ -83,6 +83,7 @@ namespace engine
         m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );
         m_windowPtr->registerMouseMoveCallback( engine::LInputHandler::callback_mouseMove );
+        m_windowPtr->registerScrollCallback( engine::LInputHandler::callback_scroll );
 
         // let the user initialize its own stuff
         _initUser();
