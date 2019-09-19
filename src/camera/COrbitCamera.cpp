@@ -155,9 +155,24 @@ namespace engine
         float _stheta = std::sin( m_theta );
         float _ctheta = std::cos( m_theta );
 
-        m_r.x = m_rho * _sphi * _ctheta;
-        m_r.y = m_rho * _sphi * _stheta;
-        m_r.z = m_rho * _cphi;
+        if ( m_upAxis == eAxis::X )
+        {
+            m_r.x = m_rho * _cphi;
+            m_r.y = m_rho * _sphi * _ctheta;
+            m_r.z = m_rho * _sphi * _stheta;
+        }
+        else if ( m_upAxis == eAxis::Y )
+        {
+            m_r.x = m_rho * _sphi * _stheta;
+            m_r.y = m_rho * _cphi;
+            m_r.z = m_rho * _sphi * _ctheta;
+        }
+        else if ( m_upAxis == eAxis::Z )
+        {
+            m_r.x = m_rho * _sphi * _ctheta;
+            m_r.y = m_rho * _sphi * _stheta;
+            m_r.z = m_rho * _cphi;
+        }
 
         m_position = m_targetPoint + m_r;
     }
