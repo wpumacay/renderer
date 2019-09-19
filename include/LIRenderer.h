@@ -4,11 +4,11 @@
 
 #include "LCommon.h"
 #include "LIRenderable.h"
-#include "LICamera.h"
+#include <camera/CICamera.h>
 #include "LILight.h"
 #include "LScene.h"
 #include "LShadowMap.h"
-#include "shaders/LShaderManager.h"
+#include <shaders/LShaderManager.h>
 
 using namespace std;
 

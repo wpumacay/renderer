@@ -4,8 +4,8 @@
 #include <core/COpenGLApp.h>
 #include <graphics/CMeshBuilder.h>
 
-#include <LFpsCamera.h>
-#include <LFixedCamera3d.h>
+#include <camera/CFpsCamera.h>
+#include <camera/CFixedCamera.h>
 #include <LLightDirectional.h>
 
 #include <utils/CImguiUiDemo.h>
@@ -28,6 +28,12 @@ protected :
     }
 
 };
+
+void checkPointClip( engine::LMat4 proj, engine::LMat4 view, engine::LVec4 worldpoint )
+{
+    auto _clipv = proj * view * worldpoint;
+    std::cout << "world-point: " << worldpoint.toString() << " mapped to clip point: " << _clipv.toString() << std::endl;
+}
 
 int main()
 {
@@ -128,15 +134,40 @@ int main()
     _scene->addRenderable( _axy );
 
     // make a sample camera
-    auto _camera = new engine::LFpsCamera( "fps",
-                                           engine::LVec3( 1.0f, 2.0f, 1.0f ),
-                                           engine::LVec3( -2.0f, -4.0f, -2.0f ),
-                                           engine::LICamera::UP_Z );
+    auto _cameraProjData = engine::CCameraProjData();
 
-    // auto _camera = new engine::LFixedCamera3d( "fixed",
-    //                                            engine::LVec3( 1.0f, 2.0f, 1.0f ),
-    //                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
-    //                                            engine::LICamera::UP_Z );
+    _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
+    _cameraProjData.fov         = 45.0f;
+    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.zNear       = 0.1f;
+    _cameraProjData.zFar        = 100.0f;
+
+    // // @TODO: Still presents some weird behaviour. It should be width - height, but that 
+    // //        clips everything in the wrong way.
+    // _cameraProjData.projection  = engine::eCameraProjection::ORTHOGRAPHIC;
+    // _cameraProjData.width       = 4.0f * engine::COpenGLApp::GetWindow()->aspect();
+    // _cameraProjData.height      = 4.0f;
+    // _cameraProjData.zNear       = 0.1f;
+    // _cameraProjData.zFar        = 100.0f;
+
+    const float _cameraSensitivity  = 0.25f;
+    const float _cameraSpeed        = 5.0f;
+    const float _cameraMaxDelta     = 10.0f;
+
+    auto _camera = new engine::CFpsCamera( "fps",
+                                           engine::LVec3( 2.0f, 2.0f, 2.0f ),
+                                           engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                           engine::eAxis::Z,
+                                           _cameraProjData,
+                                           _cameraSensitivity,
+                                           _cameraSpeed,
+                                           _cameraMaxDelta );
+
+    // auto _camera = new engine::CFixedCamera( "fixed",
+    //                                          engine::LVec3( 2.0f, 2.0f, 2.0f ),
+    //                                          engine::LVec3( 0.0f, 0.0f, 0.0f ),
+    //                                          engine::eAxis::Z,
+    //                                          _cameraProjData );
 
     // make a sample light source
     auto _light = new engine::LLightDirectional( engine::LVec3( 0.8, 0.8, 0.8 ), engine::LVec3( 0.8, 0.8, 0.8 ),
@@ -167,7 +198,7 @@ int main()
                 _renderables[i]->setWireframeMode( false );
         else if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
-        
+
         _app->begin();
         _app->update();
         _app->end();

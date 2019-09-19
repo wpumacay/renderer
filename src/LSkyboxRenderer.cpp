@@ -37,8 +37,8 @@ namespace engine
         if ( _skybox != NULL )
         {
             _shader->bind();
-            _shader->setViewMatrix( _camera->getViewMatrix() );
-            _shader->setProjectionMatrix( _camera->getProjectionMatrix() );
+            _shader->setViewMatrix( _camera->matView() );
+            _shader->setProjectionMatrix( _camera->matProj() );
 
             _skybox->render();
 

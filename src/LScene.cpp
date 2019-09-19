@@ -21,7 +21,7 @@ namespace engine
         }
         m_renderables.clear();
 
-        map<string, LICamera*>::iterator _it;
+        map<string, CICamera*>::iterator _it;
         for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {
             delete _it->second;
@@ -51,14 +51,12 @@ namespace engine
 
     void LScene::update( float dt )
     {
-        map<string, LICamera*>::iterator _it;
+        map<string, CICamera*>::iterator _it;
         for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {
             auto _camera = _it->second;
             if ( _camera != NULL )
-            {
-                _camera->update( dt );
-            }
+                _camera->update();
         }
     }
 
@@ -90,7 +88,7 @@ namespace engine
         m_lights.push_back( pLight );
     }
 
-    void LScene::addCamera( LICamera* pCamera )
+    void LScene::addCamera( CICamera* pCamera )
     {
         m_cameras[ pCamera->name() ] = pCamera;
 

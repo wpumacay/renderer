@@ -22,8 +22,9 @@ namespace engine
 
     COpenGLApp::COpenGLApp()
     {
-        // initialize logger first, as other resources use it
+        // initialize there resources first, as other resources use it
         engine::CLogger::Init();
+        engine::CTime::Init();
 
         // create the global reference for other systems to use
         COpenGLApp::s_instance = this;
@@ -53,6 +54,7 @@ namespace engine
         m_scenePtr          = NULL;
         m_uiPtr             = NULL;
 
+        engine::CTime::Release();
         engine::DebugSystem::release();
         engine::InputSystem::release();
         engine::LShaderManager::release();
@@ -85,6 +87,9 @@ namespace engine
         // let the user initialize its own stuff
         _initUser();
 
+        // start keeping track of time
+        engine::CTime::Start();
+
         ENGINE_CORE_INFO( "GL-Application started successfully" );
     }
 
@@ -106,9 +111,9 @@ namespace engine
 
         auto _currentCamera = m_scenePtr->getCurrentCamera();
         // handle the usage of the cursor according to the current camera active mode
-        if ( _currentCamera->type() == LFpsCamera::GetStaticType() )
+        if ( _currentCamera->type() == CFpsCamera::GetStaticType() )
         {
-            if ( _currentCamera->isActive() )
+            if ( _currentCamera->active() )
                 m_windowPtr->disableCursor();
             else
                 m_windowPtr->enableCursor();
@@ -120,8 +125,8 @@ namespace engine
         if ( m_uiPtr )
             m_uiPtr->render();
 
-        engine::DebugSystem::setupMatrices( _currentCamera->getViewMatrix(),
-                                            _currentCamera->getProjectionMatrix() );
+        engine::DebugSystem::setupMatrices( _currentCamera->matView(),
+                                            _currentCamera->matProj() );
         engine::DebugSystem::render();
     }
 
@@ -131,8 +136,10 @@ namespace engine
 
         m_windowPtr->end();
 
-        m_timeDelta = min( (float)( glfwGetTime() - m_timeNow ), MAX_DELTA );
+        m_timeDelta = glfwGetTime() - m_timeNow;
         m_timeNow = glfwGetTime();
+
+        engine::CTime::Update( m_timeDelta );
     }
 
     void COpenGLApp::_initUser()

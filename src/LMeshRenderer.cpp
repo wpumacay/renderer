@@ -72,8 +72,8 @@ namespace engine
 
         _debugShader->bind();
 
-        _debugShader->setViewMatrix( _camera->getViewMatrix() );
-        _debugShader->setProjectionMatrix( _camera->getProjectionMatrix() );
+        _debugShader->setViewMatrix( _camera->matView() );
+        _debugShader->setProjectionMatrix( _camera->matProj() );
 
         for ( auto _mesh : m_debugList )
         {
@@ -114,9 +114,9 @@ namespace engine
 
         // Load uniforms
         _shader->setLightDirectional( _light );
-        _shader->setViewMatrix( _camera->getViewMatrix() );
-        _shader->setProjectionMatrix( _camera->getProjectionMatrix() );
-        _shader->setViewPosition( _camera->getPosition() );
+        _shader->setViewMatrix( _camera->matView() );
+        _shader->setProjectionMatrix( _camera->matProj() );
+        _shader->setViewPosition( _camera->position() );
         _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
 
         // render all meshes
@@ -248,9 +248,9 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, shadowMap->getDepthTexture() );
         
         _shader->setLightDirectional( _light );
-        _shader->setViewMatrix( _camera->getViewMatrix() );
-        _shader->setProjectionMatrix( _camera->getProjectionMatrix() );
-        _shader->setViewPosition( _camera->getPosition() );
+        _shader->setViewMatrix( _camera->matView() );
+        _shader->setProjectionMatrix( _camera->matProj() );
+        _shader->setViewPosition( _camera->position() );
         _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
         _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
         _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );

@@ -209,6 +209,14 @@ namespace engine
             buff[3] = 0; buff[7] = 0; buff[11] = 0; buff[15] = 1;
         }
 
+        LMat4( const LVec3& xAxis, const LVec3& yAxis, const LVec3& zAxis )
+        {
+            buff[0] = xAxis.x ; buff[4] = yAxis.x ; buff[8]  = zAxis.x ; buff[12] = 0;
+            buff[1] = xAxis.y ; buff[5] = yAxis.y ; buff[9]  = zAxis.y ; buff[13] = 0;
+            buff[2] = xAxis.z ; buff[6] = yAxis.z ; buff[10] = zAxis.z ; buff[14] = 0;
+            buff[3] =    0    ; buff[7] =    0    ; buff[11] =    0    ; buff[15] = 1;
+        }
+
         LMat4( const LMat4& other )
         {
             for ( int i = 0; i < 16; i++ )
@@ -372,7 +380,7 @@ namespace engine
             _res.buff[0] =  1 / ( width / 2 )   ; _res.buff[4] =       0            ; _res.buff[8]  =         0             ; _res.buff[12] = 0;
             _res.buff[1] =        0             ; _res.buff[5] = 1 / ( height / 2 ) ; _res.buff[9]  =         0             ; _res.buff[13] = 0;
             _res.buff[2] =        0             ; _res.buff[6] =       0            ; _res.buff[10] = -2 / ( zFar - zNear ) ; _res.buff[14] = -( zFar + zNear ) / ( zFar - zNear );
-            _res.buff[3] =        0             ; _res.buff[7] =       0            ; _res.buff[11] =         0             ; _res.buff[15] =  1;        
+            _res.buff[3] =        0             ; _res.buff[7] =       0            ; _res.buff[11] =         0             ; _res.buff[15] = 1;
 
             return _res;
         }
@@ -552,11 +560,24 @@ namespace engine
             this->z = vec3.z;
             this->w = w;
         }
+
+        string toString()
+        {
+            string _v;
+            _v += "( ";  _v += to_string( x );
+            _v += " , "; _v += to_string( y );
+            _v += " , "; _v += to_string( z );
+            _v += " , "; _v += to_string( w );
+            _v += " )";
+
+            return _v;
+        }
     };
 
     LVec4 operator* ( const LMat4& mat, const LVec4& vec );
 
     float toRadians( float angle );
+    float toDegrees( float angle );
 
     struct LTextureData
     {

@@ -5,12 +5,13 @@
 #include "LLightDirectional.h"
 #include "LLightDirectional.h"
 #include "LLightDirectional.h"
-#include "LICamera.h"
 #include "LFog.h"
 #include "LSkybox.h"
 #include "LIRenderable.h"
-#include "LFpsCamera.h"
-#include "LFixedCamera3d.h"
+
+#include <camera/CICamera.h>
+#include <camera/CFpsCamera.h>
+#include <camera/CFixedCamera.h>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ namespace engine
         void addRenderable( LIRenderable* pRenderable );
         void addFog( LFog* pFog );
         void addLight( LILight* pLight ); 
-        void addCamera( LICamera* pCamera );
+        void addCamera( CICamera* pCamera );
         void addSkybox( LSkybox* pSkybox );
 
         void changeToCameraByName( const string& cameraId );
@@ -35,7 +36,7 @@ namespace engine
         void cleanScene();
 
         LMat4 getProjMatrix() { return m_projMatrix; }
-        LICamera* getCurrentCamera() { return m_currentCamera; }
+        CICamera* getCurrentCamera() { return m_currentCamera; }
         vector<LILight*>& getLights() { return m_lights; }
 
         template< class T >
@@ -66,11 +67,11 @@ namespace engine
 
         vector<LIRenderable*> m_renderables;
         vector<LILight*> m_lights;
-        map<string, LICamera*> m_cameras;
+        map<string, CICamera*> m_cameras;
         LFog* m_fog;
         LSkybox* m_skybox;
         
-        LICamera* m_currentCamera;
+        CICamera* m_currentCamera;
 
         LMat4 m_projMatrix;
     };

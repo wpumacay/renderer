@@ -60,6 +60,7 @@ namespace engine
 
         int width() { return m_properties.width; }
         int height() { return m_properties.height; }
+        float aspect() { return ((float) m_properties.width) / m_properties.height; }
         std::string title() { return m_properties.title; }
         
         CWindowProps properties() { return m_properties; }

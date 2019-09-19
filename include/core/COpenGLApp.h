@@ -2,10 +2,9 @@
 
 #include <LScene.h>
 
-#include <LICamera.h>
-#include <LFpsCamera.h>
-#include <LFixedCamera3d.h>
-#include <LFollowCamera.h>
+#include <camera/CICamera.h>
+#include <camera/CFpsCamera.h>
+#include <camera/CFixedCamera.h>
 
 #include <LMasterRenderer.h>
 
@@ -17,6 +16,7 @@
 
 #include <core/COpenGLWindow.h>
 #include <utils/CLogger.h>
+#include <utils/CTime.h>
 #include <utils/CImguiUi.h>
 
 namespace engine

@@ -6,7 +6,12 @@ namespace engine
 
     float toRadians( float angle )
     {
-        return angle * M_PI / 180.0;
+        return angle * M_PI / 180.0f;
+    }
+
+    float toDegrees( float angle )
+    {
+        return angle * 180.0f / M_PI;
     }
 
     LVec4 operator* ( const LMat4& mat, const LVec4& vec )
