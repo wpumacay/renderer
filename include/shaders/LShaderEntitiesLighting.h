@@ -5,6 +5,7 @@
 #include <shaders/LShaderBasic3d.h>
 #include <LLightDirectional.h>
 #include <LMaterial.h>
+#include <shaders/CShaderUniforms.h>
 
 using namespace std;
 
@@ -53,12 +54,12 @@ namespace engine
             _setInt( m_ulDir.isActive, pLightDirectional->isActive );
         }
 
-        void setGlobalAmbientLight( const LVec3& vec )
+        void setGlobalAmbientLight( const CVec3& vec )
         {
             _setVec3( m_uGlobalAmbient, vec );
         }
 
-        void setViewPosition( const LVec3& vec )
+        void setViewPosition( const CVec3& vec )
         {
             _setVec3( m_uViewPos, vec );
         }

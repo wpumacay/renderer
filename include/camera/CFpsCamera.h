@@ -12,8 +12,8 @@ namespace engine
     public :
 
         CFpsCamera( const std::string& name,
-                    const LVec3& position,
-                    const LVec3& targetPoint,
+                    const CVec3& position,
+                    const CVec3& targetPoint,
                     const eAxis& upAxis,
                     const CCameraProjData& projData,
                     float sensitivity,
@@ -60,6 +60,6 @@ namespace engine
         float m_camSpeed;
         float m_camMaxDelta;
 
-        LVec2 m_lastCursorPos;
+        CVec2 m_lastCursorPos;
     };
 }

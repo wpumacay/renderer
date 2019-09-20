@@ -9,11 +9,11 @@ namespace engine
     {
         m_name = name;
 
-        m_type = RENDERABLE_TYPE_MODEL;
+        m_type = eRenderableType::MODEL;
 
         m_material = new LMaterial();
         
-        scale = LVec3( 1.0f, 1.0f, 1.0f );
+        scale = CVec3( 1.0f, 1.0f, 1.0f );
     }
 
     LModel::~LModel()

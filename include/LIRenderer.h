@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 #include "LIRenderable.h"
 #include <camera/CICamera.h>
 #include "LILight.h"

@@ -8,6 +8,7 @@
 #include <LLightPoint.h>
 #include <LLightSpot.h>
 #include <LMaterial.h>
+#include <shaders/CShaderUniforms.h>
 
 #define MAX_DIRECTIONAL_LIGHTS 2
 #define MAX_POSITIONAL_LIGHTS 5
@@ -17,60 +18,6 @@ using namespace std;
 
 namespace engine
 {
-
-    struct LFogUniforms
-    {
-        GLuint type;
-        GLuint color;
-        GLuint density;
-        GLuint start;
-        GLuint end;
-        GLuint isActive;
-    };
-
-    struct LLDirUniforms
-    {
-        GLuint direction;
-        GLuint ambient;
-        GLuint diffuse;
-        GLuint specular;
-        GLuint isActive;
-    };
-
-    struct LLPointUniforms
-    {
-        GLuint position;
-        GLuint constant;
-        GLuint linear;
-        GLuint quadratic;
-        GLuint ambient;
-        GLuint diffuse;
-        GLuint specular;
-        GLuint isActive;
-    };
-
-    struct LLSpotUniforms
-    {
-        GLuint position;
-        GLuint direction;
-        GLuint cutOff;
-        GLuint outerCutOff;
-        GLuint constant;
-        GLuint linear;
-        GLuint quadratic;
-        GLuint ambient;
-        GLuint diffuse;
-        GLuint specular;
-        GLuint isActive;
-    };
-
-    struct LMaterialUniforms
-    {
-        GLuint ambient;
-        GLuint diffuse;
-        GLuint specular;
-        GLuint shininess;
-    };
 
     class LShaderLighting : public LShaderBasic3d
     {
@@ -282,12 +229,12 @@ namespace engine
             _setInt( m_uNumLightsSpot, num );
         }
 
-        void setGlobalAmbientLight( const LVec3& vec )
+        void setGlobalAmbientLight( const CVec3& vec )
         {
             _setVec3( m_uGlobalAmbient, vec );
         }
 
-        void setViewPosition( const LVec3& vec )
+        void setViewPosition( const CVec3& vec )
         {
             _setVec3( m_uViewPos, vec );
         }

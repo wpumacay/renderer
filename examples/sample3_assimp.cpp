@@ -41,8 +41,8 @@ int main()
 //     const float _cameraMaxDelta     = 10.0f;
 // 
 //     auto _camera = new engine::CFpsCamera( "fps",
-//                                            engine::LVec3( 2.0f, 2.0f, 2.0f ),
-//                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
+//                                            engine::CVec3( 2.0f, 2.0f, 2.0f ),
+//                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
 //                                            engine::eAxis::Z,
 //                                            _cameraProjData,
 //                                            _cameraSensitivity,
@@ -50,22 +50,22 @@ int main()
 //                                            _cameraMaxDelta );
 
     // auto _camera = new engine::CFixedCamera( "fixed",
-    //                                          engine::LVec3( 1.0f, 2.0f, 1.0f ),
-    //                                          engine::LVec3( 0.0f, 0.0f, 0.0f ),
+    //                                          engine::CVec3( 1.0f, 2.0f, 1.0f ),
+    //                                          engine::CVec3( 0.0f, 0.0f, 0.0f ),
     //                                          engine::eAxis::Z,
     //                                          _cameraProjData );
 
     auto _camera = new engine::COrbitCamera( "orbit",
-                                             engine::LVec3( 2.0f, 2.0f, 2.0f ),
-                                             engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                             engine::CVec3( 2.0f, 2.0f, 2.0f ),
+                                             engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
     // make a sample light source
-    auto _light = new engine::LLightDirectional( engine::LVec3( 0.2, 0.2, 0.2 ), engine::LVec3( 0.8, 0.8, 0.8 ),
-                                                 engine::LVec3( 0.05, 0.05, 0.05 ), 0, engine::LVec3( -1, -1, 0 ) );
+    auto _light = new engine::LLightDirectional( engine::CVec3( 0.2, 0.2, 0.2 ), engine::CVec3( 0.8, 0.8, 0.8 ),
+                                                 engine::CVec3( 0.05, 0.05, 0.05 ), 0, engine::CVec3( -1, -1, 0 ) );
 
     // add these components to the scene
     _scene->addCamera( _camera );
@@ -78,7 +78,7 @@ int main()
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _model->rotation = _model->rotation * engine::LMat4::rotationX( 0.01f );
+        _model->rotation = _model->rotation * engine::CMat4::rotationX( 0.01f );
 
         if ( engine::InputSystem::isKeyDown( ENGINE_KEY_SPACE ) )
             _scene->getCurrentCamera()->setActiveMode( false );

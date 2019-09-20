@@ -30,10 +30,10 @@ protected :
 
 };
 
-void checkPointClip( engine::LMat4 proj, engine::LMat4 view, engine::LVec4 worldpoint )
+void checkPointClip( engine::CMat4 proj, engine::CMat4 view, engine::CVec4 worldpoint )
 {
     auto _clipv = proj * view * worldpoint;
-    std::cout << "world-point: " << worldpoint.toString() << " mapped to clip point: " << _clipv.toString() << std::endl;
+    std::cout << "world-point: " << engine::toString( worldpoint ) << " mapped to clip point: " << engine::toString( _clipv ) << std::endl;
 }
 
 int main()
@@ -99,13 +99,13 @@ int main()
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
     {
-        if ( _renderables[i]->getType() == RENDERABLE_TYPE_MESH )
+        if ( _renderables[i]->getType() == engine::eRenderableType::MESH )
             _renderables[i]->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
     }
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
     {
-        if ( _renderables[i]->getType() == RENDERABLE_TYPE_MESH )
+        if ( _renderables[i]->getType() == engine::eRenderableType::MESH )
         {
             _renderables[i]->addTexture( _chessboardTex );
         }
@@ -151,37 +151,37 @@ int main()
     // _cameraProjData.zNear       = 0.1f;
     // _cameraProjData.zFar        = 100.0f;
 
-//     const float _cameraSensitivity  = 0.25f;
-//     const float _cameraSpeed        = 5.0f;
-//     const float _cameraMaxDelta     = 10.0f;
-// 
-//     auto _camera = new engine::CFpsCamera( "fps",
-//                                            engine::LVec3( 2.0f, 2.0f, 2.0f ),
-//                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
-//                                            engine::eAxis::Z,
-//                                            _cameraProjData,
-//                                            _cameraSensitivity,
-//                                            _cameraSpeed,
-//                                            _cameraMaxDelta );
+    // const float _cameraSensitivity  = 0.25f;
+    // const float _cameraSpeed        = 5.0f;
+    // const float _cameraMaxDelta     = 10.0f;
+    // 
+    // auto _camera = new engine::CFpsCamera( "fps",
+    //                                        engine::CVec3( 2.0f, 2.0f, 2.0f ),
+    //                                        engine::CVec3( 0.0f, 0.0f, 0.0f ),
+    //                                        engine::eAxis::Z,
+    //                                        _cameraProjData,
+    //                                        _cameraSensitivity,
+    //                                        _cameraSpeed,
+    //                                        _cameraMaxDelta );
 
     // auto _camera = new engine::CFixedCamera( "fixed",
-    //                                          engine::LVec3( 2.0f, 2.0f, 2.0f ),
-    //                                          engine::LVec3( 0.0f, 0.0f, 0.0f ),
+    //                                          engine::CVec3( 2.0f, 2.0f, 2.0f ),
+    //                                          engine::CVec3( 0.0f, 0.0f, 0.0f ),
     //                                          engine::eAxis::Z,
     //                                          _cameraProjData );
 
     auto _camera = new engine::COrbitCamera( "orbit",
-                                             engine::LVec3( 2.0f, 2.0f, 2.0f ),
-                                             engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                             engine::CVec3( 2.0f, 2.0f, 2.0f ),
+                                             engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
     // make a sample light source
-    auto _light = new engine::LLightDirectional( engine::LVec3( 0.8, 0.8, 0.8 ), engine::LVec3( 0.8, 0.8, 0.8 ),
-                                                 engine::LVec3( 0.3, 0.3, 0.3 ), 0, engine::LVec3( 0, 0, -1 ) );
-    _light->setVirtualPosition( engine::LVec3( 5.0f, 0.0f, 5.0f ) );
+    auto _light = new engine::LLightDirectional( engine::CVec3( 0.8, 0.8, 0.8 ), engine::CVec3( 0.8, 0.8, 0.8 ),
+                                                 engine::CVec3( 0.3, 0.3, 0.3 ), 0, engine::CVec3( 0, 0, -1 ) );
+    _light->setVirtualPosition( engine::CVec3( 5.0f, 0.0f, 5.0f ) );
 
     // add these components to the scene
     _scene->addCamera( _camera );
@@ -211,9 +211,9 @@ int main()
 //         std::cout << "cam-info *****************" << std::endl;
 //         std::cout << _camera->toString() << std::endl;
 //         std::cout << "proj-mat: " << std::endl;
-//         std::cout << _camera->matProj().toString() << std::endl;
+//         std::cout << engine::toString( _camera->matProj() ) << std::endl;
 //         std::cout << "view-mat: " << std::endl;
-//         std::cout << _camera->matView().toString() << std::endl;
+//         std::cout << engine::toString( _camera->matView() ) << std::endl;
 
 //         std::cout << "scroll-off-x          : " << std::to_string( engine::InputSystem::getScrollOffX() ) << std::endl;
 //         std::cout << "scroll-off-y          : " << std::to_string( engine::InputSystem::getScrollOffY() ) << std::endl;

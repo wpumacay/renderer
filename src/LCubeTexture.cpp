@@ -6,7 +6,7 @@
 namespace engine
 {
 
-    LCubeTexture::LCubeTexture( const LCubeTextureData& cubeTextureData )
+    LCubeTexture::LCubeTexture( const CCubeTextureData& cubeTextureData )
     {
         glGenTextures( 1, &m_cubeTextureId );
 

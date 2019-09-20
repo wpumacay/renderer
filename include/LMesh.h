@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 #include "LVertexBuffer.h"
 #include "LVertexArray.h"
 #include "LIndexBuffer.h"
@@ -26,38 +27,38 @@ namespace engine
         LVertexBuffer* m_vBuffer;
         LVertexBuffer* m_nBuffer;
         LVertexBuffer* m_tBuffer;
-        vector<LVec3> m_vertices;
-        vector<LVec3> m_normals;
-        vector<LVec2> m_texCoords;
-        vector<LInd3> m_indices;
+        vector<CVec3> m_vertices;
+        vector<CVec3> m_normals;
+        vector<CVec2> m_texCoords;
+        vector<CInd3> m_indices;
 
         bool m_usesIndices;
 
         public :
 
-        LMesh( const vector<LVec3>& vertices,
-               const vector<LVec3>& normals );
+        LMesh( const vector<CVec3>& vertices,
+               const vector<CVec3>& normals );
 
-        LMesh( const vector<LVec3>& vertices, 
-               const vector<LVec3>& normals,
-               const vector<LInd3>& indices );
+        LMesh( const vector<CVec3>& vertices, 
+               const vector<CVec3>& normals,
+               const vector<CInd3>& indices );
 
-        LMesh( const vector<LVec3>& vertices, 
-               const vector<LVec3>& normals,
-               const vector<LVec2>& texCoords,
-               const vector<LInd3>& indices );
+        LMesh( const vector<CVec3>& vertices, 
+               const vector<CVec3>& normals,
+               const vector<CVec2>& texCoords,
+               const vector<CInd3>& indices );
 
-        LMesh( const vector<LVec3>& vertices,
-               const vector<LVec3>& normals,
-               const vector<LVec2>& texCoords );
+        LMesh( const vector<CVec3>& vertices,
+               const vector<CVec3>& normals,
+               const vector<CVec2>& texCoords );
 
         ~LMesh();
 
         LVertexArray* getVertexArray() const { return m_vertexArray; }
         LIndexBuffer* getIndexBuffer() const { return m_indexBuffer; }
 
-        vector< LVec3 >& vertices() { return m_vertices; }
-        vector< LInd3 >& indices() { return m_indices; }
+        vector< CVec3 >& vertices() { return m_vertices; }
+        vector< CInd3 >& indices() { return m_indices; }
 
         void render() override;
     };

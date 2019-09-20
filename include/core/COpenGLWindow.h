@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../Config.h"
-
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <GLFW/glfw3.h>
 
 #include <input/CInputKey.h>
@@ -19,9 +18,12 @@ namespace engine
 
     struct CWindowProps
     {
-        int width = 1024;
-        int height = 768;
+        int width;
+        int height;
         std::string title;
+
+        int gl_api_version_major;
+        int gl_api_version_minor;
 
         FnPtr_keyboard_callback callbackKey;
         FnPtr_mouse_callback callbackMouse;
@@ -33,6 +35,9 @@ namespace engine
             width = 1024;
             height = 768;
             title = "OpenGL-Window";
+
+            gl_api_version_major = 3;
+            gl_api_version_minor = 3;
 
             callbackKey = nullptr;
             callbackMouse = nullptr;

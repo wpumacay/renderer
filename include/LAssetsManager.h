@@ -1,7 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
-#include "../Config.h"
+#include <CCommon.h>
+#include <CMath.h>
 
 #include <LTexture.h>
 #include <LCubeTexture.h>
@@ -34,9 +34,9 @@ namespace engine
 
         ~LAssetsManager();
 
-        static LTextureData _loadTextureData( const string& filename,
+        static CTextureData _loadTextureData( const string& filename,
                                               const string& ftype = ".jpg" );
-        static LCubeTextureData _loadCubeTextureData( const string& basename,
+        static CCubeTextureData _loadCubeTextureData( const string& basename,
                                                   const string& ftype = ".jpg" );
 
         static LTexture* loadTexture( const string& filename, 

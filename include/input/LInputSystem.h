@@ -1,6 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <input/LInputHandler.h>
 
 namespace engine { namespace InputSystem {
@@ -11,7 +12,7 @@ namespace engine { namespace InputSystem {
     bool isKeyDown( int key );
     bool checkSingleKeyPress( int key );
     bool isMouseDown( int button );
-    LVec2 getCursorPosition();
+    CVec2 getCursorPosition();
     float getScrollOffX();
     float getScrollOffY();
     float getScrollAccumValueX();

@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 
 namespace engine
 {
@@ -27,19 +28,19 @@ namespace engine
         int m_indx;
         light::_light m_type;
 
-        LVec3 m_virtualPosition;
+        CVec3 m_virtualPosition;
 
         public :
 
-        LVec3 ambient;
-        LVec3 diffuse;
-        LVec3 specular;
+        CVec3 ambient;
+        CVec3 diffuse;
+        CVec3 specular;
 
         int isActive;
 
-        LILight( const LVec3& ambient,
-                 const LVec3& diffuse,
-                 const LVec3& specular,
+        LILight( const CVec3& ambient,
+                 const CVec3& diffuse,
+                 const CVec3& specular,
                  int lIndx )
         {
             this->ambient = ambient;
@@ -63,8 +64,8 @@ namespace engine
         light::_light getType() { return m_type; }
         int getIndx() { return m_indx; }
 
-        void setVirtualPosition( const LVec3& virtualPos ) { m_virtualPosition = virtualPos; }
-        LVec3 getVirtualPosition() { return m_virtualPosition; }
+        void setVirtualPosition( const CVec3& virtualPos ) { m_virtualPosition = virtualPos; }
+        CVec3 getVirtualPosition() { return m_virtualPosition; }
 
     };
 

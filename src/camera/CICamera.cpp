@@ -49,16 +49,16 @@ namespace engine
         return _strRep;
     }
 
-    CICamera::CICamera( const string& name,
-                        const LVec3& position,
-                        const LVec3& targetPoint,
+    CICamera::CICamera( const std::string& name,
+                        const CVec3& position,
+                        const CVec3& targetPoint,
                         const eAxis& upAxis,
                         const CCameraProjData& projData )
     {
         m_name          = name;
         m_position      = position;
         m_targetPoint   = targetPoint;
-        m_targetDir     = LVec3::normalize( m_targetPoint - m_position );
+        m_targetDir     = CVec3::normalize( m_targetPoint - m_position );
         m_upAxis        = upAxis;
         m_projData      = projData;
         m_active        = true;
@@ -77,7 +77,7 @@ namespace engine
         // nothing to delete for now
     }
 
-    void CICamera::setPosition( const LVec3& position )
+    void CICamera::setPosition( const CVec3& position )
     {
         m_position = position;
 
@@ -105,9 +105,9 @@ namespace engine
     {
         std::string _strRep;
         _strRep += "name        : " + m_name + "\n\r";
-        _strRep += "position    : " + m_position.toString() + "\n\r";
-        _strRep += "targetDir   : " + m_targetDir.toString() + "\n\r";
-        _strRep += "worldUp     : " + m_worldUp.toString() + "\n\r";
+        _strRep += "position    : " + engine::toString( m_position ) + "\n\r";
+        _strRep += "targetDir   : " + engine::toString( m_targetDir ) + "\n\r";
+        _strRep += "worldUp     : " + engine::toString( m_worldUp ) + "\n\r";
         _strRep += engine::toString( m_projData );
 
         _strRep += _toStringInternal();
@@ -141,9 +141,9 @@ namespace engine
         m_matView.buff[10] = -m_front.z;
         m_matView.buff[11] = 0;
 
-        m_matView.buff[12] = -LVec3::dot( m_right, m_position );
-        m_matView.buff[13] = -LVec3::dot( m_up, m_position );
-        m_matView.buff[14] = LVec3::dot( m_front, m_position );
+        m_matView.buff[12] = -CVec3::dot( m_right, m_position );
+        m_matView.buff[13] = -CVec3::dot( m_up, m_position );
+        m_matView.buff[14] = CVec3::dot( m_front, m_position );
         m_matView.buff[15] = 1;
     }
 
@@ -151,14 +151,14 @@ namespace engine
     {
         if ( m_projData.projection == eCameraProjection::PERSPECTIVE )
         {
-            m_matProj = LMat4::perspective( m_projData.fov, 
+            m_matProj = CMat4::perspective( m_projData.fov, 
                                             m_projData.aspect,
                                             m_projData.zNear, 
                                             m_projData.zFar );
         }
         else if ( m_projData.projection == eCameraProjection::ORTHOGRAPHIC )
         {
-            m_matProj = LMat4::ortho( m_projData.width,
+            m_matProj = CMat4::ortho( m_projData.width,
                                       m_projData.height,
                                       m_projData.zNear,
                                       m_projData.zFar );

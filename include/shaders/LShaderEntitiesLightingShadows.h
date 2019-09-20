@@ -5,6 +5,7 @@
 #include <shaders/LShaderBasic3d.h>
 #include <LLightDirectional.h>
 #include <LMaterial.h>
+#include <shaders/CShaderUniforms.h>
 
 using namespace std;
 
@@ -60,12 +61,12 @@ namespace engine
             _setInt( m_ulDir.isActive, pLightDirectional->isActive );
         }
 
-        void setGlobalAmbientLight( const LVec3& vec )
+        void setGlobalAmbientLight( const CVec3& vec )
         {
             _setVec3( m_uGlobalAmbient, vec );
         }
 
-        void setViewPosition( const LVec3& vec )
+        void setViewPosition( const CVec3& vec )
         {
             _setVec3( m_uViewPos, vec );
         }
@@ -78,17 +79,17 @@ namespace engine
             _setFloat( m_uMaterial.shininess, pMaterial->shininess );
         }
 
-        void setLightSpaceViewMatrix( const LMat4& mat )
+        void setLightSpaceViewMatrix( const CMat4& mat )
         {
             _setMat4( m_uLightSpaceViewMatrix, mat );
         }
 
-        void setLightSpaceProjectionMatrix( const LMat4& mat )
+        void setLightSpaceProjectionMatrix( const CMat4& mat )
         {
             _setMat4( m_uLightSpaceProjMatrix, mat );
         }
 
-        void setLightPosition( const LVec3& vec )
+        void setLightPosition( const CVec3& vec )
         {
             _setVec3( m_uLightPos, vec );
         }

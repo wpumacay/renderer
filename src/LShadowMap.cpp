@@ -53,12 +53,12 @@ namespace engine
         float _width  = 20.0f;
         float _height = 20.0f;
 
-        m_projMat = LMat4::ortho( _width, _height, _zNear, _zFar );
+        m_projMat = CMat4::ortho( _width, _height, _zNear, _zFar );
 
         auto _vpos = pLight->getVirtualPosition();
         auto _vtarget = _vpos + pLight->direction;
 
-        m_viewMat = LMat4::lookAt( _vpos, _vtarget, LVec3( 0.0f, 1.0f, 0.0f ) );
+        m_viewMat = CMat4::lookAt( _vpos, _vtarget, CVec3( 0.0f, 1.0f, 0.0f ) );
         m_virtualLightPosition = _vpos;
     }
 

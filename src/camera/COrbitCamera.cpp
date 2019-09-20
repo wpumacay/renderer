@@ -16,8 +16,8 @@ namespace engine
     }
 
     COrbitCamera::COrbitCamera( const std::string& name,
-                                const LVec3& position,
-                                const LVec3& targetPoint,
+                                const CVec3& position,
+                                const CVec3& targetPoint,
                                 const eAxis& upAxis,
                                 const CCameraProjData& projData,
                                 float viewportWidth,
@@ -87,8 +87,8 @@ namespace engine
             float _dx = m_cursor.x - m_cursor0.x;
             float _dy = m_cursor.y - m_cursor0.y;
 
-            float _dtheta = ( -_dx / m_viewportWidth ) * 2.0f * _PI;
-            float _dphi = ( -_dy / m_viewportHeight ) * _PI;
+            float _dtheta = ( -_dx / m_viewportWidth ) * 2.0f * ENGINE_PI;
+            float _dphi = ( -_dy / m_viewportHeight ) * ENGINE_PI;
 
             m_theta = m_theta0 + _dtheta;
             m_phi = m_phi0 + _dphi;
@@ -123,16 +123,16 @@ namespace engine
         std::string _strRep;
 
         _strRep += "state   : " + engine::toString( m_cameraState ) + "\n\r";
-        _strRep += "front   : " + m_front.toString() + "\n\r";
-        _strRep += "right   : " + m_right.toString() + "\n\r";
-        _strRep += "up      : " + m_up.toString() + "\n\r";
+        _strRep += "front   : " + engine::toString( m_front ) + "\n\r";
+        _strRep += "right   : " + engine::toString( m_right ) + "\n\r";
+        _strRep += "up      : " + engine::toString( m_up ) + "\n\r";
         _strRep += "rho     : " + std::to_string( m_rho ) + "\n\r";
         _strRep += "rho0    : " + std::to_string( m_rho0 ) + "\n\r";
         _strRep += "phi     : " + std::to_string( m_phi ) + "\n\r";
         _strRep += "phi0    : " + std::to_string( m_phi0 ) + "\n\r";
         _strRep += "theta   : " + std::to_string( m_theta ) + "\n\r";
         _strRep += "theta0  : " + std::to_string( m_theta0 ) + "\n\r";
-        _strRep += "r       : " + m_r.toString() + "\n\r";
+        _strRep += "r       : " + engine::toString( m_r ) + "\n\r";
         _strRep += "vpwidth : " + std::to_string( m_viewportWidth ) + "\n\r";
         _strRep += "vpheight: " + std::to_string( m_viewportHeight ) + "\n\r";
 
@@ -179,9 +179,9 @@ namespace engine
 
     void COrbitCamera::_updateCameraVectors()
     {
-        m_front = LVec3::normalize( m_targetPoint - m_position );
-        m_right = LVec3::normalize( LVec3::cross( m_front, m_worldUp ) );
-        m_up    = LVec3::normalize( LVec3::cross( m_right, m_front ) );
+        m_front = CVec3::normalize( m_targetPoint - m_position );
+        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
+        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
     }
 
 }

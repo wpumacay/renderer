@@ -141,9 +141,9 @@ namespace engine
         return m_buttons[button] == ENGINE_MOUSE_BUTTON_PRESSED;
     }
 
-    LVec2 LInputHandler::getCursorPosition()
+    CVec2 LInputHandler::getCursorPosition()
     {
-        return LVec2( m_mouseX, m_mouseY );
+        return CVec2( m_mouseX, m_mouseY );
     }
 
     float LInputHandler::getScrollOffX()

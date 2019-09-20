@@ -2,6 +2,7 @@
 #pragma once
 
 #include <shaders/LShader.h>
+#include <shaders/CShaderUniforms.h>
 
 namespace engine
 {
@@ -28,17 +29,17 @@ namespace engine
             unbind();
         }
 
-        void setModelMatrix( const LMat4& mat )
+        void setModelMatrix( const CMat4& mat )
         {
             _setMat4( m_uModelMatrix, mat );
         }
 
-        void setLightSpaceViewMatrix( const LMat4& mat )
+        void setLightSpaceViewMatrix( const CMat4& mat )
         {
             _setMat4( m_uLightSpaceViewMatrix, mat );
         }
 
-        void setLightSpaceProjectionMatrix( const LMat4& mat )
+        void setLightSpaceProjectionMatrix( const CMat4& mat )
         {
             _setMat4( m_uLightSpaceProjMatrix, mat );
         }

@@ -38,22 +38,22 @@ namespace engine
         glUniform1f( glGetUniformLocation( m_id, uName.c_str() ), value );
     }
 
-    void LShader::setVec2( const string& uName, const LVec2& vec )
+    void LShader::setVec2( const string& uName, const CVec2& vec )
     {
         glUniform2fv( glGetUniformLocation( m_id, uName.c_str() ), 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::setVec3( const string& uName, const LVec3& vec )
+    void LShader::setVec3( const string& uName, const CVec3& vec )
     {
         glUniform3fv( glGetUniformLocation( m_id, uName.c_str() ), 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::setVec4( const string& uName, const LVec4& vec )
+    void LShader::setVec4( const string& uName, const CVec4& vec )
     {
         glUniform4fv( glGetUniformLocation( m_id, uName.c_str() ), 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::setMat4( const string& uName, const LMat4& mat )
+    void LShader::setMat4( const string& uName, const CMat4& mat )
     {
         glUniformMatrix4fv( glGetUniformLocation( m_id, uName.c_str() ), 1, GL_FALSE, mat.buff );
     }
@@ -69,22 +69,22 @@ namespace engine
         glUniform1f( uniform, value );        
     }
 
-    void LShader::_setVec2( GLuint uniform, const LVec2& vec )
+    void LShader::_setVec2( GLuint uniform, const CVec2& vec )
     {
         glUniform2fv( uniform, 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::_setVec3( GLuint uniform, const LVec3& vec )
+    void LShader::_setVec3( GLuint uniform, const CVec3& vec )
     {
         glUniform3fv( uniform, 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::_setVec4( GLuint uniform, const LVec4& vec )
+    void LShader::_setVec4( GLuint uniform, const CVec4& vec )
     {
         glUniform4fv( uniform, 1, ( GLfloat* ) &vec );
     }
 
-    void LShader::_setMat4( GLuint uniform, const LMat4& mat )
+    void LShader::_setMat4( GLuint uniform, const CMat4& mat )
     {
         glUniformMatrix4fv( uniform, 1, GL_FALSE, mat.buff );
     }

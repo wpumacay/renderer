@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <LMesh.h>
 #include <LModel.h>
 #include <utils/CLogger.h>
@@ -157,8 +158,8 @@ namespace engine
 
     private :
 
-        static LVec3 _rotateToMatchUpAxis( const LVec3& vec, const eAxis& axis );
-        static LVec3 _rotateBackFromUpAxis( const LVec3& vec, const eAxis& axis );
+        static CVec3 _rotateToMatchUpAxis( const CVec3& vec, const eAxis& axis );
+        static CVec3 _rotateBackFromUpAxis( const CVec3& vec, const eAxis& axis );
     };
 
 

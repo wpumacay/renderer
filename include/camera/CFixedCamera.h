@@ -10,8 +10,8 @@ namespace engine
     public :
 
         CFixedCamera( const std::string& name,
-                      const LVec3& position,
-                      const LVec3& targetPoint,
+                      const CVec3& position,
+                      const CVec3& targetPoint,
                       const eAxis& upAxis,
                       const CCameraProjData& projData );
 

@@ -23,7 +23,7 @@ namespace engine { namespace InputSystem {
         return LInputHandler::GetInstance()->isMouseDown( button );
     }
 
-    LVec2 getCursorPosition()
+    CVec2 getCursorPosition()
     {
         return LInputHandler::GetInstance()->getCursorPosition();
     }

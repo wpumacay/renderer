@@ -7,12 +7,8 @@
 
 #pragma once
 
-#include "LCommon.h"
-
-#include <cmath>
-#include <vector>
-#include <algorithm>
-#include <random>
+#include <CCommon.h>
+#include <CMath.h>
 
 using namespace std;
 
@@ -20,36 +16,36 @@ using namespace std;
 
 namespace engine
 {
-	
-	class LHeightmapGenerator
-	{
+    
+    class LHeightmapGenerator
+    {
 
-		private :
+        private :
 
-		vector<int> permutations;
+        vector<int> permutations;
 
-		float _fade( float t );
-		float _lerp( float a, float b, float t );
-		float _dotgrad( int hash, float x, float y );
-		float _perlin2d( float x, float y );
+        float _fade( float t );
+        float _lerp( float a, float b, float t );
+        float _dotgrad( int hash, float x, float y );
+        float _perlin2d( float x, float y );
 
-		int m_octaves;
-		float m_persistance;
-		float m_lacunarity;
-		float m_noiseScale;
+        int m_octaves;
+        float m_persistance;
+        float m_lacunarity;
+        float m_noiseScale;
 
-		vector<LVec2> m_octaveOffsets;
+        vector<CVec2> m_octaveOffsets;
 
-		public :
+        public :
 
-		LHeightmapGenerator();
-		LHeightmapGenerator( int octaves, float persistance, float lacunarity, float noiseScale );
-		~LHeightmapGenerator();
+        LHeightmapGenerator();
+        LHeightmapGenerator( int octaves, float persistance, float lacunarity, float noiseScale );
+        ~LHeightmapGenerator();
 
 
-		float getHeight( float x, float y );
+        float getHeight( float x, float y );
 
-	};
+    };
 
 }
 

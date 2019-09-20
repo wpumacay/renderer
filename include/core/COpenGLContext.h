@@ -1,6 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <utils/CLogger.h>
 #include <GLFW/glfw3.h>
 

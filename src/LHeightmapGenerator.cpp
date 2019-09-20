@@ -13,7 +13,7 @@ namespace engine
 
 		for ( int o = 0; o < octaves; o++ )
 		{
-			m_octaveOffsets.push_back( LVec2( _RANDOM( -10000.0f, 10000.0f ),
+			m_octaveOffsets.push_back( CVec2( _RANDOM( -10000.0f, 10000.0f ),
 											  _RANDOM( -10000.0f, 10000.0f ) ) );
 		}
 
@@ -45,7 +45,7 @@ namespace engine
 
 		for ( int o = 0; o < m_octaves; o++ )
 		{
-			m_octaveOffsets.push_back( LVec2( _RANDOM( -10000.0f, 10000.0f ),
+			m_octaveOffsets.push_back( CVec2( _RANDOM( -10000.0f, 10000.0f ),
 											  _RANDOM( -10000.0f, 10000.0f ) ) );
 		}
 

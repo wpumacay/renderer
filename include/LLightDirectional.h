@@ -11,13 +11,13 @@ namespace engine
 
         public :
 
-        LVec3 direction;
+        CVec3 direction;
 
-        LLightDirectional( const LVec3& ambient, 
-                           const LVec3& diffuse,
-                           const LVec3& specular, 
+        LLightDirectional( const CVec3& ambient, 
+                           const CVec3& diffuse,
+                           const CVec3& specular, 
                            int lIndx, 
-                           const LVec3& direction ) 
+                           const CVec3& direction ) 
             : LILight( ambient, diffuse, specular, lIndx )
         {
             this->direction = direction;

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <utils/CLogger.h>
 
 namespace engine
@@ -43,8 +44,8 @@ namespace engine
     public :
 
         CICamera( const std::string& name,
-                  const LVec3& position,
-                  const LVec3& targetPoint,
+                  const CVec3& position,
+                  const CVec3& targetPoint,
                   const eAxis& upAxis,
                   const CCameraProjData& projData );
 
@@ -52,7 +53,7 @@ namespace engine
 
         static eCameraType GetStaticType() { return eCameraType::BASE; }
 
-        void setPosition( const LVec3& position );
+        void setPosition( const CVec3& position );
         void setActiveMode( bool activeMode );
         void setProjectionData( const CCameraProjData& projData );
         void update();
@@ -62,14 +63,14 @@ namespace engine
         eCameraType type() const { return m_type; }
         bool active() const { return m_active; }
 
-        LVec3 targetPoint() const { return m_targetPoint; }
-        LVec3 targetDir() const { return m_targetDir; }
-        LVec3 position() const { return m_position; }
+        CVec3 targetPoint() const { return m_targetPoint; }
+        CVec3 targetDir() const { return m_targetDir; }
+        CVec3 position() const { return m_position; }
 
         CCameraProjData projData() const { return m_projData; }
 
-        LMat4 matView() const { return m_matView; }
-        LMat4 matProj() const { return m_matProj; }
+        CMat4 matView() const { return m_matView; }
+        CMat4 matProj() const { return m_matProj; }
 
     protected :
 
@@ -86,17 +87,17 @@ namespace engine
         eCameraType m_type;
         eAxis m_upAxis;
 
-        LVec3 m_position;
-        LVec3 m_worldUp;
-        LVec3 m_targetPoint;
-        LVec3 m_targetDir;
+        CVec3 m_position;
+        CVec3 m_worldUp;
+        CVec3 m_targetPoint;
+        CVec3 m_targetDir;
         
-        LVec3 m_front;
-        LVec3 m_up;
-        LVec3 m_right;
+        CVec3 m_front;
+        CVec3 m_up;
+        CVec3 m_right;
         
-        LMat4 m_matView;
-        LMat4 m_matProj;
+        CMat4 m_matView;
+        CMat4 m_matProj;
 
         CCameraProjData m_projData;
 

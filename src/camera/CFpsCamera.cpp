@@ -5,8 +5,8 @@ namespace engine
 {
 
     CFpsCamera::CFpsCamera( const std::string& name,
-                            const LVec3& position,
-                            const LVec3& targetPoint,
+                            const CVec3& position,
+                            const CVec3& targetPoint,
                             const eAxis& upAxis,
                             const CCameraProjData& projData,
                             float sensitivity,
@@ -29,9 +29,9 @@ namespace engine
         m_lastCursorPos = { 0.0f, 0.0f };
 
         // initialize looking at the target
-        m_front = LVec3::normalize( m_targetPoint - m_position );
-        m_right = LVec3::normalize( LVec3::cross( m_front, m_worldUp ) );
-        m_up    = LVec3::normalize( LVec3::cross( m_right, m_front ) );
+        m_front = CVec3::normalize( m_targetPoint - m_position );
+        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
+        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
         _updateCameraAngles();
 
         // initialize view matrix to this orientation
@@ -64,7 +64,7 @@ namespace engine
             m_camSpeedRight = -m_camSpeed;
 
         /* compute camera angles from user cursor */
-        LVec2 _currentCursorPos = InputSystem::getCursorPosition();
+        CVec2 _currentCursorPos = InputSystem::getCursorPosition();
         float _xOff = _currentCursorPos.x - m_lastCursorPos.x;
         float _yOff = m_lastCursorPos.y - _currentCursorPos.y;
 
@@ -90,9 +90,9 @@ namespace engine
     {
         std::string _strRep;
 
-        _strRep += "front   : " + m_front.toString() + "\n\r";
-        _strRep += "right   : " + m_right.toString() + "\n\r";
-        _strRep += "up      : " + m_up.toString() + "\n\r";
+        _strRep += "front   : " + engine::toString( m_front ) + "\n\r";
+        _strRep += "right   : " + engine::toString( m_right ) + "\n\r";
+        _strRep += "up      : " + engine::toString( m_up ) + "\n\r";
         _strRep += "roll    : " + std::to_string( m_roll ) + "\n\r";
         _strRep += "pitch   : " + std::to_string( m_pitch ) + "\n\r";
         _strRep += "yaw     : " + std::to_string( m_yaw ) + "\n\r";
@@ -125,9 +125,9 @@ namespace engine
             m_front.z = std::sin( toRadians( m_pitch ) );
         }
 
-        m_front = LVec3::normalize( m_front );
-        m_right = LVec3::normalize( LVec3::cross( m_front, m_worldUp ) );
-        m_up    = LVec3::normalize( LVec3::cross( m_right, m_front ) );
+        m_front = CVec3::normalize( m_front );
+        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
+        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
 
         _buildViewMatrix();
     }

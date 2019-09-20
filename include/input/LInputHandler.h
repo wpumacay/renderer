@@ -1,6 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <utils/CLogger.h>
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
@@ -29,7 +30,7 @@ namespace engine
         bool isKeyDown( int key );
         bool checkSingleKeyPress( int key );
         bool isMouseDown( int button );
-        LVec2 getCursorPosition();
+        CVec2 getCursorPosition();
         float getScrollOffX();
         float getScrollOffY();
         float getScrollAccumValueX();

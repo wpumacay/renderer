@@ -8,7 +8,7 @@ namespace engine
 
     LIRenderable::LIRenderable()
     {
-        m_type              = RENDERABLE_TYPE_BASE;
+        m_type              = eRenderableType::BASE;
         m_isVisible         = true;
         m_drawAsWireframe   = false;
         this->debug         = false;
@@ -21,7 +21,7 @@ namespace engine
         m_textures.clear();
     }
 
-    int LIRenderable::getType()
+    eRenderableType LIRenderable::getType()
     {
         return m_type;
     }
@@ -41,13 +41,13 @@ namespace engine
         return m_material;
     }
 
-    LMat4 LIRenderable::getModelMatrix()
+    CMat4 LIRenderable::getModelMatrix()
     {
-        LMat4 _model;
+        CMat4 _model;
 
-        _model = LMat4::scale( scale ) * _model;
+        _model = CMat4::scale( scale ) * _model;
         _model = rotation * _model;
-        _model = LMat4::translate( pos ) * _model;
+        _model = CMat4::translate( pos ) * _model;
 
         return _model;
     }

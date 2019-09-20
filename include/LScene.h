@@ -1,6 +1,7 @@
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 #include "LILight.h"
 #include "LLightDirectional.h"
 #include "LLightDirectional.h"
@@ -35,7 +36,7 @@ namespace engine
 
         void cleanScene();
 
-        LMat4 getProjMatrix() { return m_projMatrix; }
+        CMat4 getProjMatrix() { return m_projMatrix; }
         CICamera* getCurrentCamera() { return m_currentCamera; }
         vector<LILight*>& getLights() { return m_lights; }
 
@@ -73,7 +74,7 @@ namespace engine
         
         CICamera* m_currentCamera;
 
-        LMat4 m_projMatrix;
+        CMat4 m_projMatrix;
     };
 
 

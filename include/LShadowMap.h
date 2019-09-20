@@ -19,8 +19,8 @@ namespace engine
 
 		LFrameBuffer* m_shadowBuffer;
 
-		LMat4 m_viewMat;
-		LMat4 m_projMat;
+		CMat4 m_viewMat;
+		CMat4 m_projMat;
 
 		int m_width;
 		int m_height;
@@ -28,7 +28,7 @@ namespace engine
 		int m_prevViewWidth;
 		int m_prevViewHeight;
 
-		LVec3 m_virtualLightPosition;
+		CVec3 m_virtualLightPosition;
 
 		public :
 
@@ -43,9 +43,9 @@ namespace engine
 
 		GLuint getDepthTexture() { return m_shadowBuffer->getTex(); }
 
-		LMat4 getLightSpaceViewMatrix() { return m_viewMat; }
-		LMat4 getLightSpaceProjectionMatrix() { return m_projMat; }
-		LVec3 getLightPosition() { return m_virtualLightPosition; }
+		CMat4 getLightSpaceViewMatrix() { return m_viewMat; }
+		CMat4 getLightSpaceProjectionMatrix() { return m_projMat; }
+		CVec3 getLightPosition() { return m_virtualLightPosition; }
 	};
 
 

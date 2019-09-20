@@ -11,17 +11,17 @@ namespace engine
 
         public :
 
-        LVec3 position;
+        CVec3 position;
 
         float attenuation_constant;
         float attenuation_linear;
         float attenuation_quadratic;
 
-        LLightPoint( const LVec3& ambient, 
-                     const LVec3& diffuse,
-                     const LVec3& specular, 
+        LLightPoint( const CVec3& ambient, 
+                     const CVec3& diffuse,
+                     const CVec3& specular, 
                      int lIndx, 
-                     const LVec3& position,
+                     const CVec3& position,
                      float attenuation_constant, 
                      float attenuation_linear,
                      float attenuation_quadratic )

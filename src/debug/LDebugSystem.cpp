@@ -8,42 +8,42 @@ namespace engine { namespace DebugSystem {
         LDebugDrawer::GetInstance();
     }
 
-    void drawLine( const LVec3& start, const LVec3& end, const LVec3& color )
+    void drawLine( const CVec3& start, const CVec3& end, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawLine( start, end, color );
     }
 
-    void drawArrow( const LVec3& start, const LVec3& end, const LVec3& color )
+    void drawArrow( const CVec3& start, const CVec3& end, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawArrow( start, end, color );
     }
 
-    void drawClipVolume( const LMat4& clipMatrix, const LVec3& color )
+    void drawClipVolume( const CMat4& clipMatrix, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawClipVolume( clipMatrix, color );
     }
 
-    void drawTrailPoints( const std::vector< LVec3 >& trailpoints, const LVec3& color )
+    void drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawTrailPoints( trailpoints, color );
     }
 
-    void drawLinesBatch( const std::vector< LLine >& linesBatch, const LVec3& color )
+    void drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawLinesBatch( linesBatch, color );
     }
 
-    void drawAABB( const LVec3& aabbMin, const LVec3& aabbMax, const LMat4& aabbWorldTransform, const LVec3& color )
+    void drawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color )
     {
         LDebugDrawer::GetInstance()->drawAABB( aabbMin, aabbMax, aabbWorldTransform, color );
     }
 
-    void renderView( const LVec2& pos, const LVec2& size, GLuint textureID )
+    void renderView( const CVec2& pos, const CVec2& size, GLuint textureID )
     {
 
     }
 
-    void setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix )
+    void setupMatrices( const CMat4& viewMatrix, const CMat4& projectionMatrix )
     {
         LDebugDrawer::GetInstance()->setupMatrices( viewMatrix, projectionMatrix );
     }

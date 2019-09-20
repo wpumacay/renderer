@@ -74,8 +74,8 @@ int main()
 //     const float _cameraMaxDelta     = 10.0f;
 // 
 //     auto _camera = new engine::CFpsCamera( "fps",
-//                                            engine::LVec3( 2.0f, 2.0f, 2.0f ),
-//                                            engine::LVec3( 0.0f, 0.0f, 0.0f ),
+//                                            engine::CVec3( 2.0f, 2.0f, 2.0f ),
+//                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
 //                                            engine::eAxis::Z,
 //                                            _cameraProjData,
 //                                            _cameraSensitivity,
@@ -83,14 +83,14 @@ int main()
 //                                            _cameraMaxDelta );
 
 //     auto _camera = new engine::CFixedCamera( "fixed",
-//                                              engine::LVec3( 1.0f, 2.0f, 1.0f ),
-//                                              engine::LVec3( 0.0f, 0.0f, 0.0f ),
+//                                              engine::CVec3( 1.0f, 2.0f, 1.0f ),
+//                                              engine::CVec3( 0.0f, 0.0f, 0.0f ),
 //                                              engine::eAxis::Z,
 //                                              _cameraProjData );
 
     auto _camera = new engine::COrbitCamera( "orbit",
-                                             engine::LVec3( 2.0f, 2.0f, 2.0f ),
-                                             engine::LVec3( 0.0f, 0.0f, 0.0f ),
+                                             engine::CVec3( 2.0f, 2.0f, 2.0f ),
+                                             engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
                                              engine::COpenGLApp::GetWindow()->width(),
@@ -99,9 +99,9 @@ int main()
     _camera->setPosition( { -1.77f, -4.12f, 4.37f } );
 
     // make a sample light source
-    auto _light = new engine::LLightDirectional( engine::LVec3( 0.2, 0.2, 0.2 ), engine::LVec3( 0.5, 0.5, 0.5 ),
-                                                 engine::LVec3( 0.05, 0.05, 0.05 ), 0, engine::LVec3( 0, 0, -1 ) );
-    _light->setVirtualPosition( engine::LVec3( 5.0f, 0.0f, 5.0f ) );
+    auto _light = new engine::LLightDirectional( engine::CVec3( 0.2, 0.2, 0.2 ), engine::CVec3( 0.5, 0.5, 0.5 ),
+                                                 engine::CVec3( 0.05, 0.05, 0.05 ), 0, engine::CVec3( 0, 0, -1 ) );
+    _light->setVirtualPosition( engine::CVec3( 5.0f, 0.0f, 5.0f ) );
 
     // make a simple skybox
     auto _skybox = new engine::LSkybox( "starfield" );
@@ -118,7 +118,7 @@ int main()
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _model->rotation = _model->rotation * engine::LMat4::rotationX( 0.01f );
+        _model->rotation = _model->rotation * engine::CMat4::rotationX( 0.01f );
 
         if ( engine::InputSystem::isKeyDown( ENGINE_KEY_SPACE ) )
             _scene->getCurrentCamera()->setActiveMode( false );

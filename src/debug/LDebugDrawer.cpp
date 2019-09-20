@@ -63,7 +63,7 @@ namespace engine
         m_linesColorsVBO = NULL;
     }
 
-    void LDebugDrawer::setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix )
+    void LDebugDrawer::setupMatrices( const CMat4& viewMatrix, const CMat4& projectionMatrix )
     {
         m_viewMat = viewMatrix;
         m_projMat = projectionMatrix;
@@ -126,7 +126,7 @@ namespace engine
         m_linesVAO->unbind();
     }
 
-    void LDebugDrawer::drawLine( const LVec3& start, const LVec3& end, const LVec3& color )
+    void LDebugDrawer::drawLine( const CVec3& start, const CVec3& end, const CVec3& color )
     {
         LDLinePositions _linePos;
         _linePos.vStart = start;
@@ -141,18 +141,18 @@ namespace engine
         m_linesColors.push_back( _lineCol );
     }
 
-    void LDebugDrawer::drawArrow( const LVec3& start, const LVec3& end, const LVec3& color )
+    void LDebugDrawer::drawArrow( const CVec3& start, const CVec3& end, const CVec3& color )
     {
         // Draw core of the arrow
         drawLine( start, end, color );
 
         // Draw side parts of the arrow
-        LVec3 _arrowVec = LVec3::minus( end, start );
+        CVec3 _arrowVec = end - start;
         float _length = _arrowVec.length();
 
-        LVec3 _uf = LVec3::normalize( _arrowVec );
-        LVec3 _ur = LVec3::cross( _uf, LVec3( 0, 1, 0 ) );
-        LVec3 _uu = LVec3::cross( _ur, _uf );
+        CVec3 _uf = CVec3::normalize( _arrowVec );
+        CVec3 _ur = CVec3::cross( _uf, CVec3( 0, 1, 0 ) );
+        CVec3 _uu = CVec3::cross( _ur, _uf );
 
         float _sidesLength = _length / 10.0f;
 
@@ -160,10 +160,10 @@ namespace engine
         _ur.scale( _sidesLength, _sidesLength, _sidesLength );
         _uu.scale( _sidesLength, _sidesLength, _sidesLength );
 
-        LVec3 _p0 = LVec3::minus( LVec3::plus( end, _ur ) + _uu, _uf );
-        LVec3 _p1 = LVec3::minus( LVec3::plus( end, _ur ) - _uu, _uf );
-        LVec3 _p2 = LVec3::minus( LVec3::minus( end, _ur ) + _uu, _uf );
-        LVec3 _p3 = LVec3::minus( LVec3::minus( end, _ur ) - _uu, _uf );
+        CVec3 _p0 = end + _ur + _uu - _uf;
+        CVec3 _p1 = end + _ur - _uu - _uf;
+        CVec3 _p2 = end + _ur + _uu - _uf;
+        CVec3 _p3 = end + _ur - _uu - _uf;
 
         drawLine( end, _p0, color );
         drawLine( end, _p1, color );
@@ -171,28 +171,28 @@ namespace engine
         drawLine( end, _p3, color );
     }
 
-    void LDebugDrawer::drawClipVolume( const LMat4& clipMatrix, const LVec3& color )
+    void LDebugDrawer::drawClipVolume( const CMat4& clipMatrix, const CVec3& color )
     {
-        LMat4 _invClipMatrix = clipMatrix.inverse();
+        CMat4 _invClipMatrix = clipMatrix.inverse();
 
-        LVec3 _frustumPointsClipSpace[8] = {
+        CVec3 _frustumPointsClipSpace[8] = {
             // near plane
-            LVec3( -1.0f, -1.0f, -1.0f ), 
-            LVec3( 1.0f, -1.0f, -1.0f ),
-            LVec3( 1.0f,  1.0f, -1.0f ),
-            LVec3( -1.0f,  1.0f, -1.0f ),
+            CVec3( -1.0f, -1.0f, -1.0f ), 
+            CVec3( 1.0f, -1.0f, -1.0f ),
+            CVec3( 1.0f,  1.0f, -1.0f ),
+            CVec3( -1.0f,  1.0f, -1.0f ),
             // far plane
-            LVec3( -1.0f, -1.0f, 1.0f ), 
-            LVec3( 1.0f, -1.0f, 1.0f ),
-            LVec3( 1.0f,  1.0f, 1.0f ),
-            LVec3( -1.0f,  1.0f, 1.0f )
+            CVec3( -1.0f, -1.0f, 1.0f ), 
+            CVec3( 1.0f, -1.0f, 1.0f ),
+            CVec3( 1.0f,  1.0f, 1.0f ),
+            CVec3( -1.0f,  1.0f, 1.0f )
         };
 
-        vector< engine::LVec3 > _points3d;
+        vector< engine::CVec3 > _points3d;
         for ( size_t q = 0; q < 8; q++ )
         {
-            LVec4 _pointFrustum = _invClipMatrix * LVec4( _frustumPointsClipSpace[q], 1.0f );
-            LVec3 _pointFrustumNormalized = LVec3( _pointFrustum.x / _pointFrustum.w,
+            CVec4 _pointFrustum = _invClipMatrix * CVec4( _frustumPointsClipSpace[q], 1.0f );
+            CVec3 _pointFrustumNormalized = CVec3( _pointFrustum.x / _pointFrustum.w,
                                                    _pointFrustum.y / _pointFrustum.w,
                                                    _pointFrustum.z / _pointFrustum.w );
 
@@ -218,7 +218,7 @@ namespace engine
         drawLine( _points3d[3], _points3d[7] );
     }
 
-    void LDebugDrawer::drawTrailPoints( const vector< LVec3 >& trailpoints, const LVec3& color )
+    void LDebugDrawer::drawTrailPoints( const vector< CVec3 >& trailpoints, const CVec3& color )
     {
         if ( trailpoints.size() < 1 )
         {
@@ -231,7 +231,7 @@ namespace engine
         }
     }
 
-    void LDebugDrawer::drawLinesBatch( const vector< LLine >& linesBatch, const LVec3& color )
+    void LDebugDrawer::drawLinesBatch( const vector< CLine >& linesBatch, const CVec3& color )
     {
         if ( linesBatch.size() < 1 )
         {
@@ -244,15 +244,15 @@ namespace engine
         }
     }
 
-    void LDebugDrawer::drawAABB( const LVec3& aabbMin, 
-                                 const LVec3& aabbMax, 
-                                 const LMat4& aabbWorldTransform, 
-                                 const LVec3& color )
+    void LDebugDrawer::drawAABB( const CVec3& aabbMin, 
+                                 const CVec3& aabbMax, 
+                                 const CMat4& aabbWorldTransform, 
+                                 const CVec3& color )
     {
-        auto _vmin2max = LVec3::minus( aabbMax, aabbMin );
-        auto _dx = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorX() );
-        auto _dy = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorY() );
-        auto _dz = LVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorZ() );
+        auto _vmin2max = aabbMax - aabbMin;
+        auto _dx = CVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorX() );
+        auto _dy = CVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorY() );
+        auto _dz = CVec3::dot( _vmin2max, aabbWorldTransform.getBasisVectorZ() );
         auto _origin = aabbWorldTransform.getPosition();
         auto _sidex = aabbWorldTransform.getBasisVectorX();
         auto _sidey = aabbWorldTransform.getBasisVectorY();

@@ -1,9 +1,19 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 
 namespace engine
 {
+
+    struct CCubeTextureData
+    {
+        u8* vpData[6];
+        int width;
+        int height;
+        int channels;
+        int ftype;
+    };
 
     class LCubeTexture
     {
@@ -12,17 +22,17 @@ namespace engine
 
         GLuint m_cubeTextureId;
         GLuint m_cubeTextureIndx;
-        LCubeTextureData m_cubeTextureData;
+        CCubeTextureData m_cubeTextureData;
 
         public :
 
-        LCubeTexture( const LCubeTextureData& cubeTextureData );
+        LCubeTexture( const CCubeTextureData& cubeTextureData );
         ~LCubeTexture();
 
         void bind();
         void unbind();
 
-        LCubeTextureData data() { return m_cubeTextureData; }
+        CCubeTextureData data() { return m_cubeTextureData; }
         
         void setTextureIndex( GLuint cubeTextureIndx ) { m_cubeTextureIndx = cubeTextureIndx; }
         GLuint getTextureIndex() { return m_cubeTextureIndx; }

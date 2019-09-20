@@ -6,41 +6,41 @@ namespace engine
 {
     LMesh* CMeshBuilder::createPlane( float sizeX, float sizeY )
     {
-        std::vector< LVec3 > _vertices = { {  0.5f * sizeX, -0.5f * sizeY, 0.0f },
+        std::vector< CVec3 > _vertices = { {  0.5f * sizeX, -0.5f * sizeY, 0.0f },
                                            {  0.5f * sizeX,  0.5f * sizeY, 0.0f },
                                            { -0.5f * sizeX,  0.5f * sizeY, 0.0f },
                                            { -0.5f * sizeX, -0.5f * sizeY, 0.0f } };
 
-        std::vector< LVec3 > _normals = { { 0.0f, 0.0f, 1.0f }, 
+        std::vector< CVec3 > _normals = { { 0.0f, 0.0f, 1.0f }, 
                                           { 0.0f, 0.0f, 1.0f },
                                           { 0.0f, 0.0f, 1.0f },
                                           { 0.0f, 0.0f, 1.0f } };
 
-        std::vector< LVec2 > _texCoords = { { 0.0f, 0.0f }, 
+        std::vector< CVec2 > _texCoords = { { 0.0f, 0.0f }, 
                                             { 1.0f, 0.0f },
                                             { 1.0f, 1.0f }, 
                                             { 0.0f, 1.0f } };
 
-        std::vector< LInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
+        std::vector< CInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 
         return new LMesh( _vertices, _normals, _texCoords, _indices );
     }
 
     LMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
-        std::vector< LVec3 > _normalsSource = { { 0.0f,  0.0f,  1.0f },
+        std::vector< CVec3 > _normalsSource = { { 0.0f,  0.0f,  1.0f },
                                                 { 0.0f,  0.0f, -1.0f },
                                                 { 0.0f,  1.0f,  0.0f },
                                                 { 0.0f, -1.0f,  0.0f },
                                                 { 1.0f,  0.0f,  0.0f },
                                                 {-1.0f,  0.0f,  0.0f } };
 
-        auto _scale = LVec3( 0.5 * sizeX, 0.5 * sizeY, 0.5 * sizeZ );
+        auto _scale = CVec3( 0.5 * sizeX, 0.5 * sizeY, 0.5 * sizeZ );
 
         // for each face, compute the vertices that form the face perpendicular to that normal
         for ( int q = 0; q < _normalsSource.size(); q++ )
@@ -50,15 +50,15 @@ namespace engine
             _indices.push_back( { (GLint)_vertices.size(), (GLint)_vertices.size() + 2, (GLint)_vertices.size() + 3 } );
 
             // Form a perpendicular right hand system based on the current normal
-            LVec3 _n = _normalsSource[q];
-            LVec3 _s1 = { _n.y, _n.z, _n.x };
-            LVec3 _s2 = LVec3::cross( _n, _s1 );
+            CVec3 _n = _normalsSource[q];
+            CVec3 _s1 = { _n.y, _n.z, _n.x };
+            CVec3 _s2 = CVec3::cross( _n, _s1 );
 
             // Generate each vertex of each face according to these vectors
-            auto _v0 = LVec3::scale( _n - _s1 - _s2, _scale );
-            auto _v1 = LVec3::scale( _n + _s1 - _s2, _scale );
-            auto _v2 = LVec3::scale( _n + _s1 + _s2, _scale );
-            auto _v3 = LVec3::scale( _n - _s1 + _s2, _scale );
+            auto _v0 = CVec3::scale( _n - _s1 - _s2, _scale );
+            auto _v1 = CVec3::scale( _n + _s1 - _s2, _scale );
+            auto _v2 = CVec3::scale( _n + _s1 + _s2, _scale );
+            auto _v3 = CVec3::scale( _n - _s1 + _s2, _scale );
 
             _vertices.push_back( _v0 );
             _vertices.push_back( _v1 );
@@ -81,23 +81,23 @@ namespace engine
 
     LMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         // Construct all vertices using spherical coordinates, except the poles
         for ( size_t i = 0; i <= nDiv1; i++ )
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -_PI / 2.0f + _PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -ENGINE_PI / 2.0f + ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
 
-                auto _vertex = LVec3( radius * cos( _theta ) * cos( _phi ),
+                auto _vertex = CVec3( radius * cos( _theta ) * cos( _phi ),
                                       radius * sin( _theta ) * cos( _phi ),
                                       radius * sin( _phi ) );
-                auto _normal = LVec3::normalize( _vertex );
+                auto _normal = CVec3::normalize( _vertex );
 
                 _vertices.push_back( _vertex );
                 _normals.push_back( _normal );
@@ -137,23 +137,23 @@ namespace engine
 
     LMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         // Construct all vertices using spherical coordinates, except the poles
         for ( size_t i = 0; i <= nDiv1; i++ )
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -_PI / 2.0f + _PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -ENGINE_PI / 2.0f + ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
 
-                auto _vertex = LVec3( radX * cos( _theta ) * cos( _phi ),
+                auto _vertex = CVec3( radX * cos( _theta ) * cos( _phi ),
                                       radY * sin( _theta ) * cos( _phi ),
                                       radZ * sin( _phi ) );
-                auto _normal = LVec3::normalize( _vertex );
+                auto _normal = CVec3::normalize( _vertex );
 
                 _vertices.push_back( _vertex );
                 _normals.push_back( _normal );
@@ -191,17 +191,17 @@ namespace engine
 
     LMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         // Compute points in any section ***********************************************************
-        std::vector< LVec3 > _sectionXY;
+        std::vector< CVec3 > _sectionXY;
         for ( int q = 0; q <= nDiv1; q++ )
         {
-            float _x = radius * cos( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
-            float _y = radius * sin( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            float _x = radius * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -211,7 +211,7 @@ namespace engine
         ////////// Up base //////////
         for ( int q = 0; q < nDiv1; q++ )
         {
-            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + LVec3( 0.0f, 0.0f, 0.5f * height ), axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + CVec3( 0.0f, 0.0f, 0.5f * height ), axis ) );
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ) );
 
             // @TODO: Check this part, there might be something wrong with the texture coordinates
@@ -220,7 +220,7 @@ namespace engine
         }
 
         for ( int q = 1; q <= nDiv1 - 2; q++ )
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + q, _baseIndx + q + 1 ) );
+            _indices.push_back( CInd3( _baseIndx, _baseIndx + q, _baseIndx + q + 1 ) );
 
         _baseIndx += _vertices.size();
 
@@ -228,10 +228,10 @@ namespace engine
         for ( int q = 0; q < nDiv1; q++ )
         {
             // quad vertices
-            auto _p0 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, -0.5f * height );
-            auto _p1 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, -0.5f * height );
-            auto _p2 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, 0.5f * height );
-            auto _p3 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p0 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p1 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p2 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p3 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, 0.5f * height );
 
             _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
@@ -243,8 +243,8 @@ namespace engine
             _texCoords.push_back( { ( (float) ( q + 1 ) ) / nDiv1, 1.0f } );
             _texCoords.push_back( { ( (float) ( q + 0 ) ) / nDiv1, 1.0f } );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[q + 0] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[q + 1] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 0] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 1] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -260,7 +260,7 @@ namespace engine
         ////////// Down base //////////
         for ( int q = 0; q < nDiv1; q++ )
         {
-            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + LVec3( 0.0f, 0.0f, -0.5f * height ), axis ) );
+            _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + CVec3( 0.0f, 0.0f, -0.5f * height ), axis ) );
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
 
             // @TODO: Check this part, there might be something wrong with the texture coordinates
@@ -278,10 +278,10 @@ namespace engine
     {
         LMesh* _mesh = NULL;
 
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         /* Capsule format
         *
@@ -296,15 +296,15 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = 0.5f * _PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = 0.5f * ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
 
                 // vertex without offset to up-position
-                auto _vertex = _rotateToMatchUpAxis( LVec3( radius * cos( _theta ) * cos( _phi ),
+                auto _vertex = _rotateToMatchUpAxis( CVec3( radius * cos( _theta ) * cos( _phi ),
                                                             radius * sin( _theta ) * cos( _phi ),
                                                             radius * sin( _phi ) ),
                                                      axis );
-                auto _normal = LVec3::normalize( _vertex );
+                auto _normal = CVec3::normalize( _vertex );
                 // apply offset to up position
                 _vertex = _vertex + _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * height }, axis );
 
@@ -341,11 +341,11 @@ namespace engine
         // Build surface *******************************
 
         // calculate section geometry
-        std::vector< LVec3 > _sectionXY;
+        std::vector< CVec3 > _sectionXY;
         for ( int q = 0; q <= nDiv1; q++ )
         {
-            float _x = radius * cos( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
-            float _y = radius * sin( 2.0f * _PI * ( ( (float) q ) / nDiv1 ) );
+            float _x = radius * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -353,18 +353,18 @@ namespace engine
         for ( int q = 0; q < nDiv1; q++ )
         {
             // quad vertices
-            auto _p0 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, -0.5f * height );
-            auto _p1 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, -0.5f * height );
-            auto _p2 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, 0.5f * height );
-            auto _p3 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p0 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p1 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, -0.5f * height );
+            auto _p2 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, 0.5f * height );
+            auto _p3 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, 0.5f * height );
 
             _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p2, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p3, axis ) );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -387,15 +387,15 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * _PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -0.5f * _PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -0.5f * ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
 
                 // vertex without offset to up-position
-                auto _vertex = _rotateToMatchUpAxis( LVec3( radius * cos( _theta ) * cos( _phi ),
+                auto _vertex = _rotateToMatchUpAxis( CVec3( radius * cos( _theta ) * cos( _phi ),
                                                             radius * sin( _theta ) * cos( _phi ),
                                                             radius * sin( _phi ) ),
                                                      axis );
-                auto _normal = LVec3::normalize( _vertex );
+                auto _normal = CVec3::normalize( _vertex );
                 // apply offset to up position
                 _vertex = _vertex - _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * height }, axis );
 
@@ -435,10 +435,10 @@ namespace engine
 
     LMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         // Arrow construction parameters
         const int _nDiv1 = 10;
@@ -450,11 +450,11 @@ namespace engine
         // Tesselate cylinder ***********************************************************************
 
         // calculate section geometry
-        std::vector< LVec3 > _sectionXY;
+        std::vector< CVec3 > _sectionXY;
         for ( size_t q = 0; q <= _nDiv1; q++ )
         {
-            float _x = _radiusCyl * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
-            float _y = _radiusCyl * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _x = _radiusCyl * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _y = _radiusCyl * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -473,7 +473,7 @@ namespace engine
 
         for ( size_t q = 1; q <= _nDiv1 - 2; q++ )
         {
-            _indices.push_back( LInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
+            _indices.push_back( CInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
         }
 
         _baseIndx += _vertices.size();
@@ -483,10 +483,10 @@ namespace engine
         for ( size_t q = 0; q < _nDiv1; q++ )
         {
             // quad vertices
-            auto _p0 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, 0.0f );
-            auto _p1 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, 0.0f );
-            auto _p2 = _sectionXY[q + 1] + LVec3( 0.0f, 0.0f, _lengthCyl );
-            auto _p3 = _sectionXY[q + 0] + LVec3( 0.0f, 0.0f, _lengthCyl );
+            auto _p0 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, 0.0f );
+            auto _p1 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, 0.0f );
+            auto _p2 = _sectionXY[q + 1] + CVec3( 0.0f, 0.0f, _lengthCyl );
+            auto _p3 = _sectionXY[q + 0] + CVec3( 0.0f, 0.0f, _lengthCyl );
 
             _vertices.push_back( _rotateToMatchUpAxis( _p0, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p1, axis ) );
@@ -499,8 +499,8 @@ namespace engine
             _texCoords.push_back( { ( (float) ( q + 1 ) ) / _nDiv1, 1.0f } );
             _texCoords.push_back( { ( (float) ( q + 0 ) ) / _nDiv1, 1.0f } );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[q + 0] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( LVec3::normalize( _sectionXY[q + 1] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 0] ), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 1] ), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -517,16 +517,16 @@ namespace engine
         // Tesselate cone ***************************************************************************
 
         // Build base points
-        std::vector< LVec3 > _sectionXYConeOut;
-        std::vector< LVec3 > _sectionXYConeIn;
+        std::vector< CVec3 > _sectionXYConeOut;
+        std::vector< CVec3 > _sectionXYConeIn;
         for ( size_t q = 0; q < _nDiv1; q++ )
         {
-            float _xOut = _radiusCone * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
-            float _yOut = _radiusCone * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _xOut = _radiusCone * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yOut = _radiusCone * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXYConeOut.push_back( { _xOut, _yOut, 0.0f } );
 
-            float _xIn = _radiusCyl * cos( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
-            float _yIn = _radiusCyl * sin( 2.0f * _PI * ( ( (float) q ) / _nDiv1 ) );
+            float _xIn = _radiusCyl * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yIn = _radiusCyl * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXYConeIn.push_back( { _xIn, _yIn, 0.0f } );
         }
 
@@ -535,8 +535,8 @@ namespace engine
         {
             _indices.push_back( { (GLint) _vertices.size(), (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
 
-            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
-            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + CVec3( 0, 0, _lengthCyl ), axis );
+            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + CVec3( 0, 0, _lengthCyl ), axis );
             auto _p2 = _rotateToMatchUpAxis( { 0, 0, _lengthCyl + _lengthCone }, axis );
 
             _vertices.push_back( _p0 );
@@ -561,10 +561,10 @@ namespace engine
 
         for ( size_t q = 0; q < _sectionXYConeOut.size(); q++ )
         {
-            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
-            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 0 ) % _sectionXYConeIn.size()] + LVec3( 0, 0, _lengthCyl ), axis );
-            auto _p2 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()] + LVec3( 0, 0, _lengthCyl ), axis );
-            auto _p3 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + LVec3( 0, 0, _lengthCyl ), axis );
+            auto _p0 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 0 ) % _sectionXYConeOut.size()] + CVec3( 0, 0, _lengthCyl ), axis );
+            auto _p1 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 0 ) % _sectionXYConeIn.size()] + CVec3( 0, 0, _lengthCyl ), axis );
+            auto _p2 = _rotateToMatchUpAxis( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()] + CVec3( 0, 0, _lengthCyl ), axis );
+            auto _p3 = _rotateToMatchUpAxis( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()] + CVec3( 0, 0, _lengthCyl ), axis );
 
             _vertices.push_back( _p0 );
             _vertices.push_back( _p1 );
@@ -634,10 +634,10 @@ namespace engine
 
     LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, const eAxis& axis )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LInd3 > _indices;
-        std::vector< LVec2 > _texCoord;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CInd3 > _indices;
+        std::vector< CVec2 > _texCoord;
 
         LHeightmapGenerator _hmapGenerator;
 
@@ -651,19 +651,19 @@ namespace engine
         {
             for ( int j = 0; j < cellDivision; j++ )
             {
-                auto _p0 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
-                auto _p1 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
-                auto _p2 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
-                auto _p3 = _rotateToMatchUpAxis( LVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+                auto _p0 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
+                auto _p1 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
+                auto _p2 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+                auto _p3 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
 
                 // TODO: For now just make dummy indices for the rigid bodies :/
                 _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
                 _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
 
-                LVec2 _t0( 0, 0 );
-                LVec2 _t1( 0, 1 );
-                LVec2 _t2( 1, 1 );
-                LVec2 _t3( 1, 0 );
+                CVec2 _t0( 0, 0 );
+                CVec2 _t1( 0, 1 );
+                CVec2 _t2( 1, 1 );
+                CVec2 _t3( 1, 0 );
 
                 _texCoord.push_back( _t0 );
                 _texCoord.push_back( _t1 );
@@ -679,8 +679,8 @@ namespace engine
                 _vertices.push_back( _p2 );
                 _vertices.push_back( _p3 );
 
-                auto _nt1 = LVec3::cross( _p1 - _p0, _p2 - _p1 );
-                auto _nt2 = LVec3::cross( _p2 - _p0, _p3 - _p2 );
+                auto _nt1 = CVec3::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = CVec3::cross( _p2 - _p0, _p3 - _p2 );
 
                 _normals.push_back( _nt1 );
                 _normals.push_back( _nt1 );
@@ -715,16 +715,16 @@ namespace engine
             auto _p8 = _rotateToMatchUpAxis( { _pv.x      , _pv.y - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x      , _pv.y - _dd ) }, axis );
             auto _p9 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.y - _dd ) }, axis );
 
-            LVec3 _n;
+            CVec3 _n;
 
-            _n = _n + LVec3::cross( _p4 - _p1, _pv - _p4 );
-            _n = _n + LVec3::cross( _pv - _p1, _p2 - _pv );
+            _n = _n + CVec3::cross( _p4 - _p1, _pv - _p4 );
+            _n = _n + CVec3::cross( _pv - _p1, _p2 - _pv );
 
-            _n = _n + LVec3::cross( _pv - _p2, _p6 - _pv );
-            _n = _n + LVec3::cross( _p8 - _p4, _pv - _p8 );
+            _n = _n + CVec3::cross( _pv - _p2, _p6 - _pv );
+            _n = _n + CVec3::cross( _p8 - _p4, _pv - _p8 );
 
-            _n = _n + LVec3::cross( _p8 - _pv, _p9 - _p8 );
-            _n = _n + LVec3::cross( _p9 - _pv, _p6 - _p9 );
+            _n = _n + CVec3::cross( _p8 - _pv, _p9 - _p8 );
+            _n = _n + CVec3::cross( _p9 - _pv, _p6 - _p9 );
 
             _n.normalize();
 
@@ -740,10 +740,10 @@ namespace engine
                                             const std::vector< float >& heightData, float heightBase,
                                             const eAxis& axis )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         ENGINE_CORE_ASSERT( heightData.size() == nWidthSamples * nDepthSamples, "Mismatch in number of heightmap samples" );
 
@@ -775,10 +775,10 @@ namespace engine
                 _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
                 _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
 
-                LVec2 _t0( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
-                LVec2 _t1( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
-                LVec2 _t2( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
-                LVec2 _t3( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
+                CVec2 _t0( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
+                CVec2 _t1( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
+                CVec2 _t2( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
+                CVec2 _t3( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
 
                 _texCoords.push_back( _t0 );
                 _texCoords.push_back( _t1 );
@@ -794,8 +794,8 @@ namespace engine
                 _vertices.push_back( _p2 );
                 _vertices.push_back( _p3 );
 
-                auto _nt1 = LVec3::cross( _p1 - _p0, _p2 - _p1 );
-                auto _nt2 = LVec3::cross( _p2 - _p0, _p3 - _p2 );
+                auto _nt1 = CVec3::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = CVec3::cross( _p2 - _p0, _p3 - _p2 );
 
                 _normals.push_back( _nt1 );
                 _normals.push_back( _nt1 );
@@ -819,7 +819,7 @@ namespace engine
             int j0;
             int i1;
             int j1;
-            LVec3 normal;
+            CVec3 normal;
         };
 
         std::vector< SideInfo > _sides = { {         0        ,         0        , nWidthSamples - 1,         0        , {  0.0f, -1.0f, 0.0f } },
@@ -954,29 +954,29 @@ namespace engine
 
     LMesh* CMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
     {
-        std::vector< LVec3 > _vertices;
-        std::vector< LVec3 > _normals;
-        std::vector< LVec2 > _texCoords;
-        std::vector< LInd3 > _indices;
+        std::vector< CVec3 > _vertices;
+        std::vector< CVec3 > _normals;
+        std::vector< CVec2 > _texCoords;
+        std::vector< CInd3 > _indices;
 
         for ( size_t i = 0; i < assimpMeshPtr->mNumVertices; i++ )
         {
-            _vertices.push_back( LVec3( assimpMeshPtr->mVertices[i].x,
+            _vertices.push_back( CVec3( assimpMeshPtr->mVertices[i].x,
                                         assimpMeshPtr->mVertices[i].y,
                                         assimpMeshPtr->mVertices[i].z ) );
 
-            _normals.push_back( LVec3( assimpMeshPtr->mNormals[i].x,
+            _normals.push_back( CVec3( assimpMeshPtr->mNormals[i].x,
                                        assimpMeshPtr->mNormals[i].y,
                                        assimpMeshPtr->mNormals[i].z ) );
 
             if ( assimpMeshPtr->mTextureCoords[0] )
             {
-                _texCoords.push_back( LVec2( assimpMeshPtr->mTextureCoords[0][i].x,
+                _texCoords.push_back( CVec2( assimpMeshPtr->mTextureCoords[0][i].x,
                                              assimpMeshPtr->mTextureCoords[0][i].y ) );
             }
             else
             {
-                _texCoords.push_back( LVec2( 0.0f, 0.0f ) );
+                _texCoords.push_back( CVec2( 0.0f, 0.0f ) );
             }
         }
 
@@ -987,7 +987,7 @@ namespace engine
             // @TODO: Check this part as may have to support quads
             for ( size_t j = 0; j < _assimpFace.mNumIndices / 3; j++ )
             {
-                _indices.push_back( LInd3( _assimpFace.mIndices[ 3 * j + 0 ],
+                _indices.push_back( CInd3( _assimpFace.mIndices[ 3 * j + 0 ],
                                            _assimpFace.mIndices[ 3 * j + 1 ],
                                            _assimpFace.mIndices[ 3 * j + 2 ] ) );
             }
@@ -1000,7 +1000,7 @@ namespace engine
     * HELPER FUNCTIONS
     ************************************************************************/
 
-    LVec3 CMeshBuilder::_rotateToMatchUpAxis( const LVec3& vec, const eAxis& axis )
+    CVec3 CMeshBuilder::_rotateToMatchUpAxis( const CVec3& vec, const eAxis& axis )
     {
         if ( axis == eAxis::X )
             return { vec.z, vec.x, vec.y };
@@ -1013,7 +1013,7 @@ namespace engine
         return { vec.x, vec.y, vec.z };
     }
 
-    LVec3 CMeshBuilder::_rotateBackFromUpAxis( const LVec3& vec, const eAxis& axis )
+    CVec3 CMeshBuilder::_rotateBackFromUpAxis( const CVec3& vec, const eAxis& axis )
     {
         if ( axis == eAxis::X )
             return { vec.y, vec.z, vec.x };

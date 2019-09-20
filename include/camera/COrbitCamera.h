@@ -21,8 +21,8 @@ namespace engine
     public :
 
         COrbitCamera( const std::string& name,
-                      const LVec3& position,
-                      const LVec3& targetPoint,
+                      const CVec3& position,
+                      const CVec3& targetPoint,
                       const eAxis& upAxis,
                       const CCameraProjData& projData,
                       float viewportWidth,
@@ -56,12 +56,12 @@ namespace engine
         float m_theta0;
         float m_phi0;
 
-        LVec3 m_r;
-        LVec3 m_targetPoint0;
+        CVec3 m_r;
+        CVec3 m_targetPoint0;
 
         eOrbitCameraState m_cameraState;
-        LVec2 m_cursor;
-        LVec2 m_cursor0;
+        CVec2 m_cursor;
+        CVec2 m_cursor0;
     };
 
 }

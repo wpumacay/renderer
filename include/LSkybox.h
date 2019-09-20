@@ -1,6 +1,7 @@
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <LVertexBuffer.h>
 #include <LVertexArray.h>
 #include <LCubeTexture.h>

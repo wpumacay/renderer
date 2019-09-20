@@ -2,6 +2,7 @@
 #pragma once
 
 #include <shaders/LShader.h>
+#include <shaders/CShaderUniforms.h>
 
 namespace engine
 {

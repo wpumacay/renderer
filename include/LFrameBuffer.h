@@ -1,42 +1,42 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 
 namespace engine
 {
 
+    class LFrameBuffer
+    {
 
-	class LFrameBuffer
-	{
+        protected :
 
-		protected :
+        GLuint m_frameBufferId;
+        GLuint m_frameBufferTex;
 
-		GLuint m_frameBufferId;
-		GLuint m_frameBufferTex;
+        GLint m_fboFormat;
+        GLint m_fboDataType;
+        GLint m_fboAttachmentType;
 
-		GLint m_fboFormat;
-		GLint m_fboDataType;
-		GLint m_fboAttachmentType;
+        int m_width;
+        int m_height;
 
-		int m_width;
-		int m_height;
+        public :
 
-		public :
+        LFrameBuffer( GLint fboFormat, GLint fboDataType, GLint fboAttachmentType, int width, int height );
+        ~LFrameBuffer();
 
-		LFrameBuffer( GLint fboFormat, GLint fboDataType, GLint fboAttachmentType, int width, int height );
-		~LFrameBuffer();
+        void bind();
+        void unbind();
 
-		void bind();
-		void unbind();
+        int width() { return m_width; }
+        int height() { return m_height; }
 
-		int width() { return m_width; }
-		int height() { return m_height; }
+        GLuint getFBO() { return m_frameBufferId; }
+        GLuint getTex() { return m_frameBufferTex; }
 
-		GLuint getFBO() { return m_frameBufferId; }
-		GLuint getTex() { return m_frameBufferTex; }
-
-	};
+    };
 
 
 }

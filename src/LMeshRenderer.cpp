@@ -39,7 +39,7 @@ namespace engine
             }
             else
             {
-                // if ( _renderable->getType() == RENDERABLE_TYPE_MESH )
+                // if ( _renderable->getType() == eRenderableType::MESH )
                 // {
                     m_renderList.push_back( _renderable );
 
@@ -117,14 +117,14 @@ namespace engine
         _shader->setViewMatrix( _camera->matView() );
         _shader->setProjectionMatrix( _camera->matProj() );
         _shader->setViewPosition( _camera->position() );
-        _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
+        _shader->setGlobalAmbientLight( CVec3( 0.15f, 0.15f, 0.15f ) );
 
         // render all meshes
         if ( textured )
         {
             for ( auto _mesh : m_texturedList )
             {
-                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                if ( _mesh->getType() == eRenderableType::MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
                     //
@@ -151,7 +151,7 @@ namespace engine
         {
             for ( auto _mesh : m_nonTexturedList )
             {
-                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                if ( _mesh->getType() == eRenderableType::MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
                     //
@@ -251,7 +251,7 @@ namespace engine
         _shader->setViewMatrix( _camera->matView() );
         _shader->setProjectionMatrix( _camera->matProj() );
         _shader->setViewPosition( _camera->position() );
-        _shader->setGlobalAmbientLight( LVec3( 0.15f, 0.15f, 0.15f ) );
+        _shader->setGlobalAmbientLight( CVec3( 0.15f, 0.15f, 0.15f ) );
         _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
         _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );
         _shader->setLightPosition( shadowMap->getLightPosition() );
@@ -261,7 +261,7 @@ namespace engine
         {
             for ( auto _mesh : m_texturedList )
             {
-                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                if ( _mesh->getType() == eRenderableType::MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
                     //
@@ -288,7 +288,7 @@ namespace engine
         {
             for ( auto _mesh : m_nonTexturedList )
             {
-                if ( _mesh->getType() == RENDERABLE_TYPE_MODEL )
+                if ( _mesh->getType() == eRenderableType::MODEL )
                 {
                     auto _children = reinterpret_cast< LModel* >( _mesh )->getMeshes();
                     //

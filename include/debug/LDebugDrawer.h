@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <shaders/LShaderManager.h>
 #include <shaders/LShaderDebug3d.h>
 #include <LVertexBuffer.h>
@@ -9,7 +10,7 @@
 
 using namespace std;
 
-#define DEBUG_DRAWER_DEFAULT_COLOR LVec3( 0, 0, 1 )
+#define DEBUG_DRAWER_DEFAULT_COLOR CVec3( 0, 0, 1 )
 
 #define DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE 1024
 
@@ -17,14 +18,14 @@ namespace engine
 {
     struct LDLinePositions
     {
-        LVec3 vStart;
-        LVec3 vEnd;
+        CVec3 vStart;
+        CVec3 vEnd;
     };
 
     struct LDLinePositionsColors
     {
-        LVec3 cStart;
-        LVec3 cEnd;
+        CVec3 cStart;
+        CVec3 cEnd;
     };
 
     class LDebugDrawer
@@ -44,8 +45,8 @@ namespace engine
 
         LShaderDebug3d* m_shaderLinesRef;
 
-        LMat4 m_viewMat;
-        LMat4 m_projMat;
+        CMat4 m_viewMat;
+        CMat4 m_projMat;
 
         void _renderLinesBatch( int countLines );
         void _renderLines();
@@ -60,14 +61,14 @@ namespace engine
         ~LDebugDrawer();
 
 
-        void drawLine( const LVec3& start, const LVec3& end, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawArrow( const LVec3& start, const LVec3& end, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawClipVolume( const LMat4& clipMatrix, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawTrailPoints( const vector< LVec3 >& trailpoints, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawLinesBatch( const vector< LLine >& linesBatch, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawAABB( const LVec3& aabbMin, const LVec3& aabbMax, const LMat4& aabbWorldTransform, const LVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawLine( const CVec3& start, const CVec3& end, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawArrow( const CVec3& start, const CVec3& end, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawClipVolume( const CMat4& clipMatrix, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawTrailPoints( const vector< CVec3 >& trailpoints, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawLinesBatch( const vector< CLine >& linesBatch, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
 
-        void setupMatrices( const LMat4& viewMatrix, const LMat4& projectionMatrix );
+        void setupMatrices( const CMat4& viewMatrix, const CMat4& projectionMatrix );
         void render();
     };
 

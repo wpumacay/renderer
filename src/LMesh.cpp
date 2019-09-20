@@ -7,23 +7,23 @@ using namespace std;
 namespace engine
 {
 
-    LMesh::LMesh( const vector<LVec3>& vertices, 
-                  const vector<LVec3>& normals )
+    LMesh::LMesh( const vector<CVec3>& vertices, 
+                  const vector<CVec3>& normals )
         : LIRenderable()
     {
         m_usesIndices = false;
 
-        m_type = RENDERABLE_TYPE_MESH;
+        m_type = eRenderableType::MESH;
 
         m_vertices = vertices;
         m_normals = normals;
 
         m_vBuffer = new LVertexBuffer();
-        m_vBuffer->setData( sizeof( LVec3 ) * vertices.size(),
+        m_vBuffer->setData( sizeof( CVec3 ) * vertices.size(),
                             3, (GLfloat*) vertices.data() );
 
         m_nBuffer = new LVertexBuffer();
-        m_nBuffer->setData( sizeof( LVec3 ) * normals.size(),
+        m_nBuffer->setData( sizeof( CVec3 ) * normals.size(),
                             3, (GLfloat*) normals.data() );
 
         m_tBuffer = NULL;
@@ -36,32 +36,32 @@ namespace engine
         // Create a default material
         m_material = new LMaterial();
 
-        scale = LVec3( 1.0f, 1.0f, 1.0f );
+        scale = CVec3( 1.0f, 1.0f, 1.0f );
     }
 
-    LMesh::LMesh( const vector<LVec3>& vertices, 
-                  const vector<LVec3>& normals,
-                  const vector<LVec2>& texCoords )
+    LMesh::LMesh( const vector<CVec3>& vertices, 
+                  const vector<CVec3>& normals,
+                  const vector<CVec2>& texCoords )
         : LIRenderable()
     {
         m_usesIndices = false;
 
-        m_type = RENDERABLE_TYPE_MESH;
+        m_type = eRenderableType::MESH;
 
         m_vertices = vertices;
         m_normals = normals;
         m_texCoords = texCoords;
 
         m_vBuffer = new LVertexBuffer();
-        m_vBuffer->setData( sizeof( LVec3 ) * vertices.size(),
+        m_vBuffer->setData( sizeof( CVec3 ) * vertices.size(),
                             3, (GLfloat*) vertices.data() );
 
         m_nBuffer = new LVertexBuffer();
-        m_nBuffer->setData( sizeof( LVec3 ) * normals.size(),
+        m_nBuffer->setData( sizeof( CVec3 ) * normals.size(),
                             3, (GLfloat*) normals.data() );
 
         m_tBuffer = new LVertexBuffer();
-        m_tBuffer->setData( sizeof( LVec2 ) * texCoords.size(),
+        m_tBuffer->setData( sizeof( CVec2 ) * texCoords.size(),
                             2, ( GLfloat* ) texCoords.data() );
 
         m_indexBuffer = NULL;
@@ -74,18 +74,18 @@ namespace engine
         // Create a default material
         m_material = new LMaterial();
 
-        scale = LVec3( 1.0f, 1.0f, 1.0f );
+        scale = CVec3( 1.0f, 1.0f, 1.0f );
     }
 
-    LMesh::LMesh( const vector<LVec3>& vertices, 
-                  const vector<LVec3>& normals,
-                  const vector<LVec2>& texCoords,
-                  const vector<LInd3>& indices )
+    LMesh::LMesh( const vector<CVec3>& vertices, 
+                  const vector<CVec3>& normals,
+                  const vector<CVec2>& texCoords,
+                  const vector<CInd3>& indices )
         : LIRenderable()
     {
         m_usesIndices = true;
 
-        m_type = RENDERABLE_TYPE_MESH;
+        m_type = eRenderableType::MESH;
 
         m_vertices = vertices;
         m_normals = normals;
@@ -93,19 +93,19 @@ namespace engine
         m_texCoords = texCoords;
 
         m_vBuffer = new LVertexBuffer();
-        m_vBuffer->setData( sizeof( LVec3 ) * vertices.size(),
+        m_vBuffer->setData( sizeof( CVec3 ) * vertices.size(),
                             3, (GLfloat*) vertices.data() );
 
         m_nBuffer = new LVertexBuffer();
-        m_nBuffer->setData( sizeof( LVec3 ) * normals.size(),
+        m_nBuffer->setData( sizeof( CVec3 ) * normals.size(),
                             3, (GLfloat*) normals.data() );
 
         m_tBuffer = new LVertexBuffer();
-        m_tBuffer->setData( sizeof( LVec2 ) * texCoords.size(),
+        m_tBuffer->setData( sizeof( CVec2 ) * texCoords.size(),
                             2, ( GLfloat* ) texCoords.data() );
 
         m_indexBuffer = new LIndexBuffer();
-        m_indexBuffer->setData( sizeof( LInd3 ) * indices.size(), 
+        m_indexBuffer->setData( sizeof( CInd3 ) * indices.size(), 
                                 3 * indices.size(), (GLuint*) indices.data() );
 
         m_vertexArray = new LVertexArray();
@@ -116,28 +116,28 @@ namespace engine
         // Create a default material
         m_material = new LMaterial();
 
-        scale = LVec3( 1.0f, 1.0f, 1.0f );
+        scale = CVec3( 1.0f, 1.0f, 1.0f );
     }
 
-    LMesh::LMesh( const vector<LVec3>& vertices, 
-                  const vector<LVec3>& normals,
-                  const vector<LInd3>& indices )
+    LMesh::LMesh( const vector<CVec3>& vertices, 
+                  const vector<CVec3>& normals,
+                  const vector<CInd3>& indices )
         : LIRenderable()
     {
         m_usesIndices = true;
 
-        m_type = RENDERABLE_TYPE_MESH;
+        m_type = eRenderableType::MESH;
 
         m_vertices = vertices;
         m_normals = normals;
         m_indices = indices;
 
         m_vBuffer = new LVertexBuffer();
-        m_vBuffer->setData( sizeof( LVec3 ) * vertices.size(),
+        m_vBuffer->setData( sizeof( CVec3 ) * vertices.size(),
                             3, (GLfloat*) vertices.data() );
 
         m_nBuffer = new LVertexBuffer();
-        m_nBuffer->setData( sizeof( LVec3 ) * normals.size(),
+        m_nBuffer->setData( sizeof( CVec3 ) * normals.size(),
                             3, (GLfloat*) normals.data() );
 
         m_tBuffer = NULL;// no textures by default
@@ -147,13 +147,13 @@ namespace engine
         m_vertexArray->addBuffer( m_nBuffer, 1 );
 
         m_indexBuffer = new LIndexBuffer();
-        m_indexBuffer->setData( sizeof( LInd3 ) * indices.size(), 
+        m_indexBuffer->setData( sizeof( CInd3 ) * indices.size(), 
                                 3 * indices.size(), (GLuint*) indices.data() );
 
         // Create a default material
         m_material = new LMaterial();
 
-        scale = LVec3( 1.0f, 1.0f, 1.0f );
+        scale = CVec3( 1.0f, 1.0f, 1.0f );
     }
 
     LMesh::~LMesh()

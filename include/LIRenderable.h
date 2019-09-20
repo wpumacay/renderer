@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <LCommon.h>
+#include <CCommon.h>
+#include <CMath.h>
 #include <LMaterial.h>
 #include <LTexture.h>
 
@@ -14,15 +15,17 @@ namespace engine
     enum class eRenderableType
     {
         BASE = 0,
-        MESH = 1,
-        MODEL = 2
+        MESH,
+        MODEL
     };
+
+    std::string toString( const eRenderableType& renderable );
 
     class LIRenderable
     {
         protected :
- 
-        int                 m_type;
+
+        eRenderableType     m_type;
         bool                m_isVisible;
         bool                m_drawAsWireframe;
         LMaterial*          m_material;
@@ -30,21 +33,21 @@ namespace engine
 
         public :
 
-        LVec3 pos;
-        LMat4 rotation;
-        LVec3 scale;
+        CVec3 pos;
+        CMat4 rotation;
+        CVec3 scale;
 
         bool debug;
 
         LIRenderable();
         ~LIRenderable();
 
-        int getType();
+        eRenderableType getType();
 
         void setMaterial( LMaterial* pMaterial );
         LMaterial* getMaterial();
 
-        LMat4 getModelMatrix();
+        CMat4 getModelMatrix();
 
         void addTexture( LTexture* pTexture );
         bool hasTextures();

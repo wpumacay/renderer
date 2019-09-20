@@ -1,9 +1,0 @@
-
-#pragma once
-
-#define APP_CONTEXT_VERSION_MAJOR 3
-#define APP_CONTEXT_VERSION_MINOR 3
-
-#ifndef ENGINE_RESOURCES_PATH
-	#define ENGINE_RESOURCES_PATH "../res/"
-#endif

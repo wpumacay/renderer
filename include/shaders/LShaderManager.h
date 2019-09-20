@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "../Config.h"
+#include <CCommon.h>
 #include <shaders/LShader.h>
-
-#include <fstream>
-#include <sstream>
+#include <shaders/CShaderUniforms.h>
 
 using namespace std;
 

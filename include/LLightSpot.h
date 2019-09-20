@@ -11,8 +11,8 @@ namespace engine
 
         public :
 
-        LVec3 position;
-        LVec3 direction;
+        CVec3 position;
+        CVec3 direction;
 
         float attenuation_constant;
         float attenuation_linear;
@@ -21,12 +21,12 @@ namespace engine
         float cutOff;
         float outerCutOff;
 
-        LLightSpot( const LVec3& ambient,
-                    const LVec3& diffuse,
-                    const LVec3& specular,
+        LLightSpot( const CVec3& ambient,
+                    const CVec3& diffuse,
+                    const CVec3& specular,
                     int lIndx,
-                    const LVec3& position,
-                    const LVec3& direction,
+                    const CVec3& position,
+                    const CVec3& direction,
                     float attenuation_constant,
                     float attenuation_linear,
                     float attenuation_quadratic,

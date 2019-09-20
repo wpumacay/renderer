@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "LCommon.h"
+#include <CCommon.h>
+#include <CMath.h>
 
 #define FOG_TYPE_LINEAR     0
 #define FOG_TYPE_EXP        1
@@ -14,7 +15,7 @@ namespace engine
     {
 
         GLint type;
-        LVec4 color;
+        CVec4 color;
         GLfloat density;
 
         GLfloat start;
@@ -22,7 +23,7 @@ namespace engine
 
         GLint isActive;
 
-        LFog( GLint type, LVec4 color, GLfloat density, GLfloat start, GLfloat end )
+        LFog( GLint type, CVec4 color, GLfloat density, GLfloat start, GLfloat end )
         {
             this->type = type;
             this->color = color;
