@@ -1,10 +1,5 @@
 
-#include <iostream>
-
-#include <core/COpenGLApp.h>
-#include <LVertexBuffer.h>
-#include <LIndexBuffer.h>
-#include <LVertexArray.h>
+#include <CEngine.h>
 
 int main()
 {

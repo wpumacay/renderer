@@ -1,18 +1,5 @@
 
-#include <iostream>
-
-#include <core/COpenGLApp.h>
-#include <graphics/CMeshBuilder.h>
-
-#include <camera/CFpsCamera.h>
-#include <camera/CFixedCamera.h>
-#include <camera/COrbitCamera.h>
-#include <LLightDirectional.h>
-#include <LSkybox.h>
-
-#ifndef ENGINE_RESOURCES_PATH
-    #define ENGINE_RESOURCES_PATH "../res/"
-#endif
+#include <CEngine.h>
 
 int main()
 {

@@ -1,5 +1,5 @@
 
-#include <core/COpenGLWindow.h>
+#include <app/COpenGLWindow.h>
 
 using namespace std;
 

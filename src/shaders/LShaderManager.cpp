@@ -5,7 +5,6 @@
 // General purpose shaders
 #include <shaders/LShaderBasic3d.h>
 #include <shaders/LShaderDebug3d.h>
-#include <shaders/LShaderFramebufferScreenRender.h>
 #include <shaders/LShaderSkybox.h>
 #include <shaders/LShaderShadowMap.h>
 
@@ -50,20 +49,6 @@ namespace engine
 
         m_programs["debug3d"] = _program;
         m_programObjs["debug3d"] = new LShaderDebug3d( _program );
-
-        _vShader = createShader( "postprocessing/framebuffer_screenrender_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "postprocessing/framebuffer_screenrender_fs.glsl", GL_FRAGMENT_SHADER );
-        _program = createProgram( _vShader, _fShader );
-
-        m_programs["pp_framebuffer_screenrender"] = _program;
-        m_programObjs["pp_framebuffer_screenrender"] = new LShaderFramebufferScreenRender( _program );
-
-        _vShader = createShader( "postprocessing/framebuffer_screenrender_channel_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "postprocessing/framebuffer_screenrender_channel_fs.glsl", GL_FRAGMENT_SHADER );
-        _program = createProgram( _vShader, _fShader );
-
-        m_programs["pp_framebuffer_screenrender_channel"] = _program;
-        m_programObjs["pp_framebuffer_screenrender_channel"] = new LShaderFramebufferScreenRender( _program );
 
         _vShader = createShader( "shadows/shadow_mapping_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "shadows/shadow_mapping_fs.glsl", GL_FRAGMENT_SHADER );

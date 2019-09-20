@@ -8,7 +8,7 @@
 #include <input/CInputMouse.h>
 #include <input/CInputCallbacks.h>
 
-#include <core/COpenGLContext.h>
+#include <app/COpenGLContext.h>
 #include <utils/CLogger.h>
 
 #define CLEAR_COLOR 0.6f, 0.659f, 0.690f, 1.0f

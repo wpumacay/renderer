@@ -14,7 +14,7 @@
 #include <debug/LDebugSystem.h>
 #include <input/LInputSystem.h>
 
-#include <core/COpenGLWindow.h>
+#include <app/COpenGLWindow.h>
 #include <utils/CLogger.h>
 #include <utils/CTime.h>
 #include <utils/CImguiUi.h>

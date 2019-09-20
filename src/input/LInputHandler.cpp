@@ -1,7 +1,7 @@
 
 #include <input/LInputHandler.h>
 
-#include <core/COpenGLApp.h>
+#include <app/COpenGLApp.h>
 
 namespace engine
 {

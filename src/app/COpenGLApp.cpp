@@ -1,5 +1,5 @@
 
-#include <core/COpenGLApp.h>
+#include <app/COpenGLApp.h>
 
 namespace engine
 {

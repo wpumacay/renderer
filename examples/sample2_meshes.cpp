@@ -1,15 +1,5 @@
 
-#include <iostream>
-
-#include <core/COpenGLApp.h>
-#include <graphics/CMeshBuilder.h>
-
-#include <camera/CFpsCamera.h>
-#include <camera/CFixedCamera.h>
-#include <camera/COrbitCamera.h>
-#include <LLightDirectional.h>
-
-#include <utils/CImguiUiDemo.h>
+#include <CEngine.h>
 
 class Application : public engine::COpenGLApp
 {
