@@ -35,6 +35,8 @@ namespace engine
     typedef unsigned char u8;
     typedef unsigned int uint32;
     typedef unsigned long uint64;
+    typedef int int32;
+    typedef long int64;
     typedef float float32;
     typedef double float64;
 
