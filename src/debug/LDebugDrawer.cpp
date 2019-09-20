@@ -19,11 +19,11 @@ namespace engine
 
         m_linesVAO = new LVertexArray();
 
-        m_linesPositionsVBO = new LVertexBuffer( GL_STREAM_DRAW );
+        m_linesPositionsVBO = new LVertexBuffer( GL_DYNAMIC_DRAW );
         m_linesPositionsVBO->setData( sizeof( LDLinePositions ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
                                       3, ( GLfloat* ) m_linesRenderBufferPositions.data() );
 
-        m_linesColorsVBO = new LVertexBuffer( GL_STREAM_DRAW );
+        m_linesColorsVBO = new LVertexBuffer( GL_DYNAMIC_DRAW );
         m_linesColorsVBO->setData( sizeof( LDLinePositionsColors ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
                                    3, (GLfloat*)m_linesRenderBufferColors.data() );
 

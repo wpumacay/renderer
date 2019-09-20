@@ -3,37 +3,47 @@
 #include <CCommon.h>
 #include <CMath.h>
 #include <utils/CLogger.h>
+#include <core/CVertexBufferLayout.h>
 
 namespace engine
 {
+
+    enum class eBufferUsage
+    {
+        STATIC = 0, DYNAMIC
+    };
+
+    std::string toString( const eBufferUsage& usage );
+
+    uint32 toOpenGLEnum( const eBufferUsage& usage );
 
     class CVertexBuffer
     {
 
     public :
 
-        CVertexBuffer( uint32 bufferSize, 
-                       uint32 bufferComponentCount, 
-                       uint32 bufferUsage, 
+        CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
+                       const eBufferUsage& bufferUsage, 
+                       uint32 bufferSize, 
                        float32* bufferData );
 
         ~CVertexBuffer();
 
         void updateData( uint32 bufferSize, float32* bufferData );
-        void updateData( uint32 bufferSize, uint32 bufferOffset, float32* bufferData );
         void bind();
         void unbind();
 
-        uint32 componentCount() { return m_bufferComponentCount; }
-        uint32 size() { return m_bufferSize; }
-        uint32 usage() { return m_bufferUsage; }
+        CVertexBufferLayout layout() const { return m_bufferLayout; }
+        uint32 size() const { return m_bufferSize; }
+        eBufferUsage usage() const { return m_bufferUsage; }
+        uint32 openglId() const { return m_openglId; }
 
     private :
 
-        uint32 m_bufferSize;
-        uint32 m_bufferComponentCount;
-        uint32 m_bufferUsage;
-        uint32 m_bufferOpenGLId;
+        CVertexBufferLayout m_bufferLayout;
+        eBufferUsage        m_bufferUsage;
+        uint32              m_bufferSize;
+        uint32              m_openglId;
 
     };
 

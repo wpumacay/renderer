@@ -25,3 +25,5 @@ foreach( sampleFile ${SampleFiles} )
     FcnBuildExample( ${sampleFile} ${executableName} )
 
 endforeach( sampleFile )
+
+add_subdirectory( core )
