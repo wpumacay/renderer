@@ -40,7 +40,7 @@ namespace engine
         bool debug;
 
         LIRenderable();
-        ~LIRenderable();
+        virtual ~LIRenderable();
 
         eRenderableType getType();
 

@@ -24,18 +24,24 @@ int main()
     std::cout << "sizeof( CVec3 ): " << sizeof( engine::CVec3 ) << std::endl;
     std::cout << "sizeof( CInd3 ): " << sizeof( engine::CInd3 ) << std::endl;
 
-    auto _vbufferPos = new engine::LVertexBuffer();
-    _vbufferPos->setData( sizeof( engine::CVec2 ) * _vertices.size(), 2, (GLfloat*) _vertices.data() );
+    auto _vbufferPos = new engine::CVertexBuffer( { { "pos", engine::eElementType::Float2, false } },
+                                                  engine::eBufferUsage::STATIC,
+                                                  sizeof( engine::CVec2 ) * _vertices.size(),
+                                                  (engine::float32*) _vertices.data() );
 
-    auto _vbufferCol = new engine::LVertexBuffer();
-    _vbufferCol->setData( sizeof( engine::CVec3 ) * _colors.size(), 3, (GLfloat*) _colors.data() );
+    auto _vbufferCol = new engine::CVertexBuffer( { { "color", engine::eElementType::Float3, false } },
+                                                  engine::eBufferUsage::STATIC,
+                                                  sizeof( engine::CVec3 ) * _colors.size(),
+                                                  (engine::float32*) _colors.data() );
 
-    auto _ibuffer = new engine::LIndexBuffer();
-    _ibuffer->setData( sizeof( engine::CInd3 ) * _indices.size(), 3 * _indices.size(), (GLuint*) _indices.data() );
+    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
+                                              3 * _indices.size(),
+                                              (engine::uint32*) _indices.data() );
 
-    auto _varray = new engine::LVertexArray();
-    _varray->addBuffer( _vbufferPos, 0 );
-    _varray->addBuffer( _vbufferCol, 1 );
+    auto _varray = new engine::CVertexArray();
+    _varray->addVertexBuffer( _vbufferPos );
+    _varray->addVertexBuffer( _vbufferCol );
+    _varray->setIndexBuffer( _ibuffer );
 
     while( _app->isActive() )
     {
@@ -45,15 +51,11 @@ int main()
             break;
 
         _shader->bind();
-
         _varray->bind();
-        _ibuffer->bind();
 
-        glDrawElements( GL_TRIANGLES, _ibuffer->getCount(), GL_UNSIGNED_INT, 0 );
+        glDrawElements( GL_TRIANGLES, _varray->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
 
-        _ibuffer->unbind();
         _varray->unbind();
-
         _shader->unbind();
 
         _app->end();

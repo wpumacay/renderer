@@ -3,76 +3,52 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include "LVertexBuffer.h"
-#include "LVertexArray.h"
-#include "LIndexBuffer.h"
-#include "LIRenderable.h"
-
-using namespace std;
-
+#include <core/CVertexBuffer.h>
+#include <core/CIndexBuffer.h>
+#include <core/CVertexArray.h>
+#include <LIRenderable.h>
 
 namespace engine
 {
 
-
-
     class LMesh : public LIRenderable
     {
 
-        private :
+    public :
 
-        LVertexArray* m_vertexArray;
-        LIndexBuffer* m_indexBuffer;
-
-        LVertexBuffer* m_vBuffer;
-        LVertexBuffer* m_nBuffer;
-        LVertexBuffer* m_tBuffer;
-        vector<CVec3> m_vertices;
-        vector<CVec3> m_normals;
-        vector<CVec2> m_texCoords;
-        vector<CInd3> m_indices;
-
-        bool m_usesIndices;
-
-        public :
-
-        LMesh( const vector<CVec3>& vertices,
-               const vector<CVec3>& normals );
-
-        LMesh( const vector<CVec3>& vertices, 
-               const vector<CVec3>& normals,
-               const vector<CInd3>& indices );
-
-        LMesh( const vector<CVec3>& vertices, 
-               const vector<CVec3>& normals,
-               const vector<CVec2>& texCoords,
-               const vector<CInd3>& indices );
-
-        LMesh( const vector<CVec3>& vertices,
-               const vector<CVec3>& normals,
-               const vector<CVec2>& texCoords );
+        LMesh( const std::vector<CVec3>& vertices, 
+               const std::vector<CVec3>& normals,
+               const std::vector<CVec2>& texCoords,
+               const std::vector<CInd3>& indices,
+               const eBufferUsage& buffersUsage = eBufferUsage::STATIC );
 
         ~LMesh();
 
-        LVertexArray* getVertexArray() const { return m_vertexArray; }
-        LIndexBuffer* getIndexBuffer() const { return m_indexBuffer; }
+        CVertexArray* vertexArray() const { return m_varray; }
+        CVertexBuffer* verticesBuffer() const { return m_vbufferVertices; }
+        CVertexBuffer* normalsBuffer() const { return m_vbufferNormals; }
+        CVertexBuffer* uvsBuffer() const { return m_vbufferUVs; }
+        CIndexBuffer* indexBuffer() const { return m_ibuffer; }
 
-        vector< CVec3 >& vertices() { return m_vertices; }
-        vector< CInd3 >& indices() { return m_indices; }
+        std::vector< CVec3 >& vertices() { return m_vertices; }
+        std::vector< CVec3 >& normals() { return m_normals; }
+        std::vector< CVec2 >& uvs() { return m_texCoords; }
+        std::vector< CInd3 >& indices() { return m_indices; }
 
         void render() override;
+
+    private :
+
+        CVertexArray*   m_varray;
+        CVertexBuffer*  m_vbufferVertices;
+        CVertexBuffer*  m_vbufferNormals;
+        CVertexBuffer*  m_vbufferUVs;
+        CIndexBuffer*   m_ibuffer;
+
+        std::vector<CVec3> m_vertices;
+        std::vector<CVec3> m_normals;
+        std::vector<CVec2> m_texCoords;
+        std::vector<CInd3> m_indices;
     };
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

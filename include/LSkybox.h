@@ -2,21 +2,21 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <LVertexBuffer.h>
-#include <LVertexArray.h>
+#include <core/CVertexBuffer.h>
+#include <core/CVertexArray.h>
 #include <LCubeTexture.h>
+#include <LAssetsManager.h>
 
 using namespace std;
 
 namespace engine
 {
 
-
     class LSkybox
     {
         private : 
 
-        LVertexArray* m_vertexArray;
+        CVertexArray* m_vertexArray;
         LCubeTexture* m_cubeTextureRef;
 
         public :
@@ -26,10 +26,5 @@ namespace engine
 
         void render();
     };
-
-
-
-
-
 
 }

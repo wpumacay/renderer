@@ -1,10 +1,6 @@
 
 #include <debug/LDebugDrawer.h>
 
-using namespace std;
-
-
-
 namespace engine
 {
 
@@ -14,29 +10,28 @@ namespace engine
     {
         m_shaderLinesRef = ( engine::LShaderDebug3d* ) LShaderManager::getShader( "debug3d" );
 
-        m_linesRenderBufferPositions = vector< LDLinePositions >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
-        m_linesRenderBufferColors = vector< LDLinePositionsColors >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
+        m_linesRenderBufferPositions = std::vector< LDLinePositions >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
+        m_linesRenderBufferColors = std::vector< LDLinePositionsColors >( DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE );
 
-        m_linesVAO = new LVertexArray();
+        m_linesPositionsVBO = new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                                 eBufferUsage::DYNAMIC,
+                                                 sizeof( LDLinePositions ) * m_linesRenderBufferPositions.size(),
+                                                 (float32*) m_linesRenderBufferPositions.data() );
 
-        m_linesPositionsVBO = new LVertexBuffer( GL_DYNAMIC_DRAW );
-        m_linesPositionsVBO->setData( sizeof( LDLinePositions ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
-                                      3, ( GLfloat* ) m_linesRenderBufferPositions.data() );
+        m_linesColorsVBO = new CVertexBuffer( { { "color", eElementType::Float3, false } },
+                                              eBufferUsage::DYNAMIC,
+                                              sizeof( LDLinePositionsColors ) * m_linesRenderBufferColors.size(),
+                                              (float32*) m_linesRenderBufferColors.data() );
 
-        m_linesColorsVBO = new LVertexBuffer( GL_DYNAMIC_DRAW );
-        m_linesColorsVBO->setData( sizeof( LDLinePositionsColors ) * DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE,
-                                   3, (GLfloat*)m_linesRenderBufferColors.data() );
-
-        m_linesVAO->addBuffer( m_linesPositionsVBO, 0 );
-        m_linesVAO->addBuffer( m_linesColorsVBO, 1 );
+        m_linesVAO = new CVertexArray();
+        m_linesVAO->addVertexBuffer( m_linesPositionsVBO );
+        m_linesVAO->addVertexBuffer( m_linesColorsVBO );
     }
 
     LDebugDrawer* LDebugDrawer::GetInstance()
     {
-        if ( LDebugDrawer::_INSTANCE == NULL )
-        {
+        if ( !LDebugDrawer::_INSTANCE )
             LDebugDrawer::_INSTANCE = new LDebugDrawer();
-        }
 
         return LDebugDrawer::_INSTANCE;
     }
@@ -109,11 +104,8 @@ namespace engine
     {
         m_linesVAO->bind();
 
-        m_linesPositionsVBO->updateData( count * sizeof( LDLinePositions ), ( GLfloat* ) m_linesRenderBufferPositions.data() );
-        m_linesColorsVBO->updateData( count * sizeof( LDLinePositionsColors ), ( GLfloat* ) m_linesRenderBufferColors.data() );
-
-        //m_linesPositionsVBO->setData( count * sizeof( LDLinePositions ), 3, ( GLfloat* ) m_linesRenderBufferPositions.data() );
-        //m_linesColorsVBO->setData( count * sizeof( LDLinePositionsColors ), 3, ( GLfloat* ) m_linesRenderBufferColors.data() );
+        m_linesPositionsVBO->updateData( count * sizeof( LDLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
+        m_linesColorsVBO->updateData( count * sizeof( LDLinePositionsColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
         m_shaderLinesRef->bind();
         m_shaderLinesRef->setViewMatrix( m_viewMat );
@@ -188,7 +180,7 @@ namespace engine
             CVec3( -1.0f,  1.0f, 1.0f )
         };
 
-        vector< engine::CVec3 > _points3d;
+        std::vector< engine::CVec3 > _points3d;
         for ( size_t q = 0; q < 8; q++ )
         {
             CVec4 _pointFrustum = _invClipMatrix * CVec4( _frustumPointsClipSpace[q], 1.0f );
@@ -218,7 +210,7 @@ namespace engine
         drawLine( _points3d[3], _points3d[7] );
     }
 
-    void LDebugDrawer::drawTrailPoints( const vector< CVec3 >& trailpoints, const CVec3& color )
+    void LDebugDrawer::drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color )
     {
         if ( trailpoints.size() < 1 )
         {
@@ -231,7 +223,7 @@ namespace engine
         }
     }
 
-    void LDebugDrawer::drawLinesBatch( const vector< CLine >& linesBatch, const CVec3& color )
+    void LDebugDrawer::drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color )
     {
         if ( linesBatch.size() < 1 )
         {

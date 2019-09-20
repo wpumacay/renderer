@@ -5,14 +5,11 @@
 #include <CMath.h>
 #include <shaders/LShaderManager.h>
 #include <shaders/LShaderDebug3d.h>
-#include <LVertexBuffer.h>
-#include <LVertexArray.h>
+#include <core/CVertexBuffer.h>
+#include <core/CVertexArray.h>
 
-using namespace std;
-
-#define DEBUG_DRAWER_DEFAULT_COLOR CVec3( 0, 0, 1 )
-
-#define DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE 1024
+#define DEBUG_DRAWER_DEFAULT_COLOR              { 0.0f, 0.0f, 1.0f }
+#define DEBUG_DRAWER_LINES_BUFFER_COUNT_SIZE    1024
 
 namespace engine
 {
@@ -33,15 +30,15 @@ namespace engine
 
         private :
 
-        vector< LDLinePositions > m_linesRenderBufferPositions;
-        vector< LDLinePositionsColors > m_linesRenderBufferColors;
+        std::vector< LDLinePositions > m_linesRenderBufferPositions;
+        std::vector< LDLinePositionsColors > m_linesRenderBufferColors;
 
-        vector< LDLinePositions > m_linesPositions;
-        vector< LDLinePositionsColors > m_linesColors;
+        std::vector< LDLinePositions > m_linesPositions;
+        std::vector< LDLinePositionsColors > m_linesColors;
 
-        LVertexBuffer* m_linesPositionsVBO;
-        LVertexBuffer* m_linesColorsVBO;
-        LVertexArray* m_linesVAO;
+        CVertexBuffer*  m_linesPositionsVBO;
+        CVertexBuffer*  m_linesColorsVBO;
+        CVertexArray*   m_linesVAO;
 
         LShaderDebug3d* m_shaderLinesRef;
 
@@ -64,8 +61,8 @@ namespace engine
         void drawLine( const CVec3& start, const CVec3& end, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
         void drawArrow( const CVec3& start, const CVec3& end, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
         void drawClipVolume( const CMat4& clipMatrix, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawTrailPoints( const vector< CVec3 >& trailpoints, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
-        void drawLinesBatch( const vector< CLine >& linesBatch, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
+        void drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
         void drawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color = DEBUG_DRAWER_DEFAULT_COLOR );
 
         void setupMatrices( const CMat4& viewMatrix, const CMat4& projectionMatrix );

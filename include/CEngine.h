@@ -15,10 +15,10 @@
 #include <input/LInputHandler.h>                    // #include <input/CInputHandler.h>
 #include <input/LInputSystem.h>                     // #include <input/CInputSystem.h>
 
-#include <LVertexBuffer.h>                          // #include <core/CVertexBuffer.h>
-// #include <LVertexBufferLayout.h>                 // #include <core/CVertexBufferLayout.h>
-#include <LIndexBuffer.h>                           // #include <core/CIndexBuffer.h>
-#include <LVertexArray.h>                           // #include <core/CVertexArray.h>
+#include <core/CVertexBuffer.h>
+#include <core/CVertexBufferLayout.h>
+#include <core/CIndexBuffer.h>
+#include <core/CVertexArray.h>
 #include <LTexture.h>                               // #include <core/CTexture.h>
 #include <LCubeTexture.h>                           // #include <core/CTextureCube.h>
 #include <LFrameBuffer.h>                           // #include <core/CFrameBuffer.h>

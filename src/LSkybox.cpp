@@ -1,15 +1,12 @@
-#include <LSkybox.h>
-#include <LAssetsManager.h>
 
-using namespace std;
+#include <LSkybox.h>
 
 namespace engine
 {
 
-
-    LSkybox::LSkybox( const string& skyboxResId )
+    LSkybox::LSkybox( const std::string& skyboxResId )
     {
-        GLfloat _vertices[] =
+        float32 _vertices[] =
         {
             -1.0f,  1.0f, -1.0f,
             -1.0f, -1.0f, -1.0f,
@@ -54,20 +51,23 @@ namespace engine
              1.0f, -1.0f,  1.0f
         };
 
-        auto _vBuffer = new LVertexBuffer();
-        _vBuffer->setData( sizeof( GLfloat ) * 3 * 36,
-                           3, _vertices );
+        auto _vBuffer = new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                           eBufferUsage::STATIC,
+                                           sizeof( _vertices ),
+                                           _vertices );
 
-        m_vertexArray = new LVertexArray();
-        m_vertexArray->addBuffer( _vBuffer, 0 );
+        m_vertexArray = new CVertexArray();
+        m_vertexArray->addVertexBuffer( _vBuffer );
 
         m_cubeTextureRef = LAssetsManager::getCubeTexture( skyboxResId );
-        // m_cubeTextureRef->log();
     }
 
     LSkybox::~LSkybox()
     {
-        delete m_vertexArray;
+        if ( m_vertexArray )
+            delete m_vertexArray;
+
+        m_vertexArray = NULL;
     }
 
     void LSkybox::render()
@@ -80,4 +80,5 @@ namespace engine
         m_vertexArray->unbind();
         m_cubeTextureRef->unbind();
     }
+
 }
