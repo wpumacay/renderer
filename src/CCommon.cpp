@@ -16,4 +16,24 @@ namespace engine
         return "undefined";
     }
 
+    std::string toString( const ePixelFormat& format )
+    {
+        if ( format == ePixelFormat::RGB ) return "rgb";
+        if ( format == ePixelFormat::RGBA ) return "rgba";
+
+        ENGINE_CORE_ASSERT( false, "Invalid ePixelFormat type given" );
+
+        return "undefined";
+    }
+
+    uint32 toOpenGLEnum( const ePixelFormat& format )
+    {
+        if ( format == ePixelFormat::RGB ) return GL_RGB;
+        if ( format == ePixelFormat::RGBA ) return GL_RGBA;
+
+        ENGINE_CORE_ASSERT( false, "Invalid ePixelFormat type given" );
+
+        return 0;
+    }
+
 }

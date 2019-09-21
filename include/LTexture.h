@@ -8,11 +8,11 @@ namespace engine
 
     struct CTextureData
     {
-        u8* data;
-        int width;
-        int height;
-        int channels;
-        int ftype;
+        uint8*  data;
+        int     width;
+        int     height;
+        int     channels;
+        int     ftype;
     };
 
     class LTexture

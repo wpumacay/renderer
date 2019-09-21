@@ -8,7 +8,7 @@ namespace engine
 
     struct CCubeTextureData
     {
-        u8* vpData[6];
+        uint8* vpData[6];
         int width;
         int height;
         int channels;

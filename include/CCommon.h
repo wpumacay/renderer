@@ -25,6 +25,14 @@
 namespace engine
 {
 
+    typedef unsigned char uint8;
+    typedef unsigned int uint32;
+    typedef unsigned long uint64;
+    typedef int int32;
+    typedef long int64;
+    typedef float float32;
+    typedef double float64;
+
     enum class eAxis
     {
         X = 0, Y, Z
@@ -32,12 +40,14 @@ namespace engine
 
     std::string toString( const eAxis& axis );
 
-    typedef unsigned char u8;
-    typedef unsigned int uint32;
-    typedef unsigned long uint64;
-    typedef int int32;
-    typedef long int64;
-    typedef float float32;
-    typedef double float64;
+    enum class ePixelFormat
+    {
+        NONE = 0, 
+        RGB, 
+        RGBA
+    };
+
+    std::string toString( const ePixelFormat& format );
+    uint32 toOpenGLEnum( const ePixelFormat& format );
 
 }

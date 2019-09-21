@@ -34,7 +34,10 @@ namespace engine
 
             struct LPixel
             {
-                u8 r; u8 g; u8 b; u8 a;
+                uint8 r; 
+                uint8 g; 
+                uint8 b; 
+                uint8 a;
             };
 
             auto _imgData = new LPixel[ _w * _h ];
@@ -60,7 +63,7 @@ namespace engine
             }
 
             CTextureData _tdata;
-            _tdata.data = ( u8* ) _imgData;
+            _tdata.data = ( uint8* ) _imgData;
             _tdata.width = _w;
             _tdata.height = _h;
             _tdata.channels = 3;
