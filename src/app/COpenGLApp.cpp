@@ -63,8 +63,8 @@ namespace engine
     void COpenGLApp::init()
     {
         CWindowProps _windowProperties;
-        _windowProperties.width = 1024;
-        _windowProperties.height = 768;
+        _windowProperties.width = 800;
+        _windowProperties.height = 600;
         _windowProperties.title = "OpenGL Application window";
         _windowProperties.callbackKey = nullptr;
         _windowProperties.callbackMouse = nullptr;
@@ -112,24 +112,28 @@ namespace engine
         _updateUser();
 
         auto _currentCamera = m_scenePtr->getCurrentCamera();
-        // handle the usage of the cursor according to the current camera active mode
-        if ( _currentCamera->type() == CFpsCamera::GetStaticType() )
+        if ( _currentCamera )
         {
-            if ( _currentCamera->active() )
-                m_windowPtr->disableCursor();
-            else
-                m_windowPtr->enableCursor();
-        }
+            // handle the usage of the cursor according to the current camera active mode
+            if ( _currentCamera->type() == CFpsCamera::GetStaticType() )
+            {
+                if ( _currentCamera->active() )
+                    m_windowPtr->disableCursor();
+                else
+                    m_windowPtr->enableCursor();
+            }
 
-        m_scenePtr->update( m_timeDelta );
-        m_masterRenderer->render( m_scenePtr );
+            m_scenePtr->update( m_timeDelta );
+            m_masterRenderer->render( m_scenePtr );
+
+            engine::DebugSystem::setupMatrices( _currentCamera->matView(),
+                                                _currentCamera->matProj() );
+
+            engine::DebugSystem::render();
+        }
 
         if ( m_uiPtr )
             m_uiPtr->render();
-
-        engine::DebugSystem::setupMatrices( _currentCamera->matView(),
-                                            _currentCamera->matProj() );
-        engine::DebugSystem::render();
     }
 
     void COpenGLApp::end()

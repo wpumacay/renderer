@@ -31,6 +31,7 @@ namespace engine
 
     struct CTextureData
     {
+        std::string     name;
         uint8*          data;
         int             width;
         int             height;
@@ -76,6 +77,9 @@ namespace engine
         void bind();
         void unbind();
 
+        std::shared_ptr< CTextureData > data() const { return m_texData; }
+
+        std::string name() const { return m_texData->name; }
         uint32 width() const { return m_texData->width; }
         uint32 height() const { return m_texData->height; }
         uint32 channels() const { return m_texData->channels; }

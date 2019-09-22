@@ -50,6 +50,7 @@ namespace engine
 
     CTextureData::CTextureData()
     {
+        name        = "undefined";
         data        = NULL;
         width       = 0;
         height      = 0;

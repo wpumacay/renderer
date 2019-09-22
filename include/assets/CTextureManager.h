@@ -34,6 +34,9 @@ namespace engine
         static std::shared_ptr< CTextureData > GetCachedTextureData( const std::string& texdataId );
         static std::shared_ptr< CTexture > GetCachedTexture( const std::string& texId );
 
+        static std::vector< std::shared_ptr< CTextureData > > GetAllCachedTexturesData();
+        static std::vector< std::shared_ptr< CTexture > > GetAllCachedTextures();
+
     private :
 
         CTextureManager();
@@ -48,7 +51,13 @@ namespace engine
         std::shared_ptr< CTextureData > _getCachedTextureData( const std::string& texdataId );
         std::shared_ptr< CTexture > _getCachedTexture( const std::string& texId );
 
+        std::vector< std::shared_ptr< CTextureData > > const _getAllCachedTexturesData() { return m_texturesDataList; }
+        std::vector< std::shared_ptr< CTexture > > const _getAllCachedTextures() { return m_texturesList; }
+
         static CTextureManager* s_instance;
+
+        std::vector< std::shared_ptr< CTextureData > >  m_texturesDataList;
+        std::vector< std::shared_ptr< CTexture > >      m_texturesList;
 
         std::map< std::string, std::shared_ptr< CTextureData > >    m_texturesData;
         std::map< std::string, std::shared_ptr< CTexture > >        m_textures;

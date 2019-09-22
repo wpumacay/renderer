@@ -30,7 +30,7 @@ namespace engine
     CTextureManager::CTextureManager()
     {
         // make sure textures are loaded in the standard orientation
-        stbi_set_flip_vertically_on_load( true );
+        // stbi_set_flip_vertically_on_load( true );
 
         _loadTextures();
         _createBuiltInTextures();
@@ -39,7 +39,10 @@ namespace engine
     CTextureManager::~CTextureManager()
     {
         m_textures.clear();
+        m_texturesList.clear();
+
         m_texturesData.clear();
+        m_texturesDataList.clear();
     }
 
     std::shared_ptr< CTextureData > CTextureManager::LoadTextureData( const std::string& filepath )
@@ -82,6 +85,21 @@ namespace engine
 
         return CTextureManager::s_instance->_getCachedTexture( texId );
     }
+
+    std::vector< std::shared_ptr< CTextureData > > CTextureManager::GetAllCachedTexturesData()
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_getAllCachedTexturesData();
+    }
+
+    std::vector< std::shared_ptr< CTexture > > CTextureManager::GetAllCachedTextures()
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_getAllCachedTextures();
+    }
+
 
     void CTextureManager::_loadTextures()
     {
@@ -135,6 +153,12 @@ namespace engine
         std::string _filename = engine::split( filepath, '/' ).back();
         std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
 
+        if ( m_texturesData.find( _filenameNoExtension ) != m_texturesData.end() )
+        {
+            ENGINE_CORE_WARN( "Tried loading texture-data with name %s twice", _filenameNoExtension );
+            return nullptr;
+        }
+
         auto _textureData = new CTextureData();
 
         int _width, _height, _channels;
@@ -145,6 +169,7 @@ namespace engine
             return nullptr;
         }
 
+        _textureData->name      = _filenameNoExtension;
         _textureData->format    = _format;
         _textureData->width     = _width;
         _textureData->height    = _height;
@@ -154,6 +179,7 @@ namespace engine
         _textureDataPtr.reset( _textureData );
 
         m_texturesData[ _filenameNoExtension ] = _textureDataPtr;
+        m_texturesDataList.push_back( _textureDataPtr );
 
         return _textureDataPtr;
     }
@@ -164,12 +190,18 @@ namespace engine
         auto _textureData = _loadTextureData( filepath );
         if ( !_textureData )
         {
-            ENGINE_CORE_WARN( "Could not load texture %s with not-supported file extension", filepath );
+            ENGINE_CORE_WARN( "Could not load requested texture: %s", filepath );
             return nullptr;
         }
 
         std::string _filename = engine::split( filepath, '/' ).back();
         std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
+
+        if ( m_textures.find( _filenameNoExtension ) != m_textures.end() )
+        {
+            ENGINE_CORE_WARN( "Tried loading texture with name %s twice", _filenameNoExtension );
+            return nullptr;
+        }
 
         auto _texture = new CTexture( _textureData, texOptions );
 
@@ -177,6 +209,7 @@ namespace engine
         _texturePtr.reset( _texture );
 
         m_textures[ _filenameNoExtension ] = _texturePtr;
+        m_texturesList.push_back( _texturePtr );
 
         return _texturePtr;
     }

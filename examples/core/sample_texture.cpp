@@ -19,13 +19,22 @@ public :
     Application() : engine::COpenGLApp() {}
     ~Application() {}
 
+    void setTextureToShow( std::shared_ptr< engine::CTexture > texture )
+    {
+        if ( !m_uiPtr )
+            return;
+
+        reinterpret_cast< engine::CImguiUiDemo* >( m_uiPtr )->showTexture( texture );
+    }
+
 protected :
 
     void _initUser() override
     {
         ENGINE_TRACE( "Initializing custom ui" );
         // m_uiPtr = new ApplicationUi( m_windowPtr->context() );
-        // m_uiPtr->init();
+        m_uiPtr = new engine::CImguiUiDemo( m_windowPtr->context() );
+        m_uiPtr->init();
     }
 
 };
@@ -87,6 +96,8 @@ int main()
 
     auto _shader = engine::LShaderManager::getShader( "basic2d_tex" );
 
+    _app->setTextureToShow( _textureContainer );
+
     while( _app->isActive() )
     {
         _app->begin();
@@ -106,6 +117,7 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
+        _app->update();
         _app->end();
     }
 
