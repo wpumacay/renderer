@@ -2,18 +2,19 @@
 
 #include <GL/glew.h>
 #include <cassert>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <random>
-#include <string>
-#include <vector>
-#include <map>
 #include <cmath>
-#include <memory>
 #include <csignal>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <random>
+#include <memory>
+#include <algorithm>
 #include <functional>
+#include <vector>
+#include <unordered_map>
+#include <map>
 
 #define ENGINE_PI 3.141592653589793
 #define ENGINE_EPS 0.000001
@@ -24,6 +25,8 @@
 
 namespace engine
 {
+
+    std::vector< std::string > split( const std::string &txt, char separator = '.' );
 
     typedef unsigned char uint8;
     typedef unsigned int uint32;

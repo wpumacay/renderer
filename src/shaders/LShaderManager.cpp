@@ -36,6 +36,13 @@ namespace engine
         m_programs["basic2d"] = _program;
         m_programObjs["basic2d"] = new LShader( _program );
 
+        _vShader = createShader( "basic2d_tex_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( "basic2d_tex_fs.glsl", GL_FRAGMENT_SHADER );
+        _program = createProgram( _vShader, _fShader );
+
+        m_programs["basic2d_tex"] = _program;
+        m_programObjs["basic2d_tex"] = new LShader( _program );
+
         _vShader = createShader( "basic3d_vs.glsl", GL_VERTEX_SHADER );
         _fShader = createShader( "basic3d_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );

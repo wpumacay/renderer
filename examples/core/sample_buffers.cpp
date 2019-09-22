@@ -1,8 +1,5 @@
 
 #include <CEngine.h>
-#include <core/CVertexBuffer.h>
-#include <core/CIndexBuffer.h>
-#include <core/CVertexArray.h>
 
 engine::CVertexArray* createGeometryVer1()
 {

@@ -79,6 +79,7 @@ namespace engine
         engine::LAssetsManager::create();
         engine::InputSystem::init();
         engine::DebugSystem::init();
+        engine::CTextureManager::Init();
 
         m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );

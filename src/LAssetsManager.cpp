@@ -62,7 +62,7 @@ namespace engine
                 }
             }
 
-            CTextureData _tdata;
+            LTextureData _tdata;
             _tdata.data = ( uint8* ) _imgData;
             _tdata.width = _w;
             _tdata.height = _h;
@@ -111,9 +111,9 @@ namespace engine
         LAssetsManager::_INSTANCE = new LAssetsManager();
     }    
 
-    CTextureData LAssetsManager::_loadTextureData( const string& filename, const string& ftype )
+    LTextureData LAssetsManager::_loadTextureData( const string& filename, const string& ftype )
     {
-        CTextureData _textureData;
+        LTextureData _textureData;
 
         string _strFilename = string( ENGINE_RESOURCES_PATH ) + string( "imgs/" ) + filename + ftype;
 

@@ -34,7 +34,7 @@ namespace engine
 
         ~LAssetsManager();
 
-        static CTextureData _loadTextureData( const string& filename,
+        static LTextureData _loadTextureData( const string& filename,
                                               const string& ftype = ".jpg" );
         static CCubeTextureData _loadCubeTextureData( const string& basename,
                                                   const string& ftype = ".jpg" );

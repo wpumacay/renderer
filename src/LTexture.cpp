@@ -6,7 +6,7 @@
 namespace engine
 {
 
-    LTexture::LTexture( const CTextureData& textureData )
+    LTexture::LTexture( const LTextureData& textureData )
     {
         glGenTextures( 1, &m_textureId );
 

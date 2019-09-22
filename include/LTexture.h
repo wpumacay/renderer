@@ -6,7 +6,7 @@
 namespace engine
 {
 
-    struct CTextureData
+    struct LTextureData
     {
         uint8*  data;
         int     width;
@@ -22,17 +22,17 @@ namespace engine
 
         GLuint m_textureId;
         GLuint m_textureIndx;
-        CTextureData m_textureData;
+        LTextureData m_textureData;
 
         public :
 
-        LTexture( const CTextureData& textureData );
+        LTexture( const LTextureData& textureData );
         ~LTexture();
 
         void bind();
         void unbind();
 
-        CTextureData data() { return m_textureData; }
+        LTextureData data() { return m_textureData; }
 
         void setTextureIndex( GLuint textureIndx ) { m_textureIndx = textureIndx; }
         GLuint getTextureIndex() { return m_textureIndx; }

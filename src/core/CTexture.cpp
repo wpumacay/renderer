@@ -48,6 +48,23 @@ namespace engine
         return 0;
     }
 
+    CTextureData::CTextureData()
+    {
+        data        = NULL;
+        width       = 0;
+        height      = 0;
+        channels    = 0;
+        format      = ePixelFormat::NONE;
+    }
+
+    CTextureData::~CTextureData()
+    {
+        if ( data )
+            delete data;
+
+        data = NULL;
+    }
+
     std::string toString( const CTextureData& data )
     {
         std::string _strRep;
@@ -60,7 +77,7 @@ namespace engine
         return _strRep;
     }
 
-    CTexture::CTexture( const CTextureData& texData,
+    CTexture::CTexture( std::shared_ptr< CTextureData > texData,
                         const eTextureFilter& filterMin,
                         const eTextureFilter& filterMag,
                         const eTextureWrap& wrapU,
@@ -104,12 +121,26 @@ namespace engine
 
         /* send our data to the texture buffer */
         glTexImage2D( GL_TEXTURE_2D, 0, 
-                      toOpenGLEnum( m_texData.format ), m_texData.width, m_texData.height, 0,
-                      toOpenGLEnum( m_texData.format ), GL_UNSIGNED_BYTE, m_texData.data );
+                      toOpenGLEnum( m_texData->format ), m_texData->width, m_texData->height, 0,
+                      toOpenGLEnum( m_texData->format ), GL_UNSIGNED_BYTE, m_texData->data );
         glGenerateMipmap( GL_TEXTURE_2D );
 
         glBindTexture( GL_TEXTURE_2D, 0 );
         /***********************************************************************/
+    }
+
+    CTexture::CTexture( std::shared_ptr< CTextureData > texData,
+                        const CTextureOptions& texOptions )
+        : CTexture( texData,
+                    texOptions.filterMin,
+                    texOptions.filterMag,
+                    texOptions.wrapU,
+                    texOptions.wrapV,
+                    texOptions.borderColorU,
+                    texOptions.borderColorV,
+                    texOptions.textureUnit )
+    {
+        // no additional construction steps needed
     }
 
     CTexture::~CTexture()
