@@ -29,6 +29,9 @@ namespace engine
 
     CTextureManager::CTextureManager()
     {
+        // make sure textures are loaded in the standard orientation
+        stbi_set_flip_vertically_on_load( true );
+
         _loadTextures();
         _createBuiltInTextures();
     }

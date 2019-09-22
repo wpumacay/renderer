@@ -36,17 +36,26 @@ int main()
     auto _app = new Application();
     _app->init();
 
-    auto _textureData = engine::CTextureManager::GetCachedTextureData( "img_container" );
+    auto _textureDataJpg = engine::CTextureManager::GetCachedTextureData( "img_container" );
+    auto _textureDataPng = engine::CTextureManager::GetCachedTextureData( "img_smiley" );
 
-    if ( _textureData )
+    if ( _textureDataJpg )
     {
-        std::cout << "texture-data:" << std::endl;
-        std::cout << engine::toString( *_textureData ) << std::endl;
+        std::cout << "texture-data-jpg:" << std::endl;
+        std::cout << engine::toString( *_textureDataJpg ) << std::endl;
     }
 
-    auto _texture = engine::CTextureManager::GetCachedTexture( "img_container" );
+    if ( _textureDataPng )
+    {
+        std::cout << "texture-data-png:" << std::endl;
+        std::cout << engine::toString( *_textureDataPng ) << std::endl;
+    }
 
-    ENGINE_ASSERT( _texture, "Could not retrieve a valid texture for the sample" );
+    auto _textureContainer = engine::CTextureManager::GetCachedTexture( "img_container" );
+    ENGINE_ASSERT( _textureContainer, "Could not retrieve valid texture for the sample - container" );
+
+    auto _textureSmiley = engine::CTextureManager::GetCachedTexture( "img_smiley" );
+    ENGINE_ASSERT( _textureContainer, "Could not retrieve valid texture for the sample - smiley" );
 
     float _bufferData[] = {
     /*|      pos     |     color      |  texture  */
@@ -87,11 +96,13 @@ int main()
 
         _shader->bind();
         _varray->bind();
-        _texture->bind();
+        // _textureContainer->bind();
+        _textureSmiley->bind();
 
         glDrawElements( GL_TRIANGLES, _varray->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
 
-        _texture->unbind();
+        _textureSmiley->unbind();
+        // _textureContainer->unbind();
         _varray->unbind();
         _shader->unbind();
 
