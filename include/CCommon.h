@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <csignal>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,6 +16,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <set>
 
 #define ENGINE_PI 3.141592653589793
 #define ENGINE_EPS 0.000001

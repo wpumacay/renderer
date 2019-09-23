@@ -42,7 +42,7 @@ namespace engine
         ~CTextureData();
     };
 
-    std::string toString( const CTextureData& data );
+    std::string toString( const CTextureData& texData );
 
     struct CTextureOptions
     {

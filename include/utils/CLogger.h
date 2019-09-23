@@ -29,7 +29,7 @@ namespace engine
     {                                                                           \
         if( !x )                                                                \
         {                                                                       \
-            ENGINE_CORE_CRITICAL( "Failed due to assertion {0}", __VA_ARGS__ ); \
+            ENGINE_CORE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ ); \
             assert( false );                                                    \
         }                                                                       \
     }
@@ -44,7 +44,7 @@ namespace engine
     {                                                                       \
         if( !x )                                                            \
         {                                                                   \
-            ENGINE_CRITICAL( "Failed due to assertion {0}", __VA_ARGS__ );  \
-            assert( false );                                                \
+            ENGINE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ );  \
+            exit( EXIT_FAILURE );                                                \
         }                                                                   \
     }

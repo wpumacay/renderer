@@ -4,6 +4,10 @@
 namespace engine
 {
 
+    /**************************************************************************
+    *                    CTextureOptions + CTextureData impl.                 *
+    ***************************************************************************/
+
     std::string toString( const eTextureWrap& wrap )
     {
         if ( wrap == eTextureWrap::REPEAT ) return "repeat";
@@ -66,17 +70,22 @@ namespace engine
         data = NULL;
     }
 
-    std::string toString( const CTextureData& data )
+    std::string toString( const CTextureData& texData )
     {
         std::string _strRep;
 
-        _strRep += "width   : " + std::to_string( data.width ) + "\n\r";
-        _strRep += "height  : " + std::to_string( data.height ) + "\n\r";
-        _strRep += "chnls   : " + std::to_string( data.channels ) + "\n\r";
-        _strRep += "format  : " + engine::toString( data.format ) + "\n\r";
+        _strRep += "name    : " + texData.name + "\n\r";
+        _strRep += "width   : " + std::to_string( texData.width ) + "\n\r";
+        _strRep += "height  : " + std::to_string( texData.height ) + "\n\r";
+        _strRep += "chnls   : " + std::to_string( texData.channels ) + "\n\r";
+        _strRep += "format  : " + engine::toString( texData.format ) + "\n\r";
 
         return _strRep;
     }
+
+    /**************************************************************************
+    *                             CTexture impl.                              *
+    ***************************************************************************/
 
     CTexture::CTexture( std::shared_ptr< CTextureData > texData,
                         const eTextureFilter& filterMin,
