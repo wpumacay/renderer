@@ -23,6 +23,14 @@ protected :
 
 };
 
+engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
+{
+    if ( axis == engine::eAxis::X ) return engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
+    if ( axis == engine::eAxis::Y ) return engine::CMat4();
+    if ( axis == engine::eAxis::Z ) return engine::CMat4::rotationX( ENGINE_PI / 2.0f );
+
+    return engine::CMat4();
+}
 
 int main()
 {
@@ -31,6 +39,7 @@ int main()
 
     auto _textureCubeDataCloudtop   = engine::CTextureManager::GetCachedTextureCubeData( "cloudtop" );
     auto _textureCubeDataStarfield  = engine::CTextureManager::GetCachedTextureCubeData( "starfield" );
+    auto _textureCubeDataSiege      = engine::CTextureManager::GetCachedTextureCubeData( "siege" );
 
     if ( _textureCubeDataCloudtop )
         std::cout << engine::toString( *_textureCubeDataCloudtop ) << std::endl;
@@ -38,10 +47,15 @@ int main()
     if ( _textureCubeDataStarfield )
         std::cout << engine::toString( *_textureCubeDataStarfield ) << std::endl;
 
+    if ( _textureCubeDataSiege )
+        std::cout << engine::toString( *_textureCubeDataSiege ) << std::endl;
+
     auto _textureCubeCloudtop = engine::CTextureManager::GetCachedTextureCube( "cloudtop" );
     auto _textureCubeStarfield = engine::CTextureManager::GetCachedTextureCube( "starfield" );
+    auto _textureCubeSiege = engine::CTextureManager::GetCachedTextureCube( "siege" );
     ENGINE_ASSERT( _textureCubeCloudtop, "Could not retrieve valid texture-cube for the sample - cloudtop" );
     ENGINE_ASSERT( _textureCubeStarfield, "Could not retrieve valid texture-cube for the sample - starfield" );
+    ENGINE_ASSERT( _textureCubeSiege, "Could not retrieve valid texture-cube for the sample - siege" );
 
     auto _shader = engine::LShaderManager::getShader( "skybox" );
 
@@ -117,8 +131,11 @@ int main()
 
     _scene->addCamera( _camera );
 
-    // auto _textureCubemap = _textureCubeCloudtop;
-    auto _textureCubemap = _textureCubeStarfield;
+    auto _textureCubemap = _textureCubeCloudtop;
+    // auto _textureCubemap = _textureCubeStarfield;
+    // auto _textureCubemap = _textureCubeSiege;
+
+    auto _correctionMat = computeSkyboxCorrectionMat( _camera->upAxis() );
 
     while( _app->isActive() )
     {
@@ -135,7 +152,7 @@ int main()
 
         _shader->bind();
         _shader->setMat4( "u_tProj", _camera->matProj() );
-        _shader->setMat4( "u_tView", _camera->matView().getRotation() );
+        _shader->setMat4( "u_tView", _camera->matView().getRotation() * _correctionMat );
 
         _textureCubemap->bind();
         _varray->bind();

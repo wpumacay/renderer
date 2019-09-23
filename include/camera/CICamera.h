@@ -61,6 +61,7 @@ namespace engine
 
         std::string name() const { return m_name; }
         eCameraType type() const { return m_type; }
+        eAxis upAxis() const { return m_upAxis; }
         bool active() const { return m_active; }
 
         CVec3 targetPoint() const { return m_targetPoint; }

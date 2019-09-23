@@ -560,6 +560,15 @@ namespace engine
         return _res;
     }
 
+    CMat4 CMat4::rotation( float32 theta, const eAxis& axis )
+    {
+        if ( axis == eAxis::X ) return rotationX( theta );
+        if ( axis == eAxis::Y ) return rotationY( theta );
+        if ( axis == eAxis::Z ) return rotationZ( theta );
+
+        return CMat4();
+    }
+
     std::string toString( const CMat4& mat )
     {
         std::string _res;

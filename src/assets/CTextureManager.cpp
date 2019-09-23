@@ -131,7 +131,8 @@ namespace engine
                 std::string _fname = _direntPtr->d_name;
                 if ( _fname.find( ".jpg" ) != std::string::npos ||
                      _fname.find( ".jpeg" ) != std::string::npos ||
-                     _fname.find( ".png" ) != std::string::npos )
+                     _fname.find( ".png" ) != std::string::npos ||
+                     _fname.find( ".tga" ) != std::string::npos )
                 {
                     CTextureOptions _texOptions;
                     _texOptions.filterMin       = eTextureFilter::NEAREST;
@@ -169,7 +170,8 @@ namespace engine
                 std::string _fname = _direntPtr->d_name;
                 if ( _fname.find( ".jpg" ) != std::string::npos ||
                      _fname.find( ".jpeg" ) != std::string::npos ||
-                     _fname.find( ".png" ) != std::string::npos )
+                     _fname.find( ".png" ) != std::string::npos ||
+                     _fname.find( ".tga" ) != std::string::npos )
                 {
                     std::string _filename = engine::split( _fname, '/' ).back();
                     std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
@@ -269,6 +271,7 @@ namespace engine
             if ( filepaths[i].find( ".jpg" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGB; }
             if ( filepaths[i].find( ".jpeg" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGB; }
             if ( filepaths[i].find( ".png" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGBA; }
+            if ( filepaths[i].find( ".tga" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGBA; }
 
             if ( _sideFormat == ePixelFormat::NONE )
             {
@@ -371,7 +374,7 @@ namespace engine
         _textureCubeData->width     = _width;
         _textureCubeData->height    = _height;
         _textureCubeData->channels  = _channels;
-        _textureCubeData->format    = _format;
+        _textureCubeData->format    = ( _channels == 3 ) ? ePixelFormat::RGB : ePixelFormat::RGBA;
 
         std::shared_ptr< CTextureCubeData > _textureCubeDataPtr;
         _textureCubeDataPtr.reset( _textureCubeData );
