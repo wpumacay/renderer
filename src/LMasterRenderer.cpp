@@ -12,7 +12,7 @@ namespace engine
         m_skyboxRenderer = new LSkyboxRenderer();
 
         m_shadowMap = new LShadowMap();
-        m_shadowsEnabled = false;
+        m_shadowsEnabled = true;
     }
 
     LMasterRenderer::~LMasterRenderer()
@@ -40,18 +40,26 @@ namespace engine
 
         if ( m_shadowsEnabled )
         {
-            _success = _renderToShadowMap( pScene );
-            if ( _success )
+            auto _dirLights = pScene->getLights< LLightDirectional >();
+            if ( _dirLights.size() > 0 )
             {
-                // if could draw to shadowmap, then continue to second pass
-                _renderSceneWithShadowMap( pScene );
+                _success = _renderToShadowMap( pScene );
+                if ( _success )
+                {
+                    // if could draw to shadowmap, then continue to second pass
+                    _renderSceneWithShadowMap( pScene );
+                }
+                else
+                {
+                    // if could not draw to shadowmap, then render without shadows
+                    cout << "WARNING> Something went wrong while doing shadow mapping first pass" << endl;
+                    _renderScene( pScene );
+                }
             }
             else
             {
-                // if could not draw to shadowmap, then render without shadows
-                cout << "WARNING> Something went wrong while doing shadow mapping first pass" << endl;
                 _renderScene( pScene );
-            }            
+            }
         }
         else
         {

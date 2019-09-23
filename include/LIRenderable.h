@@ -5,9 +5,8 @@
 #include <CCommon.h>
 #include <CMath.h>
 #include <LMaterial.h>
-#include <LTexture.h>
 
-using namespace std;
+#include <core/CTexture.h>
 
 namespace engine
 {
@@ -25,11 +24,11 @@ namespace engine
     {
         protected :
 
-        eRenderableType     m_type;
-        bool                m_isVisible;
-        bool                m_drawAsWireframe;
-        LMaterial*          m_material;
-        vector< LTexture* > m_textures;
+        eRenderableType             m_type;
+        bool                        m_isVisible;
+        bool                        m_drawAsWireframe;
+        LMaterial*                  m_material;
+        std::shared_ptr< CTexture > m_texture;
 
         public :
 
@@ -49,12 +48,11 @@ namespace engine
 
         CMat4 getModelMatrix();
 
-        void addTexture( LTexture* pTexture );
-        bool hasTextures();
-        vector< LTexture* > textures();
+        void setTexture( std::shared_ptr< CTexture > texture ) { m_texture = texture; }
+        std::shared_ptr< CTexture > texture() const { return m_texture; }
 
-        bool isVisible();
-        void setVisibility( bool visibility );
+        bool isVisible() const { return m_isVisible; }
+        void setVisibility( bool visibility ) { m_isVisible = visibility; }
 
         virtual void setWireframeMode( bool useWireframe );
         bool isWireframe();

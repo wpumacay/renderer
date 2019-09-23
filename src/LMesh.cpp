@@ -62,7 +62,8 @@ namespace engine
     }
 
     /* @TODO: Implement another way of using the textures. Currently we ...
-              are binding each texture for each render call :( */
+              are binding each texture for each render call :( . Perhaps
+              we could batch according to the texture|material*/
     void LMesh::render()
     {
         ENGINE_CORE_ASSERT( m_varray, "Mesh should have a valid GL-VAO" );
@@ -71,8 +72,8 @@ namespace engine
         if ( m_drawAsWireframe )
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-        for ( LTexture* _texture : m_textures )
-            _texture->bind();
+        if ( m_texture )
+            m_texture->bind();
 
         m_varray->bind();
 
@@ -82,8 +83,8 @@ namespace engine
 
         m_varray->unbind();
 
-        for ( LTexture* _texture : m_textures )
-            _texture->unbind();
+        if ( m_texture )
+            m_texture->unbind();
 
         if ( m_drawAsWireframe )
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );

@@ -1,7 +1,5 @@
 
-#include "LIRenderable.h"
-
-using namespace std;
+#include <LIRenderable.h>
 
 namespace engine
 {
@@ -11,14 +9,13 @@ namespace engine
         m_type              = eRenderableType::BASE;
         m_isVisible         = true;
         m_drawAsWireframe   = false;
-        this->debug         = false;
+        m_texture           = nullptr;
+        debug               = false;
     }
 
     LIRenderable::~LIRenderable()
     {
-        // we only hold references, the assetsmanager ...
-        // should handle deletion of the textures
-        m_textures.clear();
+        // nothing to do here for now
     }
 
     eRenderableType LIRenderable::getType()
@@ -50,31 +47,6 @@ namespace engine
         _model = CMat4::translate( pos ) * _model;
 
         return _model;
-    }
-
-    void LIRenderable::addTexture( LTexture* pTexture )
-    {
-        m_textures.push_back( pTexture );
-    }
-
-    bool LIRenderable::hasTextures()
-    {
-        return m_textures.size() > 0;
-    }
-
-    vector< LTexture* > LIRenderable::textures()
-    {
-        return m_textures;
-    }
-
-    bool LIRenderable::isVisible()
-    {
-        return m_isVisible;
-    }
-
-    void LIRenderable::setVisibility( bool visibility ) 
-    { 
-        m_isVisible = visibility; 
     }
 
     void LIRenderable::setWireframeMode( bool useWireframe )

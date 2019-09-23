@@ -37,9 +37,8 @@ int main()
     _plane->getMaterial()->setColor( { 0.2f, 0.3f, 0.4f } );
     _scene->addRenderable( _plane );
 
-    auto _chessboardTex = engine::LAssetsManager::getBuiltInTexture( "chessboard" );
-    auto _containerTex = engine::LAssetsManager::getTexture( "wood_container" );
-    auto _gridTex = engine::LAssetsManager::getTexture( "grid_deepmimic" );
+    auto _containerTex = engine::CTextureManager::GetCachedTexture( "img_container" );
+    auto _gridTex = engine::CTextureManager::GetCachedTexture( "img_grid" );
     // make a sample mesh just for testing
     auto _boxy      = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
     auto _sphery    = engine::CMeshBuilder::createSphere( 0.5f );
@@ -97,16 +96,16 @@ int main()
     {
         if ( _renderables[i]->getType() == engine::eRenderableType::MESH )
         {
-            _renderables[i]->addTexture( _chessboardTex );
+            _renderables[i]->setTexture( _gridTex );
         }
         else
         {
             auto _submeshes = reinterpret_cast< engine::LModel* >( _renderables[i] )->getMeshes();
             for ( size_t j = 0; j < _submeshes.size(); j++ )
-                _submeshes[j]->addTexture( _gridTex );
+                _submeshes[j]->setTexture( _gridTex );
 
             // @TODO: fix issue of requiring to add texture to model as well, even though is not used
-            _renderables[i]->addTexture( _gridTex );
+            _renderables[i]->setTexture( _gridTex );
         }
     }
 

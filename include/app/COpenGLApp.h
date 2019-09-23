@@ -8,7 +8,7 @@
 
 #include <LMasterRenderer.h>
 
-#include <LAssetsManager.h>
+#include <assets/CTextureManager.h>
 #include <shaders/LShaderManager.h>
 
 #include <debug/LDebugSystem.h>

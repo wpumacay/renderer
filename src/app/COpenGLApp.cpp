@@ -75,11 +75,10 @@ namespace engine
         m_scenePtr          = new LScene();
         m_uiPtr             = NULL; // let the user create its own specific UI
 
+        engine::CTextureManager::Init();
         engine::LShaderManager::create();
-        engine::LAssetsManager::create();
         engine::InputSystem::init();
         engine::DebugSystem::init();
-        engine::CTextureManager::Init();
 
         m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );

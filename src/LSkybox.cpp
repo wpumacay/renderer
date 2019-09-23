@@ -59,7 +59,7 @@ namespace engine
         m_vertexArray = new CVertexArray();
         m_vertexArray->addVertexBuffer( _vBuffer );
 
-        m_cubeTextureRef = LAssetsManager::getCubeTexture( skyboxResId );
+        m_textureCube = CTextureManager::GetCachedTextureCube( skyboxResId );
     }
 
     LSkybox::~LSkybox()
@@ -72,13 +72,13 @@ namespace engine
 
     void LSkybox::render()
     {
-        m_cubeTextureRef->bind();
+        m_textureCube->bind();
         m_vertexArray->bind();
 
         glDrawArrays( GL_TRIANGLES, 0, 36 );
 
         m_vertexArray->unbind();
-        m_cubeTextureRef->unbind();
+        m_textureCube->unbind();
     }
 
 }

@@ -19,8 +19,8 @@
 #include <core/CVertexBufferLayout.h>
 #include <core/CIndexBuffer.h>
 #include <core/CVertexArray.h>
-#include <LTexture.h>                               // #include <core/CTexture.h>
-#include <LCubeTexture.h>                           // #include <core/CTextureCube.h>
+#include <core/CTexture.h>
+#include <core/CTextureCube.h>
 #include <LFrameBuffer.h>                           // #include <core/CFrameBuffer.h>
 
 #include <LIRenderable.h>                           // #include <graphics/CRenderable.h>
@@ -29,7 +29,6 @@
 #include <graphics/CMeshBuilder.h>
 #include <LMaterial.h>                              // #include <graphics/CMaterial.h>
 #include <LFog.h>                                   // #include <graphics/CFog.h>
-#include <LAssetsManager.h>                         // #include <graphics/CAssetsManager.h>
 #include <LScene.h>                                 // #include <graphics/CScene.h>
 
 #include <shaders/CShaderUniforms.h>
@@ -58,6 +57,8 @@
 #include <LMasterRenderer.h>                        // #include <renderer/COpenGLRenderer.h>
 #include <LMeshRenderer.h>                          // #include <renderer/COpenGLMeshRenderer.h>
 #include <LSkyboxRenderer.h>                        // #include <renderer/COpenGLSkyboxRender.h>
+
+#include <assets/CTextureManager.h>
 
 #include <app/COpenGLWindow.h>
 #include <app/COpenGLContext.h>

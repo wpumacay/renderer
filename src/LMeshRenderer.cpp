@@ -44,7 +44,7 @@ namespace engine
                     m_renderList.push_back( _renderable );
 
                     // add it to the appropiate texture-list
-                    if ( _renderable->hasTextures() )
+                    if ( _renderable->texture() )
                     {
                         m_texturedList.push_back( _renderable );
                     }

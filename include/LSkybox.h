@@ -4,10 +4,8 @@
 #include <CMath.h>
 #include <core/CVertexBuffer.h>
 #include <core/CVertexArray.h>
-#include <LCubeTexture.h>
-#include <LAssetsManager.h>
-
-using namespace std;
+#include <core/CTextureCube.h>
+#include <assets/CTextureManager.h>
 
 namespace engine
 {
@@ -16,12 +14,12 @@ namespace engine
     {
         private : 
 
-        CVertexArray* m_vertexArray;
-        LCubeTexture* m_cubeTextureRef;
+        CVertexArray*                   m_vertexArray;
+        std::shared_ptr< CTextureCube > m_textureCube;
 
         public :
 
-        LSkybox( const string& skyboxResId );
+        LSkybox( const std::string& skyboxResId );
         ~LSkybox();
 
         void render();
