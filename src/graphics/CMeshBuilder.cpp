@@ -1,5 +1,4 @@
 
-#include "LHeightmapGenerator.h"
 #include <graphics/CMeshBuilder.h>
 
 namespace engine
@@ -632,14 +631,16 @@ namespace engine
         return _axesModel;
     }
 
-    LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, const eAxis& axis )
+    LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, 
+                                            int nOctaves, float nPersistance, float nLacunarity, float nScale, 
+                                            const eAxis& axis )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
         std::vector< CInd3 > _indices;
         std::vector< CVec2 > _texCoord;
 
-        LHeightmapGenerator _hmapGenerator;
+        CNoiseGenerator::Config( nOctaves, nPersistance, nLacunarity, nScale );
 
         float _dw = width / cellDivision;
         float _dd = depth / cellDivision;
@@ -651,10 +652,21 @@ namespace engine
         {
             for ( int j = 0; j < cellDivision; j++ )
             {
-                auto _p0 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
-                auto _p1 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
-                auto _p2 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
-                auto _p3 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+                auto _p0 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, 
+                                                        _y0 + ( i + 0 ) * _dd, 
+                                                        2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
+
+                auto _p1 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, 
+                                                        _y0 + ( i + 0 ) * _dd, 
+                                                        2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 0 ) * _dd ) ), axis );
+
+                auto _p2 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 1 ) * _dw, 
+                                                        _y0 + ( i + 1 ) * _dd, 
+                                                        2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _x0 + ( j + 1 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
+
+                auto _p3 = _rotateToMatchUpAxis( CVec3( _x0 + ( j + 0 ) * _dw, 
+                                                        _y0 + ( i + 1 ) * _dd, 
+                                                        2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _x0 + ( j + 0 ) * _dw, _y0 + ( i + 1 ) * _dd ) ), axis );
 
                 // TODO: For now just make dummy indices for the rigid bodies :/
                 _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
@@ -706,14 +718,14 @@ namespace engine
 
             auto _pv = _rotateBackFromUpAxis( _vertices[q], axis );
 
-            auto _p1 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.y + _dd ) }, axis );
-            auto _p2 = _rotateToMatchUpAxis( { _pv.x      , _pv.y + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x      , _pv.y + _dd ) }, axis );
-            auto _p3 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y + _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.y + _dd ) }, axis );
-            auto _p4 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y      , 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.y       ) }, axis );
-            auto _p6 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y      , 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.y       ) }, axis );
-            auto _p7 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x - _dw, _pv.y - _dd ) }, axis );
-            auto _p8 = _rotateToMatchUpAxis( { _pv.x      , _pv.y - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x      , _pv.y - _dd ) }, axis );
-            auto _p9 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y - _dd, 2.0f + 2.0f * _hmapGenerator.getHeight( _pv.x + _dw, _pv.y - _dd ) }, axis );
+            auto _p1 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y + _dd ) }, axis );
+            auto _p2 = _rotateToMatchUpAxis( { _pv.x      , _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x      , _pv.y + _dd ) }, axis );
+            auto _p3 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y + _dd ) }, axis );
+            auto _p4 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y       ) }, axis );
+            auto _p6 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y       ) }, axis );
+            auto _p7 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y - _dd ) }, axis );
+            auto _p8 = _rotateToMatchUpAxis( { _pv.x      , _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x      , _pv.y - _dd ) }, axis );
+            auto _p9 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y - _dd ) }, axis );
 
             CVec3 _n;
 

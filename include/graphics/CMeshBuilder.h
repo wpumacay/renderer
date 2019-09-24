@@ -6,6 +6,7 @@
 #include <LMesh.h>
 #include <LModel.h>
 #include <utils/CLogger.h>
+#include <utils/CNoiseGenerator.h>
 
 // Assimp helper functionality
 #include <assimp/cimport.h>
@@ -117,7 +118,9 @@ namespace engine
         *   @param cellDivision     number of cells used to divide the section in a grid
         *   @param axis             up-axis used for this geometry (height direction)
         */
-        static LMesh* createPerlinPatch( float width, float depth, int cellDivision, const eAxis& axis = eAxis::Z );
+        static LMesh* createPerlinPatch( float width, float depth, int cellDivision, 
+                                         int nOctaves = 4, float nPersistance = 0.5f, float nLacunarity = 2.0f, float nScale = 10.0f, 
+                                         const eAxis& axis = eAxis::Z );
 
         /**
         *   Creates the geometry of a patch of terrain based on somve given heightfield (elevation) data

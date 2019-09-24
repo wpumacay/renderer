@@ -7,7 +7,7 @@
 #include <utils/CLogger.h>
 #include <utils/CImguiUi.h>
 #include <utils/CImguiUiDemo.h>
-#include <LHeightmapGenerator.h>                    // #include <utils/CHeightMapGenerator.h>
+#include <utils/CNoiseGenerator.h>
 #include <utils/CDebugDrawer.h>
 
 #include <input/CInputCallbacks.h>
@@ -41,7 +41,7 @@
 #include <shaders/LShaderSkybox.h>                  // #include <shaders/CShaderSkybox.h>
 #include <shaders/LShaderManager.h>                 // #include <shaders/CShaderManager.h>
 
-#include <camera/CICamera.h>                        // #include <camera/CCamera.h>
+#include <camera/CICamera.h>
 #include <camera/CFixedCamera.h>
 #include <camera/CFpsCamera.h>
 #include <camera/COrbitCamera.h>

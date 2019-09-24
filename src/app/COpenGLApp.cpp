@@ -59,6 +59,7 @@ namespace engine
         engine::CInputHandler::Release();
         engine::LShaderManager::release();
         engine::CTextureManager::Release();
+        engine::CNoiseGenerator::Release();
     }
 
     void COpenGLApp::init()
@@ -80,6 +81,7 @@ namespace engine
         engine::LShaderManager::create();
         engine::CInputHandler::Init();
         engine::CDebugDrawer::Init();
+        engine::CNoiseGenerator::Init();
 
         m_windowPtr->registerKeyCallback( engine::CInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::CInputHandler::callback_mouse );

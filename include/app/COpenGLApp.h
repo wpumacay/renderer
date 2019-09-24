@@ -20,6 +20,7 @@
 #include <utils/CTime.h>
 #include <utils/CImguiUi.h>
 #include <utils/CDebugDrawer.h>
+#include <utils/CNoiseGenerator.h>
 
 namespace engine
 {
