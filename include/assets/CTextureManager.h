@@ -28,6 +28,7 @@ namespace engine
                                                         const eTextureWrap& wrapV = eTextureWrap::REPEAT,
                                                         const CVec4& borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f },
                                                         const CVec4& borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f },
+                                                        const ePixelDataType& dtype = ePixelDataType::UINT_8,
                                                         uint32 textureUnit = 0 );
         static std::shared_ptr< CTexture > LoadTexture( const std::string& filepath,
                                                         const CTextureOptions& texOptions );

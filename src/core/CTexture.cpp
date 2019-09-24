@@ -5,8 +5,34 @@ namespace engine
 {
 
     /**************************************************************************
-    *                    CTextureOptions + CTextureData impl.                 *
+    *                 Enums, CTextureOptions and CTextureData impl.           *
     ***************************************************************************/
+
+    std::string toString( const eTextureFormat& format )
+    {
+        if ( format == eTextureFormat::RGB ) return "rgb";
+        if ( format == eTextureFormat::RGBA ) return "rgba";
+        if ( format == eTextureFormat::DEPTH ) return "depth_component";
+        if ( format == eTextureFormat::STENCIL ) return "stencil_index";
+        if ( format == eTextureFormat::DEPTH24_STENCIL8 ) return "depth24_stencil8";
+
+        ENGINE_CORE_ASSERT( false, "Invalid eTextureFormat enum given" );
+
+        return "undefined";
+    }
+
+    uint32 toOpenGLEnum( const eTextureFormat& format )
+    {
+        if ( format == eTextureFormat::RGB ) return GL_RGB;
+        if ( format == eTextureFormat::RGBA ) return GL_RGBA;
+        if ( format == eTextureFormat::DEPTH ) return GL_DEPTH_COMPONENT;
+        if ( format == eTextureFormat::STENCIL ) return GL_STENCIL_INDEX;
+        if ( format == eTextureFormat::DEPTH24_STENCIL8 ) return GL_DEPTH24_STENCIL8;
+
+        ENGINE_CORE_ASSERT( false, "Invalid eTextureFormat enum given" );
+
+        return 0;
+    }
 
     std::string toString( const eTextureWrap& wrap )
     {
@@ -54,12 +80,13 @@ namespace engine
 
     CTextureData::CTextureData()
     {
-        name        = "undefined";
-        data        = NULL;
-        width       = 0;
-        height      = 0;
-        channels    = 0;
-        format      = ePixelFormat::NONE;
+        name            = "undefined";
+        data            = NULL;
+        width           = 0;
+        height          = 0;
+        channels        = 0;
+        internalFormat  = eTextureFormat::NONE;
+        format          = eTextureFormat::NONE;
     }
 
     CTextureData::~CTextureData()
@@ -78,6 +105,7 @@ namespace engine
         _strRep += "width   : " + std::to_string( texData.width ) + "\n\r";
         _strRep += "height  : " + std::to_string( texData.height ) + "\n\r";
         _strRep += "chnls   : " + std::to_string( texData.channels ) + "\n\r";
+        _strRep += "iformat.: " + engine::toString( texData.internalFormat ) + "\n\r";
         _strRep += "format  : " + engine::toString( texData.format ) + "\n\r";
 
         return _strRep;
@@ -94,6 +122,7 @@ namespace engine
                         const eTextureWrap& wrapV,
                         const CVec4& borderColorU,
                         const CVec4& borderColorV,
+                        const ePixelDataType& dtype,
                         uint32 textureUnit )
     {
         m_texData           = texData;
@@ -103,6 +132,7 @@ namespace engine
         m_texFilterModeMag  = filterMag;
         m_texBorderColorU   = borderColorU;
         m_texBorderColorV   = borderColorV;
+        m_texPixelDtype     = dtype;
         m_openglTexUnit     = textureUnit;
         m_openglId          = 0;
 
@@ -131,8 +161,8 @@ namespace engine
 
         /* send our data to the texture buffer */
         glTexImage2D( GL_TEXTURE_2D, 0, 
-                      toOpenGLEnum( m_texData->format ), m_texData->width, m_texData->height, 0,
-                      toOpenGLEnum( m_texData->format ), GL_UNSIGNED_BYTE, m_texData->data );
+                      toOpenGLEnum( m_texData->internalFormat ), m_texData->width, m_texData->height, 0,
+                      toOpenGLEnum( m_texData->format ), toOpenGLEnum( m_texPixelDtype ), m_texData->data );
         glGenerateMipmap( GL_TEXTURE_2D );
 
         glBindTexture( GL_TEXTURE_2D, 0 );
@@ -148,6 +178,7 @@ namespace engine
                     texOptions.wrapV,
                     texOptions.borderColorU,
                     texOptions.borderColorV,
+                    texOptions.dtype,
                     texOptions.textureUnit )
     {
         // no additional construction steps needed

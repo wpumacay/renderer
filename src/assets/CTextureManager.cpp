@@ -68,9 +68,10 @@ namespace engine
                                                               const eTextureWrap& wrapV,
                                                               const CVec4& borderColorU,
                                                               const CVec4& borderColorV,
+                                                              const ePixelDataType& dtype,
                                                               uint32 textureUnit )
     {
-        return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, textureUnit } );
+        return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype, textureUnit } );
     }
 
     std::shared_ptr< CTextureData > CTextureManager::GetCachedTextureData( const std::string& texdataId )
@@ -142,6 +143,7 @@ namespace engine
                     _texOptions.wrapV           = eTextureWrap::REPEAT;
                     _texOptions.borderColorU    = { 0.0f, 0.0f, 0.0f, 1.0f };
                     _texOptions.borderColorV    = { 0.0f, 0.0f, 0.0f, 1.0f };
+                    _texOptions.dtype           = ePixelDataType::UINT_8;
                     _texOptions.textureUnit     = 0;
 
                     _loadTexture( _pathImagesFolder + _fname, _texOptions );
@@ -200,12 +202,12 @@ namespace engine
 
     std::shared_ptr< CTextureData > CTextureManager::_loadTextureData( const std::string& filepath )
     {
-        ePixelFormat _format = ePixelFormat::NONE;
-        if ( filepath.find( ".jpg" ) != std::string::npos ) { _format = ePixelFormat::RGB; }
-        if ( filepath.find( ".jpeg" ) != std::string::npos ) { _format = ePixelFormat::RGB; }
-        if ( filepath.find( ".png" ) != std::string::npos ) { _format = ePixelFormat::RGBA; }
+        eTextureFormat _format = eTextureFormat::NONE;
+        if ( filepath.find( ".jpg" ) != std::string::npos ) { _format = eTextureFormat::RGB; }
+        if ( filepath.find( ".jpeg" ) != std::string::npos ) { _format = eTextureFormat::RGB; }
+        if ( filepath.find( ".png" ) != std::string::npos ) { _format = eTextureFormat::RGBA; }
 
-        if ( _format == ePixelFormat::NONE )
+        if ( _format == eTextureFormat::NONE )
         {
             ENGINE_CORE_WARN( "Tried loading image {0} that hasn't a supported extension", filepath );
             return nullptr;
@@ -231,11 +233,12 @@ namespace engine
             return nullptr;
         }
 
-        _textureData->name      = _filenameNoExtension;
-        _textureData->format    = _format;
-        _textureData->width     = _width;
-        _textureData->height    = _height;
-        _textureData->channels  = _channels;
+        _textureData->name              = _filenameNoExtension;
+        _textureData->internalFormat    = _format;
+        _textureData->format            = _format;
+        _textureData->width             = _width;
+        _textureData->height            = _height;
+        _textureData->channels          = _channels;
 
         std::shared_ptr< CTextureData > _textureDataPtr;
         _textureDataPtr.reset( _textureData );
@@ -264,17 +267,17 @@ namespace engine
         int _width                          = 0;
         int _height                         = 0;
         int _channels                       = 0;
-        ePixelFormat _format                = ePixelFormat::NONE;
+        eTextureFormat _format                = eTextureFormat::NONE;
 
         for ( size_t i = 0; i < 6; i++ )
         {
-            ePixelFormat _sideFormat = ePixelFormat::NONE;
-            if ( filepaths[i].find( ".jpg" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGB; }
-            if ( filepaths[i].find( ".jpeg" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGB; }
-            if ( filepaths[i].find( ".png" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGBA; }
-            if ( filepaths[i].find( ".tga" ) != std::string::npos ) { _sideFormat = ePixelFormat::RGBA; }
+            eTextureFormat _sideFormat = eTextureFormat::NONE;
+            if ( filepaths[i].find( ".jpg" ) != std::string::npos ) { _sideFormat = eTextureFormat::RGB; }
+            if ( filepaths[i].find( ".jpeg" ) != std::string::npos ) { _sideFormat = eTextureFormat::RGB; }
+            if ( filepaths[i].find( ".png" ) != std::string::npos ) { _sideFormat = eTextureFormat::RGBA; }
+            if ( filepaths[i].find( ".tga" ) != std::string::npos ) { _sideFormat = eTextureFormat::RGBA; }
 
-            if ( _sideFormat == ePixelFormat::NONE )
+            if ( _sideFormat == eTextureFormat::NONE )
             {
                 _errorFormat = true;
                 _issueMessage = std::string( "Tried loading texture-cube data with " ) +
@@ -370,12 +373,12 @@ namespace engine
         }
 
         auto _textureCubeData = new CTextureCubeData();
-        _textureCubeData->name      = _name;
-        _textureCubeData->sidesData = _sidesData;
-        _textureCubeData->width     = _width;
-        _textureCubeData->height    = _height;
-        _textureCubeData->channels  = _channels;
-        _textureCubeData->format    = ( _channels == 3 ) ? ePixelFormat::RGB : ePixelFormat::RGBA;
+        _textureCubeData->name              = _name;
+        _textureCubeData->sidesData         = _sidesData;
+        _textureCubeData->width             = _width;
+        _textureCubeData->height            = _height;
+        _textureCubeData->channels          = _channels;
+        _textureCubeData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
         std::shared_ptr< CTextureCubeData > _textureCubeDataPtr;
         _textureCubeDataPtr.reset( _textureCubeData );

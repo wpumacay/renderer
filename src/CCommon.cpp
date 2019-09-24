@@ -37,27 +37,31 @@ namespace engine
         if ( axis == eAxis::Y ) return "y";
         if ( axis == eAxis::Z ) return "z";
 
-        ENGINE_CORE_ASSERT( false, "Invalid eAxis type given." );
+        ENGINE_CORE_ASSERT( false, "Invalid eAxis enum given." );
 
         return "undefined";
     }
 
-    std::string toString( const ePixelFormat& format )
+    std::string toString( const ePixelDataType& dtype )
     {
-        if ( format == ePixelFormat::RGB ) return "rgb";
-        if ( format == ePixelFormat::RGBA ) return "rgba";
+        if ( dtype == ePixelDataType::UINT_8 ) return "uint_8";
+        if ( dtype == ePixelDataType::UINT_32 ) return "uint_32";
+        if ( dtype == ePixelDataType::UINT_24_8 ) return "uint_24_8";
+        if ( dtype == ePixelDataType::FLOAT_32 ) return "float_32";
 
-        ENGINE_CORE_ASSERT( false, "Invalid ePixelFormat type given" );
+        ENGINE_CORE_ASSERT( false, "Invalid ePixelDataType given" );
 
-        return "undefined";
+        return 0;
     }
 
-    uint32 toOpenGLEnum( const ePixelFormat& format )
+    uint32 toOpenGLEnum( const ePixelDataType& dtype )
     {
-        if ( format == ePixelFormat::RGB ) return GL_RGB;
-        if ( format == ePixelFormat::RGBA ) return GL_RGBA;
+        if ( dtype == ePixelDataType::UINT_8 ) return GL_UNSIGNED_BYTE;
+        if ( dtype == ePixelDataType::UINT_32 ) return GL_UNSIGNED_INT;
+        if ( dtype == ePixelDataType::UINT_24_8 ) return GL_UNSIGNED_INT_24_8;
+        if ( dtype == ePixelDataType::FLOAT_32 ) return GL_FLOAT;
 
-        ENGINE_CORE_ASSERT( false, "Invalid ePixelFormat type given" );
+        ENGINE_CORE_ASSERT( false, "Invalid ePixelDataType given" );
 
         return 0;
     }

@@ -14,7 +14,7 @@ namespace engine
         int                         width;
         int                         height;
         int                         channels;
-        ePixelFormat                format;
+        eTextureFormat              format;
 
         CTextureCubeData();
         ~CTextureCubeData();
@@ -40,7 +40,7 @@ namespace engine
         uint32 width() const { return m_data->width; }
         uint32 height() const { return m_data->height; }
         uint32 channels() const { return m_data->channels; }
-        ePixelFormat format() const { return m_data->format; }
+        eTextureFormat format() const { return m_data->format; }
 
         uint32 openglId() const { return m_openglId; }
 

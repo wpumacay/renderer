@@ -45,14 +45,16 @@ namespace engine
 
     std::string toString( const eAxis& axis );
 
-    enum class ePixelFormat
+    enum class ePixelDataType
     {
-        NONE = 0, 
-        RGB, 
-        RGBA
+        NONE = 0,
+        UINT_8,
+        UINT_32,
+        UINT_24_8,
+        FLOAT_32
     };
 
-    std::string toString( const ePixelFormat& format );
-    uint32 toOpenGLEnum( const ePixelFormat& format );
+    std::string toString( const ePixelDataType& dtype );
+    uint32 toOpenGLEnum( const ePixelDataType& dtype );
 
 }
