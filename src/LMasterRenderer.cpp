@@ -12,7 +12,7 @@ namespace engine
         m_skyboxRenderer = new LSkyboxRenderer();
 
         m_shadowMap = new LShadowMap();
-        m_shadowsEnabled = false;
+        m_shadowsEnabled = true;
     }
 
     LMasterRenderer::~LMasterRenderer()

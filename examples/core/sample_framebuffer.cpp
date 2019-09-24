@@ -16,6 +16,8 @@ int main()
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
+    _fbColorConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+    _fbColorConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
@@ -25,6 +27,8 @@ int main()
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
+    _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+    _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
     auto _framebuffer = new engine::CFrameBuffer();
     _framebuffer->addAttachment( _fbColorConfig );
@@ -98,6 +102,8 @@ int main()
 
     std::cout << engine::toString( *_framebuffer->getTextureAttachment( "color_attachment" )->data() ) << std::endl;
     std::cout << engine::toString( *_framebuffer->getTextureAttachment( "depth_attachment" )->data() ) << std::endl;
+
+    _app->renderer()->disableShadows();
 
     while( _app->isActive() )
     {

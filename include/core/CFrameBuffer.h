@@ -25,6 +25,12 @@ namespace engine
         eTextureFormat  texInternalFormat;
         eTextureFormat  texFormat;
         ePixelDataType  texPixelDataType;
+
+        /* extra configuration parameters for the texture-2d */
+        eTextureWrap    texWrapU;
+        eTextureWrap    texWrapV;
+        CVec4           texBorderColorU;
+        CVec4           texBorderColorV;
     };
 
     std::string toString( const CAttachmentConfig& config );

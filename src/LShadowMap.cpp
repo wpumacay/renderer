@@ -1,8 +1,6 @@
 
 #include "LShadowMap.h"
 
-
-
 namespace engine
 {
 
@@ -15,33 +13,35 @@ namespace engine
         m_prevViewWidth  = -1;
         m_prevViewHeight = -1;
 
-        m_shadowBuffer = new LFrameBuffer( GL_DEPTH_COMPONENT, GL_FLOAT, 
-                                           GL_DEPTH_ATTACHMENT,
-                                           m_width, m_height );
-        m_shadowBuffer->bind();
+        CAttachmentConfig _fbDepthConfig;
+        _fbDepthConfig.name                 = "shadow_depth_attachment";
+        _fbDepthConfig.attachment           = eFboAttachment::DEPTH;
+        _fbDepthConfig.width                = m_width;
+        _fbDepthConfig.height               = m_height;
+        _fbDepthConfig.texInternalFormat    = eTextureFormat::DEPTH;
+        _fbDepthConfig.texFormat            = eTextureFormat::DEPTH;
+        _fbDepthConfig.texPixelDataType     = ePixelDataType::FLOAT_32;
+        _fbDepthConfig.texWrapU             = eTextureWrap::CLAMP_TO_BORDER;
+        _fbDepthConfig.texWrapV             = eTextureWrap::CLAMP_TO_BORDER;
+        _fbDepthConfig.texBorderColorU      = { 1.0f, 1.0f, 1.0f, 1.0f };
+        _fbDepthConfig.texBorderColorV      = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+        m_framebuffer = new CFrameBuffer();
+        m_framebuffer->addAttachment( _fbDepthConfig );
+
+        m_framebuffer->bind();
         glDrawBuffer( GL_NONE );
         glReadBuffer( GL_NONE );
-
-        glBindTexture( GL_TEXTURE_2D, m_shadowBuffer->getTex() );
-
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-        float _borderValues[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, _borderValues );
-
-        glBindTexture( GL_TEXTURE_2D, 0 );
-
-        m_shadowBuffer->unbind();
+        m_framebuffer->unbind();
     }
 
 
     LShadowMap::~LShadowMap()
     {
-        if ( m_shadowBuffer != NULL )
+        if ( m_framebuffer != NULL )
         {
-            delete m_shadowBuffer;
-            m_shadowBuffer = NULL;
+            delete m_framebuffer;
+            m_framebuffer = NULL;
         }
     }
 
@@ -72,15 +72,20 @@ namespace engine
         
 
         glViewport( 0, 0, m_width, m_height );
-        m_shadowBuffer->bind();
+        m_framebuffer->bind();
         glClear( GL_DEPTH_BUFFER_BIT );
     }
 
     void LShadowMap::unbind()
     {
-        m_shadowBuffer->unbind();
+        m_framebuffer->unbind();
 
         glViewport( 0, 0, m_prevViewWidth, m_prevViewHeight );
+    }
+
+    GLuint LShadowMap::getDepthTexture() const
+    {
+        return m_framebuffer->getTextureAttachment( "shadow_depth_attachment" )->openglId();
     }
 
 }

@@ -21,7 +21,7 @@
 #include <core/CVertexArray.h>
 #include <core/CTexture.h>
 #include <core/CTextureCube.h>
-#include <LFrameBuffer.h>                           // #include <core/CFrameBuffer.h>
+#include <core/CFrameBuffer.h>
 
 #include <LIRenderable.h>                           // #include <graphics/CRenderable.h>
 #include <LMesh.h>                                  // #include <graphics/CMesh.h>

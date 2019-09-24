@@ -48,6 +48,8 @@ namespace engine
 
         float fps();
 
+        LMasterRenderer* renderer() const { return m_masterRenderer; }
+
     protected :
 
         virtual void _initUser();

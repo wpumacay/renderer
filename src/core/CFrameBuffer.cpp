@@ -36,11 +36,15 @@ namespace engine
     {
         std::string _strRep;
 
-        _strRep += "name        : " + config.name + "\n\r";
-        _strRep += "attachment  : " + engine::toString( config.attachment ) + "\n\r";
-        _strRep += "texIntFormat: " + engine::toString( config.texInternalFormat ) + "\n\r";
-        _strRep += "texFormat   : " + engine::toString( config.texFormat ) + "\n\r";
-        _strRep += "pixelDtype  : " + engine::toString( config.texPixelDataType ) + "\n\r";
+        _strRep += "name            : " + config.name + "\n\r";
+        _strRep += "attachment      : " + engine::toString( config.attachment ) + "\n\r";
+        _strRep += "texIntFormat    : " + engine::toString( config.texInternalFormat ) + "\n\r";
+        _strRep += "texFormat       : " + engine::toString( config.texFormat ) + "\n\r";
+        _strRep += "texPixelDtype   : " + engine::toString( config.texPixelDataType ) + "\n\r";
+        _strRep += "texWrapU        : " + engine::toString( config.texWrapU ) + "\n\r";
+        _strRep += "texWrapV        : " + engine::toString( config.texWrapV ) + "\n\r";
+        _strRep += "texBorderColorU : " + engine::toString( config.texBorderColorU ) + "\n\r";
+        _strRep += "texBorderColorV : " + engine::toString( config.texBorderColorV ) + "\n\r";
 
         return _strRep;
     }
@@ -86,8 +90,10 @@ namespace engine
         CTextureOptions _textureOpts;
         _textureOpts.filterMin      = eTextureFilter::NEAREST;
         _textureOpts.filterMag      = eTextureFilter::NEAREST;
-        _textureOpts.wrapU          = eTextureWrap::REPEAT;
-        _textureOpts.wrapV          = eTextureWrap::REPEAT;
+        _textureOpts.wrapU          = config.texWrapU;
+        _textureOpts.wrapV          = config.texWrapV;
+        _textureOpts.borderColorU   = config.texBorderColorU;
+        _textureOpts.borderColorV   = config.texBorderColorV;
         _textureOpts.dtype          = config.texPixelDataType;
         _textureOpts.textureUnit    = 0;
 
