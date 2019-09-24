@@ -8,6 +8,7 @@
 #include <utils/CImguiUi.h>
 #include <utils/CImguiUiDemo.h>
 #include <LHeightmapGenerator.h>                    // #include <utils/CHeightMapGenerator.h>
+#include <utils/CDebugDrawer.h>
 
 #include <input/CInputCallbacks.h>
 #include <input/CInputKey.h>
@@ -49,9 +50,6 @@
 #include <LLightDirectional.h>                      // #include <light/CDirectiona.hlLight.h>
 #include <LLightPoint.h>                            // #include <light/CPointLight.h>
 #include <LLightSpot.h>                             // #include <light/CSpotLight.h>
-
-#include <debug/LDebugDrawer.h>                     // #include <debug/CDebugDrawer.h>
-#include <debug/LDebugSystem.h>                     // #include <debug/CDebugSystem.h>
 
 #include <LMasterRenderer.h>                        // #include <renderer/COpenGLRenderer.h>
 #include <LMeshRenderer.h>                          // #include <renderer/COpenGLMeshRenderer.h>

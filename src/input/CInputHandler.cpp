@@ -31,7 +31,7 @@ namespace engine
     {
         if ( CInputHandler::s_instance )
         {
-            ENGINE_CORE_WARN( "Attempting to initiliaze input handle twice" );
+            ENGINE_CORE_WARN( "Attempting to initiliaze input-handler twice" );
             return;
         }
 
@@ -40,7 +40,7 @@ namespace engine
 
     void CInputHandler::Release()
     {
-        ENGINE_CORE_ASSERT( CInputHandler::s_instance, "Tried to release input-manager more than once" );
+        ENGINE_CORE_ASSERT( CInputHandler::s_instance, "Tried to release input-handler more than once" );
 
         delete CInputHandler::s_instance;
         CInputHandler::s_instance = NULL;

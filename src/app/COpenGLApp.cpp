@@ -3,7 +3,7 @@
 
 namespace engine
 {
-    COpenGLApp* COpenGLApp::s_instance = NULL;
+    COpenGLApp* COpenGLApp::s_instance = nullptr;
 
     COpenGLApp* COpenGLApp::GetInstance()
     {
@@ -49,13 +49,13 @@ namespace engine
         if ( m_uiPtr )
             delete m_uiPtr;
 
-        m_windowPtr         = NULL;
-        m_masterRenderer    = NULL;
-        m_scenePtr          = NULL;
-        m_uiPtr             = NULL;
+        m_windowPtr         = nullptr;
+        m_masterRenderer    = nullptr;
+        m_scenePtr          = nullptr;
+        m_uiPtr             = nullptr;
 
         engine::CTime::Release();
-        engine::DebugSystem::release();
+        engine::CDebugDrawer::Release();
         engine::CInputHandler::Release();
         engine::LShaderManager::release();
         engine::CTextureManager::Release();
@@ -74,12 +74,12 @@ namespace engine
         m_windowPtr         = new COpenGLWindow( _windowProperties );
         m_masterRenderer    = new LMasterRenderer();
         m_scenePtr          = new LScene();
-        m_uiPtr             = NULL; // let the user create its own specific UI
+        m_uiPtr             = nullptr; // let the user create its own specific UI
 
         engine::CTextureManager::Init();
         engine::LShaderManager::create();
         engine::CInputHandler::Init();
-        engine::DebugSystem::init();
+        engine::CDebugDrawer::Init();
 
         m_windowPtr->registerKeyCallback( engine::CInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::CInputHandler::callback_mouse );
@@ -126,10 +126,7 @@ namespace engine
             m_scenePtr->update( m_timeDelta );
             m_masterRenderer->render( m_scenePtr );
 
-            engine::DebugSystem::setupMatrices( _currentCamera->matView(),
-                                                _currentCamera->matProj() );
-
-            engine::DebugSystem::render();
+            engine::CDebugDrawer::Render( _currentCamera );
         }
 
         if ( m_uiPtr )
