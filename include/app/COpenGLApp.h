@@ -12,7 +12,7 @@
 #include <shaders/LShaderManager.h>
 
 #include <debug/LDebugSystem.h>
-#include <input/LInputSystem.h>
+#include <input/CInputHandler.h>
 
 #include <assets/CTextureManager.h>
 #include <app/COpenGLWindow.h>

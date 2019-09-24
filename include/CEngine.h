@@ -12,8 +12,7 @@
 #include <input/CInputCallbacks.h>
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
-#include <input/LInputHandler.h>                    // #include <input/CInputHandler.h>
-#include <input/LInputSystem.h>                     // #include <input/CInputSystem.h>
+#include <input/CInputHandler.h>
 
 #include <core/CVertexBuffer.h>
 #include <core/CVertexBufferLayout.h>

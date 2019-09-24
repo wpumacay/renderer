@@ -111,7 +111,7 @@ int main()
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
         /* Render to a custom target given by our framebuffer */

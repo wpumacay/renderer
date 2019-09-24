@@ -56,8 +56,9 @@ namespace engine
 
         engine::CTime::Release();
         engine::DebugSystem::release();
-        engine::InputSystem::release();
+        engine::CInputHandler::Release();
         engine::LShaderManager::release();
+        engine::CTextureManager::Release();
     }
 
     void COpenGLApp::init()
@@ -77,13 +78,13 @@ namespace engine
 
         engine::CTextureManager::Init();
         engine::LShaderManager::create();
-        engine::InputSystem::init();
+        engine::CInputHandler::Init();
         engine::DebugSystem::init();
 
-        m_windowPtr->registerKeyCallback( engine::LInputHandler::callback_key );
-        m_windowPtr->registerMouseCallback( engine::LInputHandler::callback_mouse );
-        m_windowPtr->registerMouseMoveCallback( engine::LInputHandler::callback_mouseMove );
-        m_windowPtr->registerScrollCallback( engine::LInputHandler::callback_scroll );
+        m_windowPtr->registerKeyCallback( engine::CInputHandler::callback_key );
+        m_windowPtr->registerMouseCallback( engine::CInputHandler::callback_mouse );
+        m_windowPtr->registerMouseMoveCallback( engine::CInputHandler::callback_mouseMove );
+        m_windowPtr->registerScrollCallback( engine::CInputHandler::callback_scroll );
 
         // let the user initialize its own stuff
         _initUser();

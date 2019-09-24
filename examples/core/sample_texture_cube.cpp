@@ -145,7 +145,7 @@ int main()
 
         _app->begin();
 
-        if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
         glDepthFunc( GL_LEQUAL );
