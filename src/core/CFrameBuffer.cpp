@@ -32,10 +32,11 @@ namespace engine
         return 0;
     }
 
-    std::string toString( const CFrameBufferConfig& config )
+    std::string toString( const CAttachmentConfig& config )
     {
         std::string _strRep;
 
+        _strRep += "name        : " + config.name + "\n\r";
         _strRep += "attachment  : " + engine::toString( config.attachment ) + "\n\r";
         _strRep += "texIntFormat: " + engine::toString( config.texInternalFormat ) + "\n\r";
         _strRep += "texFormat   : " + engine::toString( config.texFormat ) + "\n\r";
@@ -48,20 +49,33 @@ namespace engine
     *                            CFrameBuffer impl.                           *
     ***************************************************************************/
 
-    CFrameBuffer::CFrameBuffer( const CFrameBufferConfig& config )
+    CFrameBuffer::CFrameBuffer()
     {
-        m_config    = config;
-        m_texture   = nullptr;
-        m_openglId  = 0;
-        m_width     = config.width;
-        m_height    = config.height;
+        // create gl-texture resource (will configure it later)
+        glGenFramebuffers( 1, &m_openglId );
+    }
+
+    CFrameBuffer::~CFrameBuffer()
+    {
+        glDeleteFramebuffers( 1, &m_openglId );
+
+        m_textures.clear();
+        m_configs.clear();
+    }
+
+    void CFrameBuffer::addAttachment( const CAttachmentConfig& config )
+    {
+        m_configs[config.name] = config;
+
+        // bind our current framebuffer object
+        glBindFramebuffer( GL_FRAMEBUFFER, m_openglId );
 
         /* create dummy texture-data for texture attachment **********************/
         auto _textureData = new CTextureData();
-        _textureData->name              = "fbo_tex";
+        _textureData->name              = "fbo_" + config.name;
         _textureData->data              = NULL;
-        _textureData->width             = m_width;
-        _textureData->height            = m_height;
+        _textureData->width             = config.width;
+        _textureData->height            = config.height;
         _textureData->channels          = 0; // not used for our case
         _textureData->internalFormat    = config.texInternalFormat;
         _textureData->format            = config.texFormat;
@@ -77,29 +91,26 @@ namespace engine
         _textureOpts.dtype          = config.texPixelDataType;
         _textureOpts.textureUnit    = 0;
 
-        m_texture.reset( new CTexture( _textureDataPtr, _textureOpts ) );
+        std::shared_ptr< CTexture > _texturePtr;
+        _texturePtr.reset( new CTexture( _textureDataPtr, _textureOpts ) );
 
-        /* create gl-texture resource with the given information ****************/
-        glGenFramebuffers( 1, &m_openglId );
-        glBindFramebuffer( GL_FRAMEBUFFER, m_openglId );
+        m_textures[config.name] = _texturePtr;
 
+        /************************************************************************/
+
+        // add the attachment to our framebuffer object
         glFramebufferTexture2D( GL_FRAMEBUFFER, 
-                                toOpenGLEnum( m_config.attachment ), 
+                                toOpenGLEnum( config.attachment ), 
                                 GL_TEXTURE_2D,
-                                m_texture->openglId(),
+                                _texturePtr->openglId(),
                                 0 );
 
         // sanity check: make sure framebuffer is correctly configured
         if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
             ENGINE_CORE_ERROR( "There seems to be an issue with a frame buffer" );
 
+        // release our current framebuffer object
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-        /************************************************************************/
-    }
-
-    CFrameBuffer::~CFrameBuffer()
-    {
-        glDeleteFramebuffers( 1, &m_openglId );
     }
 
     void CFrameBuffer::bind()
@@ -110,6 +121,29 @@ namespace engine
     void CFrameBuffer::unbind()
     {
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    }
+
+
+    std::shared_ptr< CTexture > CFrameBuffer::getTextureAttachment( const std::string& name )
+    {
+        if ( m_textures.find( name ) == m_textures.end() )
+        {
+            ENGINE_CORE_ERROR( "Tried to grab non-existent tex-attachment for id: {0}", name );
+            return nullptr;
+        }
+
+        return m_textures[name];
+    }
+
+    CAttachmentConfig CFrameBuffer::getConfigAttachment( const std::string& name )
+    {
+        if ( m_configs.find( name ) == m_configs.end() )
+        {
+            ENGINE_CORE_ERROR( "Tried to grab non-existent config-attachment for id: {0}", name );
+            return CAttachmentConfig();
+        }
+
+        return m_configs[name];
     }
 
 }

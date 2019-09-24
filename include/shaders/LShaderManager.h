@@ -30,7 +30,7 @@ namespace engine
 
         ~LShaderManager();
 
-        GLuint createShader( const char* filename, int shaderType );
+        GLuint createShader( const std::string& filename, int shaderType );
         GLuint createProgram( GLuint vShader, GLuint fShader );
 
         static LShader* getShader( const string& shaderName );

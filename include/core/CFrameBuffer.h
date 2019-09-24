@@ -16,8 +16,9 @@ namespace engine
     std::string toString( const eFboAttachment& attachment );
     uint32 toOpenGLEnum( const eFboAttachment& attachment );
 
-    struct CFrameBufferConfig
+    struct CAttachmentConfig
     {
+        std::string     name;
         eFboAttachment  attachment;
         uint32          width;
         uint32          height;
@@ -26,30 +27,35 @@ namespace engine
         ePixelDataType  texPixelDataType;
     };
 
-    std::string toString( const CFrameBufferConfig& config );
+    std::string toString( const CAttachmentConfig& config );
 
     class CFrameBuffer
     {
 
     public :
 
-        CFrameBuffer( const CFrameBufferConfig& config );
+        CFrameBuffer();
         ~CFrameBuffer();
 
+        void addAttachment( const CAttachmentConfig& config );
         void bind();
         void unbind();
 
-        std::shared_ptr< CTexture > texture() const { return m_texture; }
-        CFrameBufferConfig config() const { return m_config; }
+        std::shared_ptr< CTexture > getTextureAttachment( const std::string& name );
+        CAttachmentConfig getConfigAttachment( const std::string& name );
+
+        std::map< std::string, std::shared_ptr< CTexture > > textures() const { return m_textures; }
+        std::map< std::string, CAttachmentConfig > configs() const { return m_configs; }
+
         uint32 openglId() const { return m_openglId; }
 
     private :
 
-        std::shared_ptr< CTexture >     m_texture;
-        CFrameBufferConfig              m_config;
-        uint32                          m_width;
-        uint32                          m_height;
-        uint32                          m_openglId;
+        std::map< std::string, std::shared_ptr< CTexture > >    m_textures;
+        std::map< std::string, CAttachmentConfig >              m_configs;
+        uint32                                                  m_width;
+        uint32                                                  m_height;
+        uint32                                                  m_openglId;
 
     };
 

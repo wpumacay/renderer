@@ -3,71 +3,13 @@
 
 #include <core/CFrameBuffer.h>
 
-class ApplicationUi : public engine::CImguiUi
-{
-
-
-
-};
-
-class Application : public engine::COpenGLApp
-{
-
-public :
-
-    Application() : engine::COpenGLApp() {}
-    ~Application() {}
-
-    void setTextureToShow( std::shared_ptr< engine::CTexture > texture )
-    {
-        if ( !m_uiPtr )
-            return;
-
-        reinterpret_cast< engine::CImguiUiDemo* >( m_uiPtr )->showTexture( texture );
-    }
-
-protected :
-
-    void _initUser() override
-    {
-        ENGINE_TRACE( "Initializing custom ui" );
-        // m_uiPtr = new ApplicationUi( m_windowPtr->context() );
-        m_uiPtr = new engine::CImguiUiDemo( m_windowPtr->context() );
-        m_uiPtr->init();
-    }
-
-};
-
-
 int main()
 {
-    auto _app = new Application();
+    auto _app = new engine::COpenGLApp();
     _app->init();
 
-    auto _textureDataJpg = engine::CTextureManager::GetCachedTextureData( "img_container" );
-    auto _textureDataPng = engine::CTextureManager::GetCachedTextureData( "img_smiley" );
-
-    if ( _textureDataJpg )
-    {
-        std::cout << "texture-data-jpg:" << std::endl;
-        std::cout << engine::toString( *_textureDataJpg ) << std::endl;
-    }
-
-    if ( _textureDataPng )
-    {
-        std::cout << "texture-data-png:" << std::endl;
-        std::cout << engine::toString( *_textureDataPng ) << std::endl;
-    }
-
-    auto _textureContainer = engine::CTextureManager::GetCachedTexture( "img_container" );
-    ENGINE_ASSERT( _textureContainer, "Could not retrieve valid texture for the sample - container" );
-
-    auto _textureSmiley = engine::CTextureManager::GetCachedTexture( "img_smiley" );
-    ENGINE_ASSERT( _textureContainer, "Could not retrieve valid texture for the sample - smiley" );
-
-    _app->setTextureToShow( _textureContainer );
-
-    engine::CFrameBufferConfig _fbColorConfig;
+    engine::CAttachmentConfig _fbColorConfig;
+    _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
     _fbColorConfig.width                = engine::COpenGLApp::GetWindow()->width();
     _fbColorConfig.height               = engine::COpenGLApp::GetWindow()->height();
@@ -75,7 +17,8 @@ int main()
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
 
-    engine::CFrameBufferConfig _fbDepthConfig;
+    engine::CAttachmentConfig _fbDepthConfig;
+    _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
     _fbDepthConfig.width                = engine::COpenGLApp::GetWindow()->width();
     _fbDepthConfig.height               = engine::COpenGLApp::GetWindow()->height();
@@ -83,23 +26,120 @@ int main()
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
 
-    auto _framebufferColor = new engine::CFrameBuffer( _fbColorConfig );
-    ENGINE_INFO( "Created framebuffer for color information" );
+    auto _framebuffer = new engine::CFrameBuffer();
+    _framebuffer->addAttachment( _fbColorConfig );
+    _framebuffer->addAttachment( _fbDepthConfig );
 
-    auto _framebufferDepth = new engine::CFrameBuffer( _fbDepthConfig );
-    ENGINE_INFO( "Created framebuffer for depth information" );
+    engine::float32 _quad_buffData[] = {
+     /*|  positions |      colors     |     uvs    |*/
+        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    engine::uint32 _quad_indices[] = {
+        0, 1, 2, 
+        0, 2, 3
+    };
+
+    engine::CVertexBufferLayout _layout = { { "pos", engine::eElementType::Float2, false },
+                                            { "color", engine::eElementType::Float3, false },
+                                            { "uv", engine::eElementType::Float2, false } };
+
+    auto _quad_vbuffer = new engine::CVertexBuffer( _layout,
+                                                    engine::eBufferUsage::STATIC,
+                                                    sizeof( _quad_buffData ),
+                                                    _quad_buffData );;
+
+    auto _quad_ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
+                                                   6, _quad_indices );
+
+    auto _quad_varray = new engine::CVertexArray();
+    _quad_varray->addVertexBuffer( _quad_vbuffer );
+    _quad_varray->setIndexBuffer( _quad_ibuffer );
+
+    /* setup a simple scene to render to our target *********************************/
+
+    auto _scene = _app->scene();
+
+    auto _cameraProjData = engine::CCameraProjData();
+    _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
+    _cameraProjData.fov         = 45.0f;
+    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.zNear       = 0.1f;
+    _cameraProjData.zFar        = 100.0f;
+
+    auto _camera = new engine::COrbitCamera( "orbit",
+                                             { 4.0f, 4.0f, 4.0f },
+                                             { 0.0f, 0.0f, 0.0f },
+                                             engine::eAxis::Z,
+                                             _cameraProjData,
+                                             engine::COpenGLApp::GetWindow()->width(),
+                                             engine::COpenGLApp::GetWindow()->height() );
+    _scene->addCamera( _camera );
+
+    auto _light = new engine::LLightDirectional( { 0.8f, 0.8f, 0.8f }, { 0.8f, 0.8f, 0.8f },
+                                                 { 0.3f, 0.3f, 0.3f }, 0, { 0.0f, 0.0f, -1.0f } );
+    _light->setVirtualPosition( { 5.0f, 0.0f, 5.0f } );
+    _scene->addLight( _light );
+
+    auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
+    _plane->getMaterial()->setColor( { 0.2f, 0.3f, 0.4f } );
+    _scene->addRenderable( _plane );
+
+    auto _box = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
+    _box->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
+    _box->pos = { 1.0f, 1.0f, 1.0f };
+    _scene->addRenderable( _box );
+
+    std::cout << engine::toString( _framebuffer->getConfigAttachment( "color_attachment" ) ) << std::endl;
+    std::cout << engine::toString( _framebuffer->getConfigAttachment( "depth_attachment" ) ) << std::endl;
+
+    std::cout << engine::toString( *_framebuffer->getTextureAttachment( "color_attachment" )->data() ) << std::endl;
+    std::cout << engine::toString( *_framebuffer->getTextureAttachment( "depth_attachment" )->data() ) << std::endl;
 
     while( _app->isActive() )
     {
-        _app->begin();
+        engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
+        engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+        engine::DebugSystem::drawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         if ( engine::InputSystem::isKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
-        // set the render target to our framebuffer
+        /* Render to a custom target given by our framebuffer */
 
-        // let the renderer to its job
+        // set the render target to our framebuffer
+        _framebuffer->bind();
+
+        glEnable( GL_DEPTH_TEST );
+
+        _app->begin();
+
+        // let the renderer to the thing :D
         _app->update();
+
+        // release our render targets
+        _framebuffer->unbind();
+
+        /* Render what's inside our framebuffer into a quad on the screen */
+
+        glDisable( GL_DEPTH_TEST );
+        glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+        glClear( GL_COLOR_BUFFER_BIT );
+        auto _shaderTex2d = engine::LShaderManager::getShader( "basic2d_tex" );
+        ENGINE_ASSERT( _shaderTex2d, "No shader to render our render target texture into a quad :(" );
+
+        _shaderTex2d->bind();
+        _framebuffer->getTextureAttachment( "color_attachment" )->bind();
+        _quad_varray->bind();
+
+        glDrawElements( GL_TRIANGLES, _quad_varray->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
+
+        _quad_varray->unbind();
+        _framebuffer->getTextureAttachment( "color_attachment" )->unbind();
+        _shaderTex2d->unbind();
 
         _app->end();
     }

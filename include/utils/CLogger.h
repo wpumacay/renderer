@@ -26,12 +26,12 @@ namespace engine
 #define ENGINE_CORE_CRITICAL(...)   ::engine::CLogger::GetCoreLogger()->critical(__VA_ARGS__)
 
 #define ENGINE_CORE_ASSERT(x, ...) \
-    {                                                                           \
-        if( !x )                                                                \
-        {                                                                       \
-            ENGINE_CORE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ ); \
-            assert( false );                                                    \
-        }                                                                       \
+    {                                                                               \
+        if( !x )                                                                    \
+        {                                                                           \
+            ENGINE_CORE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ );    \
+            exit( EXIT_FAILURE );                                                   \
+        }                                                                           \
     }
 
 #define ENGINE_TRACE(...)       ::engine::CLogger::GetClientLogger()->trace(__VA_ARGS__)
@@ -44,7 +44,7 @@ namespace engine
     {                                                                       \
         if( !x )                                                            \
         {                                                                   \
-            ENGINE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ );  \
-            exit( EXIT_FAILURE );                                                \
+            ENGINE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ ); \
+            exit( EXIT_FAILURE );                                           \
         }                                                                   \
     }

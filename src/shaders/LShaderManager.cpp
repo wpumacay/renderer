@@ -29,43 +29,46 @@ namespace engine
 
         // Common shaders **************************************************
 
-        _vShader = createShader( "basic_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "basic_fs.glsl", GL_FRAGMENT_SHADER );
+        std::string _basepath = ENGINE_RESOURCES_PATH;
+        _basepath += "shaders/";
+
+        _vShader = createShader( _basepath + "basic_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "basic_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["basic2d"] = _program;
         m_programObjs["basic2d"] = new LShader( _program );
 
-        _vShader = createShader( "basic2d_tex_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "basic2d_tex_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "basic2d_tex_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "basic2d_tex_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["basic2d_tex"] = _program;
         m_programObjs["basic2d_tex"] = new LShader( _program );
 
-        _vShader = createShader( "basic3d_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "basic3d_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "basic3d_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "basic3d_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["basic3d"] = _program;
         m_programObjs["basic3d"] = new LShaderBasic3d( _program );
 
-        _vShader = createShader( "debug/debug_3d_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "debug/debug_3d_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "debug/debug_3d_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "debug/debug_3d_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["debug3d"] = _program;
         m_programObjs["debug3d"] = new LShaderDebug3d( _program );
 
-        _vShader = createShader( "shadows/shadow_mapping_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "shadows/shadow_mapping_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "shadows/shadow_mapping_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "shadows/shadow_mapping_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["shadow_mapping"] = _program;
         m_programObjs["shadow_mapping"] = new LShaderShadowMap( _program );
 
-        _vShader = createShader( "basic3d_skybox_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "basic3d_skybox_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "basic3d_skybox_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "basic3d_skybox_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["skybox"] = _program;
@@ -77,29 +80,29 @@ namespace engine
         // We have separate entities shaders in case there is the need ...
         // to do something different in for each case
 
-        _vShader = createShader( "entities/lighting_entities_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "entities/lighting_entities_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "entities/lighting_entities_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "entities/lighting_entities_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["lighting_entities"] = _program;
         m_programObjs["lighting_entities"] = new LShaderEntitiesLighting( _program );
 
-        _vShader = createShader( "entities/lighting_entities_textured_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "entities/lighting_entities_textured_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "entities/lighting_entities_textured_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "entities/lighting_entities_textured_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["lighting_entities_textured"] = _program;
         m_programObjs["lighting_entities_textured"] = new LShaderEntitiesLighting( _program );
 
-        _vShader = createShader( "entities/lighting_entities_shadows_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "entities/lighting_entities_shadows_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "entities/lighting_entities_shadows_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "entities/lighting_entities_shadows_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["lighting_entities_shadows"] = _program;
         m_programObjs["lighting_entities_shadows"] = new LShaderEntitiesLightingShadows( _program );
 
-        _vShader = createShader( "entities/lighting_entities_textured_shadows_vs.glsl", GL_VERTEX_SHADER );
-        _fShader = createShader( "entities/lighting_entities_textured_shadows_fs.glsl", GL_FRAGMENT_SHADER );
+        _vShader = createShader( _basepath + "entities/lighting_entities_textured_shadows_vs.glsl", GL_VERTEX_SHADER );
+        _fShader = createShader( _basepath + "entities/lighting_entities_textured_shadows_fs.glsl", GL_FRAGMENT_SHADER );
         _program = createProgram( _vShader, _fShader );
 
         m_programs["lighting_entities_textured_shadows"] = _program;
@@ -137,15 +140,13 @@ namespace engine
     }
 
 
-    GLuint LShaderManager::createShader( const char* filename, int shaderType )
+    GLuint LShaderManager::createShader( const std::string& filename, int shaderType )
     {
         // Load the shader code into a string ********************************************
         string _shaderStrCode;
         ifstream _shaderFile;
 
-        string _fullFilePath = ENGINE_RESOURCES_PATH;
-		_fullFilePath += "shaders/";
-        _fullFilePath += filename;
+        string _fullFilePath = filename;
 
         // cout << "file: " << _fullFilePath << endl;
 
