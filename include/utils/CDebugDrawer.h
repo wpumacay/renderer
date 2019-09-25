@@ -3,8 +3,7 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <shaders/LShaderManager.h>
-#include <shaders/LShaderDebug3d.h>
+#include <shaders/CShaderManager.h>
 #include <core/CVertexBuffer.h>
 #include <core/CVertexArray.h>
 #include <camera/CICamera.h>
@@ -68,7 +67,7 @@ namespace engine
         CVertexBuffer*  m_linesColorsVBO;
         CVertexArray*   m_linesVAO;
 
-        LShaderDebug3d* m_shader;
+        std::shared_ptr< CShader > m_shader;
 
     };
 

@@ -57,7 +57,7 @@ int main()
     ENGINE_ASSERT( _textureCubeStarfield, "Could not retrieve valid texture-cube for the sample - starfield" );
     ENGINE_ASSERT( _textureCubeSiege, "Could not retrieve valid texture-cube for the sample - siege" );
 
-    auto _shader = engine::LShaderManager::getShader( "skybox" );
+    auto _shader = engine::CShaderManager::GetCachedShader( "skybox" );
 
     engine::float32 _cubemapVertices[] = {
             -1.0f,  1.0f, -1.0f,

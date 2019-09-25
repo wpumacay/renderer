@@ -64,7 +64,7 @@ int main()
     _light->setVirtualPosition( engine::CVec3( 5.0f, 0.0f, 5.0f ) );
 
     // make a simple skybox
-    auto _skybox = new engine::LSkybox( "starfield" );
+    auto _skybox = new engine::LSkybox( "cloudtop" );
     // add these components to the scene
     _scene->addCamera( _camera );
     _scene->addLight( _light );

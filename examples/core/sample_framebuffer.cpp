@@ -134,7 +134,7 @@ int main()
         glDisable( GL_DEPTH_TEST );
         glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT );
-        auto _shaderTex2d = engine::LShaderManager::getShader( "basic2d_tex" );
+        auto _shaderTex2d = engine::CShaderManager::GetCachedShader( "basic2d_textures" );
         ENGINE_ASSERT( _shaderTex2d, "No shader to render our render target texture into a quad :(" );
 
         _shaderTex2d->bind();

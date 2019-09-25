@@ -94,7 +94,7 @@ int main()
     _varray->addVertexBuffer( _vbuffer );
     _varray->setIndexBuffer( _ibuffer );
 
-    auto _shader = engine::LShaderManager::getShader( "basic2d_tex" );
+    auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_textures" );
 
     _app->setTextureToShow( _textureContainer );
 

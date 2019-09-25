@@ -6,7 +6,7 @@ int main()
     auto _app = new engine::COpenGLApp();
     _app->init();
 
-    auto _shader = engine::LShaderManager::getShader( "basic2d" );
+    auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
 
     std::vector< engine::CVec2 > _vertices = { { -0.5f, -0.5f },
                                                {  0.5f, -0.5f },

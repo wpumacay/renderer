@@ -9,7 +9,7 @@
 #include <LMasterRenderer.h>
 
 #include <assets/CTextureManager.h>
-#include <shaders/LShaderManager.h>
+#include <shaders/CShaderManager.h>
 
 #include <input/CInputHandler.h>
 

@@ -57,7 +57,7 @@ namespace engine
         engine::CTime::Release();
         engine::CDebugDrawer::Release();
         engine::CInputHandler::Release();
-        engine::LShaderManager::release();
+        engine::CShaderManager::Release();
         engine::CTextureManager::Release();
         engine::CNoiseGenerator::Release();
     }
@@ -78,7 +78,7 @@ namespace engine
         m_uiPtr             = nullptr; // let the user create its own specific UI
 
         engine::CTextureManager::Init();
-        engine::LShaderManager::create();
+        engine::CShaderManager::Init();
         engine::CInputHandler::Init();
         engine::CDebugDrawer::Init();
         engine::CNoiseGenerator::Init();

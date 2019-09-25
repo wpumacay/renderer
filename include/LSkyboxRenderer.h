@@ -10,7 +10,7 @@ namespace engine
     class LSkyboxRenderer : public LIRenderer
     {
 
-        public :
+    public :
 
         LSkyboxRenderer();
         ~LSkyboxRenderer();
@@ -19,9 +19,7 @@ namespace engine
         void renderScene( LScene* pScene ) override;
         void renderToShadowMap( LScene* pScene, LShadowMap* shadowMap ) override;
         void renderSceneWithShadowMap( LScene* pScene, LShadowMap* shadowMap ) override;
-        void end( LScene* pScene ) override;
+        void end( LScene* pScene ) override;;
     };
-
-
 
 }

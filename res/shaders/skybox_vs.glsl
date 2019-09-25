@@ -4,8 +4,8 @@ layout ( location = 0 ) in vec3 position;
 
 out vec3 vTexDir;
 
-uniform mat4 u_tProj;
 uniform mat4 u_tView;
+uniform mat4 u_tProj;
 
 void main()
 {

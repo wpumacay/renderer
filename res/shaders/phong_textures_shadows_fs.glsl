@@ -25,7 +25,7 @@ uniform vec3 u_globalAmbientLight;
 
 uniform LMaterial u_material;
 uniform vec3 u_viewPos;
-uniform vec3 u_lightPos;
+// uniform vec3 u_lightPos;
 uniform sampler2D u_matTex;
 uniform sampler2D u_shadowMap;
 

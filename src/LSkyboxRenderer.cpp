@@ -1,6 +1,5 @@
 
 #include <LSkyboxRenderer.h>
-#include <shaders/LShaderSkybox.h>
 
 namespace engine
 {
@@ -24,7 +23,7 @@ namespace engine
     void LSkyboxRenderer::renderScene( LScene* pScene )
     {
         // use skybox shader
-        auto _shader = ( LShaderSkybox* ) LShaderManager::getShader( "skybox" );
+        auto _shader = CShaderManager::GetCachedShader( "skybox" );
         // get current camera for uniforms loading
         auto _camera = pScene->getCurrentCamera();
         if ( _camera == NULL )
@@ -36,12 +35,15 @@ namespace engine
         auto _skybox = pScene->getSkybox();
         if ( _skybox != NULL )
         {
+            CMat4 _correctionMat;
+            if ( _camera->upAxis() == engine::eAxis::X ) _correctionMat = engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
+            if ( _camera->upAxis() == engine::eAxis::Y ) _correctionMat = engine::CMat4();
+            if ( _camera->upAxis() == engine::eAxis::Z ) _correctionMat = engine::CMat4::rotationX( ENGINE_PI / 2.0f );
+
             _shader->bind();
-            _shader->setViewMatrix( _camera->matView() );
-            _shader->setProjectionMatrix( _camera->matProj() );
-
+            _shader->setMat4( "u_tView", _camera->matView().getRotation() * _correctionMat );
+            _shader->setMat4( "u_tProj", _camera->matProj() );
             _skybox->render();
-
             _shader->unbind();
         }
     }

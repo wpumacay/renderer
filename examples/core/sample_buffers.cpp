@@ -155,7 +155,7 @@ int main()
     auto _app = new engine::COpenGLApp();
     _app->init();
 
-    auto _shader = engine::LShaderManager::getShader( "basic2d" );
+    auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
 
     std::cout << "sizeof( CVec2 ): " << sizeof( engine::CVec2 ) << std::endl;
     std::cout << "sizeof( CVec3 ): " << sizeof( engine::CVec3 ) << std::endl;

@@ -32,14 +32,8 @@
 #include <LScene.h>                                 // #include <graphics/CScene.h>
 
 #include <shaders/CShaderUniforms.h>
-#include <shaders/LShader.h>                        // #include <shaders/CShader.h>
-#include <shaders/LShaderBasic3d.h>                 // #include <shaders/CShaderBasic3d.h>
-#include <shaders/LShaderDebug3d.h>                 // #include <shaders/CShaderDebug3d.h>
-#include <shaders/LShaderEntitiesLighting.h>        // #include <shaders/CShaderLighting.h>
-#include <shaders/LShaderEntitiesLightingShadows.h> // #include <shaders/CShaderLightingShadows.h>
-#include <shaders/LShaderShadowMap.h>               // #include <shaders/CShaderShadowMap.h>
-#include <shaders/LShaderSkybox.h>                  // #include <shaders/CShaderSkybox.h>
-#include <shaders/LShaderManager.h>                 // #include <shaders/CShaderManager.h>
+#include <shaders/CShader.h>
+#include <shaders/CShaderManager.h>
 
 #include <camera/CICamera.h>
 #include <camera/CFixedCamera.h>
@@ -47,7 +41,7 @@
 #include <camera/COrbitCamera.h>
 
 #include <LILight.h>                                // #include <light/CLight.h>
-#include <LLightDirectional.h>                      // #include <light/CDirectiona.hlLight.h>
+#include <LLightDirectional.h>                      // #include <light/CDirectionalLight.h>
 #include <LLightPoint.h>                            // #include <light/CPointLight.h>
 #include <LLightSpot.h>                             // #include <light/CSpotLight.h>
 

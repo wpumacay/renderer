@@ -4,24 +4,20 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include "LIRenderable.h"
+#include <LIRenderable.h>
 #include <camera/CICamera.h>
-#include "LILight.h"
-#include "LScene.h"
-#include "LShadowMap.h"
-#include <shaders/LShaderManager.h>
-
-using namespace std;
+#include <LILight.h>
+#include <LScene.h>
+#include <LShadowMap.h>
+#include <shaders/CShaderManager.h>
 
 namespace engine
 {
 
-
-
     class LIRenderer
     {
 
-        public :
+    public :
 
         virtual void begin( LScene* pScene ) = 0;
         virtual void renderScene( LScene* pScene ) = 0;
@@ -30,10 +26,6 @@ namespace engine
         virtual void end( LScene* pScene ) = 0;
 
     };
-
-
-
-
 
 }
 

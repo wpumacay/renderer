@@ -1,9 +1,5 @@
 
 #include <LMeshRenderer.h>
-#include <shaders/LShaderBasic3d.h>
-#include <shaders/LShaderEntitiesLighting.h>
-#include <shaders/LShaderShadowMap.h>
-#include <shaders/LShaderEntitiesLightingShadows.h>
 
 // @TODO: Modify the rendering process of models, as the texture check is done via the parent, not children
 
@@ -61,7 +57,7 @@ namespace engine
 
     void LMeshRenderer::_renderDebug( LScene* pScene )
     {
-        auto _debugShader = ( engine::LShaderBasic3d* ) LShaderManager::getShader( "basic3d" );
+        auto _shader = CShaderManager::GetCachedShader( "basic3d_no_textures" );
 
         auto _camera = pScene->getCurrentCamera();
         if ( _camera == NULL )
@@ -70,28 +66,28 @@ namespace engine
             return;
         }
 
-        _debugShader->bind();
+        _shader->bind();
 
-        _debugShader->setViewMatrix( _camera->matView() );
-        _debugShader->setProjectionMatrix( _camera->matProj() );
+        _shader->setMat4( "u_tView", _camera->matView() );
+        _shader->setMat4( "u_tProj", _camera->matProj() );
 
         for ( auto _mesh : m_debugList )
         {
-            _debugShader->setModelMatrix( _mesh->getModelMatrix() );
-            _debugShader->setColor( _mesh->getMaterial()->diffuse );
+            _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+            _shader->setVec3( "u_color", _mesh->getMaterial()->diffuse );
 
             _mesh->render();
         }
 
-        _debugShader->unbind();
+        _shader->unbind();
     }
 
     void LMeshRenderer::_renderScene( LScene* pScene, bool textured )
     {
-        std::string _shaderId = ( textured ? "lighting_entities_textured" : "lighting_entities" );
+        std::string _shaderId = ( textured ) ? "phong_textures_no_shadows" : "phong_no_textures_no_shadows";
 
         // Use simple lighting shader
-        auto _shader = ( LShaderEntitiesLighting* ) LShaderManager::getShader( _shaderId );
+        auto _shader = CShaderManager::GetCachedShader( _shaderId );
         // Get current camera for uniforms loading
         auto _camera = pScene->getCurrentCamera();
         if ( _camera == NULL )
@@ -107,17 +103,23 @@ namespace engine
             return;
         }
 
-        auto _light =  _lights[0];
+        auto _light =  _lights.front();
 
         // start render pass
         _shader->bind();
 
-        // Load uniforms
-        _shader->setLightDirectional( _light );
-        _shader->setViewMatrix( _camera->matView() );
-        _shader->setProjectionMatrix( _camera->matProj() );
-        _shader->setViewPosition( _camera->position() );
-        _shader->setGlobalAmbientLight( CVec3( 0.15f, 0.15f, 0.15f ) );
+        // set light-related uniforms
+        _shader->setVec3( "u_directionalLight.ambient", _light->ambient );
+        _shader->setVec3( "u_directionalLight.diffuse", _light->diffuse );
+        _shader->setVec3( "u_directionalLight.specular", _light->specular );
+        _shader->setVec3( "u_directionalLight.direction", _light->direction );
+        _shader->setInt( "u_directionalLight.isActive", _light->isActive );
+
+        // set scene related uniforms
+        _shader->setMat4( "u_tView", _camera->matView() );
+        _shader->setMat4( "u_tProj", _camera->matProj() );
+        _shader->setVec3( "u_viewPos", _camera->position() );
+        _shader->setVec3( "u_globalAmbientLight", { 0.15f, 0.15f, 0.15f } );
 
         // render all meshes
         if ( textured )
@@ -130,21 +132,27 @@ namespace engine
                     //
                     for ( auto _child : _children )
                     {
-                        _shader->setModelMatrix( _mesh->getModelMatrix() );
-                        _shader->setMaterial( _child->getMaterial() );
+                        _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                        // set material related uniforms
+                        _shader->setVec3( "u_material.ambient", _child->getMaterial()->ambient );
+                        _shader->setVec3( "u_material.diffuse", _child->getMaterial()->diffuse );
+                        _shader->setVec3( "u_material.specular", _child->getMaterial()->specular );
+                        _shader->setFloat( "u_material.shininess", _child->getMaterial()->shininess );
+
                         _child->render();
                     }
                 }
                 else
                 {
-                    _shader->setModelMatrix( _mesh->getModelMatrix() );
-                    _shader->setMaterial( _mesh->getMaterial() );
+                    _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                    // set material related uniforms
+                    _shader->setVec3( "u_material.ambient", _mesh->getMaterial()->ambient );
+                    _shader->setVec3( "u_material.diffuse", _mesh->getMaterial()->diffuse );
+                    _shader->setVec3( "u_material.specular", _mesh->getMaterial()->specular );
+                    _shader->setFloat( "u_material.shininess", _mesh->getMaterial()->shininess );
+
                     _mesh->render();
                 }
-
-                // _shader->setModelMatrix( _mesh->getModelMatrix() );
-                // _shader->setMaterial( _mesh->getMaterial() );
-                // _mesh->render();
             }
         }
         else
@@ -157,21 +165,27 @@ namespace engine
                     //
                     for ( auto _child : _children )
                     {
-                        _shader->setModelMatrix( _mesh->getModelMatrix() );
-                        _shader->setMaterial( _child->getMaterial() );
+                        _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                        // set material related uniforms
+                        _shader->setVec3( "u_material.ambient", _child->getMaterial()->ambient );
+                        _shader->setVec3( "u_material.diffuse", _child->getMaterial()->diffuse );
+                        _shader->setVec3( "u_material.specular", _child->getMaterial()->specular );
+                        _shader->setFloat( "u_material.shininess", _child->getMaterial()->shininess );
+
                         _child->render();
                     }
                 }
                 else
                 {
-                    _shader->setModelMatrix( _mesh->getModelMatrix() );
-                    _shader->setMaterial( _mesh->getMaterial() );
+                    _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                    // set material related uniforms
+                    _shader->setVec3( "u_material.ambient", _mesh->getMaterial()->ambient );
+                    _shader->setVec3( "u_material.diffuse", _mesh->getMaterial()->diffuse );
+                    _shader->setVec3( "u_material.specular", _mesh->getMaterial()->specular );
+                    _shader->setFloat( "u_material.shininess", _mesh->getMaterial()->shininess );
+
                     _mesh->render();
                 }
-
-                // _shader->setModelMatrix( _mesh->getModelMatrix() );
-                // _shader->setMaterial( _mesh->getMaterial() );
-                // _mesh->render();
             }
         }
 
@@ -202,16 +216,16 @@ namespace engine
     void LMeshRenderer::renderToShadowMap( LScene* pScene, LShadowMap* shadowMap )
     {
         // Use the appropiate shader for the first pass of the shadow mapping procedure
-        auto _shader = ( LShaderShadowMap* ) LShaderManager::getShader( "shadow_mapping" );
+        auto _shader = CShaderManager::GetCachedShader( "shadow_mapping" );
 
         _shader->bind();
 
-        _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
-        _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );
+        _shader->setMat4( "u_lightSpaceViewMatrix", shadowMap->getLightSpaceViewMatrix() );
+        _shader->setMat4( "u_lightSpaceProjMatrix", shadowMap->getLightSpaceProjectionMatrix() );
 
         for ( auto _mesh : m_renderList )
         {
-            _shader->setModelMatrix( _mesh->getModelMatrix() );
+            _shader->setMat4( "u_modelMatrix", _mesh->getModelMatrix() );
             _mesh->render();
         }
 
@@ -220,8 +234,8 @@ namespace engine
 
     void LMeshRenderer::_renderSceneWithShadowMap( LScene* pScene, LShadowMap* shadowMap, bool textured )
     {
-        std::string _shaderId = ( textured ? "lighting_entities_textured_shadows" : "lighting_entities_shadows" );
-        auto _shader = ( LShaderEntitiesLightingShadows* ) LShaderManager::getShader( _shaderId );
+        std::string _shaderId = ( textured ) ? "phong_textures_shadows" : "phong_no_textures_shadows";
+        auto _shader = CShaderManager::GetCachedShader( _shaderId );
         // Get current camera for uniforms loading
         auto _camera = pScene->getCurrentCamera();
         if ( _camera == NULL )
@@ -247,14 +261,20 @@ namespace engine
         }
         glBindTexture( GL_TEXTURE_2D, shadowMap->getDepthTexture() );
         
-        _shader->setLightDirectional( _light );
-        _shader->setViewMatrix( _camera->matView() );
-        _shader->setProjectionMatrix( _camera->matProj() );
-        _shader->setViewPosition( _camera->position() );
-        _shader->setGlobalAmbientLight( CVec3( 0.15f, 0.15f, 0.15f ) );
-        _shader->setLightSpaceViewMatrix( shadowMap->getLightSpaceViewMatrix() );
-        _shader->setLightSpaceProjectionMatrix( shadowMap->getLightSpaceProjectionMatrix() );
-        _shader->setLightPosition( shadowMap->getLightPosition() );
+        // set light-related uniforms
+        _shader->setVec3( "u_directionalLight.ambient", _light->ambient );
+        _shader->setVec3( "u_directionalLight.diffuse", _light->diffuse );
+        _shader->setVec3( "u_directionalLight.specular", _light->specular );
+        _shader->setVec3( "u_directionalLight.direction", _light->direction );
+        _shader->setInt( "u_directionalLight.isActive", _light->isActive );
+
+        _shader->setMat4( "u_tView", _camera->matView() );
+        _shader->setMat4( "u_tProj", _camera->matProj() );
+        _shader->setVec3( "u_viewPos", _camera->position() );
+        _shader->setVec3( "u_globalAmbientLight", { 0.15f, 0.15f, 0.15f } );
+        _shader->setMat4( "u_tLightSpaceViewMatrix", shadowMap->getLightSpaceViewMatrix() );
+        _shader->setMat4( "u_tLightSpaceProjMatrix", shadowMap->getLightSpaceProjectionMatrix() );
+        // _shader->setVec3( "u_lightPos", shadowMap->getLightPosition() );
 
         // render all meshes
         if ( textured )
@@ -267,21 +287,26 @@ namespace engine
                     //
                     for ( auto _child : _children )
                     {
-                        _shader->setModelMatrix( _mesh->getModelMatrix() );
-                        _shader->setMaterial( _child->getMaterial() );
+                        _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                        // set material related uniforms
+                        _shader->setVec3( "u_material.ambient", _child->getMaterial()->ambient );
+                        _shader->setVec3( "u_material.diffuse", _child->getMaterial()->diffuse );
+                        _shader->setVec3( "u_material.specular", _child->getMaterial()->specular );
+                        _shader->setFloat( "u_material.shininess", _child->getMaterial()->shininess );
+
                         _child->render();
                     }
                 }
                 else
                 {
-                    _shader->setModelMatrix( _mesh->getModelMatrix() );
-                    _shader->setMaterial( _mesh->getMaterial() );
+                    _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                    _shader->setVec3( "u_material.ambient", _mesh->getMaterial()->ambient );
+                    _shader->setVec3( "u_material.diffuse", _mesh->getMaterial()->diffuse );
+                    _shader->setVec3( "u_material.specular", _mesh->getMaterial()->specular );
+                    _shader->setFloat( "u_material.shininess", _mesh->getMaterial()->shininess );
+
                     _mesh->render();
                 }
-
-                // _shader->setModelMatrix( _mesh->getModelMatrix() );
-                // _shader->setMaterial( _mesh->getMaterial() );
-                // _mesh->render();
             }
         }
         else
@@ -294,21 +319,27 @@ namespace engine
                     //
                     for ( auto _child : _children )
                     {
-                        _shader->setModelMatrix( _mesh->getModelMatrix() );
-                        _shader->setMaterial( _child->getMaterial() );
+                        _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                        // set material related uniforms
+                        _shader->setVec3( "u_material.ambient", _child->getMaterial()->ambient );
+                        _shader->setVec3( "u_material.diffuse", _child->getMaterial()->diffuse );
+                        _shader->setVec3( "u_material.specular", _child->getMaterial()->specular );
+                        _shader->setFloat( "u_material.shininess", _child->getMaterial()->shininess );
+
                         _child->render();
                     }
                 }
                 else
                 {
-                    _shader->setModelMatrix( _mesh->getModelMatrix() );
-                    _shader->setMaterial( _mesh->getMaterial() );
+                    _shader->setMat4( "u_tModel", _mesh->getModelMatrix() );
+                    // set material related uniforms
+                    _shader->setVec3( "u_material.ambient", _mesh->getMaterial()->ambient );
+                    _shader->setVec3( "u_material.diffuse", _mesh->getMaterial()->diffuse );
+                    _shader->setVec3( "u_material.specular", _mesh->getMaterial()->specular );
+                    _shader->setFloat( "u_material.shininess", _mesh->getMaterial()->shininess );
+
                     _mesh->render();
                 }
-
-                // _shader->setModelMatrix( _mesh->getModelMatrix() );
-                // _shader->setMaterial( _mesh->getMaterial() );
-                // _mesh->render();
             }
         }
 

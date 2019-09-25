@@ -7,6 +7,7 @@
 #include <LIRenderer.h>
 #include <LShadowMap.h>
 
+#include <shaders/CShaderManager.h>
 
 namespace engine
 {

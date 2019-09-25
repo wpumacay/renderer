@@ -25,7 +25,7 @@ uniform vec3 u_globalAmbientLight;
 
 uniform LMaterial u_material;
 uniform vec3 u_viewPos;
-uniform vec3 u_lightPos;
+// uniform vec3 u_lightPos;
 uniform sampler2D u_shadowMap;
 
 in vec3 vNormal;
@@ -45,7 +45,7 @@ float calculateShadow( vec4 fragPosLightSpace, vec3 normal, vec3 lightDir )
     float _closestDepth = texture( u_shadowMap, _projCoords.xy ).r; // depth from shadow map
     float _currentDepth = _projCoords.z; // depth for the current fragment respect to the light point of view
 
-    float _bias = max( 0.005 * ( 1.0 - dot( normal, lightDir ) ), 0.0005 );
+    float _bias = max( 0.0005 * ( 1.0 - dot( normal, lightDir ) ), 0.0005 );
 
     float _shadow = ( _currentDepth - _bias ) > _closestDepth ? 1.0 : 0.0; // check if fragment is behind something
 
