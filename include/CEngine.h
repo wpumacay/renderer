@@ -23,7 +23,7 @@
 #include <core/CTextureCube.h>
 #include <core/CFrameBuffer.h>
 
-#include <LIRenderable.h>                           // #include <graphics/CRenderable.h>
+#include <LIRenderable.h>                           // #include <graphics/CIRenderable.h>
 #include <LMesh.h>                                  // #include <graphics/CMesh.h>
 #include <LModel.h>                                 // #include <graphics/CModel.h>
 #include <graphics/CMeshBuilder.h>
@@ -40,10 +40,10 @@
 #include <camera/CFpsCamera.h>
 #include <camera/COrbitCamera.h>
 
-#include <LILight.h>                                // #include <light/CLight.h>
-#include <LLightDirectional.h>                      // #include <light/CDirectionalLight.h>
-#include <LLightPoint.h>                            // #include <light/CPointLight.h>
-#include <LLightSpot.h>                             // #include <light/CSpotLight.h>
+#include <lights/CILight.h>
+#include <lights/CDirectionalLight.h>
+#include <lights/CPointLight.h>
+#include <lights/CSpotLight.h>
 
 #include <LMasterRenderer.h>                        // #include <renderer/COpenGLRenderer.h>
 #include <LMeshRenderer.h>                          // #include <renderer/COpenGLMeshRenderer.h>

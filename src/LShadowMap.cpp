@@ -45,7 +45,7 @@ namespace engine
         }
     }
 
-    void LShadowMap::setupLightDirectional( LLightDirectional* pLight )
+    void LShadowMap::setupLightDirectional( CDirectionalLight* pLight )
     {
         float _zNear = 1.0f;
         float _zFar  = 20.0f;
@@ -53,13 +53,13 @@ namespace engine
         float _width  = 20.0f;
         float _height = 20.0f;
 
-        m_projMat = CMat4::ortho( _width, _height, _zNear, _zFar );
-
-        auto _vpos = pLight->getVirtualPosition();
-        auto _vtarget = _vpos + pLight->direction;
-
-        m_viewMat = CMat4::lookAt( _vpos, _vtarget, CVec3( 0.0f, 1.0f, 0.0f ) );
-        m_virtualLightPosition = _vpos;
+//        m_projMat = CMat4::ortho( _width, _height, _zNear, _zFar );
+//
+//        auto _vpos = pLight->getVirtualPosition();
+//        auto _vtarget = _vpos + pLight->direction;
+//
+//        m_viewMat = CMat4::lookAt( _vpos, _vtarget, CVec3( 0.0f, 1.0f, 0.0f ) );
+//        m_virtualLightPosition = _vpos;
     }
 
     void LShadowMap::bind()

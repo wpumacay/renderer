@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "LLightDirectional.h"
+#include <lights/CDirectionalLight.h>
 
 #include <core/CFrameBuffer.h>
 
@@ -10,7 +10,7 @@
 
 namespace engine
 {
-    
+
     class LShadowMap
     {
 
@@ -35,7 +35,7 @@ namespace engine
         LShadowMap( int width = SHADOW_WIDTH, int height = SHADOW_HEIGHT );
         ~LShadowMap();
 
-        void setupLightDirectional( LLightDirectional* pLight );
+        void setupLightDirectional( CDirectionalLight* pLight );
 
         void bind();
         void unbind();

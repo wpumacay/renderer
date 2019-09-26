@@ -14,5 +14,5 @@ build/
 .vscode/
 
 # dependencies-exclusions
-ext/imgui
-ext/spdlog
+ext/imgui*
+ext/spdlog*

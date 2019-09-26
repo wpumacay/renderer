@@ -1,8 +1,10 @@
 
 #pragma once
 
-#include <LILight.h>
-#include <LLightDirectional.h>
+#include <lights/CILight.h>
+#include <lights/CDirectionalLight.h>
+#include <lights/CPointLight.h>
+#include <lights/CSpotLight.h>
 #include <LShadowMap.h>
 #include <LMeshRenderer.h>
 #include <LSkyboxRenderer.h>

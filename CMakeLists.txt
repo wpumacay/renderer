@@ -39,10 +39,10 @@ find_package( ASSIMP REQUIRED )
 find_package( PkgConfig REQUIRED )
 pkg_search_module( GLFW REQUIRED glfw3 )
 
-if ( APPLE )
+##if ( APPLE )
     include_directories( /usr/local/include )
     link_directories( /usr/local/lib )
-endif()
+##endif()
 
 message( "ASSIMP_INCLUDE_DIRS   : ${ASSIMP_INCLUDE_DIRS}" )
 message( "GLFW_INCLUDE_DIRS     : ${GLFW_INCLUDE_DIRS}" )

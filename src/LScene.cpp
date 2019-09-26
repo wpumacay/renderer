@@ -28,7 +28,7 @@ namespace engine
         }
         m_cameras.clear();
 
-        for ( LILight* _light : m_lights )
+        for ( CILight* _light : m_lights )
         {
             delete _light;
         }
@@ -83,9 +83,18 @@ namespace engine
         m_fog = pFog;
     }
     
-    void LScene::addLight( LILight* pLight )
+    void LScene::addLight( CILight* pLight )
     {
         m_lights.push_back( pLight );
+
+        if ( pLight->type() == eLightType::DIRECTIONAL ) 
+            m_directionalLights.push_back( (CDirectionalLight*) pLight );
+
+        if ( pLight->type() == eLightType::POINT ) 
+            m_pointLights.push_back( (CPointLight*) pLight );
+
+        if ( pLight->type() == eLightType::SPOT ) 
+            m_spotLights.push_back( (CSpotLight*) pLight );
     }
 
     void LScene::addCamera( CICamera* pCamera )
@@ -128,22 +137,19 @@ namespace engine
         m_skybox = pSkybox;
     }
 
-    LFog* LScene::getFog()
+    LFog* LScene::getFog() const
     {
         return m_fog;
     }
 
-    LSkybox* LScene::getSkybox()
+    LSkybox* LScene::getSkybox() const
     {
         return m_skybox;
     }
 
-    vector< LIRenderable* > LScene::getRenderables()
+    vector< LIRenderable* > LScene::getRenderables() const
     {
         return m_renderables;
     }
 
 }
-
-
-

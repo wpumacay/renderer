@@ -86,9 +86,11 @@ int main()
     _camera->setPosition( { -1.77f, -4.12f, 4.37f } );
 
     // make a sample light source
-    auto _light = new engine::LLightDirectional( engine::CVec3( 0.2, 0.2, 0.2 ), engine::CVec3( 0.5, 0.5, 0.5 ),
-                                                 engine::CVec3( 0.05, 0.05, 0.05 ), 0, engine::CVec3( 0, 0, -1 ) );
-    _light->setVirtualPosition( engine::CVec3( 5.0f, 0.0f, 5.0f ) );
+    auto _light = new engine::CDirectionalLight( "directional_1",
+                                                 { 0.2f, 0.2f, 0.2f }, 
+                                                 { 0.5f, 0.5f, 0.5f },
+                                                 { 0.05f, 0.05f, 0.05f }, 
+                                                 { 0.0f, 0.0f, -1.0f } );
 
     // make a simple skybox
     auto _skybox = new engine::LSkybox( "starfield" );

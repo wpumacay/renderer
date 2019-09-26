@@ -1,8 +1,6 @@
 
 #include <LMasterRenderer.h>
 
-using namespace std;
-
 namespace engine
 {
 
@@ -40,8 +38,8 @@ namespace engine
 
         if ( m_shadowsEnabled )
         {
-            auto _dirLights = pScene->getLights< LLightDirectional >();
-            if ( _dirLights.size() > 0 )
+            auto _directionalLights = pScene->directionalLights();
+            if ( _directionalLights.size() > 0 )
             {
                 _success = _renderToShadowMap( pScene );
                 if ( _success )
@@ -81,15 +79,15 @@ namespace engine
 
     bool LMasterRenderer::_renderToShadowMap( LScene* pScene )
     {
-        LLightDirectional* _light = NULL;
+        CDirectionalLight* _light = NULL;
         // Get directional light
-        vector<LLightDirectional*> _lights = pScene->getLights< LLightDirectional >();
-        if ( _lights.size() < 1 )
+        auto _directionalLights = pScene->directionalLights();
+        if ( _directionalLights.size() < 1 )
         {
             cout << "ERROR> There is no directional light for shadowmapping" << endl;
             return false;
         }
-        _light = _lights[0];
+        _light = _directionalLights.front();
 
         m_shadowMap->bind();
 

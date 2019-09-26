@@ -6,7 +6,7 @@
 #include <CMath.h>
 #include <LIRenderable.h>
 #include <camera/CICamera.h>
-#include <LILight.h>
+#include <lights/CILight.h>
 #include <LScene.h>
 #include <LShadowMap.h>
 #include <shaders/CShaderManager.h>

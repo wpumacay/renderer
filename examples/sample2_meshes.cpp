@@ -168,9 +168,11 @@ int main()
                                              engine::COpenGLApp::GetWindow()->height() );
 
     // make a sample light source
-    auto _light = new engine::LLightDirectional( engine::CVec3( 0.8, 0.8, 0.8 ), engine::CVec3( 0.8, 0.8, 0.8 ),
-                                                 engine::CVec3( 0.3, 0.3, 0.3 ), 0, engine::CVec3( 0, 0, -1 ) );
-    _light->setVirtualPosition( engine::CVec3( 5.0f, 0.0f, 5.0f ) );
+    auto _light = new engine::CDirectionalLight( "directional_1",
+                                                 { 0.8f, 0.8f, 0.8f }, 
+                                                 { 0.8f, 0.8f, 0.8f },
+                                                 { 0.3f, 0.3f, 0.3f }, 
+                                                 { 0.0f, 0.0f, -1.0f } );
 
     // add these components to the scene
     _scene->addCamera( _camera );

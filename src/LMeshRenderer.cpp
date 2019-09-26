@@ -96,14 +96,14 @@ namespace engine
             return;
         }
         // Get current light for uniforms loading
-        auto _lights = pScene->getLights< LLightDirectional >();
-        if ( _lights.size() < 1 )
+        auto _directionalLights = pScene->directionalLights();
+        if ( _directionalLights.size() < 1 )
         {
             std::cout << "ERROR> There is no light in the scene. No render executed" << std::endl;
             return;
         }
 
-        auto _light =  _lights.front();
+        auto _light =  _directionalLights.front();
 
         // start render pass
         _shader->bind();
@@ -113,7 +113,7 @@ namespace engine
         _shader->setVec3( "u_directionalLight.diffuse", _light->diffuse );
         _shader->setVec3( "u_directionalLight.specular", _light->specular );
         _shader->setVec3( "u_directionalLight.direction", _light->direction );
-        _shader->setInt( "u_directionalLight.isActive", _light->isActive );
+        _shader->setInt( "u_directionalLight.isActive", _light->enabled );
 
         // set scene related uniforms
         _shader->setMat4( "u_tView", _camera->matView() );
@@ -244,13 +244,13 @@ namespace engine
             return;
         }
         // Get current light for uniforms loading
-        auto _lights = pScene->getLights< LLightDirectional >();
-        if ( _lights.size() < 1 )
+        auto _directionalLights = pScene->directionalLights();
+        if ( _directionalLights.size() < 1 )
         {
             std::cout << "ERROR> There is no light in the scene. No render executed" << std::endl;
             return;
         }
-        auto _light = _lights[0];
+        auto _light = _directionalLights.front();
 
         _shader->bind();
         // if textured, the shadowmap is the second texture ( TEXTURE1 )
@@ -266,7 +266,7 @@ namespace engine
         _shader->setVec3( "u_directionalLight.diffuse", _light->diffuse );
         _shader->setVec3( "u_directionalLight.specular", _light->specular );
         _shader->setVec3( "u_directionalLight.direction", _light->direction );
-        _shader->setInt( "u_directionalLight.isActive", _light->isActive );
+        _shader->setInt( "u_directionalLight.isActive", _light->enabled );
 
         _shader->setMat4( "u_tView", _camera->matView() );
         _shader->setMat4( "u_tProj", _camera->matProj() );

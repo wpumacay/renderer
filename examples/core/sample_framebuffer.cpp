@@ -83,9 +83,11 @@ int main()
                                              engine::COpenGLApp::GetWindow()->height() );
     _scene->addCamera( _camera );
 
-    auto _light = new engine::LLightDirectional( { 0.8f, 0.8f, 0.8f }, { 0.8f, 0.8f, 0.8f },
-                                                 { 0.3f, 0.3f, 0.3f }, 0, { 0.0f, 0.0f, -1.0f } );
-    _light->setVirtualPosition( { 5.0f, 0.0f, 5.0f } );
+    auto _light = new engine::CDirectionalLight( "directional_1",
+                                                 { 0.8f, 0.8f, 0.8f }, 
+                                                 { 0.8f, 0.8f, 0.8f },
+                                                 { 0.3f, 0.3f, 0.3f }, 
+                                                 { 0.0f, 0.0f, -1.0f } );
     _scene->addLight( _light );
 
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
