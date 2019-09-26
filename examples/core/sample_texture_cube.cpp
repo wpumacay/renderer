@@ -166,7 +166,8 @@ int main()
 
         glDepthFunc( GL_LESS );
 
-        _app->update();
+        _app->renderScene();
+        _app->renderUi();
         _app->end();
     }
 

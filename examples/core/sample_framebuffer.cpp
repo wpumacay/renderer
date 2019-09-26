@@ -121,12 +121,10 @@ int main()
         // set the render target to our framebuffer
         _framebuffer->bind();
 
-        glEnable( GL_DEPTH_TEST );
-
         _app->begin();
 
         // let the renderer to the thing :D
-        _app->update();
+        _app->renderScene();
 
         // release our render targets
         _framebuffer->unbind();
@@ -148,6 +146,10 @@ int main()
         _quad_varray->unbind();
         _framebuffer->getTextureAttachment( "color_attachment" )->unbind();
         _shaderTex2d->unbind();
+        glEnable( GL_DEPTH_TEST );
+        
+        // render the ui on top of everything
+        _app->renderUi();
 
         _app->end();
     }

@@ -8,9 +8,9 @@ namespace engine
 
     LScene::LScene()
     {
-        m_currentCamera = NULL;
-        m_fog = NULL;
-        m_skybox = NULL;
+        m_currentCamera = nullptr;
+        m_fog = nullptr;
+        m_skybox = nullptr;
     }
 
     LScene::~LScene()
@@ -34,19 +34,19 @@ namespace engine
         }
         m_lights.clear();
 
-        if ( m_fog != NULL )
+        if ( m_fog != nullptr )
         {
             delete m_fog;
-            m_fog = NULL;
+            m_fog = nullptr;
         }
 
-        if ( m_skybox != NULL )
+        if ( m_skybox != nullptr )
         {
             delete m_skybox;
-            m_skybox = NULL;
+            m_skybox = nullptr;
         }
 
-        m_currentCamera = NULL;
+        m_currentCamera = nullptr;
     }
 
     void LScene::update( float dt )
@@ -55,7 +55,7 @@ namespace engine
         for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
         {
             auto _camera = _it->second;
-            if ( _camera != NULL )
+            if ( _camera != nullptr )
                 _camera->update();
         }
     }
@@ -68,13 +68,13 @@ namespace engine
         }
         else
         {
-            std::cout << "WARNING> Tried to pass a NULL reference" << std::endl;
+            std::cout << "WARNING> Tried to pass a nullptr reference" << std::endl;
         }
     }
 
     void LScene::addFog( LFog* pFog )
     {
-        if ( m_fog != NULL )
+        if ( m_fog != nullptr )
         {
             delete m_fog;
             std::cout << "LOG> Deleting current fog in the current scene" << std::endl;
@@ -129,7 +129,7 @@ namespace engine
 
     void LScene::addSkybox( LSkybox* pSkybox )
     {   
-        if ( m_skybox != NULL )
+        if ( m_skybox != nullptr )
         {
             delete m_skybox;
             std::cout << "LOG> Removing previous skybox from current scene" << std::endl;

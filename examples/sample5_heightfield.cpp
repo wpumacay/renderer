@@ -121,7 +121,8 @@ int main()
             break;
 
         _app->begin();
-        _app->update();
+        _app->renderScene();
+        _app->renderUi();
         _app->end();
     }
 

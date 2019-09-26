@@ -137,8 +137,8 @@ namespace engine
                      _fname.find( ".tga" ) != std::string::npos )
                 {
                     CTextureOptions _texOptions;
-                    _texOptions.filterMin       = eTextureFilter::NEAREST;
-                    _texOptions.filterMag       = eTextureFilter::NEAREST;
+                    _texOptions.filterMin       = eTextureFilter::LINEAR;
+                    _texOptions.filterMag       = eTextureFilter::LINEAR;
                     _texOptions.wrapU           = eTextureWrap::REPEAT;
                     _texOptions.wrapV           = eTextureWrap::REPEAT;
                     _texOptions.borderColorU    = { 0.0f, 0.0f, 0.0f, 1.0f };

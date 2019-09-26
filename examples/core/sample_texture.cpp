@@ -117,7 +117,8 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
-        _app->update();
+        _app->renderScene();
+        _app->renderUi();
         _app->end();
     }
 

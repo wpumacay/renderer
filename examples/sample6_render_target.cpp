@@ -180,6 +180,67 @@ int main()
 
     float _t = 0.0;
 
+    /* create a render target for the renderer ****************************************************/
+    engine::CAttachmentConfig _fbColorConfig;
+    _fbColorConfig.name                 = "color_attachment";
+    _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
+    _fbColorConfig.width                = engine::COpenGLApp::GetWindow()->width();
+    _fbColorConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
+    _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
+    _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
+    _fbColorConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+    _fbColorConfig.texWrapV             = engine::eTextureWrap::REPEAT;
+
+    engine::CAttachmentConfig _fbDepthConfig;
+    _fbDepthConfig.name                 = "depth_attachment";
+    _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
+    _fbDepthConfig.width                = engine::COpenGLApp::GetWindow()->width();
+    _fbDepthConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
+    _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
+    _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
+    _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+    _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
+
+    auto _framebuffer = new engine::CFrameBuffer();
+    _framebuffer->addAttachment( _fbColorConfig );
+    _framebuffer->addAttachment( _fbDepthConfig );
+
+    engine::float32 _quad_buffData[] = {
+     /*|  positions |      colors     |     uvs    |*/
+        -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    engine::uint32 _quad_indices[] = {
+        0, 1, 2, 
+        0, 2, 3
+    };
+
+    engine::CVertexBufferLayout _layout = { { "pos", engine::eElementType::Float2, false },
+                                            { "color", engine::eElementType::Float3, false },
+                                            { "uv", engine::eElementType::Float2, false } };
+
+    auto _quad_vbuffer = new engine::CVertexBuffer( _layout,
+                                                    engine::eBufferUsage::STATIC,
+                                                    sizeof( _quad_buffData ),
+                                                    _quad_buffData );;
+
+    auto _quad_ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
+                                                   6, _quad_indices );
+
+    auto _quad_varray = new engine::CVertexArray();
+    _quad_varray->addVertexBuffer( _quad_vbuffer );
+    _quad_varray->setIndexBuffer( _quad_ibuffer );
+
+    _app->renderer()->disableShadows();
+    _app->renderer()->setRenderTarget( _framebuffer );
+
+    /**********************************************************************************************/
+
     while( _app->isActive() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
@@ -215,9 +276,33 @@ int main()
 //         std::cout << "scroll-accum-x        : " << std::to_string( engine::CInputHandler::GetScrollAccumValueX() ) << std::endl;
 //         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputHandler::GetScrollAccumValueY() ) << std::endl;
 
+        // _framebuffer->bind();
         _app->begin();
         _app->renderScene();
+        // _framebuffer->unbind();
+
+        /* render the information grabbed in the render-target */
+
+        glDisable( GL_DEPTH_TEST );
+        glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+        glClear( GL_COLOR_BUFFER_BIT );
+
+        auto _shaderTex2d = engine::CShaderManager::GetCachedShader( "basic2d_textures" );
+        ENGINE_ASSERT( _shaderTex2d, "No shader to render our render target texture into a quad :(" );
+
+        _shaderTex2d->bind();
+        _framebuffer->getTextureAttachment( "color_attachment" )->bind();
+        _quad_varray->bind();
+
+        glDrawElements( GL_TRIANGLES, _quad_varray->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
+
+        _quad_varray->unbind();
+        _framebuffer->getTextureAttachment( "color_attachment" )->unbind();
+        _shaderTex2d->unbind();
+        glEnable( GL_DEPTH_TEST );
+
         _app->renderUi();
+
         _app->end();
     }
 

@@ -3,8 +3,9 @@
 #include <LScene.h>
 
 #include <camera/CICamera.h>
-#include <camera/CFpsCamera.h>
 #include <camera/CFixedCamera.h>
+#include <camera/CFpsCamera.h>
+#include <camera/COrbitCamera.h>
 
 #include <LMasterRenderer.h>
 
@@ -38,7 +39,9 @@ namespace engine
 
         void begin();
 
-        void update();
+        void renderScene();
+
+        void renderUi();
 
         void end();
 

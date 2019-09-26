@@ -106,7 +106,7 @@ namespace engine
         m_timeNow = glfwGetTime();
     }
 
-    void COpenGLApp::update()
+    void COpenGLApp::renderScene()
     {
         ENGINE_CORE_ASSERT( m_scenePtr, "Need a scene object to render" );
 
@@ -130,9 +130,23 @@ namespace engine
 
             engine::CDebugDrawer::Render( _currentCamera );
         }
+    }
 
-        if ( m_uiPtr )
-            m_uiPtr->render();
+    void COpenGLApp::renderUi()
+    {
+        if ( !m_uiPtr )
+            return;
+
+        auto _currentCamera = m_scenePtr->getCurrentCamera();
+        bool _hasCamera = ( _currentCamera != nullptr );
+        bool _hasActiveCamera = ( _hasCamera ) ? _currentCamera->active() : false;
+        bool _hasUserControlledCamera = ( _hasCamera ) ? ( _currentCamera->type() == CFpsCamera::GetStaticType() ||
+                                                           _currentCamera->type() == COrbitCamera::GetStaticType() ) : false;
+
+        if ( _hasCamera && _hasActiveCamera && _hasUserControlledCamera )
+            return;
+
+        m_uiPtr->render();
     }
 
     void COpenGLApp::end()

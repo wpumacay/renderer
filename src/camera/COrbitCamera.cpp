@@ -24,6 +24,7 @@ namespace engine
                                 float viewportHeight )
         : CICamera( name, position, targetPoint, upAxis, projData )
     {
+        m_type = eCameraType::ORBIT;
         m_viewportWidth = viewportWidth;
         m_viewportHeight = viewportHeight;
 

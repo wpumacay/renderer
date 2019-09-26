@@ -11,6 +11,8 @@ namespace engine
 
         m_shadowMap = new LShadowMap();
         m_shadowsEnabled = true;
+
+        m_renderTarget = nullptr;
     }
 
     LMasterRenderer::~LMasterRenderer()
@@ -31,6 +33,12 @@ namespace engine
 
     void LMasterRenderer::render( LScene* pScene )
     {
+        if ( m_renderTarget )
+        {
+            m_renderTarget->bind();
+            glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
+        }
+
         // render geometries from the scene
         m_meshRenderer->begin( pScene );
 
@@ -70,6 +78,9 @@ namespace engine
         m_skyboxRenderer->begin( pScene );
         m_skyboxRenderer->renderScene( pScene );
         m_skyboxRenderer->end( pScene );
+
+        if ( m_renderTarget )
+            m_renderTarget->unbind();
     }
 
     void LMasterRenderer::_renderScene( LScene* pScene )
