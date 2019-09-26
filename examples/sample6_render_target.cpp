@@ -9,6 +9,12 @@ public :
     Application() : engine::COpenGLApp() {}
     ~Application() {}
 
+    void showRenderTarget( engine::CFrameBuffer* fbuffer )
+    {
+        reinterpret_cast< engine::CImguiUiDemo* >( m_uiPtr )->showTexture( fbuffer->getTextureAttachment( "color_attachment" ),
+                                                                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
+    }
+
 protected :
 
     void _initUser() override
@@ -301,6 +307,7 @@ int main()
         _shaderTex2d->unbind();
         glEnable( GL_DEPTH_TEST );
 
+        _app->showRenderTarget( _framebuffer );
         _app->renderUi();
 
         _app->end();

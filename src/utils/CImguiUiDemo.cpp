@@ -18,9 +18,12 @@ namespace engine
 
     }
 
-    void CImguiUiDemo::showTexture( std::shared_ptr< CTexture > texture )
+    void CImguiUiDemo::showTexture( std::shared_ptr< CTexture > texture,
+                                    const CVec2& uv0, const CVec2& uv1 )
     {
         m_textureToShow = texture;
+        m_textureToShowUv0 = uv0;
+        m_textureToShowUv1 = uv1;
     }
 
     void CImguiUiDemo::_initInternal()
@@ -82,7 +85,9 @@ namespace engine
         ImGui::Begin( "User-texture" );
 
         ImGui::Image( (void*)(intptr_t) m_textureToShow->openglId(),
-                      ImVec2( m_textureToShow->width() / 2.0, m_textureToShow->height() / 2.0 ) );
+                      ImVec2( m_textureToShow->width() / 2.0, m_textureToShow->height() / 2.0 ),
+                      ImVec2( m_textureToShowUv0.x, m_textureToShowUv0.y ),
+                      ImVec2( m_textureToShowUv1.x, m_textureToShowUv1.y ) );
         
         ImGui::End();
     }

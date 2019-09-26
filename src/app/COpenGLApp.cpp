@@ -137,14 +137,14 @@ namespace engine
         if ( !m_uiPtr )
             return;
 
-        auto _currentCamera = m_scenePtr->getCurrentCamera();
-        bool _hasCamera = ( _currentCamera != nullptr );
-        bool _hasActiveCamera = ( _hasCamera ) ? _currentCamera->active() : false;
-        bool _hasUserControlledCamera = ( _hasCamera ) ? ( _currentCamera->type() == CFpsCamera::GetStaticType() ||
-                                                           _currentCamera->type() == COrbitCamera::GetStaticType() ) : false;
-
-        if ( _hasCamera && _hasActiveCamera && _hasUserControlledCamera )
-            return;
+//         auto _currentCamera = m_scenePtr->getCurrentCamera();
+//         bool _hasCamera = ( _currentCamera != nullptr );
+//         bool _hasActiveCamera = ( _hasCamera ) ? _currentCamera->active() : false;
+//         bool _hasUserControlledCamera = ( _hasCamera ) ? ( _currentCamera->type() == CFpsCamera::GetStaticType() ||
+//                                                            _currentCamera->type() == COrbitCamera::GetStaticType() ) : false;
+// 
+//         if ( _hasCamera && _hasActiveCamera && _hasUserControlledCamera )
+//             return;
 
         m_uiPtr->render();
     }
