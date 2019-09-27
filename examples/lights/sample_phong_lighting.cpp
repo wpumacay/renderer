@@ -68,7 +68,7 @@ int main()
         _shaderPhong->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
         _shaderPhong->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
         _shaderPhong->setVec3( "u_lightPosition", _gizmo->pos );
-        _shaderPhong->setVec3( "u_viewerPosition", _camera->matView().getPosition() );
+        _shaderPhong->setVec3( "u_viewerPosition", _camera->position() );
 
         _box->render();
 

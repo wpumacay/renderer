@@ -74,6 +74,8 @@ int main()
     _scene->addRenderable( _patch );
     _scene->addSkybox( _skybox );
 
+    _app->renderer()->disableShadows();
+
     while( _app->isActive() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );

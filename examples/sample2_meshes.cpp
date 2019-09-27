@@ -34,7 +34,7 @@ int main()
     auto _scene = _app->scene();
     
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
-    _plane->getMaterial()->setColor( { 0.2f, 0.3f, 0.4f } );
+    _plane->getMaterial()->setColor( { 0.3f, 0.45f, 0.6f } );
     _scene->addRenderable( _plane );
 
     auto _containerTex = engine::CTextureManager::GetCachedTexture( "img_container" );
@@ -89,7 +89,7 @@ int main()
     for ( size_t i = 0; i < _renderables.size(); i++ )
     {
         if ( _renderables[i]->getType() == engine::eRenderableType::MESH )
-            _renderables[i]->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
+            _renderables[i]->getMaterial()->setColor( { 1.0f * 0.7f, 1.0f * 0.5f, 1.0f * 0.3f } );
     }
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
@@ -169,9 +169,9 @@ int main()
 
     // make a sample light source
     auto _light = new engine::CDirectionalLight( "directional_1",
-                                                 { 0.8f, 0.8f, 0.8f }, 
-                                                 { 0.8f, 0.8f, 0.8f },
-                                                 { 0.3f, 0.3f, 0.3f }, 
+                                                 { 0.4f, 0.4f, 0.4f }, 
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 0.5f, 0.5f, 0.5f }, 
                                                  { 0.0f, 0.0f, -1.0f } );
 
     // add these components to the scene
@@ -179,6 +179,8 @@ int main()
     _scene->addLight( _light );
 
     float _t = 0.0;
+
+    _app->renderer()->disableShadows();
 
     while( _app->isActive() )
     {

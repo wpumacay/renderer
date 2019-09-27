@@ -55,7 +55,7 @@ vec3 computeDirectionalContribution( LLightDirectional light, vec3 normal, vec3 
     // diffuse shadding
     float _diff = max( dot( normal, _lightDir ), 0.0 );
     // specular shading
-    vec3 _reflectDir = reflect( _lightDir, normal );
+    vec3 _reflectDir = reflect( -_lightDir, normal );
     float _spec = pow( max( dot( viewDir, _reflectDir ), 0.0 ), u_material.shininess );
     // calculate components
     vec3 _ambient  = light.ambient * u_material.ambient;
