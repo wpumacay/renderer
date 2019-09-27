@@ -64,6 +64,7 @@ set( GLENGINE_INCLUDE_DIRS
 include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
+add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/" )
 
 file( GLOB_RECURSE SRCS "src/*.cpp" )
 

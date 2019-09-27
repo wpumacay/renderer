@@ -37,45 +37,57 @@ namespace engine
 
         glfwSetKeyCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, int key, int scancode, int action, int mode )
             {
-                CWindowProps _wprops = *( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops.callbackKey )
+                if ( !_wprops->callbackKey )
                     return;
 
-                _wprops.callbackKey( key, action );
+                _wprops->callbackKey( key, action );
             } );
 
         glfwSetMouseButtonCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, int button, int action, int mode )
             {
-                CWindowProps _wprops = *( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops.callbackMouse )
+                if ( !_wprops->callbackMouse )
                     return;
 
-                double _x, _y;
+                double _x,_y;
                 glfwGetCursorPos( pWindow, &_x, &_y );
 
-                _wprops.callbackMouse( button, action, _x, _y );
+                _wprops->callbackMouse( button, action, _x, _y );
             } );
 
         glfwSetCursorPosCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, double x, double y )
             {
-                CWindowProps _wprops = *( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops.callbackMouse )
+                if ( !_wprops->callbackMouse )
                     return;
 
-                _wprops.callbackMouseMove( x, y );
+                _wprops->callbackMouseMove( x, y );
             } );
 
         glfwSetScrollCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, double xOff, double yOff )
             {
-                CWindowProps _wprops = *( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops.callbackScroll )
+                if ( !_wprops->callbackScroll )
                     return;
 
-                _wprops.callbackScroll( xOff, yOff );
+                _wprops->callbackScroll( xOff, yOff );
+            } );
+
+        glfwSetWindowSizeCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, int width, int height )
+            {
+                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                _wprops->width = width;
+                _wprops->height = height;
+
+                if ( !_wprops->callbackResize )
+                    return;
+
+                _wprops->callbackResize( width, height );
             } );
 
         glfwSetInputMode( m_glfwWindowPtr, GLFW_STICKY_KEYS, 1 );
@@ -83,7 +95,10 @@ namespace engine
         glViewport( 0, 0, m_properties.width, m_properties.height );
 
         glEnable( GL_DEPTH_TEST );
-        glClearColor( CLEAR_COLOR );
+        glClearColor( m_properties.clearColor.x, 
+                      m_properties.clearColor.y,
+                      m_properties.clearColor.z,
+                      m_properties.clearColor.w );
 
         ENGINE_CORE_INFO( "Successfully created opengl-window" );
     }
@@ -111,7 +126,11 @@ namespace engine
 
     void COpenGLWindow::begin()
     {
-        glClearColor( CLEAR_COLOR );
+        glClearColor( m_properties.clearColor.x, 
+                      m_properties.clearColor.y,
+                      m_properties.clearColor.z,
+                      m_properties.clearColor.w );
+
         glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
         glfwPollEvents();
     }
@@ -149,6 +168,11 @@ namespace engine
     void COpenGLWindow::registerScrollCallback( FnPtr_scroll_callback callback )
     {
         m_properties.callbackScroll = callback;
+    }
+
+    void COpenGLWindow::registerResizeCallback( FnPtr_resize_callback callback )
+    {
+        m_properties.callbackResize = callback;
     }
 
 }

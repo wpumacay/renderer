@@ -87,6 +87,12 @@ namespace engine
         m_windowPtr->registerMouseCallback( engine::CInputHandler::callback_mouse );
         m_windowPtr->registerMouseMoveCallback( engine::CInputHandler::callback_mouseMove );
         m_windowPtr->registerScrollCallback( engine::CInputHandler::callback_scroll );
+        m_windowPtr->registerResizeCallback( []( int width, int height )
+            {
+                auto _app = COpenGLApp::GetInstance();
+                auto _scene = _app->scene();
+                _scene->resize( width, height );
+            } );
 
         // let the user initialize its own stuff
         _initUser();
@@ -125,7 +131,7 @@ namespace engine
                     m_windowPtr->enableCursor();
             }
 
-            m_scenePtr->update( m_timeDelta );
+            m_scenePtr->update();
             m_masterRenderer->render( m_scenePtr );
 
             engine::CDebugDrawer::Render( _currentCamera );

@@ -11,8 +11,6 @@
 #include <app/COpenGLContext.h>
 #include <utils/CLogger.h>
 
-#define CLEAR_COLOR 0.6f, 0.659f, 0.690f, 1.0f
-
 namespace engine
 {
 
@@ -21,6 +19,7 @@ namespace engine
         int width;
         int height;
         std::string title;
+        CVec4 clearColor;
 
         int gl_api_version_major;
         int gl_api_version_minor;
@@ -29,12 +28,14 @@ namespace engine
         FnPtr_mouse_callback callbackMouse;
         FnPtr_mousemove_callback callbackMouseMove;
         FnPtr_scroll_callback callbackScroll;
+        FnPtr_resize_callback callbackResize;
 
         CWindowProps()
         {
             width = 1024;
             height = 768;
             title = "OpenGL-Window";
+            clearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 
             gl_api_version_major = 3;
             gl_api_version_minor = 3;
@@ -43,6 +44,7 @@ namespace engine
             callbackMouse = nullptr;
             callbackMouseMove = nullptr;
             callbackScroll = nullptr;
+            callbackResize = nullptr;
         }
     };
 
@@ -57,6 +59,7 @@ namespace engine
         void registerMouseCallback( FnPtr_mouse_callback callback );
         void registerMouseMoveCallback( FnPtr_mousemove_callback callback );
         void registerScrollCallback( FnPtr_scroll_callback callback );
+        void registerResizeCallback( FnPtr_resize_callback callback );
 
         void enableCursor();
         void disableCursor();

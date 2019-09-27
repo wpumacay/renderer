@@ -27,3 +27,4 @@ foreach( sampleFile ${SampleFiles} )
 endforeach( sampleFile )
 
 add_subdirectory( core )
+add_subdirectory( lights )

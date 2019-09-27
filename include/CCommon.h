@@ -25,6 +25,10 @@
     #define ENGINE_RESOURCES_PATH "../res/"
 #endif
 
+#ifndef ENGINE_EXAMPLES_PATH
+    #define ENGINE_EXAMPLES_PATH "../../../examples/"
+#endif
+
 namespace engine
 {
 

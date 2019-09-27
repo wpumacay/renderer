@@ -49,7 +49,7 @@ namespace engine
         m_currentCamera = nullptr;
     }
 
-    void LScene::update( float dt )
+    void LScene::update()
     {
         map<string, CICamera*>::iterator _it;
         for ( _it = m_cameras.begin(); _it != m_cameras.end(); _it++ )
@@ -58,6 +58,13 @@ namespace engine
             if ( _camera != nullptr )
                 _camera->update();
         }
+    }
+
+    void LScene::resize( int width, int height )
+    {
+        for ( auto it : m_cameras )
+            if ( it.second )
+                it.second->resize( width, height );
     }
 
     void LScene::addRenderable( LIRenderable* pRenderable )

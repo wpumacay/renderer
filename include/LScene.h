@@ -45,7 +45,8 @@ namespace engine
         std::vector< CPointLight* > pointLights() const { return m_pointLights; }
         std::vector< CSpotLight* > spotLights() const { return m_spotLights; }
 
-        virtual void update( float dt );
+        void update();
+        void resize( int width, int height );
 
     protected :
 

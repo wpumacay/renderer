@@ -57,6 +57,7 @@ namespace engine
         void setActiveMode( bool activeMode );
         void setProjectionData( const CCameraProjData& projData );
         void update();
+        void resize( int width, int height );
         std::string toString();
 
         std::string name() const { return m_name; }
@@ -102,6 +103,8 @@ namespace engine
 
         CCameraProjData m_projData;
 
+        int m_viewportWidth;
+        int m_viewportHeight;
         bool m_active;
     };
 

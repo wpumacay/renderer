@@ -445,6 +445,17 @@ namespace engine
         return _res;
     }
 
+    CMat4 CMat4::transpose() const
+    {
+        CMat4 _res;
+
+        for ( size_t i = 0; i < 4; i++ )
+            for ( size_t j = 0; j < 4; j++ )
+                _res.set( i, j, get( j, i ) );
+
+        return _res;
+    }
+
     CMat4 CMat4::perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar )
     {
         CMat4 _res;

@@ -34,7 +34,12 @@ namespace engine
     void CImguiUiDemo::_renderInternal()
     {
         ImGui::Begin( "Demo-ui" );
-
+        auto _pos = ImGui::GetCursorPos();
+        auto _posScreen = ImGui::GetCursorScreenPos();
+        auto _cursor = ImGui::GetMousePos();
+        ImGui::Text( "pos : (%.3f,%.3f)", _pos.x, _pos.y );
+        ImGui::Text( "pos-screen: (%.3f,%.3f)", _posScreen.x, _posScreen.y );
+        ImGui::Text( "cursor: (%.3f,%.3f)", _cursor.x, _cursor.y );
         ImGui::End();
 
         _renderUserTextureMenu();

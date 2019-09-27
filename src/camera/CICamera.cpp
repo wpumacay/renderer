@@ -101,6 +101,15 @@ namespace engine
         _updateInternal();
     }
 
+    void CICamera::resize( int width, int height )
+    {
+        m_projData.aspect = ( (float)width ) / height;
+        m_projData.width = width;
+        m_projData.height = height;
+
+        _buildProjMatrix();
+    }
+
     std::string CICamera::toString()
     {
         std::string _strRep;

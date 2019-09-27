@@ -123,6 +123,7 @@ namespace engine
         CVec3 getPosition() const;
         CMat4 getRotation() const;
         CMat4 inverse() const;
+        CMat4 transpose() const;
 
         static CMat4 perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar );
         static CMat4 ortho( float32 width, float32 height, float32 zNear, float32 zFar );
