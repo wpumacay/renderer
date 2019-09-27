@@ -33,46 +33,86 @@ int main()
 //                                            _cameraSpeed,
 //                                            _cameraMaxDelta );
 
-    auto _box = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
+    auto _box = engine::CMeshBuilder::createBox( 3.0f, 3.0f, 3.0f );
+    auto _sphere = engine::CMeshBuilder::createSphere( 1.5f );
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->pos = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
-    std::string _baseName = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong";
+    std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong";
     auto _shaderPhong = engine::CShaderManager::CreateShaderFromFiles( "phong_shader",
-                                                                       _baseName + "_vs.glsl",
-                                                                       _baseName + "_fs.glsl" );
+                                                                       _baseNamePhong + "_vs.glsl",
+                                                                       _baseNamePhong + "_fs.glsl" );
+
+    std::string _baseNameGouraud = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/gouraud";
+    auto _shaderGouraud = engine::CShaderManager::CreateShaderFromFiles( "gouraud_shader",
+                                                                         _baseNameGouraud + "_vs.glsl",
+                                                                         _baseNameGouraud + "_fs.glsl" );
 
     ENGINE_ASSERT( _shaderPhong, "Could not load phong shader for our tests :(" );
+    ENGINE_ASSERT( _shaderGouraud, "Could not load gouraud shader for our tests :(" );
 
     /* grab a simple shader to render the camera gizmo */
     auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
     ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
 
+    // select shader to use
+    auto _shaderLighting = _shaderPhong;
+    auto _mesh = _sphere;
+    // _mesh->pos = { 1.0f, 1.0f, 0.0f };
+    // _mesh->scale = { 0.5f, 1.0f, 1.5f };
+
+    bool _moveLight = false;
+    float _mvParam = 0.0f;
+
     while( _app->isActive() )
     {
         if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        {
             break;
+        }
+        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_S ) )
+        {
+            _shaderLighting = ( _shaderLighting->name() == "phong_shader" ) ? _shaderGouraud : _shaderPhong;
+            ENGINE_INFO( "Using shader: {0}", _shaderLighting->name() );
+        }
+        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_P ) )
+        {
+            _moveLight = !_moveLight;
+            ENGINE_INFO( "Light state: {0}", ( _moveLight ) ? "moving" : "fixed" );
+        }
+
+        engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
+        engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+        engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         _app->begin();
         _camera->update();
 
-        _gizmo->pos.x = 1.0f + std::sin( glfwGetTime() ) * 2.0f;
-        _gizmo->pos.y = std::sin( glfwGetTime() / 2.0f ) * 1.0f;
+        if ( _moveLight )
+        {
+            _mvParam += 100.0f * engine::CTime::GetTimeStep();
+            // _gizmo->pos.x = 1.0f + std::sin( _mvParam ) * 2.0f;
+            // _gizmo->pos.y = std::sin( _mvParam / 2.0f ) * 1.0f;
+
+            _gizmo->pos.x = 10.0f * std::sin( _mvParam );
+            _gizmo->pos.y = 10.0f * std::cos( _mvParam );
+            _gizmo->pos.z = 0.0f;
+        }
 
         /* do our thing here ************************/
-        _shaderPhong->bind();
-        _shaderPhong->setMat4( "u_modelMat", _box->getModelMatrix() );
-        _shaderPhong->setMat4( "u_viewProjMat", _camera->matProj() * _camera->matView() );
-        _shaderPhong->setMat4( "u_normalMat", ( ( _box->getModelMatrix() ).inverse() ).transpose() );
-        _shaderPhong->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
-        _shaderPhong->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
-        _shaderPhong->setVec3( "u_lightPosition", _gizmo->pos );
-        _shaderPhong->setVec3( "u_viewerPosition", _camera->position() );
+        _shaderLighting->bind();
+        _shaderLighting->setMat4( "u_modelMat", _mesh->getModelMatrix() );
+        _shaderLighting->setMat4( "u_viewProjMat", _camera->matProj() * _camera->matView() );
+        _shaderLighting->setMat4( "u_normalMat", ( ( _mesh->getModelMatrix() ).inverse() ).transpose() );
+        _shaderLighting->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
+        _shaderLighting->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
+        _shaderLighting->setVec3( "u_lightPosition", _gizmo->pos );
+        _shaderLighting->setVec3( "u_viewerPosition", _camera->position() );
 
-        _box->render();
+        _mesh->render();
 
-        _shaderPhong->unbind();
+        _shaderLighting->unbind();
 
         _shaderGizmo->bind();
         _shaderGizmo->setMat4( "u_tModel", _gizmo->getModelMatrix() );
@@ -85,7 +125,12 @@ int main()
         _shaderGizmo->unbind();
         /********************************************/
 
+        // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
+        engine::CDebugDrawer::Render( _camera );
+
         _app->end();
+
+        // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
     }
 
     return 0;

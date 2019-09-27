@@ -13,11 +13,10 @@ void main()
 {
     vec3 _lAmbientComp = 0.1 * u_lightColor;
     vec3 _lDiffuseComp = max( dot( normalize( fNormal ), 
-                                   normalize( u_lightPosition - fPosition ) ), 
-                              0.0f ) * u_lightColor;
+                                   normalize( u_lightPosition - fPosition ) ), 0.0f ) * u_lightColor;
     vec3 _lSpecularComp = 0.5 * pow( max( dot( normalize( u_viewerPosition - fPosition ),
                                                reflect( -normalize( u_lightPosition - fPosition ),
-                                                        normalize( fNormal ) ) ), 0.0f ), 128 ) * u_lightColor;
+                                                        normalize( fNormal ) ) ), 0.0f ), 32 ) * u_lightColor;
 
     vec3 _oAmbiengComp = _lAmbientComp * u_objectColor;
     vec3 _oDiffuseComp = _lDiffuseComp * u_objectColor;

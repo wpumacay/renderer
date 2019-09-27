@@ -7,6 +7,7 @@
 #include <core/CVertexBuffer.h>
 #include <core/CVertexArray.h>
 #include <camera/CICamera.h>
+#include <LMesh.h>
 
 #define DEBUG_DRAWER_BATCH_SIZE 1024
 
@@ -38,6 +39,7 @@ namespace engine
         static void DrawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
         static void DrawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );
         static void DrawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color );
+        static void DrawNormals( LMesh* meshPtr, const CVec3& color );
 
         ~CDebugDrawer();
 
@@ -53,6 +55,7 @@ namespace engine
         void _drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
         void _drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );
         void _drawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color );
+        void _drawNormals( LMesh* meshPtr, const CVec3& color );
 
         void _render( CICamera* camera );
         void _renderLinesBatch( CICamera* camera, int numLines );

@@ -96,6 +96,13 @@ namespace engine
         CDebugDrawer::s_instance->_drawAABB( aabbMin, aabbMax, worldTransform, color );
     }
 
+    void CDebugDrawer::DrawNormals( LMesh* meshPtr, const CVec3& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawNormals( meshPtr, color );
+    }
+
     CDebugDrawer::~CDebugDrawer()
     {
         m_linesPositions.clear();
@@ -319,4 +326,28 @@ namespace engine
         _drawLine( _p5, _p6, color ); _drawLine( _p6, _p7, color );
         _drawLine( _p7, _p8, color ); _drawLine( _p8, _p5, color );
     }
+
+    void CDebugDrawer::_drawNormals( LMesh* meshPtr, const CVec3& color )
+    {
+        if ( !meshPtr )
+            return;
+
+        auto _vertices = meshPtr->vertices();
+        auto _normals = meshPtr->normals();
+
+        auto _modelMatrix = meshPtr->getModelMatrix();
+        auto _normalMatrix = ( _modelMatrix.inverse() ).transpose();
+
+        for ( size_t i = 0; i < _vertices.size(); i++ )
+        {
+            auto _wposition = _modelMatrix * CVec4( _vertices[i], 1.0f );
+            auto _wnormal = _normalMatrix * CVec4( _normals[i], 0.0f );
+
+            CVec3 _position3d = { _wposition.x, _wposition.y, _wposition.z };
+            CVec3 _normal3d = { _wnormal.x, _wnormal.y, _wnormal.z };
+
+            _drawArrow( _position3d, _position3d + 0.1f * _normal3d, color );
+        }
+    }
+
 }
