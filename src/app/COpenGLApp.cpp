@@ -103,6 +103,14 @@ namespace engine
         ENGINE_CORE_INFO( "GL-Application started successfully" );
     }
 
+    void COpenGLApp::setUi( CImguiUi* uiPtr )
+    {
+        if ( m_uiPtr )
+            delete m_uiPtr;
+
+        m_uiPtr = uiPtr;
+    }
+
     void COpenGLApp::begin()
     {
         ENGINE_CORE_ASSERT( m_windowPtr, "Should have created a window by now" );

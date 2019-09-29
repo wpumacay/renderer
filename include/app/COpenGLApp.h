@@ -37,6 +37,8 @@ namespace engine
 
         void init();
 
+        void setUi( CImguiUi* uiPtr );
+
         void begin();
 
         void renderScene();
