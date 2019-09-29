@@ -22,6 +22,7 @@ namespace engine
         ImGui::CreateContext();
         ImGuiIO& _io = ImGui::GetIO(); (void) _io;
         _io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
         ImGui_ImplGlfw_InitForOpenGL( m_windowHandle, true );
     #ifdef __APPLE__

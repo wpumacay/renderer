@@ -7,12 +7,16 @@ class ApplicationUi : public engine::CImguiUi
 public :
 
     ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        m_material = nullptr;
-    }
+        : engine::CImguiUi( context ) {}
 
-    ~ApplicationUi() {}
+    ~ApplicationUi() 
+    {
+        for ( auto _mesh : m_meshes )
+            delete _mesh;
+
+        m_meshes.clear();
+        m_cachedTextures.clear();
+    }
 
     void setMaterial( std::shared_ptr< engine::CIMaterial > material )
     {
@@ -24,45 +28,51 @@ public :
         m_light = light;
     }
 
+    engine::LIRenderable* selectedMesh()
+    {
+        return m_meshes[ m_meshSelectedIndex ];
+    }
+
 protected :
 
     void _initInternal() override
     {
         m_light = nullptr;
         m_material = nullptr;
-        m_materialSelectedIndex = -1;
         m_lightsAnimated = false;
 
-        m_materialsList = { { "emerald"       , { 0.0215, 0.1745, 0.0215 }, { 0.07568, 0.61424, 0.07568 }, { 0.633, 0.727811, 0.633 }, 0.6 * 128 },
-                            { "jade"          , { 0.1350, 0.2225, 0.1575 }, { 0.54, 0.89, 0.63 }, { 0.316228, 0.316228, 0.316228 }, 0.1 * 128 },
-                            { "obsidian"      , { 0.05375, 0.05, 0.06625 }, { 0.18275, 0.17, 0.22525 }, { 0.332741, 0.328634, 0.346435 }, 0.3 * 128 },
-                            { "pearl"         , { 0.25, 0.20725, 0.20725 }, { 1.0, 0.829, 0.829 }, { 0.296648, 0.296648, 0.296648 }, 0.088 * 128 },
-                            { "ruby"          , { 0.1745, 0.01175, 0.01175 }, { 0.61424, 0.04136, 0.04136 }, { 0.727811, 0.626959, 0.626959 }, 0.6 * 128 },
-                            { "turquoise"     , { 0.1, 0.18725, 0.1745 }, { 0.396, 0.74151, 0.69102 }, { 0.297254, 0.30829, 0.306678 }, 0.1 * 128 },
-                            { "brass"         , { 0.329412, 0.223529, 0.027451 }, { 0.780392, 0.568627, 0.113725 }, { 0.992157, 0.941176, 0.807843 }, 0.21794872 * 128 },
-                            { "bronze"        , { 0.2125, 0.1275, 0.054 }, { 0.714, 0.4284, 0.18144 }, { 0.393548, 0.271906, 0.166721 }, 0.2 * 128 },
-                            { "chrome"        , { 0.25, 0.25, 0.25 }, { 0.4, 0.4, 0.4 }, { 0.774597, 0.774597, 0.774597 }, 0.6 * 128 },
-                            { "copper"        , { 0.19125, 0.0735, 0.0225 }, { 0.7038, 0.27048, 0.0828 }, { 0.256777, 0.137622, 0.086014 }, 0.1 * 128 },
-                            { "gold"          , { 0.24725, 0.1995, 0.0745 }, { 0.75164, 0.60648, 0.22648 }, { 0.628281, 0.555802, 0.366065 }, 0.4 * 128 },
-                            { "silver"        , { 0.19225, 0.19225, 0.19225 }, { 0.50754, 0.50754, 0.50754 }, { 0.508273, 0.508273, 0.508273 }, 0.4 * 128 },
-                            { "blackPlastic"  , { 0.0, 0.0, 0.0 }, { 0.01, 0.01, 0.01 }, { 0.50, 0.50, 0.50 }, 0.25 * 128 },
-                            { "cyanPlastic"   , { 0.0, 0.1, 0.06 }, { 0.0, 0.50980392, 0.50980392 }, { 0.50196078, 0.50196078, 0.50196078 }, 0.25 * 128 },
-                            { "greenPlastic"  , { 0.0, 0.0, 0.0 }, { 0.1, 0.35, 0.1 }, { 0.45, 0.55, 0.45 }, 0.25 * 128 },
-                            { "redPlastic"    , { 0.0, 0.0, 0.0 }, { 0.5, 0.0, 0.0 }, { 0.7, 0.6, 0.6 }, 0.25 * 128 },
-                            { "whitePlastic"  , { 0.0, 0.0, 0.0 }, { 0.55, 0.55, 0.55 }, { 0.70, 0.70, 0.70 }, 0.25 * 128 },
-                            { "yellowPlastic" , { 0.0, 0.0, 0.0 }, { 0.5, 0.5, 0.0 }, { 0.60, 0.60, 0.50 }, 0.25 * 128 },
-                            { "blackRubber"   , { 0.02, 0.02, 0.02 }, { 0.01, 0.01, 0.01 }, { 0.4, 0.4, 0.4 }, 0.078125 * 128 },
-                            { "cyanRubber"    , { 0.0, 0.05, 0.05 }, { 0.4, 0.5, 0.5 }, { 0.04, 0.7, 0.7 }, 0.078125 * 128 },
-                            { "greenRubber"   , { 0.0, 0.05, 0.0 }, { 0.4, 0.5, 0.4 }, { 0.04, 0.7, 0.04 }, 0.078125 * 128 },
-                            { "redRubber"     , { 0.05, 0.0, 0.0 }, { 0.5, 0.4, 0.4 }, { 0.7, 0.04, 0.04 }, 0.078125 * 128 },
-                            { "whiteRubber"   , { 0.05, 0.05, 0.05 }, { 0.5, 0.5, 0.5 }, { 0.7, 0.7, 0.7 }, 0.078125 * 128 },
-                            { "yelloRubber"   , { 0.05, 0.05, 0.0 }, { 0.5, 0.5, 0.4 }, { 0.7, 0.7, 0.04 }, 0.078125 * 128 } };
+        auto _box       = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
+        auto _sphere    = engine::CMeshBuilder::createSphere( 1.5f );
+        auto _ellipsoid = engine::CMeshBuilder::createEllipsoid( 1.0f, 1.25f, 1.5f );
+        auto _cylinderX = engine::CMeshBuilder::createCylinder( 0.5f, 1.0f, engine::eAxis::X );
+        auto _cylinderY = engine::CMeshBuilder::createCylinder( 0.5f, 1.0f, engine::eAxis::Y );
+        auto _cylinderZ = engine::CMeshBuilder::createCylinder( 0.5f, 1.0f, engine::eAxis::Z );
+        auto _capsuleX  = engine::CMeshBuilder::createCapsule( 0.5f, 1.0f, engine::eAxis::X );
+        auto _capsuleY  = engine::CMeshBuilder::createCapsule( 0.5f, 1.0f, engine::eAxis::Y );
+        auto _capsuleZ  = engine::CMeshBuilder::createCapsule( 0.5f, 1.0f, engine::eAxis::Z );
+        auto _arrowX    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::X );
+        auto _arrowY    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::Y );
+        auto _arrowZ    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::Z );
+        auto _axes      = engine::CMeshBuilder::createAxes( 1.0f );
+
+        m_meshes = { _box, _sphere, _ellipsoid, _cylinderX, _cylinderY, _cylinderZ, 
+                     _capsuleX, _capsuleY, _capsuleZ, _arrowX, _arrowY, _arrowZ, _axes };
+        m_meshesNames = { "box", "sphere", "ellipsoid", "cylinderX", "cylinderY", "cylinderZ", 
+                          "capsuleX", "capsuleY", "capsuleZ", "arrowX", "arrowY", "arrowZ", "axes" };
+        m_meshSelectedName = "box";
+        m_meshSelectedIndex = 0;
+
+        m_cachedTextures = engine::CTextureManager::GetAllCachedTextures();
+        m_cachedTextures.push_back( nullptr );
+        m_currentDiffuseMapName = "none";
+        m_currentSpecularMapName = "none";
     }
 
     void _renderInternal() override
     {
         _menuUiMaterial();
         _menuUiLight();
+        _menuUiGeometry();
     }
 
 private :
@@ -74,62 +84,87 @@ private :
 
         ImGui::Begin( "Material-properties" );
 
-        std::string _materialSelectionName = ( m_materialSelectedIndex == -1 ) ? "" : 
-                                                            m_materialsList[m_materialSelectedIndex].name();
-
-        if ( ImGui::BeginCombo( "materials-list", _materialSelectionName.c_str() ) )
+        /* diffuse properties (phong and lambert materials) */
+        if ( m_material->type() == engine::eMaterialType::PHONG || m_material->type() == engine::eMaterialType::LAMBERT )
         {
-            for ( size_t i = 0; i < m_materialsList.size(); i++ )
+            if ( ImGui::BeginCombo( "Diffuse-map", m_currentDiffuseMapName.c_str() ) )
             {
-                bool _isSelected = ( _materialSelectionName == m_materialsList[i].name() );
-                if ( ImGui::Selectable( m_materialsList[i].name().c_str(), _isSelected ) )
-                    m_materialSelectedIndex = i;
-
-                if ( _isSelected )
-                    ImGui::SetItemDefaultFocus();
+                for ( auto& _cachedTexture : m_cachedTextures )
+                {
+                    std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
+                    bool _isSelected = ( _textureName == m_currentDiffuseMapName );
+    
+                    if ( ImGui::Selectable( _textureName.c_str(), _isSelected ) )
+                    {
+                        m_currentDiffuseMap = _cachedTexture;
+                        m_currentDiffuseMapName = _textureName;
+                    }
+    
+                    if ( _isSelected )
+                        ImGui::SetItemDefaultFocus();
+                }
+    
+                ImGui::EndCombo();
             }
 
-            ImGui::EndCombo();
+            if ( m_material->type() == engine::eMaterialType::PHONG )
+                std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material )->setDiffuseMap( m_currentDiffuseMap );
+
+            if ( m_material->type() == engine::eMaterialType::LAMBERT )
+                std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material )->setDiffuseMap( m_currentDiffuseMap );
+
+            if ( m_currentDiffuseMap )
+                ImGui::Image( (void*)(intptr_t) m_currentDiffuseMap->openglId(), ImVec2( 64, 64 ) );
+            else
+                _menuUiDiffuseProps();
         }
 
-        if ( ImGui::Button( "set material" ) && ( m_materialSelectedIndex != -1 ) )
+        /* specular properties (phong material only) */
+        if ( m_material->type() == engine::eMaterialType::PHONG )
         {
-            if ( m_material->type() == engine::eMaterialType::PHONG )
+            if ( ImGui::BeginCombo( "Specular-map", m_currentSpecularMapName.c_str() ) )
             {
-                auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+                for ( auto& _cachedTexture : m_cachedTextures )
+                {
+                    std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
+                    bool _isSelected = ( _textureName == m_currentSpecularMapName );
 
-                _materialPhong->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
-                _materialPhong->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
-                _materialPhong->specular = m_materialsList[m_materialSelectedIndex].specular;
-                _materialPhong->shininess = m_materialsList[m_materialSelectedIndex].shininess;
-            }
-            else if ( m_material->type() == engine::eMaterialType::LAMBERT )
-            {
-                auto _materialLambert = std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material );
+                    if ( ImGui::Selectable( _textureName.c_str(), _isSelected ) )
+                    {
+                        m_currentSpecularMap = _cachedTexture;
+                        m_currentSpecularMapName = _textureName;
+                    }
 
-                _materialLambert->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
-                _materialLambert->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
+                    if ( _isSelected )
+                        ImGui::SetItemDefaultFocus();
+                }
             }
+
+            std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material )->setSpecularMap( m_currentSpecularMap );
+
+            if ( m_currentSpecularMap )
+                ImGui::Image( (void*)(intptr_t) m_currentSpecularMap->openglId(), ImVec2( 64, 64 ) );
+            else
+                _menuUiSpecularProps();
         }
 
         ImGui::Spacing();
+        ImGui::Text( m_material->toString().c_str() );
+        ImGui::End();
+    }
 
+    void _menuUiDiffuseProps()
+    {
         if ( m_material->type() == engine::eMaterialType::PHONG )
         {
             auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
 
             float _cAmbient[3]  = { _materialPhong->ambient.x, _materialPhong->ambient.y, _materialPhong->ambient.z };
             float _cDiffuse[3]  = { _materialPhong->diffuse.x, _materialPhong->diffuse.y, _materialPhong->diffuse.z };
-            float _cSpecular[3] = { _materialPhong->specular.x, _materialPhong->specular.y, _materialPhong->specular.z };
-
             ImGui::ColorEdit3( "cAmbient", _cAmbient );
             ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-            ImGui::ColorEdit3( "cSpecular", _cSpecular );
-            ImGui::SliderFloat( "cShininess", &_materialPhong->shininess, 32.0f, 256.0f );
-
             _materialPhong->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
             _materialPhong->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-            _materialPhong->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
         }
         else if ( m_material->type() == engine::eMaterialType::LAMBERT )
         {
@@ -137,17 +172,24 @@ private :
 
             float _cAmbient[3]  = { _materialLambert->ambient.x, _materialLambert->ambient.y, _materialLambert->ambient.z };
             float _cDiffuse[3]  = { _materialLambert->diffuse.x, _materialLambert->diffuse.y, _materialLambert->diffuse.z };
-
             ImGui::ColorEdit3( "cAmbient", _cAmbient );
             ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-
             _materialLambert->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
             _materialLambert->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
         }
+    }
 
-        ImGui::Spacing();
-        ImGui::Text( m_material->toString().c_str() );
-        ImGui::End();
+    void _menuUiSpecularProps()
+    {
+        if ( m_material->type() == engine::eMaterialType::PHONG )
+        {
+            auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+
+            float _cSpecular[3] = { _materialPhong->specular.x, _materialPhong->specular.y, _materialPhong->specular.z };
+            ImGui::ColorEdit3( "cSpecular", _cSpecular );
+            ImGui::SliderFloat( "cShininess", &_materialPhong->shininess, 32.0f, 256.0f );
+            _materialPhong->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
+        }
     }
 
     void _menuUiLight()
@@ -188,11 +230,45 @@ private :
         ImGui::End();
     }
 
+    void _menuUiGeometry()
+    {
+        ImGui::Begin( "Mesh-selection" );
+
+        if ( ImGui::BeginCombo( "Geometries", m_meshSelectedName.c_str() ) )
+        {
+            for ( size_t i = 0; i < m_meshes.size(); i++ )
+            {
+                std::string _meshName = m_meshesNames[i];
+                bool _isSelected = ( _meshName == m_meshSelectedName );
+
+                if ( ImGui::Selectable( _meshName.c_str(), _isSelected ) )
+                {
+                    m_meshSelectedName = _meshName;
+                    m_meshSelectedIndex = i;
+                }
+
+                if ( _isSelected )
+                    ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::End();
+    }
+
     std::shared_ptr< engine::CIMaterial > m_material;
     std::shared_ptr< engine::CILight > m_light;
-    std::vector< engine::CPhongMaterial > m_materialsList;
-    int m_materialSelectedIndex;
     bool m_lightsAnimated;
+
+    std::string m_currentDiffuseMapName;
+    std::string m_currentSpecularMapName;
+    std::shared_ptr< engine::CTexture > m_currentDiffuseMap;
+    std::shared_ptr< engine::CTexture > m_currentSpecularMap;
+    std::vector< std::shared_ptr< engine::CTexture > > m_cachedTextures;
+
+    std::vector< engine::LIRenderable* > m_meshes;
+    std::vector< std::string > m_meshesNames;
+    std::string m_meshSelectedName;
+    int m_meshSelectedIndex;
 };
 
 int main()
@@ -220,14 +296,12 @@ int main()
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
-    auto _box = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
-    auto _sphere = engine::CMeshBuilder::createSphere( 1.5f );
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->pos = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
-    std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_materials";
-    auto _shaderLighting = engine::CShaderManager::CreateShaderFromFiles( "phong_material_shader",
+    std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightmaps";
+    auto _shaderLighting = engine::CShaderManager::CreateShaderFromFiles( "phong_lightmaps_shader",
                                                                        _baseNamePhong + "_vs.glsl",
                                                                        _baseNamePhong + "_fs.glsl" );
 
@@ -236,9 +310,6 @@ int main()
     /* grab a simple shader to render the camera gizmo */
     auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
     ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
-
-    // engine::LMesh* _mesh = _box;
-    engine::LMesh* _mesh = _box;
 
     /* create material properties */
     std::shared_ptr< engine::CPhongMaterial > _phongMaterial;
@@ -302,6 +373,8 @@ int main()
             _pointLightPtr->position.z = 0.0f;
         }
 
+        auto _mesh = _ui->selectedMesh();
+
         _gizmo->pos = _pointLightPtr->position;
 
         /* do our thing here ************************/
@@ -309,10 +382,7 @@ int main()
         _shaderLighting->setMat4( "u_modelMatrix", _mesh->getModelMatrix() );
         _shaderLighting->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
         _shaderLighting->setMat4( "u_normalMatrix", ( ( _mesh->getModelMatrix() ).inverse() ).transpose() );
-        _shaderLighting->setVec3( "u_material.ambient", _phongMaterial->ambient );
-        _shaderLighting->setVec3( "u_material.diffuse", _phongMaterial->diffuse );
-        _shaderLighting->setVec3( "u_material.specular", _phongMaterial->specular );
-        _shaderLighting->setFloat( "u_material.shininess", _phongMaterial->shininess );
+        _phongMaterial->bind( _shaderLighting );
         _shaderLighting->setVec3( "u_light.ambient", _pointLight->ambient );
         _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );
         _shaderLighting->setVec3( "u_light.specular", _pointLight->specular );
@@ -322,6 +392,7 @@ int main()
 
         _mesh->render();
 
+        _phongMaterial->unbind();
         _shaderLighting->unbind();
 
         _shaderGizmo->bind();
@@ -335,7 +406,6 @@ int main()
         _shaderGizmo->unbind();
         /********************************************/
 
-        // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
         engine::CDebugDrawer::Render( _camera );
 
         if ( !_camera->active() )

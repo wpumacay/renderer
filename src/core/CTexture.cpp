@@ -194,7 +194,6 @@ namespace engine
 
     void CTexture::bind()
     {
-        glActiveTexture( GL_TEXTURE0 + m_openglTexUnit );
         glBindTexture( GL_TEXTURE_2D, m_openglId );
     }
 

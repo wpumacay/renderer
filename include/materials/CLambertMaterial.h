@@ -17,22 +17,22 @@ namespace engine
         CLambertMaterial( const std::string& name,
                           const CVec3& ambientColor,
                           const CVec3& diffuseColor,
-                          std::shared_ptr< CTexture > albedoMap = nullptr );
+                          std::shared_ptr< CTexture > diffuseMap = nullptr );
 
         ~CLambertMaterial();
 
-        void setAlbedoMap( std::shared_ptr< CTexture > albedoMap ) { m_albedoMap = albedoMap; }
+        void setDiffuseMap( std::shared_ptr< CTexture > diffuseMap ) { m_diffuseMap = diffuseMap; }
 
         void bind( std::shared_ptr< CShader > shader ) override;
         void unbind() override;
 
-        std::shared_ptr< CTexture > albedoMap() const { return m_albedoMap; }
+        std::shared_ptr< CTexture > diffuseMap() const { return m_diffuseMap; }
 
     protected :
 
         std::string _toStringInternal() override;
 
-        std::shared_ptr< CTexture > m_albedoMap;
+        std::shared_ptr< CTexture > m_diffuseMap;
 
     };
 

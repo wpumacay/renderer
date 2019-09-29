@@ -27,8 +27,8 @@
 #include <LMesh.h>                                  // #include <graphics/CMesh.h>
 #include <LModel.h>                                 // #include <graphics/CModel.h>
 #include <graphics/CMeshBuilder.h>
-#include <LMaterial.h>                              // #include <graphics/CMaterial.h>
 #include <LFog.h>                                   // #include <graphics/CFog.h>
+#include <LShadowMap.h>
 #include <LScene.h>                                 // #include <graphics/CScene.h>
 
 #include <materials/CIMaterial.h>
