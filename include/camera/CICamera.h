@@ -74,6 +74,10 @@ namespace engine
         CMat4 matView() const { return m_matView; }
         CMat4 matProj() const { return m_matProj; }
 
+        CVec3 front() const { return m_front; }
+        CVec3 up() const { return m_up; }
+        CVec3 right() const { return m_right; }
+
     protected :
 
         void _buildViewMatrix();
