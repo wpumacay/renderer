@@ -134,6 +134,7 @@ namespace engine
         static CMat4 rotationY( float32 theta );
         static CMat4 rotationZ( float32 theta );
         static CMat4 rotation( float32 theta, const eAxis& axis );
+        static CMat4 rotation( float32 theta, const CVec3& axis );
     };
 
     std::string toString( const CMat4& mat );

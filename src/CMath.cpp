@@ -580,6 +580,25 @@ namespace engine
         return CMat4();
     }
 
+    CMat4 CMat4::rotation( float32 theta, const CVec3& axis )
+    {
+        CMat4 _res;
+
+        auto _nAxis = CVec3::normalize( axis );
+        float32 _c = std::cos( theta );
+        float32 _s = std::sin( theta );
+        float32 _ccomp = 1.0f - _c;
+        float32 _x = _nAxis.x;
+        float32 _y = _nAxis.y;
+        float32 _z = _nAxis.z;
+
+        _res.buff[0] = _x * _x * _ccomp + _c;      _res.buff[4] = _x * _y * _ccomp - _z * _s; _res.buff[8] = _x * _z * _ccomp + _y * _s;
+        _res.buff[1] = _y * _x * _ccomp + _z * _s; _res.buff[5] = _y * _y * _ccomp + _c;      _res.buff[9] = _y * _z * _ccomp - _x * _s;
+        _res.buff[2] = _z * _x * _ccomp - _y * _s; _res.buff[6] = _z * _y * _ccomp + _x * _s; _res.buff[10] = _z * _z * _ccomp + _c;
+
+        return _res;
+    }
+
     std::string toString( const CMat4& mat )
     {
         std::string _res;

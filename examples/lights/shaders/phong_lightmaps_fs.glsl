@@ -65,11 +65,11 @@ void main()
                                          reflect( -normalize( u_light.position - fPosition ),
                                                   normalize( fNormal ) ) ), 0.0f ), u_material.shininess ) * u_light.specular;
 
-    vec3 _oAmbiengComp = u_light.intensity * _computeObjectAmbientComp( _lAmbientComp );
+    vec3 _oAmbientComp = u_light.intensity * _computeObjectAmbientComp( _lAmbientComp );
     vec3 _oDiffuseComp = u_light.intensity * _computeObjectDiffuseComp( _lDiffuseComp );
     vec3 _oSpecularComp = u_light.intensity * _computeObjectSpecularComp( _lSpecularComp );
 
-    vec3 _oResultColor = _oAmbiengComp + _oDiffuseComp + _oSpecularComp;
+    vec3 _oResultColor = _oAmbientComp + _oDiffuseComp + _oSpecularComp;
 
     fColor = vec4( _oResultColor, 1.0f );
 }
