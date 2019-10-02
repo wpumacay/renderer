@@ -24,7 +24,7 @@ namespace engine
         CIMaterial( const std::string& name );
         virtual ~CIMaterial();
 
-        virtual void bind( std::shared_ptr< CShader > shader ) = 0;
+        virtual void bind( CShader* shaderPtr ) = 0;
         virtual void unbind() = 0;
 
         std::string toString();

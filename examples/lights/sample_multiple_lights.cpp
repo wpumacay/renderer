@@ -513,7 +513,7 @@ int main()
         _shaderMultipleLights->setFloat( "u_spotLights[0].innerCutoffCos", std::cos( _spotLight->innerCutoff ) );
         _shaderMultipleLights->setFloat( "u_spotLights[0].outerCutoffCos", std::cos( _spotLight->outerCutoff ) );
 
-        _phongMaterial->bind( _shaderMultipleLights );
+        _phongMaterial->bind( _shaderMultipleLights.get() );
 
         for ( size_t i = 0; i < _meshPositions.size(); i++ )
         {

@@ -3,22 +3,22 @@
 
 namespace engine
 {
-    LMesh* CMeshBuilder::createPlane( float sizeX, float sizeY )
+    LMesh* CMeshBuilder::createPlane( float sizeX, float sizeY, const eAxis& axis )
     {
-        std::vector< CVec3 > _vertices = { {  0.5f * sizeX, -0.5f * sizeY, 0.0f },
-                                           {  0.5f * sizeX,  0.5f * sizeY, 0.0f },
-                                           { -0.5f * sizeX,  0.5f * sizeY, 0.0f },
-                                           { -0.5f * sizeX, -0.5f * sizeY, 0.0f } };
+        std::vector< CVec3 > _vertices = { _rotateToMatchUpAxis( {  0.5f * sizeX, -0.5f * sizeY, 0.0f }, axis ),
+                                           _rotateToMatchUpAxis( {  0.5f * sizeX,  0.5f * sizeY, 0.0f }, axis ),
+                                           _rotateToMatchUpAxis( { -0.5f * sizeX,  0.5f * sizeY, 0.0f }, axis ),
+                                           _rotateToMatchUpAxis( { -0.5f * sizeX, -0.5f * sizeY, 0.0f }, axis ) };
 
-        std::vector< CVec3 > _normals = { { 0.0f, 0.0f, 1.0f }, 
-                                          { 0.0f, 0.0f, 1.0f },
-                                          { 0.0f, 0.0f, 1.0f },
-                                          { 0.0f, 0.0f, 1.0f } };
+        std::vector< CVec3 > _normals = { _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ), 
+                                          _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ),
+                                          _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ),
+                                          _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ) };
 
-        std::vector< CVec2 > _texCoords = { { 0.0f, 0.0f }, 
-                                            { 1.0f, 0.0f },
-                                            { 1.0f, 1.0f }, 
-                                            { 0.0f, 1.0f } };
+        std::vector< CVec2 > _texCoords = { { 0.5f * sizeX * 0.0f, 0.5f * sizeY * 0.0f }, 
+                                            { 0.5f * sizeX * 1.0f, 0.5f * sizeY * 0.0f },
+                                            { 0.5f * sizeX * 1.0f, 0.5f * sizeY * 1.0f }, 
+                                            { 0.5f * sizeX * 0.0f, 0.5f * sizeY * 1.0f } };
 
         std::vector< CInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 

@@ -23,7 +23,7 @@ namespace engine
 
         void setDiffuseMap( std::shared_ptr< CTexture > diffuseMap ) { m_diffuseMap = diffuseMap; }
 
-        void bind( std::shared_ptr< CShader > shader ) override;
+        void bind( CShader* shaderPtr ) override;
         void unbind() override;
 
         std::shared_ptr< CTexture > diffuseMap() const { return m_diffuseMap; }

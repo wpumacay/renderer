@@ -505,7 +505,7 @@ int main()
         /* do our thing here ************************/
         _shaderLightCasters->bind();
         _shaderLightCasters->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _phongMaterial->bind( _shaderLightCasters );
+        _phongMaterial->bind( _shaderLightCasters.get() );
         // deactivate all lights first
         _shaderLightCasters->setInt( "u_pointLight.enabled", 0 );
         _shaderLightCasters->setInt( "u_directionalLight.enabled", 0 );

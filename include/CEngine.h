@@ -28,8 +28,9 @@
 #include <LModel.h>                                 // #include <graphics/CModel.h>
 #include <graphics/CMeshBuilder.h>
 #include <LFog.h>                                   // #include <graphics/CFog.h>
-#include <LShadowMap.h>
+#include <LShadowMap.h>                             // #include <graphics/CShadowMap.h>
 #include <LScene.h>                                 // #include <graphics/CScene.h>
+#include <graphics/CShadowMap.h>
 
 #include <materials/CIMaterial.h>
 #include <materials/CPhongMaterial.h>

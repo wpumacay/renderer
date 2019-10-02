@@ -31,7 +31,7 @@ namespace engine
         void setSpecularMap( std::shared_ptr< CTexture > specularMap ) { m_specularMap = specularMap; }
         void setNormalMap( std::shared_ptr< CTexture > normalMap ) { m_normalMap = normalMap; }
 
-        void bind( std::shared_ptr< CShader > shader ) override;
+        void bind( CShader* shaderPtr ) override;
         void unbind() override;
 
         std::shared_ptr< CTexture > diffuseMap() const { return m_diffuseMap; }

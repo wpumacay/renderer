@@ -25,8 +25,9 @@ namespace engine
         *
         *   @param sizeX    extent of the plane in the X axis
         *   @param sizeY    extent of the plane in the Y axis
+        *   @param axis     normal vector to the plane
         */
-        static LMesh* createPlane( float sizeX, float sizeY );
+        static LMesh* createPlane( float sizeX, float sizeY, const eAxis& axis = eAxis::Z );
 
         /**
         *   Creates the geometry for a box with given dimensions along the x, y and z axes

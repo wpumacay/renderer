@@ -234,11 +234,11 @@ namespace engine
         }
 
         _textureData->name              = _filenameNoExtension;
-        _textureData->internalFormat    = _format;
-        _textureData->format            = _format;
         _textureData->width             = _width;
         _textureData->height            = _height;
         _textureData->channels          = _channels;
+        _textureData->internalFormat    = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
+        _textureData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
         std::shared_ptr< CTextureData > _textureDataPtr;
         _textureDataPtr.reset( _textureData );

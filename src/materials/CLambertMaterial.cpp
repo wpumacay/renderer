@@ -21,21 +21,21 @@ namespace engine
         // do nothing for now
     }
 
-    void CLambertMaterial::bind( std::shared_ptr< CShader > shader )
+    void CLambertMaterial::bind( CShader* shaderPtr )
     {
-        shader->setVec3( "u_material.ambient", ambient );
-        shader->setVec3( "u_material.diffuse", diffuse );
+        shaderPtr->setVec3( "u_material.ambient", ambient );
+        shaderPtr->setVec3( "u_material.diffuse", diffuse );
 
         if ( m_diffuseMap )
         {
-            shader->setInt( "u_diffuseMap", 0 );
-            shader->setInt( "u_diffuseMapActive", 1 );
+            shaderPtr->setInt( "u_diffuseMap", 0 );
+            shaderPtr->setInt( "u_diffuseMapActive", 1 );
             glActiveTexture( GL_TEXTURE0 );
             m_diffuseMap->bind();
         }
         else
         {
-            shader->setInt( "u_diffuseMapActive", 0 );
+            shaderPtr->setInt( "u_diffuseMapActive", 0 );
         }
     }
 

@@ -32,47 +32,47 @@ namespace engine
         // do nothing for now
     }
 
-    void CPhongMaterial::bind( std::shared_ptr< CShader > shader )
+    void CPhongMaterial::bind( CShader* shaderPtr )
     {
-        shader->setVec3( "u_material.ambient", ambient );
-        shader->setVec3( "u_material.diffuse", diffuse );
-        shader->setVec3( "u_material.specular", specular );
-        shader->setFloat( "u_material.shininess", shininess );
+        shaderPtr->setVec3( "u_material.ambient", ambient );
+        shaderPtr->setVec3( "u_material.diffuse", diffuse );
+        shaderPtr->setVec3( "u_material.specular", specular );
+        shaderPtr->setFloat( "u_material.shininess", shininess );
 
         if ( m_diffuseMap )
         {
-            shader->setInt( "u_material.diffuseMap", 0 );
-            shader->setInt( "u_material.diffuseMapActive", 1 );
+            shaderPtr->setInt( "u_material.diffuseMap", 0 );
+            shaderPtr->setInt( "u_material.diffuseMapActive", 1 );
             glActiveTexture( GL_TEXTURE0 );
             m_diffuseMap->bind();
         }
         else
         {
-            shader->setInt( "u_material.diffuseMapActive", 0 );
+            shaderPtr->setInt( "u_material.diffuseMapActive", 0 );
         }
 
         if ( m_specularMap )
         {
-            shader->setInt( "u_material.specularMap", 1 );
-            shader->setInt( "u_material.specularMapActive", 1 );
+            shaderPtr->setInt( "u_material.specularMap", 1 );
+            shaderPtr->setInt( "u_material.specularMapActive", 1 );
             glActiveTexture( GL_TEXTURE1 );
             m_specularMap->bind();
         }
         else
         {
-            shader->setInt( "u_material.specularMapActive", 0 );
+            shaderPtr->setInt( "u_material.specularMapActive", 0 );
         }
 
         if ( m_normalMap )
         {
-            shader->setInt( "u_material.normalMap", 2 );
-            shader->setInt( "u_material.normalMapActive", 1 );
+            shaderPtr->setInt( "u_material.normalMap", 2 );
+            shaderPtr->setInt( "u_material.normalMapActive", 1 );
             glActiveTexture( GL_TEXTURE2 );
             m_normalMap->bind();
         }
         else
         {
-            shader->setInt( "u_material.normalMapActive", 0 );
+            shaderPtr->setInt( "u_material.normalMapActive", 0 );
         }
     }
 

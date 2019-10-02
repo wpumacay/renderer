@@ -111,7 +111,7 @@ namespace engine
                                 _texturePtr->openglId(),
                                 0 );
 
-        // sanity check: make sure framebuffer is correctly configured
+        // sanity check: make sure framebuffer is correctly configured (@TODO: might be an issue with only depth-attach)
         if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
             ENGINE_CORE_ERROR( "There seems to be an issue with a frame buffer" );
 
