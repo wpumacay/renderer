@@ -23,8 +23,8 @@ namespace engine
         _fbDepthConfig.texInternalFormat    = eTextureFormat::DEPTH;
         _fbDepthConfig.texFormat            = eTextureFormat::DEPTH;
         _fbDepthConfig.texPixelDataType     = ePixelDataType::FLOAT_32;
-        _fbDepthConfig.texWrapU             = eTextureWrap::REPEAT;
-        _fbDepthConfig.texWrapV             = eTextureWrap::REPEAT;
+        _fbDepthConfig.texWrapU             = eTextureWrap::CLAMP_TO_BORDER;
+        _fbDepthConfig.texWrapV             = eTextureWrap::CLAMP_TO_BORDER;
         _fbDepthConfig.texBorderColorU      = { 1.0f, 1.0f, 1.0f, 1.0f };
         _fbDepthConfig.texBorderColorV      = { 1.0f, 1.0f, 1.0f, 1.0f };
 

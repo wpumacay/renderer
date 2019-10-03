@@ -43,6 +43,9 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
                                    engine::CShader* shaderPtr,
                                    engine::CShadowMap* shadowMapPtr );
 
+engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
+// engine::CVec3 g_lightPosition = { 0.0f, 4.0f, 0.0f };
+
 int main()
 {
     auto _app = new engine::COpenGLApp();
@@ -140,20 +143,17 @@ int main()
                                                      _floorTexture,
                                                      _floorTexture );
 
-    /* define the position (point-light-> actual position | directional-light-> virtual position) */
-    engine::CVec3 _lightPosition = { -2.0f, 4.0f, -1.0f };
-
     auto _dirlight = new engine::CDirectionalLight( "directional",
                                                     { 0.3f, 0.3f, 0.3f },
                                                     { 0.3f, 0.3f, 0.3f },
                                                     { 0.3f, 0.3f, 0.3f },
-                                                    engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - _lightPosition ) );
+                                                    engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
 
     auto _pointlight = new engine::CPointLight( "point",
                                                 { 0.3f, 0.3f, 0.3f },
                                                 { 0.3f, 0.3f, 0.3f },
                                                 { 0.3f, 0.3f, 0.3f },
-                                                _lightPosition,
+                                                g_lightPosition,
                                                 1.0f, 0.09f, 0.032f );
 
     /**********************************************************************************************/
@@ -243,12 +243,13 @@ void renderToShadowMap( engine::CILight* lightPtr,
                         engine::LIRenderable* floor,
                         std::vector< engine::LIRenderable* > cubes )
 {
+    // glCullFace( GL_FRONT );
     shaderPtr->bind();
     shadowMapPtr->bind();
 
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( { -2.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
     auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
@@ -266,6 +267,7 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     shadowMapPtr->unbind();
     shaderPtr->unbind();
+    // glCullFace( GL_BACK );
 }
 
 void renderSceneWithShadows( engine::CILight* lightPtr, 
@@ -330,7 +332,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     /* setup the light-clip-space transform */
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( { -2.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
     auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
     shaderPtr->setMat4( "u_viewProjLightSpaceMatrix", _lightProjMat * _lightViewMat );
 
@@ -342,7 +344,9 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     /* render the floor */
     floorMaterialPtr->bind( shaderPtr );
     {
-        shaderPtr->setMat4( "u_modelMatrix", floor->getModelMatrix() );
+        auto _modelMat = floor->getModelMatrix();
+        shaderPtr->setMat4( "u_modelMatrix", _modelMat );
+        shaderPtr->setMat4( "u_normalMatrix", _modelMat.inverse().transpose() );
         floor->render();
     }
     floorMaterialPtr->unbind();

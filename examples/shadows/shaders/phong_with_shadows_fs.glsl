@@ -78,6 +78,10 @@ vec3 _computeObjectDiffuseComp( vec3 lightDiffuseComp );
 vec3 _computeObjectSpecularComp( vec3 lightSpecularComp );
 float _computeObjectShadowFactor();
 
+const int PCF_COUNT = 2;
+const float PCF_TOTAL_TEXELS = ( PCF_COUNT * 2.0 + 1.0 ) * ( PCF_COUNT * 2.0 + 1.0 );
+const float PCF_TEXEL_SIZE = 1.0 / 2048.0;
+
 void main()
 {
     vec3 _lAmbientFactor = _computeLightAmbientFactor();
@@ -99,16 +103,34 @@ float _computeObjectShadowFactor()
     vec3 _projCoords = fLightClipSpacePosition.xyz / fLightClipSpacePosition.w; // perspective divide -> clip-space
     _projCoords = _projCoords * 0.5 + 0.5; // from clip-space to NDC
 
+    /* fragments outside of the light-space view frustum have depth > 1.0, so discard shadows for those fragments */
+    if ( _projCoords.z > 1.0 )
+        return 0.0;
+
+    /* compute a bias term to avoid peter panning */
+    float _bias = 0.005;
+    if ( u_directionalLight.enabled == 1 )
+        _bias = max( 0.05 * ( 1.0 - dot( normalize( fNormal ), -normalize( u_directionalLight.direction ) ) ), 0.005 );
+
     /* grab depths required to check if we are in shadow or not */
     float _closestDepth = texture( u_depthmapTexture, _projCoords.xy ).r;
     float _currentDepth = _projCoords.z;
-    float _bias = 0.005;
+    float _shadowFactor = ( ( _currentDepth - _bias ) > _closestDepth ) ? 1.0 : 0.0;
 
-    if ( u_directionalLight.enabled == 1 )
-        _bias = max( 0.05 * ( 1.0 - dot( normalize( fNormal ), normalize( u_directionalLight.direction ) ) ), 0.005 );
+    /* use PCF to smooth the edges */
+    for ( int x = -PCF_COUNT; x <= PCF_COUNT; x++ )
+    {
+        for ( int y = -PCF_COUNT; y <= PCF_COUNT; y++ )
+        {
+            float _sampleDepth = texture( u_depthmapTexture, _projCoords.xy + vec2( x, y ) * PCF_TEXEL_SIZE ).r;
+            _shadowFactor += ( ( _currentDepth - _bias ) > _sampleDepth ) ? 1.0 : 0.0;
+        }
+    }
+
+    _shadowFactor /= PCF_TOTAL_TEXELS;
 
     /* compute and return shadow-factor accordingly ( 1.0 -> in shadow | 0.0 -> no shadow )*/
-    return ( ( _currentDepth - _bias ) > _closestDepth ) ? 1.0 : 0.0;
+    return _shadowFactor;
 }
 
 vec3 _computeLightAmbientFactor()
