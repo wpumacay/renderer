@@ -484,9 +484,22 @@ namespace engine
 
     CMat4 CMat4::lookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp )
     {
-        auto _front = CVec3::normalize( position - target );
-        auto _right = CVec3::normalize( CVec3::cross( worldUp, _front ) );
-        auto _up    = CVec3::normalize( CVec3::cross( _front, _right ) );
+        /* axes vectors for the coordinate system represented by the resulting transform */
+        CVec3 _front, _right, _up;
+
+        _front = CVec3::normalize( position - target );
+        // in case in the same direction of the world-up vector, just use a standard coordinate system
+        if ( CVec3::equal( _front, worldUp ) )
+        {
+            _front = worldUp;
+            _right = { worldUp.z, worldUp.x, worldUp.y };
+            _up    = { worldUp.y, worldUp.z, worldUp.x };
+        }
+        else
+        {
+            _right = CVec3::normalize( CVec3::cross( worldUp, _front ) );
+            _up    = CVec3::normalize( CVec3::cross( _front, _right ) );
+        }
 
         CMat4 _res;
 
