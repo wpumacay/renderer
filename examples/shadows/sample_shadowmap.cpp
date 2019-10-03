@@ -90,7 +90,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
-    auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
+    auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
     _floor->pos = { 0.0f, 0.0f, 0.0f };
 
     auto _cube1 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
@@ -196,8 +196,8 @@ int main()
         // render to shadow map first
         renderToShadowMap( _currentLight, _shadowmap, _shaderShadowMapProj.get(), _floor, { _cube1, _cube2, _cube3 } );
 
-        // // render the scene normally
-        // renderScene( _currentLight, _camera, _shaderPhongLighting.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
+        // render the scene normally
+        renderScene( _currentLight, _camera, _shaderPhongLighting.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the shadowmap to a quad
         renderShadowMapVisualization( _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
@@ -226,7 +226,7 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( { -1.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightViewMat = engine::CMat4::lookAt( { -2.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
     auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
@@ -331,7 +331,7 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
                                    engine::CShadowMap* shadowMapPtr )
 {
     glDisable( GL_DEPTH_TEST );
-    // glViewport( 0, 0, 200, 200 );
+    glViewport( 0, 0, 256, 256 );
     shaderPtr->bind();
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->bind();
     quadVAO->bind();
@@ -342,5 +342,5 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    // glViewport( 0, 0, engine::COpenGLApp::GetWindow()->width(), engine::COpenGLApp::GetWindow()->height() );
+    glViewport( 0, 0, engine::COpenGLApp::GetWindow()->width(), engine::COpenGLApp::GetWindow()->height() );
 }

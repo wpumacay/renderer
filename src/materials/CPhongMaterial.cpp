@@ -86,6 +86,8 @@ namespace engine
 
         if ( m_normalMap )
             m_normalMap->unbind();
+
+        glActiveTexture( GL_TEXTURE0 );
     }
 
     std::string CPhongMaterial::_toStringInternal()
