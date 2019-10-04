@@ -25,6 +25,7 @@ protected :
 };
 
 void renderToShadowMap( engine::CILight* lightPtr,
+                        engine::CICamera* cameraPtr,
                         engine::CShadowMap* shadowMapPtr,
                         engine::CShader* shaderPtr,
                         engine::LIRenderable* floor,
@@ -56,7 +57,127 @@ struct ComparatorDotDirection
     }
 };
 
+void computeLightSpaceViewProj( engine::CICamera* cameraPtr, 
+                                const engine::CVec3& direction,
+                                engine::CMat4& matView,
+                                engine::CMat4& matProj,
+                                float ddf = 0.0f,
+                                float ddr = 0.0f,
+                                float ddu = 0.0f )
+{
+    if ( !cameraPtr )
+        return;
+
+    auto _viewProjMatrix = cameraPtr->matProj() * cameraPtr->matView();
+
+    /* get back the corners of the frustum in world space */
+    engine::CMat4 _invClipMatrix = _viewProjMatrix.inverse();
+
+    engine::CVec3 _frustumPointsClipSpace[8] = {
+        /*      near plane      */
+        { -1.0f, -1.0f, -1.0f }, 
+        { 1.0f, -1.0f, -1.0f },
+        { 1.0f,  1.0f, -1.0f },
+        { -1.0f,  1.0f, -1.0f },
+        /*      far plane       */
+        { -1.0f, -1.0f, 1.0f }, 
+        { 1.0f, -1.0f, 1.0f },
+        { 1.0f,  1.0f, 1.0f },
+        { -1.0f,  1.0f, 1.0f }
+    };
+
+    std::vector< engine::CVec3 > _points3d;
+    for ( size_t q = 0; q < 8; q++ )
+    {
+        engine::CVec4 _pointFrustum = _invClipMatrix * engine::CVec4( _frustumPointsClipSpace[q], 1.0f );
+        engine::CVec3 _pointFrustumNormalized = { _pointFrustum.x / _pointFrustum.w,
+                                                  _pointFrustum.y / _pointFrustum.w,
+                                                  _pointFrustum.z / _pointFrustum.w };
+
+        _points3d.push_back( _pointFrustumNormalized );
+    }
+
+    /* construct a frame using the direction vector as front */
+    engine::CVec3 _fvec, _rvec, _uvec;
+    engine::CVec3 _worldUp = { 0.0f, 1.0f, 0.0f };
+
+    if ( engine::CVec3::equal( direction, { 0.0f, 1.0f, 0.0f } ) )
+    {
+        _fvec = _worldUp;
+        _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
+        _uvec = { _worldUp.y, _worldUp.z, _worldUp.x };
+    }
+    else if ( engine::CVec3::equal( direction + _worldUp, { 0.0f, 0.0f, 0.0f } ) )
+    {
+        _fvec = -_worldUp;
+        _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
+        _uvec = { _worldUp.y, _worldUp.z, _worldUp.x };
+    }
+    else
+    {
+        _fvec = direction;
+        _rvec = engine::CVec3::cross( { 0.0f, 1.0f, 0.0f }, _fvec );
+        _uvec = engine::CVec3::cross( _fvec, _rvec );
+    }
+
+    _fvec.normalize();
+    _rvec.normalize();
+    _uvec.normalize();
+
+    /* sort over f-vector */
+    auto _fPoints3d = _points3d; // create a copy
+    {
+        auto _fComparator = ComparatorDotDirection();
+        _fComparator.direction = _fvec;
+
+        std::sort( _fPoints3d.begin(), _fPoints3d.end(), _fComparator );
+    }
+    /* sort over r-vector */
+    auto _rPoints3d = _points3d; // create a copy
+    {
+        auto _rComparator = ComparatorDotDirection();
+        _rComparator.direction = _rvec;
+
+        std::sort( _rPoints3d.begin(), _rPoints3d.end(), _rComparator );
+    }
+    /* sort over u-vector */
+    auto _uPoints3d = _points3d; // create a copy
+    {
+        auto _uComparator = ComparatorDotDirection();
+        _uComparator.direction = _uvec;
+
+        std::sort( _uPoints3d.begin(), _uPoints3d.end(), _uComparator );
+    }
+
+    float _df = std::abs( engine::CVec3::dot( _fPoints3d.back() - _fPoints3d.front(), _fvec ) );
+    float _dr = std::abs( engine::CVec3::dot( _rPoints3d.back() - _rPoints3d.front(), _rvec ) );
+    float _du = std::abs( engine::CVec3::dot( _uPoints3d.back() - _uPoints3d.front(), _uvec ) );
+
+    auto _center = engine::CVec3::dot( 0.5f * ( _fPoints3d.front() + _fPoints3d.back() ), _fvec ) * _fvec +
+                   engine::CVec3::dot( 0.5f * ( _rPoints3d.front() + _rPoints3d.back() ), _rvec ) * _rvec +
+                   engine::CVec3::dot( 0.5f * ( _uPoints3d.front() + _uPoints3d.back() ), _uvec ) * _uvec;
+
+    auto _position = _center - ( 0.5f * _df ) * _fvec;
+    auto _target = _position + direction;
+
+    matView = engine::CMat4::lookAt( _position, _target, _worldUp );
+    matProj = engine::CMat4::ortho( _dr + ddr, _du + ddu, 0.0f, _df + ddf );
+}
+
 void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec3& direction )
+{
+    if ( !cameraPtr )
+        return;
+
+    engine::CMat4 _lspaceMatView, _lspaceMatProj;
+
+    computeLightSpaceViewProj( cameraPtr, direction, _lspaceMatView, _lspaceMatProj );
+
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( _lspaceMatProj * _lspaceMatView, { 0.7f, 0.5f, 0.3f } );
+}
+
+void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine::CVec3& direction )
 {
     if ( !cameraPtr )
         return;
@@ -80,7 +201,6 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec
         { 1.0f,  1.0f, 1.0f },
         { -1.0f,  1.0f, 1.0f }
     };
-
 
     std::vector< engine::CVec3 > _points3d;
     for ( size_t q = 0; q < 8; q++ )
@@ -120,12 +240,6 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec
     _fvec.normalize();
     _rvec.normalize();
     _uvec.normalize();
-
-    // std::cout << "***********************************************************" << std::endl;
-    // std::cout << "direction: " << engine::toString( direction ) << std::endl;
-    // std::cout << "fvec: " << engine::toString( _fvec ) << std::endl;
-    // std::cout << "rvec: " << engine::toString( _rvec ) << std::endl;
-    // std::cout << "uvec: " << engine::toString( _uvec ) << std::endl;
 
     /* sort over f-vector */
     auto _fPoints3d = _points3d; // create a copy
@@ -192,26 +306,17 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec
 
     engine::CDebugDrawer::DrawLine( _p2, _p6, _bcolor ); engine::CDebugDrawer::DrawLine( _p3, _p7, _bcolor );
     engine::CDebugDrawer::DrawLine( _p0, _p4, _bcolor ); engine::CDebugDrawer::DrawLine( _p1, _p5, _bcolor );
-
-//     auto _comparator = ComparatorDotDirection();
-//     _comparator.direction = direction;
-// 
-//     // sort the points of the frustum according to the dot-product to the direction
-//     std::sort( _points3d.begin(), _points3d.end(), _comparator );
-// 
-//     for ( size_t i = 0; i < _points3d.size(); i++ )
-//     {
-//         auto _dot = engine::CVec3::dot( _points3d[i], direction );
-//         std::cout << "sort-dot(" << i << "): " << _dot << std::endl;;
-//         std::cout << "sort-vec(" << i << "): " << engine::toString( _points3d[i] ) << std::endl;
-//     }
-// 
-//     engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _points3d.front(), { 1.0f, 1.0f, 0.5f } );
-//     engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _points3d.back(), { 1.0f, 0.5f, 1.0f } );
 }
 
 engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
 // engine::CVec3 g_lightPosition = { 0.0f, 4.0f, 0.0f };
+
+engine::CVec3 g_lightDirection = engine::CVec3::normalize( -g_lightPosition );
+
+engine::CICamera* g_currentCamera = nullptr;
+engine::CICamera* g_testCamera = nullptr;
+
+bool g_useAutofixToCamera = false;
 
 int main()
 {
@@ -251,7 +356,7 @@ int main()
     _cameraProjData.fov         = 45.0f;
     _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
     _cameraProjData.zNear       = 0.1f;
-    _cameraProjData.zFar        = 100.0f;
+    _cameraProjData.zFar        = 50.0f;
 
     // auto _camera = new engine::COrbitCamera( "orbit",
     //                                          { 0.0f, 0.0f, 3.0f },
@@ -280,15 +385,18 @@ int main()
     _cameraProjDataTest.fov         = 45.0f;
     _cameraProjDataTest.aspect      = engine::COpenGLApp::GetWindow()->aspect();
     _cameraProjDataTest.zNear       = 1.0f;
-    _cameraProjDataTest.zFar        = 4.0f;
+    _cameraProjDataTest.zFar        = 3.0f;
 
     auto _cameraTest = new engine::CFixedCamera( "fixed",
-                                                  engine::CVec3( 5.0f, 5.0f, 5.0f ),
+                                                  engine::CVec3( 3.0f, 3.0f, 3.0f ),
                                                   engine::CVec3( 0.0f, 0.0f, 0.0f ),
-                                                  engine::eAxis::Z,
+                                                  engine::eAxis::Y,
                                                   _cameraProjDataTest );
 
-    auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
+    g_currentCamera = _camera;
+    g_testCamera = _cameraTest;
+
+    auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->pos = { 0.0f, 0.0f, 0.0f };
 
     auto _cube1 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
@@ -340,7 +448,7 @@ int main()
     /**********************************************************************************************/
 
     auto _currentLight = _dirlight;
-    auto _shadowmap = new engine::CShadowMap( 2048, 2048 );
+    auto _shadowmap = new engine::CShadowMap( 4096, 4096 );
 
     engine::float32 _quad_buffData[] = {
      /*|  positions |     uvs    |*/
@@ -378,6 +486,8 @@ int main()
             _camera->setActiveMode( false );
         else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
             _camera->setActiveMode( true );
+        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_F ) )
+            g_useAutofixToCamera = !g_useAutofixToCamera;
 
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
         {
@@ -391,7 +501,17 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
+        float _t = glfwGetTime();
+        float _scaler = 1.0f;
+        float _ctheta = std::cos( _t * _scaler );
+        float _stheta = std::sin( _t * _scaler );
+        float _cphi = std::cos( _t * _scaler );
+        float _sphi = std::sin( _t * _scaler );
+
+        engine::CVec3 _testDirection = { _sphi * _ctheta, _sphi * _stheta, _cphi };
+
+        // showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
+        showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( _testDirection ) );
         // showDirectionalLightVolume( _cameraTest, { 0.0f, -1.0f, 0.0f } );
 
         _app->begin();
@@ -400,7 +520,7 @@ int main()
         /* do our thing here ************************/
 
         // render to shadow map first
-        renderToShadowMap( _currentLight, _shadowmap, _shaderShadowMapProj.get(), _floor, { _cube1, _cube2, _cube3 } );
+        renderToShadowMap( _currentLight, _camera, _shadowmap, _shaderShadowMapProj.get(), _floor, { _cube1, _cube2, _cube3 } );
 
         // render the scene normally
         renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
@@ -422,6 +542,7 @@ int main()
 }
 
 void renderToShadowMap( engine::CILight* lightPtr,
+                        engine::CICamera* cameraPtr,
                         engine::CShadowMap* shadowMapPtr,
                         engine::CShader* shaderPtr,
                         engine::LIRenderable* floor,
@@ -430,11 +551,23 @@ void renderToShadowMap( engine::CILight* lightPtr,
     // glCullFace( GL_FRONT );
     shaderPtr->bind();
     shadowMapPtr->bind();
+    engine::CMat4 _lightViewMat, _lightProjMat;
 
-    const float _znear = 1.0f;
-    const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-    auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    if ( g_useAutofixToCamera )
+    {
+        computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
+    }
+    else
+    {
+        const float _znear = 1.0f;
+        const float _zfar = 7.5f;
+
+        _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+        _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    }
+
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( _lightProjMat * _lightViewMat, { 0.7f, 0.5f, 0.3f } );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
 
@@ -514,10 +647,21 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     shaderPtr->setVec3( "u_viewerPosition", cameraPtr->position() );
 
     /* setup the light-clip-space transform */
-    const float _znear = 1.0f;
-    const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-    auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    engine::CMat4 _lightViewMat, _lightProjMat;
+
+    if ( g_useAutofixToCamera )
+    {
+        computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
+    }
+    else
+    {
+        const float _znear = 1.0f;
+        const float _zfar = 7.5f;
+
+        _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+        _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    }
+
     shaderPtr->setMat4( "u_viewProjLightSpaceMatrix", _lightProjMat * _lightViewMat );
 
     /* configure the texture unit for our shadowmap's depth texture (slot 3 in the shader) */
@@ -546,7 +690,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     }
     cubeMaterialPtr->unbind();
 
-    shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->bind();
+    shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
 }
 

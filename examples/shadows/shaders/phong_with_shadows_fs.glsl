@@ -80,7 +80,7 @@ float _computeObjectShadowFactor();
 
 const int PCF_COUNT = 2;
 const float PCF_TOTAL_TEXELS = ( PCF_COUNT * 2.0 + 1.0 ) * ( PCF_COUNT * 2.0 + 1.0 );
-const float PCF_TEXEL_SIZE = 1.0 / 2048.0;
+const float PCF_TEXEL_SIZE = 1.0 / 4096.0;
 
 void main()
 {
