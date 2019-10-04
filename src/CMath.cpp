@@ -241,6 +241,11 @@ namespace engine
         return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
     }
 
+    CVec3 operator- ( const CVec3& v )
+    {
+        return { -v.x, -v.y, -v.z };
+    }
+
     CVec3 operator* ( const CVec3& v, float32 s )
     {
         return { v.x * s, v.y * s, v.z * s };
@@ -492,6 +497,12 @@ namespace engine
         if ( CVec3::equal( _front, worldUp ) )
         {
             _front = worldUp;
+            _right = { worldUp.z, worldUp.x, worldUp.y };
+            _up    = { worldUp.y, worldUp.z, worldUp.x };
+        }
+        else if ( CVec3::equal( _front + worldUp, { 0.0f, 0.0f, 0.0f } ) )
+        {
+            _front = -worldUp;
             _right = { worldUp.z, worldUp.x, worldUp.y };
             _up    = { worldUp.y, worldUp.z, worldUp.x };
         }

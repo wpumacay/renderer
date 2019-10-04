@@ -103,6 +103,21 @@ namespace engine
         CDebugDrawer::s_instance->_drawNormals( meshPtr, color );
     }
 
+    
+    void CDebugDrawer::DrawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawAxes( xAxis, yAxis, zAxis, position, size );
+    }
+
+    void CDebugDrawer::DrawFrame( const CMat4& frame, float32 size )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawFrame( frame, size );
+    }
+
     CDebugDrawer::~CDebugDrawer()
     {
         m_linesPositions.clear();
@@ -348,6 +363,23 @@ namespace engine
 
             _drawArrow( _position3d, _position3d + 0.1f * _normal3d, color );
         }
+    }
+
+    void CDebugDrawer::_drawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size )
+    {
+        _drawArrow( position, position + size * xAxis, { 1.0f, 0.0f, 0.0f } );
+        _drawArrow( position, position + size * yAxis, { 0.0f, 1.0f, 0.0f } );
+        _drawArrow( position, position + size * zAxis, { 0.0f, 0.0f, 1.0f } );
+    }
+
+    void CDebugDrawer::_drawFrame( const CMat4& frame, float32 size )
+    {
+        auto _xAxis = frame.getBasisVectorX();
+        auto _yAxis = frame.getBasisVectorY();
+        auto _zAxis = frame.getBasisVectorZ();
+        auto _position = frame.getPosition();
+
+        _drawAxes( _xAxis, _yAxis, _zAxis, _position, size );
     }
 
 }

@@ -66,6 +66,7 @@ namespace engine
 
     CVec3 operator+ ( const CVec3& v1, const CVec3& v2 );
     CVec3 operator- ( const CVec3& v1, const CVec3& v2 );
+    CVec3 operator- ( const CVec3& v );
     CVec3 operator* ( const CVec3& v, float32 s );
     CVec3 operator* ( float32 s, const CVec3& v );
 

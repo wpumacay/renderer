@@ -40,6 +40,8 @@ namespace engine
         static void DrawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );
         static void DrawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color );
         static void DrawNormals( LMesh* meshPtr, const CVec3& color );
+        static void DrawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size );
+        static void DrawFrame( const CMat4& frame, float32 size );
 
         ~CDebugDrawer();
 
@@ -56,6 +58,8 @@ namespace engine
         void _drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );
         void _drawAABB( const CVec3& aabbMin, const CVec3& aabbMax, const CMat4& aabbWorldTransform, const CVec3& color );
         void _drawNormals( LMesh* meshPtr, const CVec3& color );
+        void _drawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size );
+        void _drawFrame( const CMat4& frame, float32 size );
 
         void _render( CICamera* camera );
         void _renderLinesBatch( CICamera* camera, int numLines );
