@@ -199,17 +199,23 @@ namespace engine
                                                 config.clipSpaceHeight, 
                                                 0.0f, config.clipSpaceDepth );
         }
+        else
+            ENGINE_CORE_ERROR( "Invalid range-type parameter given while setting up shadowmap" );
     }
 
     void CShadowMap::_setupPointLight( const CShadowMapRangeConfig& config, CPointLight* pointLightPtr )
     {
         if ( config.type == eShadowRangeType::AUTOFIX_CAMERA )
         {
-
+            ENGINE_CORE_WARN( "Point-lights don't support autofix functionality yet :(. Use a directional light instead, or use FIXED_USER" );
         }
         else if ( config.type == eShadowRangeType::FIXED_USER )
         {
-
+            m_lightSpaceMatView = CMat4::lookAt( pointLightPtr->position, config.focusPoint, config.worldUp );
+            m_lightSpaceMatProj = CMat4::perspective( config.clipSpaceFov, 
+                                                      ((float)m_shadowMapWidth) / m_shadowMapHeight, 
+                                                      config.clipSpaceZNear, 
+                                                      config.clipSpaceZFar );
         }
     }
 
@@ -217,11 +223,17 @@ namespace engine
     {
         if ( config.type == eShadowRangeType::AUTOFIX_CAMERA )
         {
-
+            ENGINE_CORE_WARN( "Spot-lights don't support autofix functionality yet :(. Use a directional light instead, or use FIXED_USER" );
         }
         else if ( config.type == eShadowRangeType::FIXED_USER )
         {
-            
+            m_lightSpaceMatView = CMat4::lookAt( spotLightPtr->position, 
+                                                 spotLightPtr->position + spotLightPtr->direction, 
+                                                 config.worldUp );
+            m_lightSpaceMatProj = CMat4::perspective( config.clipSpaceFov, 
+                                                      ((float)m_shadowMapWidth) / m_shadowMapHeight, 
+                                                      config.clipSpaceZNear, 
+                                                      config.clipSpaceZFar );
         }
     }
 

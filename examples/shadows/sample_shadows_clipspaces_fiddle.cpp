@@ -706,7 +706,7 @@ int main()
         renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the shadowmap to a quad
-        renderShadowMapVisualization(_currentLight,  _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
+        renderShadowMapVisualization( _currentLight, _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
 
         /********************************************/
 

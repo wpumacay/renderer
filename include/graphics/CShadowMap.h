@@ -23,20 +23,28 @@ namespace engine
     {
         eShadowRangeType    type;
         CVec3               worldUp;
-        /* light casters used for the shadowmap */
+        /* light casters used for the shadowmap ****/
         CPointLight*        pointLightPtr;
         CSpotLight*         spotLightPtr;
         CDirectionalLight*  dirLightPtr;
-        /* configuration used for autofix-camera */
+        /*******************************************/
+        /* configuration used for autofix-camera ***/
         CICamera* cameraPtr;
         float32   extraWidth;
         float32   extraHeight;
         float32   extraDepth;
-        /* configuration used for fixed-by-user */
-        CVec3     focusPoint;
-        float32   clipSpaceWidth;
-        float32   clipSpaceHeight;
-        float32   clipSpaceDepth;
+        /*******************************************/
+        /* configuration used for fixed-by-user ****/
+        CVec3       focusPoint;
+        // used for orthographics projection
+        float32     clipSpaceWidth;
+        float32     clipSpaceHeight;
+        float32     clipSpaceDepth;
+        // used for perspective projection
+        float32     clipSpaceZNear;
+        float32     clipSpaceZFar;
+        float32     clipSpaceFov;
+        /*******************************************/
 
         CShadowMapRangeConfig()
         {
