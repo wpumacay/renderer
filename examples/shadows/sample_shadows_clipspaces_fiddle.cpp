@@ -1,6 +1,22 @@
 
 #include <CEngine.h>
 
+engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
+// engine::CVec3 g_lightPosition = { 0.0f, 5.0f, 0.0f };
+
+engine::CVec3 g_lightDirection = engine::CVec3::normalize( -g_lightPosition );
+
+engine::CICamera* g_currentCamera = nullptr;
+engine::CICamera* g_testCamera = nullptr;
+
+bool g_useAutofixToCamera = false;
+
+const float g_znearDir = 1.0f;
+const float g_zfarDir = 7.5f;
+const float g_znearPoint = 0.1f;
+const float g_zfarPoint = 15.0f;
+const float g_fovPoint = 120.0f;
+
 class ApplicationUi : public engine::CImguiUi
 {
 
@@ -11,17 +27,71 @@ public :
 
     ~ApplicationUi() {}
 
+    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
+
 protected :
 
     void _initInternal() override
     {
-        // nothing for now
+        auto _dirlight = new engine::CDirectionalLight( "directional",
+                                                        { 0.3f, 0.3f, 0.3f },
+                                                        { 0.5f, 0.5f, 0.5f },
+                                                        { 0.8f, 0.8f, 0.8f },
+                                                        g_lightDirection );
+
+        auto _pointlight = new engine::CPointLight( "point",
+                                                    { 0.3f, 0.3f, 0.3f },
+                                                    { 0.5f, 0.5f, 0.5f },
+                                                    { 0.8f, 0.8f, 0.8f },
+                                                    g_lightPosition,
+                                                    1.0f, 0.05f, 0.005f );
+
+        m_lights = { _dirlight, _pointlight };
+        m_lightsNames = { "directional", "point" };
+        m_lightSelectedIndex = 1;
+        m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
     }
 
     void _renderInternal() override
     {
-        // nothing for now
+        _menuUiLights();
     }
+
+    void _menuUiLights()
+    {
+        ImGui::Begin( "Lights configuration" );
+
+        ImGui::Spacing();
+
+        if ( ImGui::BeginCombo( "Lights", m_lightSelectedName.c_str() ) )
+        {
+            for ( size_t i = 0; i < m_lights.size(); i++ )
+            {
+                std::string _lightName = m_lightsNames[i];
+                bool _isSelected = ( _lightName == m_lightSelectedName );
+
+                if ( ImGui::Selectable( _lightName.c_str(), _isSelected ) )
+                {
+                    m_lightSelectedName = _lightName;
+                    m_lightSelectedIndex = i;
+                }
+
+                if ( _isSelected )
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+
+        ImGui::Spacing();
+        ImGui::Text( m_lights[ m_lightSelectedIndex ]->toString().c_str() );
+        ImGui::End();
+    }
+
+    std::vector< engine::CILight* > m_lights;
+    std::vector< std::string > m_lightsNames;
+    std::string m_lightSelectedName;
+    int m_lightSelectedIndex;
 };
 
 void renderToShadowMap( engine::CILight* lightPtr,
@@ -40,7 +110,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
                              engine::LIRenderable* floor,
                              std::vector< engine::LIRenderable* > cubes );
 
-void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
+void renderShadowMapVisualization( engine::CILight* lightPtr,
+                                   engine::CVertexArray* quadVAO,
                                    engine::CShader* shaderPtr,
                                    engine::CShadowMap* shadowMapPtr );
 
@@ -308,16 +379,6 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
     engine::CDebugDrawer::DrawLine( _p0, _p4, _bcolor ); engine::CDebugDrawer::DrawLine( _p1, _p5, _bcolor );
 }
 
-engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
-// engine::CVec3 g_lightPosition = { 0.0f, 4.0f, 0.0f };
-
-engine::CVec3 g_lightDirection = engine::CVec3::normalize( -g_lightPosition );
-
-engine::CICamera* g_currentCamera = nullptr;
-engine::CICamera* g_testCamera = nullptr;
-
-bool g_useAutofixToCamera = false;
-
 int main()
 {
     auto _app = new engine::COpenGLApp();
@@ -358,26 +419,26 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    // auto _camera = new engine::COrbitCamera( "orbit",
-    //                                          { 0.0f, 0.0f, 3.0f },
-    //                                          { 0.0f, 0.0f, 0.0f },
-    //                                          engine::eAxis::Y,
-    //                                          _cameraProjData,
-    //                                          engine::COpenGLApp::GetWindow()->width(),
-    //                                          engine::COpenGLApp::GetWindow()->height() );
+    auto _camera = new engine::COrbitCamera( "orbit",
+                                             { 0.0f, 0.0f, 3.0f },
+                                             { 0.0f, 0.0f, 0.0f },
+                                             engine::eAxis::Y,
+                                             _cameraProjData,
+                                             engine::COpenGLApp::GetWindow()->width(),
+                                             engine::COpenGLApp::GetWindow()->height() );
 
-    const float _cameraSensitivity  = 0.25f;
-    const float _cameraSpeed        = 250.0f;
-    const float _cameraMaxDelta     = 10.0f;
-    
-    auto _camera = new engine::CFpsCamera( "fps",
-                                           { 2.0f, 2.0f, 2.0f },
-                                           { 0.0f, 0.0f, 0.0f },
-                                           engine::eAxis::Y,
-                                           _cameraProjData,
-                                           _cameraSensitivity,
-                                           _cameraSpeed,
-                                           _cameraMaxDelta );
+//     const float _cameraSensitivity  = 0.25f;
+//     const float _cameraSpeed        = 250.0f;
+//     const float _cameraMaxDelta     = 10.0f;
+//     
+//     auto _camera = new engine::CFpsCamera( "fps",
+//                                            { 2.0f, 2.0f, 2.0f },
+//                                            { 0.0f, 0.0f, 0.0f },
+//                                            engine::eAxis::Y,
+//                                            _cameraProjData,
+//                                            _cameraSensitivity,
+//                                            _cameraSpeed,
+//                                            _cameraMaxDelta );
 
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();
@@ -432,22 +493,9 @@ int main()
                                                      _floorTexture,
                                                      _floorTexture );
 
-    auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
-
-    auto _pointlight = new engine::CPointLight( "point",
-                                                { 0.3f, 0.3f, 0.3f },
-                                                { 0.3f, 0.3f, 0.3f },
-                                                { 0.3f, 0.3f, 0.3f },
-                                                g_lightPosition,
-                                                1.0f, 0.09f, 0.032f );
-
     /**********************************************************************************************/
 
-    auto _currentLight = _dirlight;
+    auto _currentLight = _ui->selectedLight();
     auto _shadowmap = new engine::CShadowMap( 4096, 4096 );
 
     engine::float32 _quad_buffData[] = {
@@ -501,6 +549,9 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
+        /* use the light selected by the user */
+        _currentLight = _ui->selectedLight();
+
         float _t = glfwGetTime();
         float _scaler = 1.0f;
         float _ctheta = std::cos( _t * _scaler );
@@ -526,7 +577,7 @@ int main()
         renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the shadowmap to a quad
-        renderShadowMapVisualization( _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
+        renderShadowMapVisualization(_currentLight,  _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
 
         /********************************************/
 
@@ -536,6 +587,10 @@ int main()
             _app->renderUi();
 
         _app->end();
+
+        // ENGINE_TRACE( "frame_time: {0} - fps: {1}", 
+        //               std::to_string( engine::CTime::GetTimeStep() ),
+        //               std::to_string( 1. / engine::CTime::GetRawTimeStep() ) );
     }
 
     return 0;
@@ -553,23 +608,28 @@ void renderToShadowMap( engine::CILight* lightPtr,
     shadowMapPtr->bind();
     engine::CMat4 _lightViewMat, _lightProjMat;
 
-    if ( g_useAutofixToCamera )
+    if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {
         computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
     }
     else
     {
-        const float _znear = 1.0f;
-        const float _zfar = 7.5f;
-
-        _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-        _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+        if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
+        {
+            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightProjMat = engine::CMat4::ortho( 20, 20, g_znearDir, g_zfarDir );
+        }
+        else if ( lightPtr->type() == engine::eLightType::POINT )
+        {
+            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightProjMat = engine::CMat4::perspective( g_fovPoint, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearPoint, g_zfarPoint );
+        }
     }
 
-    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
-    engine::CDebugDrawer::DrawClipVolume( _lightProjMat * _lightViewMat, { 0.7f, 0.5f, 0.3f } );
-
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
+
+    // auto _pointInClip = _lightProjMat * _lightViewMat * engine::CVec4( { 0.0f, 2.5f, 0.0f }, 1.0f );
+    // std::cout << "point: " << engine::toString( _pointInClip ) << std::endl;
 
     {
         shaderPtr->setMat4( "u_modelMatrix", floor->getModelMatrix() );
@@ -649,20 +709,32 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     /* setup the light-clip-space transform */
     engine::CMat4 _lightViewMat, _lightProjMat;
 
-    if ( g_useAutofixToCamera )
+    if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {
         computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
     }
     else
     {
-        const float _znear = 1.0f;
-        const float _zfar = 7.5f;
+        if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
+        {
 
-        _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-        _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightProjMat = engine::CMat4::ortho( 20, 20, g_znearDir, g_zfarDir );
+        }
+        else if ( lightPtr->type() == engine::eLightType::POINT )
+        {
+            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightProjMat = engine::CMat4::perspective( g_fovPoint, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearPoint, g_zfarPoint );
+        }
     }
 
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( _lightProjMat * _lightViewMat, { 0.7f, 0.5f, 0.3f } );
+
     shaderPtr->setMat4( "u_viewProjLightSpaceMatrix", _lightProjMat * _lightViewMat );
+
+    // auto _pointInClip = _lightProjMat * _lightViewMat * engine::CVec4( { 0.0f, 2.5f, 0.0f }, 1.0f );
+    // std::cout << "point: " << engine::toString( _pointInClip ) << std::endl;
 
     /* configure the texture unit for our shadowmap's depth texture (slot 3 in the shader) */
     shaderPtr->setInt( "u_depthmapTexture", 3 );
@@ -694,7 +766,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     shaderPtr->unbind();
 }
 
-void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
+void renderShadowMapVisualization( engine::CILight* lightPtr,
+                                   engine::CVertexArray* quadVAO,
                                    engine::CShader* shaderPtr,
                                    engine::CShadowMap* shadowMapPtr )
 {
@@ -703,6 +776,17 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
     shaderPtr->bind();
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->bind();
     quadVAO->bind();
+
+    if ( lightPtr->type() == engine::eLightType::POINT || lightPtr->type() == engine::eLightType::SPOT )
+    {
+        shaderPtr->setInt( "u_linearizeDepth", 1 );
+        shaderPtr->setFloat( "u_znear", g_znearPoint );
+        shaderPtr->setFloat( "u_zfar", g_zfarPoint );
+    }
+    else
+    {
+        shaderPtr->setInt( "u_linearizeDepth", 0 );
+    }
 
     glDrawElements( GL_TRIANGLES, quadVAO->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
 

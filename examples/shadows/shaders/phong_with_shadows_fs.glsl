@@ -112,6 +112,9 @@ float _computeObjectShadowFactor()
     if ( u_directionalLight.enabled == 1 )
         _bias = max( 0.05 * ( 1.0 - dot( normalize( fNormal ), -normalize( u_directionalLight.direction ) ) ), 0.005 );
 
+    if ( u_pointLight.enabled == 1 ) // point lights seem to need a smaller bias
+        _bias = max( 0.005 * ( 1.0 - dot( normalize( fNormal ), normalize( u_pointLight.position - fPosition ) ) ), 0.0005 );
+
     /* grab depths required to check if we are in shadow or not */
     float _closestDepth = texture( u_depthmapTexture, _projCoords.xy ).r;
     float _currentDepth = _projCoords.z;
@@ -143,11 +146,11 @@ vec3 _computeLightAmbientFactor()
         // @OPTIM: should avoid doing 3-times the attenuation computation
         float _dist = length( u_pointLight.position - fPosition );
         float _attn = 1.0 / ( u_pointLight.attnk0 + u_pointLight.attnk1 * _dist + u_pointLight.attnk2 * _dist * _dist );
-        return u_directionalLight.intensity * _attn * u_pointLight.ambient;
+        return u_pointLight.intensity * _attn * u_pointLight.ambient;
     }
 
     if ( u_spotLight.enabled == 1 )
-        return u_directionalLight.intensity * u_directionalLight.ambient;
+        return u_spotLight.intensity * u_spotLight.ambient;
 
     // default value, in case some configuration went wrong
     return vec3( 0.2f, 0.2f, 0.2f );
