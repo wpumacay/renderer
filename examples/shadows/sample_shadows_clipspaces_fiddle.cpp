@@ -1,21 +1,39 @@
 
 #include <CEngine.h>
 
-engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
-// engine::CVec3 g_lightPosition = { 0.0f, 5.0f, 0.0f };
+engine::CVec3 g_lightDirPosition    = { 0.0f, 5.0f, 0.0f };
+engine::CVec3 g_lightPointPosition  = { 0.0f, 5.0f, 0.0f };
+engine::CVec3 g_lightSpotPosition   = { 0.0f, 5.0f, 0.0f };
 
-engine::CVec3 g_lightDirection = engine::CVec3::normalize( -g_lightPosition );
+// engine::CVec3 g_lightDirPosition    = { -2.0f, 4.0f, -1.0f };
+// engine::CVec3 g_lightPointPosition  = { -2.0f, 4.0f, -1.0f };
+// engine::CVec3 g_lightSpotPosition   = { -2.0f, 4.0f, -1.0f };
 
-engine::CICamera* g_currentCamera = nullptr;
-engine::CICamera* g_testCamera = nullptr;
+engine::CVec3 g_lightDirDirection   = engine::CVec3::normalize( -g_lightDirPosition );
+engine::CVec3 g_lightPointDirection = engine::CVec3::normalize( -g_lightPointPosition );
+engine::CVec3 g_lightSpotDirection  = engine::CVec3::normalize( -g_lightSpotPosition );
+
+engine::CVec3 g_focusPoint = { 0.0f, 0.0f, 0.0f };
+const engine::CVec3 g_worldUp = { 0.0f, 1.0f, 0.0f };
 
 bool g_useAutofixToCamera = false;
 
-const float g_znearDir = 1.0f;
-const float g_zfarDir = 7.5f;
-const float g_znearPoint = 0.1f;
-const float g_zfarPoint = 15.0f;
-const float g_fovPoint = 120.0f;
+float g_znearDir = 1.0f;
+float g_zfarDir = 7.5f;
+float g_widthDir = 20.0f;
+float g_heightDir = 20.0f;
+
+float g_znearPoint = 0.1f;
+float g_zfarPoint = 15.0f;
+float g_fovPoint = 120.0f;
+
+float g_znearSpot = 0.1f;
+float g_zfarSpot = 15.0f;
+float g_fovSpot = 120.0f;
+
+float g_extraWidth = 1.0f;
+float g_extraHeight = 1.0f;
+float g_extraDepth = 1.0f;
 
 class ApplicationUi : public engine::CImguiUi
 {
@@ -34,22 +52,39 @@ protected :
     void _initInternal() override
     {
         auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                        { 0.3f, 0.3f, 0.3f },
-                                                        { 0.5f, 0.5f, 0.5f },
+                                                        { 0.2f, 0.2f, 0.2f },
+                                                        { 0.4f, 0.4f, 0.4f },
                                                         { 0.8f, 0.8f, 0.8f },
-                                                        g_lightDirection );
+                                                        g_lightDirDirection );
 
         auto _pointlight = new engine::CPointLight( "point",
-                                                    { 0.3f, 0.3f, 0.3f },
+                                                    { 0.2f, 0.2f, 0.2f },
                                                     { 0.5f, 0.5f, 0.5f },
                                                     { 0.8f, 0.8f, 0.8f },
-                                                    g_lightPosition,
+                                                    g_lightPointPosition,
                                                     1.0f, 0.05f, 0.005f );
 
-        m_lights = { _dirlight, _pointlight };
-        m_lightsNames = { "directional", "point" };
-        m_lightSelectedIndex = 1;
+        auto _spotLight = new engine::CSpotLight( "spot",
+                                                  { 0.2f, 0.2f, 0.2f },
+                                                  { 0.5f, 0.5f, 0.5f },
+                                                  { 0.8f, 0.8f, 0.8f },
+                                                  g_lightSpotPosition,
+                                                  g_lightSpotDirection,
+                                                  1.0f, 0.05f, 0.005f,
+                                                  ENGINE_PI / 4.0f,
+                                                  ENGINE_PI / 3.0f );
+
+        m_lights = { _dirlight, _pointlight, _spotLight };
+        m_lightsNames = { "directional", "point", "spot" };
+        m_lightSelectedIndex = 2;
         m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
+
+        m_lightDirDirection     = g_lightDirDirection;
+        m_lightPointDirection   = g_lightPointDirection;
+        m_lightSpotDirection    = g_lightSpotDirection;
+
+        m_lightPointPosition    = g_lightPointPosition;
+        m_lightSpotPosition     = g_lightSpotPosition;
     }
 
     void _renderInternal() override
@@ -59,7 +94,7 @@ protected :
 
     void _menuUiLights()
     {
-        ImGui::Begin( "Lights configuration" );
+        ImGui::Begin( "Lights shadowmapping configuration" );
 
         ImGui::Spacing();
 
@@ -82,16 +117,106 @@ protected :
 
             ImGui::EndCombo();
         }
+        ImGui::Spacing();
+
+        _menuUiLightShadowProps();
 
         ImGui::Spacing();
         ImGui::Text( m_lights[ m_lightSelectedIndex ]->toString().c_str() );
         ImGui::End();
     }
 
+    void _menuUiLightShadowProps()
+    {
+        auto _lightPtr = m_lights[m_lightSelectedIndex];
+        if ( _lightPtr->type() == engine::eLightType::DIRECTIONAL )
+        {
+            /* shadow frustum transform in world-space (view) */
+            float _direction[3] = { m_lightDirDirection.x, m_lightDirDirection.y, m_lightDirDirection.z };
+            ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
+            m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
+
+            g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
+
+            auto _dirLightPtr = reinterpret_cast< engine::CDirectionalLight* >( _lightPtr );
+            _dirLightPtr->direction = g_lightDirDirection;
+
+            // whether or not to use autofix-to-camera for directional lights shadowmapping
+            ImGui::Checkbox( "autofix-to-camera", &g_useAutofixToCamera );
+
+            /* shadow-frustum size properties (proj) */
+            if ( g_useAutofixToCamera )
+            {
+                ImGui::SliderFloat( "extra-width", &g_extraWidth, 0.0f, 5.0f );
+                ImGui::SliderFloat( "extra-height", &g_extraHeight, 0.0f, 5.0f );
+                ImGui::SliderFloat( "extra-depth", &g_extraDepth, 0.0f, 5.0f );
+            }
+            else
+            {
+                ImGui::SliderFloat( "znear", &g_znearDir, 0.1f, 5.0f );
+                ImGui::SliderFloat( "zfar", &g_zfarDir, g_znearDir, 20.0f );
+                ImGui::SliderFloat( "width", &g_widthDir, 20.0f, 40.0f );
+                ImGui::SliderFloat( "height", &g_heightDir, 20.0f, 40.0f );
+
+                float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+                ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
+                g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
+            }
+        }
+        else if ( _lightPtr->type() == engine::eLightType::POINT )
+        {
+            float _position[3] = { m_lightPointPosition.x, m_lightPointPosition.y, m_lightPointPosition.z };
+            ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
+            m_lightPointPosition = { _position[0], _position[1], _position[2] };
+
+            g_lightPointDirection = engine::CVec3::normalize( m_lightPointDirection );
+            g_lightPointPosition = m_lightPointPosition;
+
+            auto _pointLightPtr = reinterpret_cast< engine::CPointLight* >( _lightPtr );
+            _pointLightPtr->position = g_lightPointPosition;
+
+            ImGui::SliderFloat( "znear", &g_znearPoint, 0.1f, 5.0f );
+            ImGui::SliderFloat( "zfar", &g_zfarPoint, g_znearPoint, 20.0f );
+            ImGui::SliderFloat( "fov", &g_fovPoint, 20.0f, 150.0f );
+
+            float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+            ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
+            g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
+        }
+        else if ( _lightPtr->type() == engine::eLightType::SPOT )
+        {
+            float _direction[3] = { m_lightSpotDirection.x, m_lightSpotDirection.y, m_lightSpotDirection.z };
+            ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
+            m_lightSpotDirection = { _direction[0], _direction[1], _direction[2] };
+
+            float _position[3] = { m_lightSpotPosition.x, m_lightSpotPosition.y, m_lightSpotPosition.z };
+            ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
+            m_lightSpotPosition = { _position[0], _position[1], _position[2] };
+
+            g_lightSpotDirection = engine::CVec3::normalize( m_lightSpotDirection );
+            g_lightSpotPosition = m_lightSpotPosition;
+
+            auto _spotLightPtr = reinterpret_cast< engine::CSpotLight* >( _lightPtr );
+            _spotLightPtr->direction = g_lightSpotDirection;
+            _spotLightPtr->position = g_lightSpotPosition;
+
+            ImGui::SliderFloat( "znear", &g_znearSpot, 0.1f, 5.0f );
+            ImGui::SliderFloat( "zfar", &g_zfarSpot, g_znearSpot, 20.0f );
+            ImGui::SliderFloat( "fov", &g_fovSpot, 20.0f, 150.0f );
+        }
+    }
+
     std::vector< engine::CILight* > m_lights;
     std::vector< std::string > m_lightsNames;
     std::string m_lightSelectedName;
     int m_lightSelectedIndex;
+
+    engine::CVec3 m_lightDirDirection;
+    engine::CVec3 m_lightPointDirection;
+    engine::CVec3 m_lightSpotDirection;
+
+    engine::CVec3 m_lightPointPosition;
+    engine::CVec3 m_lightSpotPosition;
 };
 
 void renderToShadowMap( engine::CILight* lightPtr,
@@ -139,6 +264,9 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
     if ( !cameraPtr )
         return;
 
+    // normalize in case someone passed a vector that wasn't normalized :(
+    auto _directionNorm = engine::CVec3::normalize( direction );
+
     auto _viewProjMatrix = cameraPtr->matProj() * cameraPtr->matView();
 
     /* get back the corners of the frustum in world space */
@@ -172,13 +300,13 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
     engine::CVec3 _fvec, _rvec, _uvec;
     engine::CVec3 _worldUp = { 0.0f, 1.0f, 0.0f };
 
-    if ( engine::CVec3::equal( direction, { 0.0f, 1.0f, 0.0f } ) )
+    if ( engine::CVec3::equal( _directionNorm, { 0.0f, 1.0f, 0.0f } ) )
     {
         _fvec = _worldUp;
         _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
         _uvec = { _worldUp.y, _worldUp.z, _worldUp.x };
     }
-    else if ( engine::CVec3::equal( direction + _worldUp, { 0.0f, 0.0f, 0.0f } ) )
+    else if ( engine::CVec3::equal( _directionNorm + _worldUp, { 0.0f, 0.0f, 0.0f } ) )
     {
         _fvec = -_worldUp;
         _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
@@ -186,7 +314,7 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
     }
     else
     {
-        _fvec = direction;
+        _fvec = _directionNorm;
         _rvec = engine::CVec3::cross( { 0.0f, 1.0f, 0.0f }, _fvec );
         _uvec = engine::CVec3::cross( _fvec, _rvec );
     }
@@ -229,10 +357,10 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
                    engine::CVec3::dot( 0.5f * ( _uPoints3d.front() + _uPoints3d.back() ), _uvec ) * _uvec;
 
     auto _position = _center - ( 0.5f * _df ) * _fvec;
-    auto _target = _position + direction;
+    auto _target = _position + _directionNorm;
 
     matView = engine::CMat4::lookAt( _position, _target, _worldUp );
-    matProj = engine::CMat4::ortho( _dr + ddr, _du + ddu, 0.0f, _df + ddf );
+    matProj = engine::CMat4::ortho( _dr + ddr, _du + ddu, -0.5f * ddf, _df + 0.5f * ddf );
 }
 
 void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec3& direction )
@@ -252,6 +380,9 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
 {
     if ( !cameraPtr )
         return;
+
+    // normalize in case someone passed a vector that wasn't normalized :(
+    auto _directionNorm = engine::CVec3::normalize( direction );
 
     auto _viewProjMatrix = cameraPtr->matProj() * cameraPtr->matView();
 
@@ -289,13 +420,13 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
     engine::CVec3 _fvec, _rvec, _uvec;
     engine::CVec3 _worldUp = { 0.0f, 1.0f, 0.0f };
 
-    if ( engine::CVec3::equal( direction, { 0.0f, 1.0f, 0.0f } ) )
+    if ( engine::CVec3::equal( _directionNorm, { 0.0f, 1.0f, 0.0f } ) )
     {
         _fvec = _worldUp;
         _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
         _uvec = { _worldUp.y, _worldUp.z, _worldUp.x };
     }
-    else if ( engine::CVec3::equal( direction + _worldUp, { 0.0f, 0.0f, 0.0f } ) )
+    else if ( engine::CVec3::equal( _directionNorm + _worldUp, { 0.0f, 0.0f, 0.0f } ) )
     {
         _fvec = -_worldUp;
         _rvec = { _worldUp.z, _worldUp.x, _worldUp.y };
@@ -303,7 +434,7 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
     }
     else
     {
-        _fvec = direction;
+        _fvec = _directionNorm;
         _rvec = engine::CVec3::cross( { 0.0f, 1.0f, 0.0f }, _fvec );
         _uvec = engine::CVec3::cross( _fvec, _rvec );
     }
@@ -354,7 +485,7 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
     engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _uPoints3d.front(), { 0.0f, 0.0f, 0.5f } );
     engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _uPoints3d.back(), { 0.0f, 0.0f, 1.0f } );
 
-    engine::CDebugDrawer::DrawArrow( { 3.0f, 3.0f, 3.0f }, engine::CVec3( 3.0f, 3.0f, 3.0f ) + direction, { 0.0f, 1.0f, 1.0f } );
+    engine::CDebugDrawer::DrawArrow( { 3.0f, 3.0f, 3.0f }, engine::CVec3( 3.0f, 3.0f, 3.0f ) + _directionNorm, { 0.0f, 1.0f, 1.0f } );
     engine::CDebugDrawer::DrawAxes( _fvec, _rvec, _uvec, _center, 0.5f );
 
     // define the points of the oobb
@@ -454,8 +585,6 @@ int main()
                                                   engine::eAxis::Y,
                                                   _cameraProjDataTest );
 
-    g_currentCamera = _camera;
-    g_testCamera = _cameraTest;
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->pos = { 0.0f, 0.0f, 0.0f };
@@ -549,6 +678,8 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
+        engine::CDebugDrawer::DrawNormals( _cube3, { 0.0f, 0.0f, 1.0f } );
+
         /* use the light selected by the user */
         _currentLight = _ui->selectedLight();
 
@@ -561,9 +692,7 @@ int main()
 
         engine::CVec3 _testDirection = { _sphi * _ctheta, _sphi * _stheta, _cphi };
 
-        // showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
         showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( _testDirection ) );
-        // showDirectionalLightVolume( _cameraTest, { 0.0f, -1.0f, 0.0f } );
 
         _app->begin();
         _camera->update();
@@ -610,19 +739,24 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {
-        computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
+        computeLightSpaceViewProj( cameraPtr, g_lightDirDirection, _lightViewMat, _lightProjMat, g_extraWidth, g_extraHeight, g_extraDepth );
     }
     else
     {
         if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
         {
-            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-            _lightProjMat = engine::CMat4::ortho( 20, 20, g_znearDir, g_zfarDir );
+            _lightViewMat = engine::CMat4::lookAt( g_focusPoint - 0.5f * ( g_zfarDir - g_znearDir ) * g_lightDirDirection, g_focusPoint, g_worldUp );
+            _lightProjMat = engine::CMat4::ortho( g_widthDir, g_heightDir, g_znearDir, g_zfarDir );
         }
         else if ( lightPtr->type() == engine::eLightType::POINT )
         {
-            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightViewMat = engine::CMat4::lookAt( g_lightPointPosition, g_focusPoint, g_worldUp );
             _lightProjMat = engine::CMat4::perspective( g_fovPoint, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearPoint, g_zfarPoint );
+        }
+        else if ( lightPtr->type() == engine::eLightType::SPOT )
+        {
+            _lightViewMat = engine::CMat4::lookAt( g_lightSpotPosition, g_lightSpotPosition + g_lightSpotDirection, g_worldUp );
+            _lightProjMat = engine::CMat4::perspective( g_fovSpot, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearSpot, g_zfarSpot );
         }
     }
 
@@ -711,20 +845,24 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
 
     if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {
-        computeLightSpaceViewProj( cameraPtr, g_lightDirection, _lightViewMat, _lightProjMat, 2.0f, 2.0f, 2.0f );
+        computeLightSpaceViewProj( cameraPtr, g_lightDirDirection, _lightViewMat, _lightProjMat, g_extraWidth, g_extraHeight, g_extraDepth );
     }
     else
     {
         if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
         {
-
-            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-            _lightProjMat = engine::CMat4::ortho( 20, 20, g_znearDir, g_zfarDir );
+            _lightViewMat = engine::CMat4::lookAt( g_focusPoint - 0.5f * ( g_zfarDir - g_znearDir ) * g_lightDirDirection, g_focusPoint, g_worldUp );
+            _lightProjMat = engine::CMat4::ortho( g_widthDir, g_heightDir, g_znearDir, g_zfarDir );
         }
         else if ( lightPtr->type() == engine::eLightType::POINT )
         {
-            _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+            _lightViewMat = engine::CMat4::lookAt( g_lightPointPosition, g_focusPoint, g_worldUp );
             _lightProjMat = engine::CMat4::perspective( g_fovPoint, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearPoint, g_zfarPoint );
+        }
+        else if ( lightPtr->type() == engine::eLightType::SPOT )
+        {
+            _lightViewMat = engine::CMat4::lookAt( g_lightSpotPosition, g_lightSpotPosition + g_lightSpotDirection, { 0.0f, 1.0f, 0.0f } );
+            _lightProjMat = engine::CMat4::perspective( g_fovSpot, ((float)shadowMapPtr->width()) / shadowMapPtr->height(), g_znearSpot, g_zfarSpot );
         }
     }
 

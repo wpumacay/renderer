@@ -115,6 +115,9 @@ float _computeObjectShadowFactor()
     if ( u_pointLight.enabled == 1 ) // point lights seem to need a smaller bias
         _bias = max( 0.005 * ( 1.0 - dot( normalize( fNormal ), normalize( u_pointLight.position - fPosition ) ) ), 0.0005 );
 
+    if ( u_spotLight.enabled == 1 ) // spot lights also seem to need a smaller bias
+        _bias = max( 0.005 * ( 1.0 - dot( normalize( fNormal ), normalize( u_spotLight.position - fPosition ) ) ), 0.0005 );
+
     /* grab depths required to check if we are in shadow or not */
     float _closestDepth = texture( u_depthmapTexture, _projCoords.xy ).r;
     float _currentDepth = _projCoords.z;
@@ -218,7 +221,7 @@ vec3 _computeLightSpecularFactor()
         float _epsilon = u_spotLight.innerCutoffCos - u_spotLight.outerCutoffCos;
         float _intensity = clamp( ( _costheta - u_spotLight.outerCutoffCos ) / _epsilon, 0.0, 1.0 );
         return pow( max( dot( normalize( reflect( -normalize( u_spotLight.position - fPosition ), fNormal ) ),
-                              normalize( u_viewerPosition - fPosition ) ), 0.0f ), u_material.shininess ) * u_spotLight.intensity * _attn * _intensity * u_pointLight.specular;
+                              normalize( u_viewerPosition - fPosition ) ), 0.0f ), u_material.shininess ) * u_spotLight.intensity * _attn * _intensity * u_spotLight.specular;
     }
 
     // default value (constant everywhere) in case some configuration went wrong
