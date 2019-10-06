@@ -27,10 +27,11 @@
 #include <LMesh.h>                                  // #include <graphics/CMesh.h>
 #include <LModel.h>                                 // #include <graphics/CModel.h>
 #include <graphics/CMeshBuilder.h>
-#include <LFog.h>                                   // #include <graphics/CFog.h>
-#include <LShadowMap.h>                             // #include <graphics/CShadowMap.h>
+#include <LFog.h>                                   // #include <graphics/CFog.h>       | REPLACE IN RENDERER PIPELINE
+#include <LShadowMap.h>                             // #include <graphics/CShadowMap.h> | REPLACE IN RENDERER PIPELINE
 #include <LScene.h>                                 // #include <graphics/CScene.h>
 #include <graphics/CShadowMap.h>
+#include <graphics/CFog.h>
 
 #include <materials/CIMaterial.h>
 #include <materials/CPhongMaterial.h>

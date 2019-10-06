@@ -3,6 +3,7 @@
 in vec3 fPosition;
 in vec3 fNormal;
 in vec2 fTexcoord;
+in vec3 fViewPosition;
 
 out vec4 fColor;
 
@@ -67,6 +68,18 @@ struct SpotLight
 uniform SpotLight u_spotLight;
 
 uniform vec3 u_viewerPosition;
+
+struct Fog
+{
+    int type;
+    int enabled;
+    vec3 color;
+    float density;
+    float gradient;
+    float distStart;
+    float distEnd;
+};
+uniform Fog u_fog;
 
 vec3 _computeLightAmbientFactor()
 {
@@ -192,4 +205,18 @@ void main()
     vec3 _oSpecularComp = _computeObjectSpecularComp( _lSpecularFactor );
 
     fColor = vec4( _oAmbientComp + _oDiffuseComp + _oSpecularComp, 1.0f );
+
+    if ( u_fog.enabled == 1 )
+    {
+        float _oVisibility = 1.0f;
+        if ( u_fog.type == 0 ) // linear
+            _oVisibility = 1.0f - ( length( fViewPosition ) - u_fog.distStart ) / ( u_fog.distEnd - u_fog.distStart );
+        else if ( u_fog.type == 1 ) //exponential
+            _oVisibility = exp( -pow( ( length( fViewPosition ) - u_fog.distStart ) * u_fog.density, u_fog.gradient ) );
+
+        _oVisibility = clamp( _oVisibility, 0.0f, 1.0f );
+
+        // interpolate the color of the fog with the color of the fragment from the lights calculations
+        fColor = mix( vec4( u_fog.color, 1.0f ), fColor, _oVisibility );
+    }
 }
