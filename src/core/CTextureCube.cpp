@@ -42,7 +42,7 @@ namespace engine
     *                              CCubeTexture impl.                         *
     ***************************************************************************/
 
-    CTextureCube::CTextureCube( std::shared_ptr< CTextureCubeData > texCubeData )
+    CTextureCube::CTextureCube( CTextureCubeData* texCubeData )
     {
         m_data      = texCubeData;
         m_openglId  = 0;

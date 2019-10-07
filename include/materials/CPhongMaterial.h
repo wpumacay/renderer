@@ -21,22 +21,22 @@ namespace engine
                         const CVec3& diffuseColor,
                         const CVec3& specularColor,
                         float32 shininess,
-                        std::shared_ptr< CTexture > diffuseMap = nullptr,
-                        std::shared_ptr< CTexture > specularMap = nullptr,
-                        std::shared_ptr< CTexture > normalMap = nullptr );
+                        CTexture* diffuseMap = nullptr,
+                        CTexture* specularMap = nullptr,
+                        CTexture* normalMap = nullptr );
 
         ~CPhongMaterial();
 
-        void setDiffuseMap( std::shared_ptr< CTexture > diffuseMap ) { m_diffuseMap = diffuseMap; }
-        void setSpecularMap( std::shared_ptr< CTexture > specularMap ) { m_specularMap = specularMap; }
-        void setNormalMap( std::shared_ptr< CTexture > normalMap ) { m_normalMap = normalMap; }
+        void setDiffuseMap( CTexture* diffuseMap ) { m_diffuseMap = diffuseMap; }
+        void setSpecularMap( CTexture* specularMap ) { m_specularMap = specularMap; }
+        void setNormalMap( CTexture* normalMap ) { m_normalMap = normalMap; }
 
         void bind( CShader* shaderPtr ) override;
         void unbind() override;
 
-        std::shared_ptr< CTexture > diffuseMap() const { return m_diffuseMap; }
-        std::shared_ptr< CTexture > specularMap() const { return m_specularMap; }
-        std::shared_ptr< CTexture > normalMap() const { return m_normalMap; }
+        CTexture* diffuseMap() const { return m_diffuseMap; }
+        CTexture* specularMap() const { return m_specularMap; }
+        CTexture* normalMap() const { return m_normalMap; }
 
     protected :
 
@@ -44,9 +44,9 @@ namespace engine
 
     private :
 
-        std::shared_ptr< CTexture > m_diffuseMap;
-        std::shared_ptr< CTexture > m_specularMap;
-        std::shared_ptr< CTexture > m_normalMap;
+        CTexture* m_diffuseMap;
+        CTexture* m_specularMap;
+        CTexture* m_normalMap;
     };
 
 }

@@ -75,7 +75,7 @@ namespace engine
 
     public :
 
-        CTexture( std::shared_ptr< CTextureData > texData,
+        CTexture( CTextureData* texDataPtr,
                   const eTextureFilter& filterMin,
                   const eTextureFilter& filterMag,
                   const eTextureWrap& wrapU,
@@ -85,7 +85,7 @@ namespace engine
                   const ePixelDataType& dtype,
                   uint32 textureUnit );
 
-        CTexture( std::shared_ptr< CTextureData > texData,
+        CTexture( CTextureData* texDataPtr,
                   const CTextureOptions& texOptions );
 
         ~CTexture();
@@ -93,13 +93,13 @@ namespace engine
         void bind();
         void unbind();
 
-        std::shared_ptr< CTextureData > data() const { return m_texData; }
+        CTextureData* data() const { return m_texDataPtr; }
 
-        std::string name() const { return m_texData->name; }
-        uint32 width() const { return m_texData->width; }
-        uint32 height() const { return m_texData->height; }
-        uint32 channels() const { return m_texData->channels; }
-        eTextureFormat format() const { return m_texData->format; }
+        std::string name() const { return m_texDataPtr->name; }
+        uint32 width() const { return m_texDataPtr->width; }
+        uint32 height() const { return m_texDataPtr->height; }
+        uint32 channels() const { return m_texDataPtr->channels; }
+        eTextureFormat format() const { return m_texDataPtr->format; }
 
         eTextureFilter filterMin() const { return m_texFilterModeMin; }
         eTextureFilter filterMag() const { return m_texFilterModeMag; }
@@ -114,16 +114,16 @@ namespace engine
 
     private :
 
-        std::shared_ptr< CTextureData > m_texData;
-        eTextureWrap                    m_texWrapModeU;
-        eTextureWrap                    m_texWrapModeV;
-        eTextureFilter                  m_texFilterModeMin;
-        eTextureFilter                  m_texFilterModeMag;
-        CVec4                           m_texBorderColorU;
-        CVec4                           m_texBorderColorV;
-        ePixelDataType                  m_texPixelDtype;
-        uint32                          m_openglTexUnit;
-        uint32                          m_openglId;
+        CTextureData*   m_texDataPtr;
+        eTextureWrap    m_texWrapModeU;
+        eTextureWrap    m_texWrapModeV;
+        eTextureFilter  m_texFilterModeMin;
+        eTextureFilter  m_texFilterModeMag;
+        CVec4           m_texBorderColorU;
+        CVec4           m_texBorderColorV;
+        ePixelDataType  m_texPixelDtype;
+        uint32          m_openglTexUnit;
+        uint32          m_openglId;
     };
 
 }

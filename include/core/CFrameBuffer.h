@@ -47,22 +47,23 @@ namespace engine
         void bind();
         void unbind();
 
-        std::shared_ptr< CTexture > getTextureAttachment( const std::string& name );
+        CTexture* getTextureAttachment( const std::string& name );
         CAttachmentConfig getConfigAttachment( const std::string& name );
 
-        std::map< std::string, std::shared_ptr< CTexture > > textures() const { return m_textures; }
-        std::map< std::string, CAttachmentConfig > configs() const { return m_configs; }
+        std::map< std::string, CTexture* > textures() const;
+        std::map< std::string, CAttachmentConfig > configs() const;
 
         uint32 openglId() const { return m_openglId; }
 
     private :
 
-        std::map< std::string, std::shared_ptr< CTexture > >    m_textures;
-        std::map< std::string, CAttachmentConfig >              m_configs;
-        uint32                                                  m_width;
-        uint32                                                  m_height;
-        uint32                                                  m_openglId;
+        std::map< std::string, CAttachmentConfig >                  m_configs;
+        std::map< std::string, std::unique_ptr< CTexture > >        m_textures;
+        std::map< std::string, std::unique_ptr< CTextureData > >    m_texturesData;
 
+        uint32 m_width;
+        uint32 m_height;
+        uint32 m_openglId;
     };
 
 }

@@ -22,15 +22,8 @@ namespace engine
 
     class LIRenderable
     {
-        protected :
 
-        eRenderableType             m_type;
-        bool                        m_isVisible;
-        bool                        m_drawAsWireframe;
-        LMaterial*                  m_material;
-        std::shared_ptr< CTexture > m_texture;
-
-        public :
+    public :
 
         CVec3 pos;
         CMat4 rotation;
@@ -48,8 +41,8 @@ namespace engine
 
         CMat4 getModelMatrix();
 
-        void setTexture( std::shared_ptr< CTexture > texture ) { m_texture = texture; }
-        std::shared_ptr< CTexture > texture() const { return m_texture; }
+        void setTexture( CTexture* texture ) { m_texture = texture; }
+        CTexture* texture() const { return m_texture; }
 
         bool isVisible() const { return m_isVisible; }
         void setVisibility( bool visibility ) { m_isVisible = visibility; }
@@ -58,6 +51,15 @@ namespace engine
         bool isWireframe();
 
         virtual void render() = 0;
+
+    protected :
+
+        bool            m_isVisible;
+        bool            m_drawAsWireframe;
+        LMaterial*      m_material;
+        CTexture*       m_texture;
+        eRenderableType m_type;
+
     };
 
 }

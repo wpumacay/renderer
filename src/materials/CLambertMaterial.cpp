@@ -7,7 +7,7 @@ namespace engine
     CLambertMaterial::CLambertMaterial( const std::string& name,
                                         const CVec3& ambientColor,
                                         const CVec3& diffuseColor,
-                                        std::shared_ptr< CTexture > diffuseMap )
+                                        CTexture* diffuseMap )
         : CIMaterial( name )
     {
         ambient = ambientColor;

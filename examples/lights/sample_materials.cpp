@@ -14,12 +14,12 @@ public :
 
     ~ApplicationUi() {}
 
-    void setMaterial( std::shared_ptr< engine::CIMaterial > material )
+    void setMaterial( engine::CIMaterial* material )
     {
         m_material = material;
     }
 
-    void setLight( std::shared_ptr< engine::CILight > light )
+    void setLight( engine::CILight* light )
     {
         m_light = light;
     }
@@ -96,7 +96,7 @@ private :
         {
             if ( m_material->type() == engine::eMaterialType::PHONG )
             {
-                auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+                auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
 
                 _materialPhong->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
                 _materialPhong->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
@@ -105,7 +105,7 @@ private :
             }
             else if ( m_material->type() == engine::eMaterialType::LAMBERT )
             {
-                auto _materialLambert = std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material );
+                auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
 
                 _materialLambert->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
                 _materialLambert->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
@@ -116,7 +116,7 @@ private :
 
         if ( m_material->type() == engine::eMaterialType::PHONG )
         {
-            auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
 
             float _cAmbient[3]  = { _materialPhong->ambient.x, _materialPhong->ambient.y, _materialPhong->ambient.z };
             float _cDiffuse[3]  = { _materialPhong->diffuse.x, _materialPhong->diffuse.y, _materialPhong->diffuse.z };
@@ -133,7 +133,7 @@ private :
         }
         else if ( m_material->type() == engine::eMaterialType::LAMBERT )
         {
-            auto _materialLambert = std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material );
+            auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
 
             float _cAmbient[3]  = { _materialLambert->ambient.x, _materialLambert->ambient.y, _materialLambert->ambient.z };
             float _cDiffuse[3]  = { _materialLambert->diffuse.x, _materialLambert->diffuse.y, _materialLambert->diffuse.z };
@@ -188,8 +188,8 @@ private :
         ImGui::End();
     }
 
-    std::shared_ptr< engine::CIMaterial > m_material;
-    std::shared_ptr< engine::CILight > m_light;
+    engine::CIMaterial* m_material;
+    engine::CILight* m_light;
     std::vector< engine::CPhongMaterial > m_materialsList;
     int m_materialSelectedIndex;
     bool m_lightsAnimated;
@@ -241,21 +241,19 @@ int main()
     engine::LMesh* _mesh = _box;
 
     /* create material properties */
-    std::shared_ptr< engine::CPhongMaterial > _phongMaterial;
-    _phongMaterial.reset( new engine::CPhongMaterial( "phong_material", 
+    auto _phongMaterial = new engine::CPhongMaterial( "phong_material", 
                                                       { 1.0f, 0.5f, 0.31f },
                                                       { 1.0f, 0.5f, 0.31f },
                                                       { 1.0f, 0.5f, 0.31f },
-                                                      32.0f ) );
+                                                      32.0f );
 
     /* create light properties */
-    std::shared_ptr< engine::CILight > _pointLight;
-    _pointLight.reset( new engine::CPointLight( "point_light",
+    auto _pointLight = new engine::CPointLight( "point_light",
                                                 { 0.1f, 0.1f, 0.1f },
                                                 { 1.0f, 1.0f, 1.0f },
                                                 { 1.0f, 1.0f, 1.0f },
                                                 _gizmo->pos,
-                                                1.0, 0.7, 1.8 ) );
+                                                1.0, 0.7, 1.8 );
 
     bool _moveLight = false;
     float _mvParam = 0.0f;
@@ -290,19 +288,18 @@ int main()
         _app->begin();
         _camera->update();
 
-        auto _pointLightPtr = std::dynamic_pointer_cast< engine::CPointLight >( _pointLight );
         if ( _moveLight )
         {
             _mvParam += 10.0f * engine::CTime::GetTimeStep();
             // _gizmo->pos.x = 1.0f + std::sin( _mvParam ) * 2.0f;
             // _gizmo->pos.y = std::sin( _mvParam / 2.0f ) * 1.0f;
 
-            _pointLightPtr->position.x = 4.0f * std::sin( _mvParam );
-            _pointLightPtr->position.y = 4.0f * std::cos( _mvParam );
-            _pointLightPtr->position.z = 0.0f;
+            _pointLight->position.x = 4.0f * std::sin( _mvParam );
+            _pointLight->position.y = 4.0f * std::cos( _mvParam );
+            _pointLight->position.z = 0.0f;
         }
 
-        _gizmo->pos = _pointLightPtr->position;
+        _gizmo->pos = _pointLight->position;
 
         /* do our thing here ************************/
         _shaderLighting->bind();
@@ -317,7 +314,7 @@ int main()
         _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );
         _shaderLighting->setVec3( "u_light.specular", _pointLight->specular );
         _shaderLighting->setFloat( "u_light.intensity", _pointLight->intensity );
-        _shaderLighting->setVec3( "u_light.position", _pointLightPtr->position );
+        _shaderLighting->setVec3( "u_light.position", _pointLight->position );
         _shaderLighting->setVec3( "u_viewerPosition", _camera->position() );
 
         _mesh->render();

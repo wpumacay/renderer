@@ -76,7 +76,7 @@ namespace engine
 
         /* create dummy texture-data for texture attachment **********************/
         auto _textureData = new CTextureData();
-        _textureData->name              = "fbo_" + config.name;
+        _textureData->name              = config.name;
         _textureData->data              = NULL;
         _textureData->width             = config.width;
         _textureData->height            = config.height;
@@ -84,8 +84,9 @@ namespace engine
         _textureData->internalFormat    = config.texInternalFormat;
         _textureData->format            = config.texFormat;
 
-        std::shared_ptr< CTextureData > _textureDataPtr;
-        _textureDataPtr.reset( _textureData );
+        // keep ownership of the texture data of this attachment
+        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
+        m_texturesData[config.name] = std::move( _textureDataPtr );
 
         CTextureOptions _textureOpts;
         _textureOpts.filterMin      = eTextureFilter::NEAREST;
@@ -97,10 +98,7 @@ namespace engine
         _textureOpts.dtype          = config.texPixelDataType;
         _textureOpts.textureUnit    = 0;
 
-        std::shared_ptr< CTexture > _texturePtr;
-        _texturePtr.reset( new CTexture( _textureDataPtr, _textureOpts ) );
-
-        m_textures[config.name] = _texturePtr;
+        std::unique_ptr< CTexture > _texturePtr( new CTexture( _textureData, _textureOpts ) );
 
         /************************************************************************/
 
@@ -117,6 +115,9 @@ namespace engine
 
         // release our current framebuffer object
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        // keep ownership of the texture of this attachment
+        m_textures[config.name] = std::move( _texturePtr );
     }
 
     void CFrameBuffer::bind()
@@ -130,7 +131,7 @@ namespace engine
     }
 
 
-    std::shared_ptr< CTexture > CFrameBuffer::getTextureAttachment( const std::string& name )
+    CTexture* CFrameBuffer::getTextureAttachment( const std::string& name )
     {
         if ( m_textures.find( name ) == m_textures.end() )
         {
@@ -138,7 +139,7 @@ namespace engine
             return nullptr;
         }
 
-        return m_textures[name];
+        return m_textures[name].get();
     }
 
     CAttachmentConfig CFrameBuffer::getConfigAttachment( const std::string& name )
@@ -150,6 +151,21 @@ namespace engine
         }
 
         return m_configs[name];
+    }
+
+    std::map< std::string, CTexture* > CFrameBuffer::textures() const
+    {
+        std::map< std::string, CTexture* > _texturesMap;
+
+        for ( auto& pair : m_textures )
+            _texturesMap[pair.first] = pair.second.get();
+
+        return _texturesMap;
+    }
+
+    std::map< std::string, CAttachmentConfig > CFrameBuffer::configs() const
+    {
+        return m_configs;
     }
 
 }

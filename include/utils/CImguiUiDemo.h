@@ -13,7 +13,7 @@ namespace engine
         CImguiUiDemo( COpenGLContext* context );
         ~CImguiUiDemo();
 
-        void showTexture( std::shared_ptr< CTexture > texture,
+        void showTexture( CTexture* texture,
                           const CVec2& uv0 = { 0.0f, 0.0f }, 
                           const CVec2& uv1 = { 1.0f, 1.0f } );
 
@@ -26,12 +26,12 @@ namespace engine
 
         void _renderCachedTexturesMenu();
 
-        std::string                 m_currentCachedTextureName;
-        std::shared_ptr< CTexture > m_currentCachedTexture;
+        CTexture*   m_currentCachedTexture;
+        std::string m_currentCachedTextureName;
 
         void _renderUserTextureMenu();
 
-        std::shared_ptr< CTexture > m_textureToShow;
+        CTexture* m_textureToShow;
         CVec2 m_textureToShowUv0;
         CVec2 m_textureToShowUv1;
     };

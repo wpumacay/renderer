@@ -9,9 +9,9 @@ namespace engine
                                     const CVec3& diffuseColor,
                                     const CVec3& specularColor,
                                     float32 specularShininess,
-                                    std::shared_ptr< CTexture > diffuseMap,
-                                    std::shared_ptr< CTexture > specularMap,
-                                    std::shared_ptr< CTexture > normalMap )
+                                    CTexture* diffuseMap,
+                                    CTexture* specularMap,
+                                    CTexture* normalMap )
         : CIMaterial( name )
     {
         m_type = eMaterialType::PHONG;

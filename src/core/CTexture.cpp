@@ -115,7 +115,7 @@ namespace engine
     *                             CTexture impl.                              *
     ***************************************************************************/
 
-    CTexture::CTexture( std::shared_ptr< CTextureData > texData,
+    CTexture::CTexture( CTextureData* texData,
                         const eTextureFilter& filterMin,
                         const eTextureFilter& filterMag,
                         const eTextureWrap& wrapU,
@@ -125,7 +125,7 @@ namespace engine
                         const ePixelDataType& dtype,
                         uint32 textureUnit )
     {
-        m_texData           = texData;
+        m_texDataPtr        = texData;
         m_texWrapModeU      = wrapU;
         m_texWrapModeV      = wrapV;
         m_texFilterModeMin  = filterMin;
@@ -161,15 +161,15 @@ namespace engine
 
         /* send our data to the texture buffer */
         glTexImage2D( GL_TEXTURE_2D, 0, 
-                      toOpenGLEnum( m_texData->internalFormat ), m_texData->width, m_texData->height, 0,
-                      toOpenGLEnum( m_texData->format ), toOpenGLEnum( m_texPixelDtype ), m_texData->data );
+                      toOpenGLEnum( m_texDataPtr->internalFormat ), m_texDataPtr->width, m_texDataPtr->height, 0,
+                      toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), m_texDataPtr->data );
         glGenerateMipmap( GL_TEXTURE_2D );
 
         glBindTexture( GL_TEXTURE_2D, 0 );
         /***********************************************************************/
     }
 
-    CTexture::CTexture( std::shared_ptr< CTextureData > texData,
+    CTexture::CTexture( CTextureData* texData,
                         const CTextureOptions& texOptions )
         : CTexture( texData,
                     texOptions.filterMin,

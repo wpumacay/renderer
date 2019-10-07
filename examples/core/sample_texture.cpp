@@ -19,7 +19,7 @@ public :
     Application() : engine::COpenGLApp() {}
     ~Application() {}
 
-    void setTextureToShow( std::shared_ptr< engine::CTexture > texture )
+    void setTextureToShow( engine::CTexture* texture )
     {
         if ( !m_uiPtr )
             return;

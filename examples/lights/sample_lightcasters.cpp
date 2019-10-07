@@ -22,7 +22,7 @@ public :
         m_cachedTextures.clear();
     }
 
-    void setMaterial( std::shared_ptr< engine::CIMaterial > material )
+    void setMaterial( engine::CIMaterial* material )
     {
         m_material = material;
     }
@@ -156,10 +156,10 @@ private :
             }
 
             if ( m_material->type() == engine::eMaterialType::PHONG )
-                std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material )->setDiffuseMap( m_currentDiffuseMap );
+                reinterpret_cast< engine::CPhongMaterial* >( m_material )->setDiffuseMap( m_currentDiffuseMap );
 
             if ( m_material->type() == engine::eMaterialType::LAMBERT )
-                std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material )->setDiffuseMap( m_currentDiffuseMap );
+                reinterpret_cast< engine::CLambertMaterial* >( m_material )->setDiffuseMap( m_currentDiffuseMap );
 
             if ( m_currentDiffuseMap )
                 ImGui::Image( (void*)(intptr_t) m_currentDiffuseMap->openglId(), ImVec2( 64, 64 ) );
@@ -188,7 +188,7 @@ private :
                 }
             }
 
-            std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material )->setSpecularMap( m_currentSpecularMap );
+            reinterpret_cast< engine::CPhongMaterial* >( m_material )->setSpecularMap( m_currentSpecularMap );
 
             if ( m_currentSpecularMap )
                 ImGui::Image( (void*)(intptr_t) m_currentSpecularMap->openglId(), ImVec2( 64, 64 ) );
@@ -205,7 +205,7 @@ private :
     {
         if ( m_material->type() == engine::eMaterialType::PHONG )
         {
-            auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
 
             float _cAmbient[3]  = { _materialPhong->ambient.x, _materialPhong->ambient.y, _materialPhong->ambient.z };
             float _cDiffuse[3]  = { _materialPhong->diffuse.x, _materialPhong->diffuse.y, _materialPhong->diffuse.z };
@@ -216,7 +216,7 @@ private :
         }
         else if ( m_material->type() == engine::eMaterialType::LAMBERT )
         {
-            auto _materialLambert = std::dynamic_pointer_cast< engine::CLambertMaterial >( m_material );
+            auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
 
             float _cAmbient[3]  = { _materialLambert->ambient.x, _materialLambert->ambient.y, _materialLambert->ambient.z };
             float _cDiffuse[3]  = { _materialLambert->diffuse.x, _materialLambert->diffuse.y, _materialLambert->diffuse.z };
@@ -231,7 +231,7 @@ private :
     {
         if ( m_material->type() == engine::eMaterialType::PHONG )
         {
-            auto _materialPhong = std::dynamic_pointer_cast< engine::CPhongMaterial >( m_material );
+            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
 
             float _cSpecular[3] = { _materialPhong->specular.x, _materialPhong->specular.y, _materialPhong->specular.z };
             ImGui::ColorEdit3( "cSpecular", _cSpecular );
@@ -349,13 +349,13 @@ private :
         ImGui::End();
     }
 
-    std::shared_ptr< engine::CIMaterial > m_material;
+    engine::CIMaterial* m_material;
 
     std::string m_currentDiffuseMapName;
     std::string m_currentSpecularMapName;
-    std::shared_ptr< engine::CTexture > m_currentDiffuseMap;
-    std::shared_ptr< engine::CTexture > m_currentSpecularMap;
-    std::vector< std::shared_ptr< engine::CTexture > > m_cachedTextures;
+    engine::CTexture* m_currentDiffuseMap;
+    engine::CTexture* m_currentSpecularMap;
+    std::vector< engine::CTexture* > m_cachedTextures;
 
     std::vector< engine::LIRenderable* > m_meshes;
     std::vector< std::string > m_meshesNames;
@@ -412,12 +412,11 @@ int main()
     ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     /* create material properties */
-    std::shared_ptr< engine::CPhongMaterial > _phongMaterial;
-    _phongMaterial.reset( new engine::CPhongMaterial( "phong_material", 
+    auto _phongMaterial = new engine::CPhongMaterial( "phong_material", 
                                                       { 1.0f, 0.5f, 0.31f },
                                                       { 1.0f, 0.5f, 0.31f },
                                                       { 1.0f, 0.5f, 0.31f },
-                                                      32.0f ) );
+                                                      32.0f );
 
     bool _moveLight = false;
     float _mvParam = 0.0f;

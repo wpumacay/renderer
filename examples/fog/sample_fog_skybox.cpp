@@ -75,7 +75,7 @@ protected :
         auto _cubemapsPtrs = engine::CTextureManager::GetAllCachedTexturesCube();
         for ( auto& _cubemapPtr : _cubemapsPtrs )
         {
-            m_cubemaps.push_back( _cubemapPtr.get() );
+            m_cubemaps.push_back( _cubemapPtr );
             m_cubemapsNames.push_back( _cubemapPtr->name() );
         }
 
@@ -406,7 +406,7 @@ int main()
                                   0.0f, 10.0f );
 
     auto _skybox = new engine::CSkybox();
-    _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ).get() );
+    _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
 
     /**********************************************************************************************/
 

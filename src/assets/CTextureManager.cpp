@@ -46,84 +46,84 @@ namespace engine
         m_texturesDataList.clear();
     }
 
-    std::shared_ptr< CTextureData > CTextureManager::LoadTextureData( const std::string& filepath )
+    CTextureData* CTextureManager::LoadTextureData( const std::string& filepath )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_loadTextureData( filepath );
     }
 
-    std::shared_ptr< CTexture > CTextureManager::LoadTexture( const std::string& filepath,
-                                                              const CTextureOptions& texOptions )
+    CTexture* CTextureManager::LoadTexture( const std::string& filepath,
+                                            const CTextureOptions& texOptions )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_loadTexture( filepath, texOptions );
     }
 
-    std::shared_ptr< CTexture > CTextureManager::LoadTexture( const std::string& filepath,
-                                                              const eTextureFilter& filterMin,
-                                                              const eTextureFilter& filterMag,
-                                                              const eTextureWrap& wrapU,
-                                                              const eTextureWrap& wrapV,
-                                                              const CVec4& borderColorU,
-                                                              const CVec4& borderColorV,
-                                                              const ePixelDataType& dtype,
-                                                              uint32 textureUnit )
+    CTexture* CTextureManager::LoadTexture( const std::string& filepath,
+                                            const eTextureFilter& filterMin,
+                                            const eTextureFilter& filterMag,
+                                            const eTextureWrap& wrapU,
+                                            const eTextureWrap& wrapV,
+                                            const CVec4& borderColorU,
+                                            const CVec4& borderColorV,
+                                            const ePixelDataType& dtype,
+                                            uint32 textureUnit )
     {
         return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype, textureUnit } );
     }
 
-    std::shared_ptr< CTextureData > CTextureManager::GetCachedTextureData( const std::string& texdataId )
+    CTextureData* CTextureManager::GetCachedTextureData( const std::string& texdataId )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getCachedTextureData( texdataId );
     }
 
-    std::shared_ptr< CTextureCubeData > CTextureManager::GetCachedTextureCubeData( const std::string& texCubeDataId )
+    CTextureCubeData* CTextureManager::GetCachedTextureCubeData( const std::string& texCubeDataId )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getCachedTextureCubeData( texCubeDataId );
     }
 
-    std::shared_ptr< CTexture > CTextureManager::GetCachedTexture( const std::string& texId )
+    CTexture* CTextureManager::GetCachedTexture( const std::string& texId )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getCachedTexture( texId );
     }
 
-    std::shared_ptr< CTextureCube > CTextureManager::GetCachedTextureCube( const std::string& texCubeId )
+    CTextureCube* CTextureManager::GetCachedTextureCube( const std::string& texCubeId )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getCachedTextureCube( texCubeId );
     }
 
-    std::vector< std::shared_ptr< CTextureData > > CTextureManager::GetAllCachedTexturesData()
+    std::vector< CTextureData* > CTextureManager::GetAllCachedTexturesData()
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getAllCachedTexturesData();
     }
 
-    std::vector< std::shared_ptr< CTexture > > CTextureManager::GetAllCachedTextures()
+    std::vector< CTexture* > CTextureManager::GetAllCachedTextures()
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getAllCachedTextures();
     }
 
-    std::vector< std::shared_ptr< CTextureCubeData > > CTextureManager::GetAllCachedTexturesCubeData()
+    std::vector< CTextureCubeData* > CTextureManager::GetAllCachedTexturesCubeData()
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getAllCachedTexturesCubeData();
     }
 
-    std::vector< std::shared_ptr< CTextureCube > > CTextureManager::GetAllCachedTexturesCube()
+    std::vector< CTextureCube* > CTextureManager::GetAllCachedTexturesCube()
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
@@ -214,7 +214,7 @@ namespace engine
         }
     }
 
-    std::shared_ptr< CTextureData > CTextureManager::_loadTextureData( const std::string& filepath )
+    CTextureData* CTextureManager::_loadTextureData( const std::string& filepath )
     {
         eTextureFormat _format = eTextureFormat::NONE;
         if ( filepath.find( ".jpg" ) != std::string::npos ) { _format = eTextureFormat::RGB; }
@@ -234,7 +234,7 @@ namespace engine
         {
             ENGINE_CORE_WARN( "Tried loading texture-data with name {0} twice. Returning cached one", 
                               _filenameNoExtension );
-            return m_texturesData[ _filenameNoExtension ];
+            return m_texturesData[ _filenameNoExtension ].get();
         }
 
         auto _textureData = new CTextureData();
@@ -254,17 +254,16 @@ namespace engine
         _textureData->internalFormat    = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
         _textureData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
-        std::shared_ptr< CTextureData > _textureDataPtr;
-        _textureDataPtr.reset( _textureData );
+        // keep ownership of the created texture data
+        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
+        m_texturesData[ _filenameNoExtension ] = std::move( _textureDataPtr );
+        m_texturesDataList.push_back( _textureData );
 
-        m_texturesData[ _filenameNoExtension ] = _textureDataPtr;
-        m_texturesDataList.push_back( _textureDataPtr );
-
-        return _textureDataPtr;
+        return _textureData;
     }
 
 
-    std::shared_ptr< CTextureCubeData > CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths )
+    CTextureCubeData* CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths )
     {
 
         bool _errorFormat           = false;
@@ -383,7 +382,7 @@ namespace engine
         if ( _warnAlreadyCached )
         {
             ENGINE_CORE_WARN( _issueMessage );
-            return m_texturesCubeData[ _name ];
+            return m_texturesCubeData[_name].get();
         }
 
         auto _textureCubeData = new CTextureCubeData();
@@ -394,17 +393,16 @@ namespace engine
         _textureCubeData->channels          = _channels;
         _textureCubeData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
-        std::shared_ptr< CTextureCubeData > _textureCubeDataPtr;
-        _textureCubeDataPtr.reset( _textureCubeData );
+        // keep ownership of the created texture-cube data
+        std::unique_ptr< CTextureCubeData > _textureCubeDataPtr( _textureCubeData );
+        m_texturesCubeData[ _name ] = std::move( _textureCubeDataPtr );
+        m_texturesCubeDataList.push_back( _textureCubeData );
 
-        m_texturesCubeData[ _name ] = _textureCubeDataPtr;
-        m_texturesCubeDataList.push_back( _textureCubeDataPtr );
-
-        return _textureCubeDataPtr;
+        return _textureCubeData;
     }
 
-    std::shared_ptr< CTexture > CTextureManager::_loadTexture( const std::string& filepath,
-                                                               const CTextureOptions& texOptions )
+    CTexture* CTextureManager::_loadTexture( const std::string& filepath,
+                                             const CTextureOptions& texOptions )
     {
         auto _textureData = _loadTextureData( filepath );
         if ( !_textureData )
@@ -420,21 +418,20 @@ namespace engine
         {
             ENGINE_CORE_WARN( "Tried loading texture with name {0} twice. Returning cached one", 
                               _filenameNoExtension );
-            return m_textures[ _filenameNoExtension ];
+            return m_textures[ _filenameNoExtension ].get();
         }
 
         auto _texture = new CTexture( _textureData, texOptions );
 
-        std::shared_ptr< CTexture > _texturePtr;
-        _texturePtr.reset( _texture );
+        // keep ownership of the created texture
+        std::unique_ptr< CTexture > _texturePtr( _texture );
+        m_textures[ _filenameNoExtension ] = std::move( _texturePtr );
+        m_texturesList.push_back( _texture );
 
-        m_textures[ _filenameNoExtension ] = _texturePtr;
-        m_texturesList.push_back( _texturePtr );
-
-        return _texturePtr;
+        return _texture;
     }
 
-    std::shared_ptr< CTextureCube > CTextureManager::_loadTextureCube( const std::array< std::string, 6 >& filepaths )
+    CTextureCube* CTextureManager::_loadTextureCube( const std::array< std::string, 6 >& filepaths )
     {
         auto _textureCubeData = _loadTextureCubeData( filepaths );
         if ( !_textureCubeData )
@@ -447,21 +444,20 @@ namespace engine
         {
             ENGINE_CORE_WARN( "Tried loading texture-cube with name {0} twice. Returning cached one",
                               _textureCubeData->name );
-            return m_texturesCube[ _textureCubeData->name ];
+            return m_texturesCube[ _textureCubeData->name ].get();
         }
 
         auto _textureCube = new CTextureCube( _textureCubeData );
 
-        std::shared_ptr< CTextureCube > _textureCubePtr;
-        _textureCubePtr.reset( _textureCube );
+        // keep ownership of the texture-cube
+        std::unique_ptr< CTextureCube > _textureCubePtr( _textureCube );
+        m_texturesCube[ _textureCubeData->name ] = std::move( _textureCubePtr );
+        m_texturesCubeList.push_back( _textureCube );
 
-        m_texturesCube[ _textureCubeData->name ] = _textureCubePtr;
-        m_texturesCubeList.push_back( _textureCubePtr );
-
-        return _textureCubePtr;
+        return _textureCube;
     }
 
-    std::shared_ptr< CTextureData > CTextureManager::_getCachedTextureData( const std::string& texdataId )
+    CTextureData* CTextureManager::_getCachedTextureData( const std::string& texdataId )
     {
         if ( m_texturesData.find( texdataId ) == m_texturesData.end() )
         {
@@ -469,10 +465,10 @@ namespace engine
             return nullptr;
         }
 
-        return m_texturesData[ texdataId ];
+        return m_texturesData[ texdataId ].get();
     }
 
-    std::shared_ptr< CTextureCubeData > CTextureManager::_getCachedTextureCubeData( const std::string& texCubeDataId )
+    CTextureCubeData* CTextureManager::_getCachedTextureCubeData( const std::string& texCubeDataId )
     {
         if ( m_texturesCubeData.find( texCubeDataId ) == m_texturesCubeData.end() )
         {
@@ -480,10 +476,10 @@ namespace engine
             return nullptr;
         }
 
-        return m_texturesCubeData[ texCubeDataId ];
+        return m_texturesCubeData[ texCubeDataId ].get();
     }
 
-    std::shared_ptr< CTexture > CTextureManager::_getCachedTexture( const std::string& texId )
+    CTexture* CTextureManager::_getCachedTexture( const std::string& texId )
     {
         if ( m_textures.find( texId ) == m_textures.end() )
         {
@@ -491,10 +487,10 @@ namespace engine
             return nullptr;
         }
 
-        return m_textures[ texId ];
+        return m_textures[ texId ].get();
     }
 
-    std::shared_ptr< CTextureCube > CTextureManager::_getCachedTextureCube( const std::string& texCubeId )
+    CTextureCube* CTextureManager::_getCachedTextureCube( const std::string& texCubeId )
     {
         if ( m_texturesCube.find( texCubeId ) == m_texturesCube.end() )
         {
@@ -502,7 +498,7 @@ namespace engine
             return nullptr;
         }
 
-        return m_texturesCube[ texCubeId ];
+        return m_texturesCube[ texCubeId ].get();
     }
 
     void CTextureManager::_createBuiltInTextures()

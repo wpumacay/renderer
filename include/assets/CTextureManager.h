@@ -20,33 +20,33 @@ namespace engine
 
         ~CTextureManager();
 
-        static std::shared_ptr< CTextureData > LoadTextureData( const std::string& filepath );
-        static std::shared_ptr< CTexture > LoadTexture( const std::string& filepath,
-                                                        const eTextureFilter& filterMin = eTextureFilter::NEAREST,
-                                                        const eTextureFilter& filterMag = eTextureFilter::NEAREST,
-                                                        const eTextureWrap& wrapU = eTextureWrap::REPEAT,
-                                                        const eTextureWrap& wrapV = eTextureWrap::REPEAT,
-                                                        const CVec4& borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f },
-                                                        const CVec4& borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f },
-                                                        const ePixelDataType& dtype = ePixelDataType::UINT_8,
-                                                        uint32 textureUnit = 0 );
-        static std::shared_ptr< CTexture > LoadTexture( const std::string& filepath,
-                                                        const CTextureOptions& texOptions );
+        static CTextureData* LoadTextureData( const std::string& filepath );
+        static CTexture* LoadTexture( const std::string& filepath,
+                                      const eTextureFilter& filterMin = eTextureFilter::NEAREST,
+                                      const eTextureFilter& filterMag = eTextureFilter::NEAREST,
+                                      const eTextureWrap& wrapU = eTextureWrap::REPEAT,
+                                      const eTextureWrap& wrapV = eTextureWrap::REPEAT,
+                                      const CVec4& borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f },
+                                      const CVec4& borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f },
+                                      const ePixelDataType& dtype = ePixelDataType::UINT_8,
+                                      uint32 textureUnit = 0 );
+        static CTexture* LoadTexture( const std::string& filepath,
+                                      const CTextureOptions& texOptions );
 
-        static std::shared_ptr< CTextureCubeData > LoadTextureCubeData( const std::array< std::string, 6 >& filepaths );
-        static std::shared_ptr< CTextureCube > LoadTextureCube( const std::array< std::string, 6 >& filepaths );
+        static CTextureCubeData* LoadTextureCubeData( const std::array< std::string, 6 >& filepaths );
+        static CTextureCube* LoadTextureCube( const std::array< std::string, 6 >& filepaths );
 
-        static std::shared_ptr< CTextureData > GetCachedTextureData( const std::string& texDataId );
-        static std::shared_ptr< CTextureCubeData > GetCachedTextureCubeData( const std::string& texCubeDataId );
+        static CTextureData* GetCachedTextureData( const std::string& texDataId );
+        static CTextureCubeData* GetCachedTextureCubeData( const std::string& texCubeDataId );
 
-        static std::shared_ptr< CTexture > GetCachedTexture( const std::string& texId );
-        static std::shared_ptr< CTextureCube > GetCachedTextureCube( const std::string& texCubeId );
+        static CTexture* GetCachedTexture( const std::string& texId );
+        static CTextureCube* GetCachedTextureCube( const std::string& texCubeId );
 
-        static std::vector< std::shared_ptr< CTextureData > > GetAllCachedTexturesData();
-        static std::vector< std::shared_ptr< CTexture > > GetAllCachedTextures();
+        static std::vector< CTextureData* > GetAllCachedTexturesData();
+        static std::vector< CTexture* > GetAllCachedTextures();
 
-        static std::vector< std::shared_ptr< CTextureCubeData > > GetAllCachedTexturesCubeData();
-        static std::vector< std::shared_ptr< CTextureCube > > GetAllCachedTexturesCube();
+        static std::vector< CTextureCubeData* > GetAllCachedTexturesCubeData();
+        static std::vector< CTextureCube* > GetAllCachedTexturesCube();
 
     private :
 
@@ -57,33 +57,33 @@ namespace engine
         void _loadTextures();
         void _createBuiltInTextures();
 
-        std::shared_ptr< CTextureData >     _loadTextureData( const std::string& filepath );
-        std::shared_ptr< CTextureCubeData > _loadTextureCubeData( const std::array< std::string, 6 >& filepaths );
+        CTextureData* _loadTextureData( const std::string& filepath );
+        CTextureCubeData* _loadTextureCubeData( const std::array< std::string, 6 >& filepaths );
 
-        std::shared_ptr< CTexture >     _loadTexture( const std::string& filepath, const CTextureOptions& texOptions );
-        std::shared_ptr< CTextureCube > _loadTextureCube( const std::array< std::string, 6 >& filepaths );
+        CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions );
+        CTextureCube* _loadTextureCube( const std::array< std::string, 6 >& filepaths );
 
-        std::shared_ptr< CTextureData >     _getCachedTextureData( const std::string& texDataId );
-        std::shared_ptr< CTextureCubeData > _getCachedTextureCubeData( const std::string& texCubeDataId );
+        CTextureData* _getCachedTextureData( const std::string& texDataId );
+        CTextureCubeData* _getCachedTextureCubeData( const std::string& texCubeDataId );
 
-        std::shared_ptr< CTexture >     _getCachedTexture( const std::string& texId );
-        std::shared_ptr< CTextureCube > _getCachedTextureCube( const std::string& texCubeId );
+        CTexture* _getCachedTexture( const std::string& texId );
+        CTextureCube* _getCachedTextureCube( const std::string& texCubeId );
 
-        std::vector< std::shared_ptr< CTextureData > > const _getAllCachedTexturesData() { return m_texturesDataList; }
-        std::vector< std::shared_ptr< CTextureCubeData > > const _getAllCachedTexturesCubeData() { return m_texturesCubeDataList; }
+        std::vector< CTextureData* > const _getAllCachedTexturesData() { return m_texturesDataList; }
+        std::vector< CTextureCubeData* > const _getAllCachedTexturesCubeData() { return m_texturesCubeDataList; }
 
-        std::vector< std::shared_ptr< CTexture > > const _getAllCachedTextures() { return m_texturesList; }
-        std::vector< std::shared_ptr< CTextureCube > > const _getAllCachedTexturesCube() { return m_texturesCubeList; }
+        std::vector< CTexture* > const _getAllCachedTextures() { return m_texturesList; }
+        std::vector< CTextureCube* > const _getAllCachedTexturesCube() { return m_texturesCubeList; }
 
-        std::vector< std::shared_ptr< CTextureData > >                  m_texturesDataList;
-        std::vector< std::shared_ptr< CTextureCubeData > >              m_texturesCubeDataList;
-        std::vector< std::shared_ptr< CTexture > >                      m_texturesList;
-        std::vector< std::shared_ptr< CTextureCube > >                  m_texturesCubeList;
+        std::vector< CTextureData* >     m_texturesDataList;
+        std::vector< CTextureCubeData* > m_texturesCubeDataList;
+        std::vector< CTexture* >         m_texturesList;
+        std::vector< CTextureCube* >     m_texturesCubeList;
 
-        std::map< std::string, std::shared_ptr< CTextureData > >        m_texturesData;
-        std::map< std::string, std::shared_ptr< CTextureCubeData > >    m_texturesCubeData;
-        std::map< std::string, std::shared_ptr< CTexture > >            m_textures;
-        std::map< std::string, std::shared_ptr< CTextureCube > >        m_texturesCube;
+        std::map< std::string, std::unique_ptr< CTextureData > >        m_texturesData;
+        std::map< std::string, std::unique_ptr< CTextureCubeData > >    m_texturesCubeData;
+        std::map< std::string, std::unique_ptr< CTexture > >            m_textures;
+        std::map< std::string, std::unique_ptr< CTextureCube > >        m_texturesCube;
 
     };
 

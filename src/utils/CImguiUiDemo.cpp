@@ -18,7 +18,7 @@ namespace engine
 
     }
 
-    void CImguiUiDemo::showTexture( std::shared_ptr< CTexture > texture,
+    void CImguiUiDemo::showTexture( CTexture* texture,
                                     const CVec2& uv0, const CVec2& uv1 )
     {
         m_textureToShow = texture;

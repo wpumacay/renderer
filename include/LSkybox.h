@@ -14,8 +14,8 @@ namespace engine
     {
         private : 
 
-        CVertexArray*                   m_vertexArray;
-        std::shared_ptr< CTextureCube > m_textureCube;
+        CVertexArray*   m_vertexArray;
+        CTextureCube*   m_textureCube;
 
         public :
 
