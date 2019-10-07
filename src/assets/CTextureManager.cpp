@@ -116,6 +116,20 @@ namespace engine
         return CTextureManager::s_instance->_getAllCachedTextures();
     }
 
+    std::vector< std::shared_ptr< CTextureCubeData > > CTextureManager::GetAllCachedTexturesCubeData()
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_getAllCachedTexturesCubeData();
+    }
+
+    std::vector< std::shared_ptr< CTextureCube > > CTextureManager::GetAllCachedTexturesCube()
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_getAllCachedTexturesCube();
+    }
+
 
     void CTextureManager::_loadTextures()
     {

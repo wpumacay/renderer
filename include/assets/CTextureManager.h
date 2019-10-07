@@ -45,6 +45,9 @@ namespace engine
         static std::vector< std::shared_ptr< CTextureData > > GetAllCachedTexturesData();
         static std::vector< std::shared_ptr< CTexture > > GetAllCachedTextures();
 
+        static std::vector< std::shared_ptr< CTextureCubeData > > GetAllCachedTexturesCubeData();
+        static std::vector< std::shared_ptr< CTextureCube > > GetAllCachedTexturesCube();
+
     private :
 
         static CTextureManager* s_instance;
