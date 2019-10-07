@@ -74,7 +74,7 @@ namespace engine
         CVertexBuffer*  m_linesColorsVBO;
         CVertexArray*   m_linesVAO;
 
-        std::shared_ptr< CShader > m_shader;
+        CShader* m_shaderPtr;
 
     };
 

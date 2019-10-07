@@ -382,7 +382,7 @@ int main()
         _shaderLighting->setMat4( "u_modelMatrix", _mesh->getModelMatrix() );
         _shaderLighting->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
         _shaderLighting->setMat4( "u_normalMatrix", ( ( _mesh->getModelMatrix() ).inverse() ).transpose() );
-        _phongMaterial->bind( _shaderLighting.get() );
+        _phongMaterial->bind( _shaderLighting );
         _shaderLighting->setVec3( "u_light.ambient", _pointLight->ambient );
         _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );
         _shaderLighting->setVec3( "u_light.specular", _pointLight->specular );

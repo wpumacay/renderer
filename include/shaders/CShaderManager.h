@@ -15,7 +15,8 @@ namespace engine
     enum class eShaderType
     {
         NONE = 0,
-        VERTEX, FRAGMENT
+        VERTEX, 
+        FRAGMENT
     };
 
     std::string toString( const eShaderType& type );
@@ -31,15 +32,15 @@ namespace engine
 
         ~CShaderManager();
 
-        static std::shared_ptr< CShader > CreateShaderFromFiles( const std::string& name,
-                                                                 const std::string& vrtFile,
-                                                                 const std::string& frgFile );
+        static CShader* CreateShaderFromFiles( const std::string& name,
+                                               const std::string& vrtFile,
+                                               const std::string& frgFile );
 
-        static std::shared_ptr< CShader > CreateShaderFromSources( const std::string& name,
-                                                                   const std::string& vrtSource,
-                                                                   const std::string& frgSource );
+        static CShader* CreateShaderFromSources( const std::string& name,
+                                                 const std::string& vrtSource,
+                                                 const std::string& frgSource );
 
-        static std::shared_ptr< CShader > GetCachedShader( const std::string& name );
+        static CShader* GetCachedShader( const std::string& name );
 
     private :
 
@@ -49,21 +50,21 @@ namespace engine
 
         void _loadEngineShaders();
 
-        std::shared_ptr< CShader > _getCachedShader( const std::string& name );
+        CShader* _getCachedShader( const std::string& name );
 
-        std::shared_ptr< CShader > _createShaderFromSources( const std::string& name,
-                                                             const std::string& vrtSource,
-                                                             const std::string& frgSource );
+        CShader* _createShaderFromSources( const std::string& name,
+                                           const std::string& vrtSource,
+                                           const std::string& frgSource );
 
-        std::shared_ptr< CShader > _createShaderFromFiles( const std::string& name,
-                                                           const std::string& vrtFilepath,
-                                                           const std::string& frgFilepath );
+        CShader* _createShaderFromFiles( const std::string& name,
+                                         const std::string& vrtFilepath,
+                                         const std::string& frgFilepath );
 
         uint32 _compileShaderFromFile( const std::string& filepath, const eShaderType& type );
         uint32 _compileShaderFromSource( const std::string& filepath, const eShaderType& type );
         uint32 _linkShaderProgram( uint32 vrtShaderId, uint32 frgShaderId );
 
-        std::map< std::string, std::shared_ptr< CShader > > m_shaders;
+        std::map< std::string, std::unique_ptr< CShader > > m_shaders;
     };
 
 }

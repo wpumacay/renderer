@@ -47,28 +47,28 @@ namespace engine
 
     CShaderManager::~CShaderManager()
     {
-        m_shaders.clear();
+        // nothing to release directly
     }
 
-    std::shared_ptr< CShader > CShaderManager::CreateShaderFromFiles( const std::string& name,
-                                                                      const std::string& vrtFile,
-                                                                      const std::string& frgFile )
+    CShader* CShaderManager::CreateShaderFromFiles( const std::string& name,
+                                                    const std::string& vrtFile,
+                                                    const std::string& frgFile )
     {
         ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
 
         return CShaderManager::s_instance->_createShaderFromFiles( name, vrtFile, frgFile );
     }
 
-    std::shared_ptr< CShader > CShaderManager::CreateShaderFromSources( const std::string& name,
-                                                                        const std::string& vrtSource,
-                                                                        const std::string& frgSource )
+    CShader* CShaderManager::CreateShaderFromSources( const std::string& name,
+                                                      const std::string& vrtSource,
+                                                      const std::string& frgSource )
     {
         ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
 
         return CShaderManager::s_instance->_createShaderFromSources( name, vrtSource, frgSource );
     }
 
-    std::shared_ptr< CShader > CShaderManager::GetCachedShader( const std::string& name )
+    CShader* CShaderManager::GetCachedShader( const std::string& name )
     {
         ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
 
@@ -81,7 +81,7 @@ namespace engine
         _loadEngineShaders();
     }
 
-    std::shared_ptr< CShader > CShaderManager::_getCachedShader( const std::string& name )
+    CShader* CShaderManager::_getCachedShader( const std::string& name )
     {
         if ( m_shaders.find( name ) == m_shaders.end() )
         {
@@ -89,7 +89,7 @@ namespace engine
             return nullptr;
         }
 
-        return m_shaders[name];
+        return m_shaders[name].get();
     }
 
     void CShaderManager::_loadEngineShaders()
@@ -119,13 +119,13 @@ namespace engine
             if ( m_shaders.find( _shaderName ) != m_shaders.end() )
                 continue;
 
-            m_shaders[_shaderName] = _createShaderFromFiles( _shaderName, _shaderVrtFile, _shaderFrgFile );
+            _createShaderFromFiles( _shaderName, _shaderVrtFile, _shaderFrgFile );
         }
     }
 
-    std::shared_ptr< CShader > CShaderManager::_createShaderFromSources( const std::string& name,
-                                                                         const std::string& vrtSource,
-                                                                         const std::string& frgSource )
+    CShader* CShaderManager::_createShaderFromSources( const std::string& name,
+                                                       const std::string& vrtSource,
+                                                       const std::string& frgSource )
     {
         uint32 _vrtShaderOpenglId = _compileShaderFromSource( vrtSource, eShaderType::VERTEX );
         uint32 _frgShaderOpenglId = _compileShaderFromSource( frgSource, eShaderType::FRAGMENT );
@@ -138,15 +138,17 @@ namespace engine
 
         uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
 
-        std::shared_ptr< CShader > _shaderPtr;
-        _shaderPtr.reset( new CShader( name, _programOpenglId ) );
+        // keep ownership of the created shaders
+        auto _shader = new CShader( name, _programOpenglId );
+        std::unique_ptr< CShader > _shaderPtr( _shader );
+        m_shaders[name] = std::move( _shaderPtr );
 
-        return _shaderPtr;
+        return _shader;
     }
 
-    std::shared_ptr< CShader > CShaderManager::_createShaderFromFiles( const std::string& name,
-                                                                       const std::string& vrtFilepath,
-                                                                       const std::string& frgFilepath )
+    CShader* CShaderManager::_createShaderFromFiles( const std::string& name,
+                                                     const std::string& vrtFilepath,
+                                                     const std::string& frgFilepath )
     {
         uint32 _vrtShaderOpenglId = _compileShaderFromFile( vrtFilepath, eShaderType::VERTEX );
         uint32 _frgShaderOpenglId = _compileShaderFromFile( frgFilepath, eShaderType::FRAGMENT );
@@ -159,10 +161,12 @@ namespace engine
 
         uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
 
-        std::shared_ptr< CShader > _shaderPtr;
-        _shaderPtr.reset( new CShader( name, _programOpenglId ) );
+        // keep ownership of the created shaders
+        auto _shader = new CShader( name, _programOpenglId );
+        std::unique_ptr< CShader > _shaderPtr( _shader );
+        m_shaders[name] = std::move( _shaderPtr );
 
-        return _shaderPtr;
+        return _shader;
     }
 
     uint32 CShaderManager::_compileShaderFromFile( const std::string& filepath, const eShaderType& type )

@@ -8,7 +8,7 @@ namespace engine
 
     CDebugDrawer::CDebugDrawer()
     {
-        m_shader = CShaderManager::GetCachedShader( "debug_drawing_3d" );
+        m_shaderPtr = CShaderManager::GetCachedShader( "debug_drawing_3d" );
 
         m_linesRenderBufferPositions = std::vector< LDLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
         m_linesRenderBufferColors = std::vector< LDLinePositionsColors >( DEBUG_DRAWER_BATCH_SIZE );
@@ -162,13 +162,13 @@ namespace engine
         m_linesPositionsVBO->updateData( numLines * sizeof( LDLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
         m_linesColorsVBO->updateData( numLines * sizeof( LDLinePositionsColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
-        m_shader->bind();
-        m_shader->setMat4( "u_tView", camera->matView() );
-        m_shader->setMat4( "u_tProj", camera->matProj() );
+        m_shaderPtr->bind();
+        m_shaderPtr->setMat4( "u_tView", camera->matView() );
+        m_shaderPtr->setMat4( "u_tProj", camera->matProj() );
 
         glDrawArrays( GL_LINES, 0, numLines * 2 );
 
-        m_shader->unbind();
+        m_shaderPtr->unbind();
 
         m_linesVAO->unbind();
     }

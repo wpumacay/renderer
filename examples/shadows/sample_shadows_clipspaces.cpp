@@ -437,13 +437,13 @@ int main()
         /* do our thing here ************************/
 
         // render to shadow map first
-        renderToShadowMap( _currentLight, _camera, _shadowmap, _shaderShadowMapProj.get(), _floor, { _cube1, _cube2, _cube3 } );
+        renderToShadowMap( _currentLight, _camera, _shadowmap, _shaderShadowMapProj, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the scene normally
-        renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
+        renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows, _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the shadowmap to a quad
-        renderShadowMapVisualization( _currentLight, _quad_varray, _shaderShadowMapViz.get(), _shadowmap );
+        renderShadowMapVisualization( _currentLight, _quad_varray, _shaderShadowMapViz, _shadowmap );
 
         /********************************************/
 

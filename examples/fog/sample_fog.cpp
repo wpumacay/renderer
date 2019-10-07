@@ -364,7 +364,7 @@ int main()
         /* do our thing here ************************/
 
         // render the scene using fog
-        renderSceneWithFog( _currentLight, _camera, _fog, _shaderPhongWithFog.get(), _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
+        renderSceneWithFog( _currentLight, _camera, _fog, _shaderPhongWithFog, _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         /********************************************/
 
