@@ -84,6 +84,8 @@ protected :
         m_cachedTextures.push_back( nullptr );
         m_currentDiffuseMapName = "none";
         m_currentSpecularMapName = "none";
+        m_currentSpecularMap = nullptr;
+        m_currentDiffuseMap = nullptr;
 
         auto _directionalLight = new engine::CDirectionalLight( "directional",
                                                                 { 0.2f, 0.2f, 0.2f },
