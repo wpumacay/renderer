@@ -60,7 +60,7 @@ int main()
     auto _arrowyZ   = engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Z );
     auto _axy       = engine::CMeshBuilder::createAxes( 0.5f );
 
-    std::vector< engine::LIRenderable* > _renderables;
+    std::vector< engine::CIRenderable* > _renderables;
     _renderables.push_back( _boxy );
     _renderables.push_back( _sphery );
     _renderables.push_back( _ellipsy );
@@ -75,22 +75,22 @@ int main()
     _renderables.push_back( _arrowyZ );
     _renderables.push_back( _axy );
 
-    _boxy->pos      = { -1.0f, -1.0f, 1.0f };
-    _sphery->pos    = { -1.0f,  1.0f, 1.0f };
-    _ellipsy->pos   = {  1.0f,  1.0f, 1.0f };
-    _cylindyX->pos  = {  1.0f, -1.0f, 1.0f };
+    _boxy->position      = { -1.0f, -1.0f, 1.0f };
+    _sphery->position    = { -1.0f,  1.0f, 1.0f };
+    _ellipsy->position   = {  1.0f,  1.0f, 1.0f };
+    _cylindyX->position  = {  1.0f, -1.0f, 1.0f };
 
-    _cylindyY->pos  = { -1.0f, -1.0f, 2.0f };
-    _cylindyZ->pos  = { -1.0f,  1.0f, 2.0f };
-    _capsulyX->pos  = {  1.0f,  1.0f, 2.0f };
-    _capsulyY->pos  = {  1.0f, -1.0f, 2.0f };
+    _cylindyY->position  = { -1.0f, -1.0f, 2.0f };
+    _cylindyZ->position  = { -1.0f,  1.0f, 2.0f };
+    _capsulyX->position  = {  1.0f,  1.0f, 2.0f };
+    _capsulyY->position  = {  1.0f, -1.0f, 2.0f };
 
-    _capsulyZ->pos  = { -1.0f, -1.0f, 3.0f };
-    _arrowyX->pos   = { -1.0f,  1.0f, 3.0f };
-    _arrowyY->pos   = {  1.0f,  1.0f, 3.0f };
-    _arrowyZ->pos   = {  1.0f, -1.0f, 3.0f };
+    _capsulyZ->position  = { -1.0f, -1.0f, 3.0f };
+    _arrowyX->position   = { -1.0f,  1.0f, 3.0f };
+    _arrowyY->position   = {  1.0f,  1.0f, 3.0f };
+    _arrowyZ->position   = {  1.0f, -1.0f, 3.0f };
 
-    _axy->pos       = {  0.0f,  0.0f, 1.0f };
+    _axy->position       = {  0.0f,  0.0f, 1.0f };
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
     {
@@ -247,7 +247,7 @@ int main()
 
     /**********************************************************************************************/
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );

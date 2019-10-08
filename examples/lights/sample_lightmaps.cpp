@@ -28,7 +28,7 @@ public :
         m_light = light;
     }
 
-    engine::LIRenderable* selectedMesh()
+    engine::CIRenderable* selectedMesh()
     {
         return m_meshes[ m_meshSelectedIndex ];
     }
@@ -265,7 +265,7 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::LIRenderable* > m_meshes;
+    std::vector< engine::CIRenderable* > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
@@ -279,7 +279,7 @@ int main()
     auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
     _ui->init();
 
-    _app->setUi( _ui );
+    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -297,7 +297,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
-    _gizmo->pos = { 0.0f, 0.0f, 2.0f };
+    _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightmaps";
@@ -323,7 +323,7 @@ int main()
                                                 { 0.1f, 0.1f, 0.1f },
                                                 { 1.0f, 1.0f, 1.0f },
                                                 { 1.0f, 1.0f, 1.0f },
-                                                _gizmo->pos,
+                                                _gizmo->position,
                                                 1.0, 0.7, 1.8 );
 
     bool _moveLight = false;
@@ -332,7 +332,7 @@ int main()
     _ui->setMaterial( _phongMaterial );
     _ui->setLight( _pointLight );
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
         {
@@ -362,8 +362,8 @@ int main()
         if ( _moveLight )
         {
             _mvParam += 10.0f * engine::CTime::GetTimeStep();
-            // _gizmo->pos.x = 1.0f + std::sin( _mvParam ) * 2.0f;
-            // _gizmo->pos.y = std::sin( _mvParam / 2.0f ) * 1.0f;
+            // _gizmo->position.x = 1.0f + std::sin( _mvParam ) * 2.0f;
+            // _gizmo->position.y = std::sin( _mvParam / 2.0f ) * 1.0f;
 
             _pointLight->position.x = 4.0f * std::sin( _mvParam );
             _pointLight->position.y = 4.0f * std::cos( _mvParam );
@@ -372,13 +372,13 @@ int main()
 
         auto _mesh = _ui->selectedMesh();
 
-        _gizmo->pos = _pointLight->position;
+        _gizmo->position = _pointLight->position;
 
         /* do our thing here ************************/
         _shaderLighting->bind();
-        _shaderLighting->setMat4( "u_modelMatrix", _mesh->getModelMatrix() );
+        _shaderLighting->setMat4( "u_modelMatrix", _mesh->matModel() );
         _shaderLighting->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _shaderLighting->setMat4( "u_normalMatrix", ( ( _mesh->getModelMatrix() ).inverse() ).transpose() );
+        _shaderLighting->setMat4( "u_normalMatrix", ( ( _mesh->matModel() ).inverse() ).transpose() );
         _phongMaterial->bind( _shaderLighting );
         _shaderLighting->setVec3( "u_light.ambient", _pointLight->ambient );
         _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );
@@ -393,7 +393,7 @@ int main()
         _shaderLighting->unbind();
 
         _shaderGizmo->bind();
-        _shaderGizmo->setMat4( "u_tModel", _gizmo->getModelMatrix() );
+        _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
         _shaderGizmo->setMat4( "u_tView", _camera->matView() );
         _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
         _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );

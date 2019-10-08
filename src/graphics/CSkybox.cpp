@@ -54,18 +54,20 @@ namespace engine
              1.0f, -1.0f,  1.0f
         };
 
-        auto _vBuffer = new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                           eBufferUsage::STATIC,
-                                           sizeof( _vertices ),
-                                           _vertices );
+        m_vertexBuffer = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                                                              eBufferUsage::STATIC,
+                                                                              sizeof( _vertices ),
+                                                                              _vertices ) );
 
         m_vertexArray = std::unique_ptr< CVertexArray >( new CVertexArray() );
-        m_vertexArray->addVertexBuffer( _vBuffer );
+        m_vertexArray->addVertexBuffer( m_vertexBuffer.get() );
     }
 
     CSkybox::~CSkybox()
     {
         m_cubemap = nullptr;
+        m_vertexBuffer = nullptr;
+        m_vertexArray = nullptr;
     }
 
     void CSkybox::render()

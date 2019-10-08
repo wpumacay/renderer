@@ -17,7 +17,7 @@ protected :
     void _initUser() override
     {
         ENGINE_TRACE( "Initializing custom ui" );
-        m_uiPtr = new engine::CImguiUiDemo( m_windowPtr->context() );
+        m_uiPtr.reset( new engine::CImguiUiDemo( m_windowPtr->context() ) );
         m_uiPtr->init();
     }
 
@@ -129,7 +129,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
-    _scene->addCamera( _camera );
+    _scene->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
     auto _textureCubemap = _textureCubeCloudtop;
     // auto _textureCubemap = _textureCubeStarfield;
@@ -137,7 +137,7 @@ int main()
 
     auto _correctionMat = computeSkyboxCorrectionMat( _camera->upAxis() );
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );

@@ -81,23 +81,27 @@ int main()
                                              _cameraProjData,
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
-    _scene->addCamera( _camera );
+    _scene->addCamera( std::unique_ptr< engine::COrbitCamera >( _camera ) );
 
     auto _light = new engine::CDirectionalLight( "directional_1",
                                                  { 0.8f, 0.8f, 0.8f }, 
                                                  { 0.8f, 0.8f, 0.8f },
                                                  { 0.3f, 0.3f, 0.3f }, 
                                                  { 0.0f, 0.0f, -1.0f } );
-    _scene->addLight( _light );
+    _scene->addLight( std::unique_ptr< engine::CDirectionalLight >( _light ) );
 
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
-    _plane->getMaterial()->setColor( { 0.2f, 0.3f, 0.4f } );
-    _scene->addRenderable( _plane );
+    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->ambient  = { 0.2f, 0.3f, 0.4f };
+    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->diffuse  = { 0.2f, 0.3f, 0.4f };
+    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->specular = { 0.2f, 0.3f, 0.4f };
+    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _plane ) );
 
     auto _box = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
-    _box->getMaterial()->setColor( { 0.7f, 0.5f, 0.3f } );
-    _box->pos = { 1.0f, 1.0f, 1.0f };
-    _scene->addRenderable( _box );
+    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->ambient  = { 0.7f, 0.5f, 0.3f };
+    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->diffuse  = { 0.7f, 0.5f, 0.3f };
+    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->specular = { 0.7f, 0.5f, 0.3f };
+    _box->position = { 1.0f, 1.0f, 1.0f };
+    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _box ) );
 
     std::cout << engine::toString( _framebuffer->getConfigAttachment( "color_attachment" ) ) << std::endl;
     std::cout << engine::toString( _framebuffer->getConfigAttachment( "depth_attachment" ) ) << std::endl;
@@ -105,9 +109,9 @@ int main()
     std::cout << engine::toString( *_framebuffer->getTextureAttachment( "color_attachment" )->data() ) << std::endl;
     std::cout << engine::toString( *_framebuffer->getTextureAttachment( "depth_attachment" )->data() ) << std::endl;
 
-    _app->renderer()->disableShadows();
+    // _app->renderer()->disableShadows();
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );

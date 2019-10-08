@@ -23,17 +23,14 @@
 #include <core/CTextureCube.h>
 #include <core/CFrameBuffer.h>
 
-#include <LIRenderable.h>                           // #include <graphics/CIRenderable.h>
-#include <LMesh.h>                                  // #include <graphics/CMesh.h>
-#include <LModel.h>                                 // #include <graphics/CModel.h>
-#include <graphics/CMeshBuilder.h>
-#include <LFog.h>                                   // #include <graphics/CFog.h>       | REPLACE IN RENDERER PIPELINE
-#include <LSkybox.h>                                // #include <graphics/CSkybox.h>    | REPLACE IN RENDERER PIPELINE
-#include <LShadowMap.h>                             // #include <graphics/CShadowMap.h> | REPLACE IN RENDERER PIPELINE
-#include <LScene.h>                                 // #include <graphics/CScene.h>
-#include <graphics/CShadowMap.h>
-#include <graphics/CFog.h>
-#include <graphics/CSkybox.h>
+#include <graphics/CShadowMap.h>        // REPLACE IN RENDERER PIPELINE
+#include <graphics/CFog.h>              // REPLACE IN RENDERER PIPELINE
+#include <graphics/CSkybox.h>           // REPLACE IN RENDERER PIPELINE
+#include <graphics/CMeshBuilder.h>      // REPLACE IN RENDERER PIPELINE
+#include <graphics/CIRenderable.h>      // REPLACE IN RENDERER PIPELINE
+#include <graphics/CMesh.h>             // REPLACE IN RENDERER PIPELINE
+#include <graphics/CModel.h>            // REPLACE IN RENDERER PIPELINE
+#include <graphics/CScene.h>            // REPLACE IN RENDERER PIPELINE
 
 #include <materials/CIMaterial.h>
 #include <materials/CPhongMaterial.h>
@@ -53,9 +50,10 @@
 #include <lights/CPointLight.h>
 #include <lights/CSpotLight.h>
 
-#include <LMasterRenderer.h>                        // #include <renderer/COpenGLRenderer.h>
-#include <LMeshRenderer.h>                          // #include <renderer/COpenGLMeshRenderer.h>
-#include <LSkyboxRenderer.h>                        // #include <renderer/COpenGLSkyboxRender.h>
+// #include <renderers/CMainRenderer.h>     // IMPLEMENT RENDERER PIPELINE
+// #include <renderers/CMeshRenderer.h>     // IMPLEMENT RENDERER PIPELINE
+// #include <renderers/CSkyboxRenderer.h>   // IMPLEMENT RENDERER PIPELINE
+// #include <renderers/CGizmosRenderer.h>   // IMPLEMENT RENDERER PIPELINE
 
 #include <assets/CTextureManager.h>
 

@@ -3,7 +3,8 @@
 
 namespace engine
 {
-    LMesh* CMeshBuilder::createPlane( float sizeX, float sizeY, const eAxis& axis )
+
+    CMesh* CMeshBuilder::createPlane( float sizeX, float sizeY, const eAxis& axis )
     {
         std::vector< CVec3 > _vertices = { _rotateToMatchUpAxis( {  0.5f * sizeX, -0.5f * sizeY, 0.0f }, axis ),
                                            _rotateToMatchUpAxis( {  0.5f * sizeX,  0.5f * sizeY, 0.0f }, axis ),
@@ -22,10 +23,12 @@ namespace engine
 
         std::vector< CInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "plane:" ) + std::to_string( CMeshBuilder::s_numPlanes++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
+    CMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -75,10 +78,12 @@ namespace engine
             _normals.push_back( _n );
         }
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "box:" ) + std::to_string( CMeshBuilder::s_numBoxes++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
+    CMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -131,10 +136,12 @@ namespace engine
             }
         }
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "sphere:" ) + std::to_string( CMeshBuilder::s_numSpheres++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
+    CMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -185,10 +192,12 @@ namespace engine
             }
         }
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "ellipsoid:" ) + std::to_string( CMeshBuilder::s_numEllipsoids++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
+    CMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -270,12 +279,14 @@ namespace engine
         for ( int q = 1; q <= nDiv1 - 2; q++ )
             _indices.push_back( { _baseIndx, _baseIndx + q + 1, _baseIndx + q } );
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "cylinder:" ) + std::to_string( CMeshBuilder::s_numCylinders++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
+    CMesh* CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
     {
-        LMesh* _mesh = NULL;
+        CMesh* _mesh = NULL;
 
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -427,12 +438,12 @@ namespace engine
             }
         }
 
-        _mesh = new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "capsule:" ) + std::to_string( CMeshBuilder::s_numCapsules++ );
 
-        return _mesh;
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
+    CMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -595,43 +606,46 @@ namespace engine
             _baseIndx += 4;
         }
 
-        return new LMesh( _vertices, _normals,_texCoords, _indices );
+        auto _name = std::string( "arrow:" ) + std::to_string( CMeshBuilder::s_numArrows++ );
+
+        return new CMesh( _name, _vertices, _normals,_texCoords, _indices );
     }
 
-    LModel* CMeshBuilder::createAxes( float length )
+    CModel* CMeshBuilder::createAxes( float length )
     {
-        auto _axesModel = new LModel( "" );
+        auto _name = std::string( "axes:" ) + std::to_string( CMeshBuilder::s_numAxes++ );
+        auto _axesModel = new CModel( _name );
 
-        auto _axisX         = CMeshBuilder::createArrow( length, eAxis::X );
-        auto _axisY         = CMeshBuilder::createArrow( length, eAxis::Y );
-        auto _axisZ         = CMeshBuilder::createArrow( length, eAxis::Z );
-        auto _axisCenter    = CMeshBuilder::createSphere( 0.2 * length );
+        auto _axisX         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::X ) );
+        auto _axisY         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::Y ) );
+        auto _axisZ         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::Z ) );
+        auto _axisCenter    = std::unique_ptr< CMesh >( CMeshBuilder::createSphere( 0.2 * length ) );
 
-        _axisX->getMaterial()->ambient  = { 1.0, 0.0, 0.0 };
-        _axisX->getMaterial()->diffuse  = { 1.0, 0.0, 0.0 };
-        _axisX->getMaterial()->specular = { 1.0, 0.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisX->material() )->ambient  = { 1.0, 0.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisX->material() )->diffuse  = { 1.0, 0.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisX->material() )->specular = { 1.0, 0.0, 0.0 };
 
-        _axisY->getMaterial()->ambient  = { 0.0, 1.0, 0.0 };
-        _axisY->getMaterial()->diffuse  = { 0.0, 1.0, 0.0 };
-        _axisY->getMaterial()->specular = { 0.0, 1.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisY->material() )->ambient  = { 0.0, 1.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisY->material() )->diffuse  = { 0.0, 1.0, 0.0 };
+        dynamic_cast< CPhongMaterial* >( _axisY->material() )->specular = { 0.0, 1.0, 0.0 };
 
-        _axisZ->getMaterial()->ambient  = { 0.0, 0.0, 1.0 };
-        _axisZ->getMaterial()->diffuse  = { 0.0, 0.0, 1.0 };
-        _axisZ->getMaterial()->specular = { 0.0, 0.0, 1.0 };
+        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->ambient  = { 0.0, 0.0, 1.0 };
+        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->diffuse  = { 0.0, 0.0, 1.0 };
+        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->specular = { 0.0, 0.0, 1.0 };
 
-        _axisCenter->getMaterial()->ambient  = { 0.3, 0.3, 0.3 };
-        _axisCenter->getMaterial()->diffuse  = { 0.3, 0.3, 0.3 };
-        _axisCenter->getMaterial()->specular = { 0.3, 0.3, 0.3 };
+        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->ambient  = { 0.3, 0.3, 0.3 };
+        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->diffuse  = { 0.3, 0.3, 0.3 };
+        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->specular = { 0.3, 0.3, 0.3 };
 
-        _axesModel->addMesh( _axisX );
-        _axesModel->addMesh( _axisY );
-        _axesModel->addMesh( _axisZ );
-        _axesModel->addMesh( _axisCenter );
+        _axesModel->addMesh( std::move( _axisX ) );
+        _axesModel->addMesh( std::move( _axisY ) );
+        _axesModel->addMesh( std::move( _axisZ ) );
+        _axesModel->addMesh( std::move( _axisCenter ) );
 
         return _axesModel;
     }
 
-    LMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, 
+    CMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, 
                                             int nOctaves, float nPersistance, float nLacunarity, float nScale, 
                                             const eAxis& axis )
     {
@@ -743,10 +757,12 @@ namespace engine
             _normals[q] = _n;
         }
 
-        return new LMesh( _vertices, _normals, _texCoord, _indices );
+        auto _name = std::string( "perlinPatch:" ) + std::to_string( CMeshBuilder::s_numPerlinPatches++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoord, _indices );
     }
 
-    LMesh* CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
+    CMesh* CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
                                             float widthExtent, float depthExtent, 
                                             float centerX, float centerY,
                                             const std::vector< float >& heightData, float heightBase,
@@ -920,11 +936,12 @@ namespace engine
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
         }
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
-    LModel* CMeshBuilder::createModelFromFile( const std::string& filename,
-                                               const std::string& modelName )
+    CModel* CMeshBuilder::createModelFromFile( const std::string& filename )
     {
         auto _assimpScenePtr = aiImportFile( filename.c_str(),
                                              aiProcessPreset_TargetRealtime_MaxQuality );
@@ -935,7 +952,8 @@ namespace engine
         }
 
         // Create a temporary holder to place the processes data from assimp
-        auto _model = new LModel( modelName );
+        auto _name = std::string( "assimpModel:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ );
+        auto _model = new CModel( _name );
         // recursively copy the data from assimp to our data structure
         _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr );
 
@@ -946,14 +964,15 @@ namespace engine
         return _model;
     }
 
-    void CMeshBuilder::_processAssimpNode( LModel* modelPtr, 
+    void CMeshBuilder::_processAssimpNode( CModel* modelPtr, 
                                            aiNode* assimpNodePtr, 
                                            const aiScene* assimpScenePtr )
     {
         for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
         {
             aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
-            modelPtr->addMesh( _processAssimpMesh( _assimpMeshPtr ) );
+            auto _meshPtr = std::unique_ptr< CMesh >( _processAssimpMesh( modelPtr, _assimpMeshPtr ) );
+            modelPtr->addMesh( std::move( _meshPtr ) );
         }
 
         for ( size_t i = 0; i < assimpNodePtr->mNumChildren; i++ )
@@ -964,7 +983,8 @@ namespace engine
         }
     }
 
-    LMesh* CMeshBuilder::_processAssimpMesh( aiMesh* assimpMeshPtr )
+    CMesh* CMeshBuilder::_processAssimpMesh( CModel* modelPtr, 
+                                             aiMesh* assimpMeshPtr )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -1005,7 +1025,9 @@ namespace engine
             }
         }
 
-        return new LMesh( _vertices, _normals, _texCoords, _indices );
+        auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
+
+        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
     }
 
     /***********************************************************************
@@ -1037,5 +1059,20 @@ namespace engine
         ENGINE_CORE_ASSERT( false, "Invalid axis given for conversion, should be either x, y or z" );
         return { vec.x, vec.y, vec.z };
     }
+
+    /* some counters to keep track of the number of meshes created, and some simple name assignemnt */
+
+    int32 CMeshBuilder::s_numPlanes             = 0;
+    int32 CMeshBuilder::s_numBoxes              = 0;
+    int32 CMeshBuilder::s_numSpheres            = 0;
+    int32 CMeshBuilder::s_numEllipsoids         = 0;
+    int32 CMeshBuilder::s_numCapsules           = 0;
+    int32 CMeshBuilder::s_numCylinders          = 0;
+    int32 CMeshBuilder::s_numArrows             = 0;
+    int32 CMeshBuilder::s_numAxes               = 0;
+    int32 CMeshBuilder::s_numPerlinPatches      = 0;
+    int32 CMeshBuilder::s_numHeightFields       = 0;
+    int32 CMeshBuilder::s_numAssimpModels       = 0;
+    int32 CMeshBuilder::s_numAssimpSubmeshes    = 0;
 
 }

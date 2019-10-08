@@ -31,7 +31,7 @@ public :
         m_material = material;
     }
 
-    engine::LIRenderable* selectedMesh()
+    engine::CIRenderable* selectedMesh()
     {
         return m_meshes[ m_meshSelectedIndex ];
     }
@@ -370,7 +370,7 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::LIRenderable* > m_meshes;
+    std::vector< engine::CIRenderable* > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
@@ -394,7 +394,7 @@ int main()
     auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
     _ui->init();
 
-    _app->setUi( _ui );
+    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -412,7 +412,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
-    _gizmo->pos = { 0.0f, 0.0f, 2.0f };
+    _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_multiple_lights";
@@ -448,7 +448,7 @@ int main()
         { -1.3f,  1.0f, -1.5f }
     };
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
             break;

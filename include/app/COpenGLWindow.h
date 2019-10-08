@@ -67,7 +67,7 @@ namespace engine
         void begin();
         void end();
 
-        bool isActive();
+        bool active();
         void requestClose();
 
         int width() { return m_properties.width; }

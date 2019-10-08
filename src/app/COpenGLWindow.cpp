@@ -140,7 +140,7 @@ namespace engine
         m_glContext->swapBuffers();
     }
 
-    bool COpenGLWindow::isActive()
+    bool COpenGLWindow::active()
     { 
         return glfwWindowShouldClose( m_glfwWindowPtr ) == 0;
     }

@@ -166,7 +166,7 @@ int main()
     // auto _geometryVAO = createGeometryVer1Indices();
     auto _geometryVAO = createGeometryVer2Indices();
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         _app->begin();
 

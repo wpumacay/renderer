@@ -27,7 +27,7 @@ public :
         m_material = material;
     }
 
-    engine::LIRenderable* selectedMesh()
+    engine::CIRenderable* selectedMesh()
     {
         return m_meshes[ m_meshSelectedIndex ];
     }
@@ -357,7 +357,7 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::LIRenderable* > m_meshes;
+    std::vector< engine::CIRenderable* > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
@@ -379,7 +379,7 @@ int main()
     auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
     _ui->init();
 
-    _app->setUi( _ui );
+    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -397,7 +397,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
-    _gizmo->pos = { 0.0f, 0.0f, 2.0f };
+    _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightcasters";
@@ -436,7 +436,7 @@ int main()
         { -1.3f,  1.0f, -1.5f }
     };
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
         {
@@ -488,11 +488,11 @@ int main()
         _gizmo->setVisibility( !_ui->isLightLockedToCamera() );
 
         if ( _light->type() == engine::eLightType::POINT )
-            _gizmo->pos = reinterpret_cast< engine::CPointLight* >( _light )->position;
+            _gizmo->position = reinterpret_cast< engine::CPointLight* >( _light )->position;
         else if ( _light->type() == engine::eLightType::SPOT )
-            _gizmo->pos = reinterpret_cast< engine::CSpotLight* >( _light )->position;
+            _gizmo->position = reinterpret_cast< engine::CSpotLight* >( _light )->position;
         else
-            _gizmo->pos = { 2000.0f, 2000.0f, 2000.0f }; 
+            _gizmo->position = { 2000.0f, 2000.0f, 2000.0f }; 
 
         if ( _light->type() == engine::eLightType::SPOT )
         {
@@ -576,10 +576,10 @@ int main()
         _phongMaterial->unbind();
         _shaderLightCasters->unbind();
 
-        if ( _gizmo->isVisible() )
+        if ( _gizmo->visible() )
         {
             _shaderGizmo->bind();
-            _shaderGizmo->setMat4( "u_tModel", _gizmo->getModelMatrix() );
+            _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
             _shaderGizmo->setMat4( "u_tView", _camera->matView() );
             _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
             _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );

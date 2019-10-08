@@ -13,19 +13,18 @@ namespace engine
         m_linesRenderBufferPositions = std::vector< LDLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
         m_linesRenderBufferColors = std::vector< LDLinePositionsColors >( DEBUG_DRAWER_BATCH_SIZE );
 
-        m_linesPositionsVBO = new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                 eBufferUsage::DYNAMIC,
-                                                 sizeof( LDLinePositions ) * m_linesRenderBufferPositions.size(),
-                                                 (float32*) m_linesRenderBufferPositions.data() );
+        m_linesPositionsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                                                                   eBufferUsage::DYNAMIC,
+                                                                                   sizeof( LDLinePositions ) * m_linesRenderBufferPositions.size(),
+                                                                                   (float32*) m_linesRenderBufferPositions.data() ) );
+        m_linesColorsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "color", eElementType::Float3, false } },
+                                                                                eBufferUsage::DYNAMIC,
+                                                                                sizeof( LDLinePositionsColors ) * m_linesRenderBufferColors.size(),
+                                                                                (float32*) m_linesRenderBufferColors.data() ) );
 
-        m_linesColorsVBO = new CVertexBuffer( { { "color", eElementType::Float3, false } },
-                                              eBufferUsage::DYNAMIC,
-                                              sizeof( LDLinePositionsColors ) * m_linesRenderBufferColors.size(),
-                                              (float32*) m_linesRenderBufferColors.data() );
-
-        m_linesVAO = new CVertexArray();
-        m_linesVAO->addVertexBuffer( m_linesPositionsVBO );
-        m_linesVAO->addVertexBuffer( m_linesColorsVBO );
+        m_linesVAO = std::unique_ptr< CVertexArray >( new CVertexArray() );
+        m_linesVAO->addVertexBuffer( m_linesPositionsVBO.get() );
+        m_linesVAO->addVertexBuffer( m_linesColorsVBO.get() );
     }
 
     void CDebugDrawer::Init()
@@ -96,7 +95,7 @@ namespace engine
         CDebugDrawer::s_instance->_drawAABB( aabbMin, aabbMax, worldTransform, color );
     }
 
-    void CDebugDrawer::DrawNormals( LMesh* meshPtr, const CVec3& color )
+    void CDebugDrawer::DrawNormals( CMesh* meshPtr, const CVec3& color )
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
 
@@ -121,9 +120,10 @@ namespace engine
     CDebugDrawer::~CDebugDrawer()
     {
         m_linesPositions.clear();
-        m_linesColors.clear();
+        m_linesRenderBufferPositions.clear();
 
-        delete m_linesVAO;
+        m_linesColors.clear();
+        m_linesRenderBufferColors.clear();
 
         m_linesVAO = nullptr;
         m_linesPositionsVBO = nullptr;
@@ -342,7 +342,7 @@ namespace engine
         _drawLine( _p7, _p8, color ); _drawLine( _p8, _p5, color );
     }
 
-    void CDebugDrawer::_drawNormals( LMesh* meshPtr, const CVec3& color )
+    void CDebugDrawer::_drawNormals( CMesh* meshPtr, const CVec3& color )
     {
         if ( !meshPtr )
             return;
@@ -350,7 +350,7 @@ namespace engine
         auto _vertices = meshPtr->vertices();
         auto _normals = meshPtr->normals();
 
-        auto _modelMatrix = meshPtr->getModelMatrix();
+        auto _modelMatrix = meshPtr->matModel();
         auto _normalMatrix = ( _modelMatrix.inverse() ).transpose();
 
         for ( size_t i = 0; i < _vertices.size(); i++ )

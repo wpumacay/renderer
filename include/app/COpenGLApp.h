@@ -1,13 +1,13 @@
 #pragma once
 
-#include <LScene.h>
+#include <graphics/CScene.h>
 
 #include <camera/CICamera.h>
 #include <camera/CFixedCamera.h>
 #include <camera/CFpsCamera.h>
 #include <camera/COrbitCamera.h>
 
-#include <LMasterRenderer.h>
+// #include <renderers/CMainRenderer.h>
 
 #include <assets/CTextureManager.h>
 #include <shaders/CShaderManager.h>
@@ -28,6 +28,7 @@ namespace engine
 
     class COpenGLApp
     {
+
     public :
         static COpenGLApp* GetInstance();
         static COpenGLWindow* GetWindow();
@@ -37,8 +38,6 @@ namespace engine
 
         void init();
 
-        void setUi( CImguiUi* uiPtr );
-
         void begin();
 
         void renderScene();
@@ -47,15 +46,23 @@ namespace engine
 
         void end();
 
-        LScene* scene();
+        void setScene( std::unique_ptr< CScene > scenePtr ) { m_scenePtr = std::move( scenePtr ); }
 
-        bool isActive();
+        void setUi( std::unique_ptr< CImguiUi > uiPtr ) { m_uiPtr = std::move( uiPtr ); }
 
-        float frametime();
+        CScene* scene() const { return m_scenePtr.get(); }
 
-        float fps();
+        CImguiUi* ui() const { return m_uiPtr.get(); }
 
-        LMasterRenderer* renderer() const { return m_masterRenderer; }
+        COpenGLWindow* window() const { return m_windowPtr.get(); }
+
+        // CMainRenderer* renderer() const { return m_mainRenderer.get(); }
+
+        bool active() const { return m_windowPtr->active(); }
+
+        float frametime() const { return m_timeDelta; }
+
+        float fps() const { return 1.0f / m_timeDelta; }
 
     protected :
 
@@ -66,14 +73,13 @@ namespace engine
 
         static COpenGLApp* s_instance;
 
-        LMasterRenderer* m_masterRenderer;
-        LScene* m_scenePtr;
+        std::unique_ptr< CScene >           m_scenePtr;
+        std::unique_ptr< CImguiUi >         m_uiPtr;
+        std::unique_ptr< COpenGLWindow >    m_windowPtr;
+        // std::unique_ptr< CMainRenderer>     m_mainRendererPtr;
 
-        COpenGLWindow* m_windowPtr;
-        CImguiUi* m_uiPtr;
-
-        float m_timeNow;
-        float m_timeDelta;
+        float32 m_timeNow;
+        float32 m_timeDelta;
     };
 
 }

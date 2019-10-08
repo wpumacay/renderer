@@ -36,7 +36,7 @@ int main()
     auto _box = engine::CMeshBuilder::createBox( 3.0f, 3.0f, 3.0f );
     auto _sphere = engine::CMeshBuilder::createSphere( 1.5f );
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
-    _gizmo->pos = { 0.0f, 0.0f, 2.0f };
+    _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong";
@@ -59,13 +59,13 @@ int main()
     // select shader to use
     auto _shaderLighting = _shaderPhong;
     auto _mesh = _sphere;
-    // _mesh->pos = { 1.0f, 1.0f, 0.0f };
+    // _mesh->position = { 1.0f, 1.0f, 0.0f };
     // _mesh->scale = { 0.5f, 1.0f, 1.5f };
 
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
         {
@@ -92,22 +92,22 @@ int main()
         if ( _moveLight )
         {
             _mvParam += 100.0f * engine::CTime::GetTimeStep();
-            // _gizmo->pos.x = 1.0f + std::sin( _mvParam ) * 2.0f;
-            // _gizmo->pos.y = std::sin( _mvParam / 2.0f ) * 1.0f;
+            // _gizmo->position.x = 1.0f + std::sin( _mvParam ) * 2.0f;
+            // _gizmo->position.y = std::sin( _mvParam / 2.0f ) * 1.0f;
 
-            _gizmo->pos.x = 10.0f * std::sin( _mvParam );
-            _gizmo->pos.y = 10.0f * std::cos( _mvParam );
-            _gizmo->pos.z = 0.0f;
+            _gizmo->position.x = 10.0f * std::sin( _mvParam );
+            _gizmo->position.y = 10.0f * std::cos( _mvParam );
+            _gizmo->position.z = 0.0f;
         }
 
         /* do our thing here ************************/
         _shaderLighting->bind();
-        _shaderLighting->setMat4( "u_modelMat", _mesh->getModelMatrix() );
+        _shaderLighting->setMat4( "u_modelMat", _mesh->matModel() );
         _shaderLighting->setMat4( "u_viewProjMat", _camera->matProj() * _camera->matView() );
-        _shaderLighting->setMat4( "u_normalMat", ( ( _mesh->getModelMatrix() ).inverse() ).transpose() );
+        _shaderLighting->setMat4( "u_normalMat", ( ( _mesh->matModel() ).inverse() ).transpose() );
         _shaderLighting->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
         _shaderLighting->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
-        _shaderLighting->setVec3( "u_lightPosition", _gizmo->pos );
+        _shaderLighting->setVec3( "u_lightPosition", _gizmo->position );
         _shaderLighting->setVec3( "u_viewerPosition", _camera->position() );
 
         _mesh->render();
@@ -115,7 +115,7 @@ int main()
         _shaderLighting->unbind();
 
         _shaderGizmo->bind();
-        _shaderGizmo->setMat4( "u_tModel", _gizmo->getModelMatrix() );
+        _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
         _shaderGizmo->setMat4( "u_tView", _camera->matView() );
         _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
         _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );

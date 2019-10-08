@@ -43,7 +43,7 @@ int main()
     _varray->addVertexBuffer( _vbufferCol );
     _varray->setIndexBuffer( _ibuffer );
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         _app->begin();
 

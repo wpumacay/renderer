@@ -27,8 +27,9 @@ namespace engine
 
     private :
 
-        CTextureCube*                   m_cubemap;
-        std::unique_ptr< CVertexArray > m_vertexArray;
+        CTextureCube*                       m_cubemap;
+        std::unique_ptr< CVertexBuffer >    m_vertexBuffer;
+        std::unique_ptr< CVertexArray >     m_vertexArray;
 
     };
 

@@ -24,7 +24,7 @@ public :
         if ( !m_uiPtr )
             return;
 
-        reinterpret_cast< engine::CImguiUiDemo* >( m_uiPtr )->showTexture( texture );
+        dynamic_cast< engine::CImguiUiDemo* >( m_uiPtr.get() )->showTexture( texture );
     }
 
 protected :
@@ -33,7 +33,7 @@ protected :
     {
         ENGINE_TRACE( "Initializing custom ui" );
         // m_uiPtr = new ApplicationUi( m_windowPtr->context() );
-        m_uiPtr = new engine::CImguiUiDemo( m_windowPtr->context() );
+        m_uiPtr.reset( new engine::CImguiUiDemo( m_windowPtr->context() ) );
         m_uiPtr->init();
     }
 
@@ -98,7 +98,7 @@ int main()
 
     _app->setTextureToShow( _textureContainer );
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         _app->begin();
 

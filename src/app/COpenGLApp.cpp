@@ -17,7 +17,7 @@ namespace engine
         ENGINE_CORE_ASSERT( COpenGLApp::s_instance, "Must have a valid application created" );
         ENGINE_CORE_ASSERT( COpenGLApp::s_instance->m_windowPtr, "Must have a valid window created" );
 
-        return COpenGLApp::s_instance->m_windowPtr;
+        return COpenGLApp::s_instance->m_windowPtr.get();
     }
 
     COpenGLApp::COpenGLApp()
@@ -37,22 +37,11 @@ namespace engine
 
     COpenGLApp::~COpenGLApp()
     {
-        if ( m_windowPtr )
-            delete m_windowPtr;
-
-        if ( m_masterRenderer )
-            delete m_masterRenderer;
-
-        if ( m_scenePtr )
-            delete m_scenePtr;
-
-        if ( m_uiPtr )
-            delete m_uiPtr;
 
         m_windowPtr         = nullptr;
-        m_masterRenderer    = nullptr;
         m_scenePtr          = nullptr;
         m_uiPtr             = nullptr;
+        // m_mainRenderer      = nullptr;
 
         engine::CTime::Release();
         engine::CDebugDrawer::Release();
@@ -72,10 +61,10 @@ namespace engine
         _windowProperties.callbackMouse = nullptr;
         _windowProperties.callbackMouseMove = nullptr;
 
-        m_windowPtr         = new COpenGLWindow( _windowProperties );
-        m_masterRenderer    = new LMasterRenderer();
-        m_scenePtr          = new LScene();
+        m_windowPtr         = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( _windowProperties ) );
+        m_scenePtr          = std::unique_ptr< CScene >( new CScene() );
         m_uiPtr             = nullptr; // let the user create its own specific UI
+        // m_mainRendererPtr   = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
 
         engine::CTextureManager::Init();
         engine::CShaderManager::Init();
@@ -103,14 +92,6 @@ namespace engine
         ENGINE_CORE_INFO( "GL-Application started successfully" );
     }
 
-    void COpenGLApp::setUi( CImguiUi* uiPtr )
-    {
-        if ( m_uiPtr )
-            delete m_uiPtr;
-
-        m_uiPtr = uiPtr;
-    }
-
     void COpenGLApp::begin()
     {
         ENGINE_CORE_ASSERT( m_windowPtr, "Should have created a window by now" );
@@ -127,7 +108,7 @@ namespace engine
         // let the user update its own logic
         _updateUser();
 
-        auto _currentCamera = m_scenePtr->getCurrentCamera();
+        auto _currentCamera = m_scenePtr->currentCamera();
         if ( _currentCamera )
         {
             // handle the usage of the cursor according to the current camera active mode
@@ -140,7 +121,7 @@ namespace engine
             }
 
             m_scenePtr->update();
-            m_masterRenderer->render( m_scenePtr );
+            // m_mainRenderer->render( m_scenePtr );
 
             engine::CDebugDrawer::Render( _currentCamera );
         }
@@ -185,23 +166,4 @@ namespace engine
         // Override this method with extra update logic prior to rendering
     }
 
-    LScene* COpenGLApp::scene()
-    {
-        return m_scenePtr;
-    }
-
-    bool COpenGLApp::isActive()
-    {
-        return m_windowPtr->isActive();
-    }
-
-    float COpenGLApp::frametime()
-    {
-        return m_timeDelta;
-    }
-
-    float COpenGLApp::fps()
-    {
-        return 1.0f / m_timeDelta;
-    }
 }

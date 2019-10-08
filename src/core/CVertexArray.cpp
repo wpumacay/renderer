@@ -9,25 +9,22 @@ namespace engine
     {
         m_numAttribIndx = 0;
         m_openglId      = 0;
-        m_indexBuffer   = NULL;
+        m_indexBuffer   = nullptr;
 
         glGenVertexArrays( 1, &m_openglId );
     }
 
     CVertexArray::~CVertexArray()
     {
-        for ( size_t i = 0; i < m_vertexBuffers.size(); i++ )
-            delete m_vertexBuffers[i];
-        m_vertexBuffers.clear();
+        glDeleteVertexArrays( 1, &m_openglId );
 
-        delete m_indexBuffer;
-        m_indexBuffer = NULL;
+        m_indexBuffer = nullptr;
+        m_vertexBuffers.clear();
     }
 
     void CVertexArray::addVertexBuffer( CVertexBuffer* vertexBuffer )
     {
-        m_vertexBuffers.push_back( vertexBuffer );
-
+        // setup the VBO within our VAO according to its layout
         auto _buffLayout = vertexBuffer->layout();
         auto _buffElements = _buffLayout.elements();
 
@@ -49,16 +46,21 @@ namespace engine
 
         vertexBuffer->unbind();
         unbind();
+
+        // keep a reference only
+        m_vertexBuffers.push_back( vertexBuffer );
     }
 
     void CVertexArray::setIndexBuffer( CIndexBuffer* indexBuffer )
     {
-        m_indexBuffer = indexBuffer;
-
+        // setup the IBO within our VAO
         glBindVertexArray( m_openglId );
-        m_indexBuffer->bind();
+        indexBuffer->bind();
         glBindVertexArray( 0 );
-        m_indexBuffer->unbind();
+        indexBuffer->unbind();
+
+        // keep a reference only
+        m_indexBuffer = indexBuffer;
     }
 
     void CVertexArray::bind()
@@ -70,6 +72,5 @@ namespace engine
     {
         glBindVertexArray( 0 );
     }
-
 
 }

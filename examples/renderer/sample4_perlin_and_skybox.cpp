@@ -18,7 +18,7 @@ int main()
 
     auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath, "lizardon" );
     _model->scale = { 0.05f, 0.05f, 0.05f };
-    _model->pos = { 0.0f, 0.0f, 3.0f };
+    _model->position = { 0.0f, 0.0f, 3.0f };
 
     // make a sample camera
     auto _cameraProjData = engine::CCameraProjData();
@@ -76,7 +76,7 @@ int main()
 
     _app->renderer()->disableShadows();
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );

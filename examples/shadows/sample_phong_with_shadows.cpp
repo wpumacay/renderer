@@ -27,8 +27,8 @@ protected :
 void renderToShadowMap( engine::CILight* lightPtr,
                         engine::CShadowMap* shadowMapPtr,
                         engine::CShader* shaderPtr,
-                        engine::LIRenderable* floor,
-                        std::vector< engine::LIRenderable* > cubes );
+                        engine::CIRenderable* floor,
+                        std::vector< engine::CIRenderable* > cubes );
 
 void renderSceneWithShadows( engine::CILight* lightPtr, 
                              engine::CICamera* cameraPtr, 
@@ -36,8 +36,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
                              engine::CShader* shaderPtr,
                              engine::CPhongMaterial* floorMaterialPtr,
                              engine::CPhongMaterial* cubeMaterialPtr,
-                             engine::LIRenderable* floor,
-                             std::vector< engine::LIRenderable* > cubes );
+                             engine::CIRenderable* floor,
+                             std::vector< engine::CIRenderable* > cubes );
 
 void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
                                    engine::CShader* shaderPtr,
@@ -54,7 +54,7 @@ int main()
     auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
     _ui->init();
 
-    _app->setUi( _ui );
+    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
@@ -108,16 +108,16 @@ int main()
                                            _cameraMaxDelta );
 
     auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
-    _floor->pos = { 0.0f, 0.0f, 0.0f };
+    _floor->position = { 0.0f, 0.0f, 0.0f };
 
     auto _cube1 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
-    _cube1->pos = { 0.0f, 2.0f, 0.0f };
+    _cube1->position = { 0.0f, 2.0f, 0.0f };
 
     auto _cube2 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
-    _cube2->pos = { 2.0f, 0.5f, 1.0f };
+    _cube2->position = { 2.0f, 0.5f, 1.0f };
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
-    _cube3->pos = { -1.0f, 0.5f, 2.0f };
+    _cube3->position = { -1.0f, 0.5f, 2.0f };
     _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 60.0f ), { 1.0f, 0.0f, 1.0f } );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
@@ -189,7 +189,7 @@ int main()
     _quad_varray->addVertexBuffer( _quad_vbuffer );
     _quad_varray->setIndexBuffer( _quad_ibuffer );
 
-    while( _app->isActive() )
+    while( _app->active() )
     {
         if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
             break;
@@ -240,8 +240,8 @@ int main()
 void renderToShadowMap( engine::CILight* lightPtr,
                         engine::CShadowMap* shadowMapPtr,
                         engine::CShader* shaderPtr,
-                        engine::LIRenderable* floor,
-                        std::vector< engine::LIRenderable* > cubes )
+                        engine::CIRenderable* floor,
+                        std::vector< engine::CIRenderable* > cubes )
 {
     // glCullFace( GL_FRONT );
     shaderPtr->bind();
@@ -255,13 +255,13 @@ void renderToShadowMap( engine::CILight* lightPtr,
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
 
     {
-        shaderPtr->setMat4( "u_modelMatrix", floor->getModelMatrix() );
+        shaderPtr->setMat4( "u_modelMatrix", floor->matModel() );
         floor->render();
     }
 
     for ( size_t i = 0; i < cubes.size(); i++ )
     {
-        shaderPtr->setMat4( "u_modelMatrix", cubes[i]->getModelMatrix() );
+        shaderPtr->setMat4( "u_modelMatrix", cubes[i]->matModel() );
         cubes[i]->render();
     }
 
@@ -276,8 +276,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
                              engine::CShader* shaderPtr,
                              engine::CPhongMaterial* floorMaterialPtr,
                              engine::CPhongMaterial* cubeMaterialPtr,
-                             engine::LIRenderable* floor,
-                             std::vector< engine::LIRenderable* > cubes )
+                             engine::CIRenderable* floor,
+                             std::vector< engine::CIRenderable* > cubes )
 {
     if ( !lightPtr || !cameraPtr || !shaderPtr )
         return;
@@ -344,7 +344,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     /* render the floor */
     floorMaterialPtr->bind( shaderPtr );
     {
-        auto _modelMat = floor->getModelMatrix();
+        auto _modelMat = floor->matModel();
         shaderPtr->setMat4( "u_modelMatrix", _modelMat );
         shaderPtr->setMat4( "u_normalMatrix", _modelMat.inverse().transpose() );
         floor->render();
@@ -355,7 +355,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     cubeMaterialPtr->bind( shaderPtr );
     for ( size_t i = 0; i < cubes.size(); i++ )
     {
-        auto _modelMat = cubes[i]->getModelMatrix();
+        auto _modelMat = cubes[i]->matModel();
         shaderPtr->setMat4( "u_modelMatrix", _modelMat );
         shaderPtr->setMat4( "u_normalMatrix", _modelMat.inverse().transpose() );
         cubes[i]->render();

@@ -14,19 +14,9 @@ function( FcnBuildExample paramSources paramExecutableName )
 
 endfunction()
 
-file( GLOB SampleFiles *.cpp )
-
-foreach( sampleFile ${SampleFiles} )
-    # remove extension from sample file
-    string( REPLACE ".cpp" "" executableLongName ${sampleFile} )
-    # remove other path components from file
-    get_filename_component( executableName ${executableLongName} NAME )
-
-    FcnBuildExample( ${sampleFile} ${executableName} )
-
-endforeach( sampleFile )
-
 add_subdirectory( core )
 add_subdirectory( lights )
 add_subdirectory( shadows )
 add_subdirectory( fog )
+add_subdirectory( graphics )
+## add_subdirectory( renderer )
