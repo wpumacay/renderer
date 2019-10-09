@@ -210,7 +210,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         /* do our thing here ************************/
@@ -231,7 +231,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

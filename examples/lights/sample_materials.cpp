@@ -94,56 +94,26 @@ private :
 
         if ( ImGui::Button( "set material" ) && ( m_materialSelectedIndex != -1 ) )
         {
-            if ( m_material->type() == engine::eMaterialType::PHONG )
-            {
-                auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
-
-                _materialPhong->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
-                _materialPhong->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
-                _materialPhong->specular = m_materialsList[m_materialSelectedIndex].specular;
-                _materialPhong->shininess = m_materialsList[m_materialSelectedIndex].shininess;
-            }
-            else if ( m_material->type() == engine::eMaterialType::LAMBERT )
-            {
-                auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
-
-                _materialLambert->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
-                _materialLambert->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
-            }
+            m_material->ambient  = m_materialsList[m_materialSelectedIndex].ambient;
+            m_material->diffuse  = m_materialsList[m_materialSelectedIndex].diffuse;
+            m_material->specular = m_materialsList[m_materialSelectedIndex].specular;
+            m_material->shininess = m_materialsList[m_materialSelectedIndex].shininess;
         }
 
         ImGui::Spacing();
 
-        if ( m_material->type() == engine::eMaterialType::PHONG )
-        {
-            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
+        float _cAmbient[3]  = { m_material->ambient.x, m_material->ambient.y, m_material->ambient.z };
+        float _cDiffuse[3]  = { m_material->diffuse.x, m_material->diffuse.y, m_material->diffuse.z };
+        float _cSpecular[3] = { m_material->specular.x, m_material->specular.y, m_material->specular.z };
 
-            float _cAmbient[3]  = { _materialPhong->ambient.x, _materialPhong->ambient.y, _materialPhong->ambient.z };
-            float _cDiffuse[3]  = { _materialPhong->diffuse.x, _materialPhong->diffuse.y, _materialPhong->diffuse.z };
-            float _cSpecular[3] = { _materialPhong->specular.x, _materialPhong->specular.y, _materialPhong->specular.z };
+        ImGui::ColorEdit3( "cAmbient", _cAmbient );
+        ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
+        ImGui::ColorEdit3( "cSpecular", _cSpecular );
+        ImGui::SliderFloat( "cShininess", &m_material->shininess, 32.0f, 256.0f );
 
-            ImGui::ColorEdit3( "cAmbient", _cAmbient );
-            ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-            ImGui::ColorEdit3( "cSpecular", _cSpecular );
-            ImGui::SliderFloat( "cShininess", &_materialPhong->shininess, 32.0f, 256.0f );
-
-            _materialPhong->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-            _materialPhong->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-            _materialPhong->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
-        }
-        else if ( m_material->type() == engine::eMaterialType::LAMBERT )
-        {
-            auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
-
-            float _cAmbient[3]  = { _materialLambert->ambient.x, _materialLambert->ambient.y, _materialLambert->ambient.z };
-            float _cDiffuse[3]  = { _materialLambert->diffuse.x, _materialLambert->diffuse.y, _materialLambert->diffuse.z };
-
-            ImGui::ColorEdit3( "cAmbient", _cAmbient );
-            ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-
-            _materialLambert->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-            _materialLambert->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-        }
+        m_material->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
+        m_material->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
+        m_material->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
 
         ImGui::Spacing();
         ImGui::Text( m_material->toString().c_str() );
@@ -284,7 +254,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         if ( _moveLight )
@@ -337,7 +307,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
     }

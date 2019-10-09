@@ -694,7 +694,7 @@ int main()
 
         showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( _testDirection ) );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         /* do our thing here ************************/
@@ -715,7 +715,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
 
         // ENGINE_TRACE( "frame_time: {0} - fps: {1}", 
         //               std::to_string( engine::CTime::GetTimeStep() ),

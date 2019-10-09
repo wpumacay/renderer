@@ -358,7 +358,7 @@ int main()
         /* use the light selected by the user */
         _currentLight = _ui->selectedLight();
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         /* do our thing here ************************/
@@ -373,7 +373,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

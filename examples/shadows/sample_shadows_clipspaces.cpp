@@ -431,7 +431,7 @@ int main()
 
         showDirectionalLightVolume( _cameraTest, _lightTest, _shadowmap );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         /* do our thing here ************************/
@@ -452,7 +452,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

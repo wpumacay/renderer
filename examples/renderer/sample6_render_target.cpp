@@ -283,7 +283,7 @@ int main()
 //         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputHandler::GetScrollAccumValueY() ) << std::endl;
 
         // _framebuffer->bind();
-        _app->begin();
+        _app->beginRendering();
         _app->renderScene();
         // _framebuffer->unbind();
 
@@ -310,7 +310,7 @@ int main()
         _app->showRenderTarget( _framebuffer );
         _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

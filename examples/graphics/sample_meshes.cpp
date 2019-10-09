@@ -1,11 +1,6 @@
 
 #include <CEngine.h>
 
-void renderScene( engine::CShader* shaderPtr,
-                  engine::CICamera* cameraPtr,
-                  engine::CILight* lightPtr,
-                  const std::vector< engine::CIRenderable* >& renderables );
-
 int main()
 {
     auto _app = new engine::COpenGLApp();
@@ -26,7 +21,7 @@ int main()
                                              engine::COpenGLApp::GetWindow()->width(),
                                              engine::COpenGLApp::GetWindow()->height() );
 
-
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
     while( _app->active() )
     {
@@ -37,18 +32,14 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->update();
+        _app->beginRendering();
 
-        /* do our thing here ************************/
+        _app->renderScene();
+        _app->renderUi();
+        _app->renderDebug();
 
-        // render the scene
-        // renderScene();
-
-        /********************************************/
-
-        engine::CDebugDrawer::Render( _camera );
-
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

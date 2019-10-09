@@ -45,7 +45,7 @@ int main()
 
     while( _app->active() )
     {
-        _app->begin();
+        _app->beginRendering();
 
         if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -58,7 +58,7 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

@@ -92,7 +92,31 @@ namespace engine
         ENGINE_CORE_INFO( "GL-Application started successfully" );
     }
 
-    void COpenGLApp::begin()
+    void COpenGLApp::update()
+    {
+        ENGINE_CORE_ASSERT( m_scenePtr, "Need a scene object to update" );
+
+        // let the user update its own logic
+        _updateUser();
+
+        // update internal properties of the scene (cameras, lights, etc.)
+        m_scenePtr->update();
+
+        // handle the usage of the cursor according to the current camera active mode
+        auto _currentCamera = m_scenePtr->currentCamera();
+        if ( !_currentCamera )
+            return;
+
+        if ( _currentCamera->type() == CFpsCamera::GetStaticType() )
+        {
+            if ( _currentCamera->active() )
+                m_windowPtr->disableCursor();
+            else
+                m_windowPtr->enableCursor();
+        }
+    }
+
+    void COpenGLApp::beginRendering()
     {
         ENGINE_CORE_ASSERT( m_windowPtr, "Should have created a window by now" );
 
@@ -105,26 +129,17 @@ namespace engine
     {
         ENGINE_CORE_ASSERT( m_scenePtr, "Need a scene object to render" );
 
-        // let the user update its own logic
-        _updateUser();
+        // auto _currentCamera = m_scenePtr->currentCamera();
+        // if ( _currentCamera )
+        //     m_mainRenderer->render( m_scenePtr, _currentCamera );
 
+    }
+
+    void COpenGLApp::renderDebug()
+    {
         auto _currentCamera = m_scenePtr->currentCamera();
         if ( _currentCamera )
-        {
-            // handle the usage of the cursor according to the current camera active mode
-            if ( _currentCamera->type() == CFpsCamera::GetStaticType() )
-            {
-                if ( _currentCamera->active() )
-                    m_windowPtr->disableCursor();
-                else
-                    m_windowPtr->enableCursor();
-            }
-
-            m_scenePtr->update();
-            // m_mainRenderer->render( m_scenePtr );
-
             engine::CDebugDrawer::Render( _currentCamera );
-        }
     }
 
     void COpenGLApp::renderUi()
@@ -144,7 +159,7 @@ namespace engine
         m_uiPtr->render();
     }
 
-    void COpenGLApp::end()
+    void COpenGLApp::endRendering()
     {
         ENGINE_CORE_ASSERT( m_windowPtr, "Should have created a window by now" );
 

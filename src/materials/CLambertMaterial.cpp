@@ -8,12 +8,11 @@ namespace engine
                                         const CVec3& ambientColor,
                                         const CVec3& diffuseColor,
                                         CTexture* diffuseMap )
-        : CIMaterial( name )
+        : CIMaterial( name, 
+                      ambientColor, diffuseColor, { 0.0f, 0.0f, 0.0f }, 1.0f, 
+                      diffuseMap, nullptr, nullptr )
     {
-        ambient = ambientColor;
-        diffuse = diffuseColor;
-
-        m_diffuseMap = diffuseMap;
+        m_type = eMaterialType::LAMBERT;
     }
 
     CLambertMaterial::~CLambertMaterial()

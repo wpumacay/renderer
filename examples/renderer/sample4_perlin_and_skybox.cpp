@@ -95,10 +95,10 @@ int main()
         else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
-        _app->begin();
+        _app->beginRendering();
         _app->renderScene();
         _app->renderUi();
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

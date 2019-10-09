@@ -100,7 +100,7 @@ int main()
 
     while( _app->active() )
     {
-        _app->begin();
+        _app->beginRendering();
 
         if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -119,7 +119,7 @@ int main()
 
         _app->renderScene();
         _app->renderUi();
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

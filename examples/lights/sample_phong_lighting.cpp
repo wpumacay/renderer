@@ -86,7 +86,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         if ( _moveLight )
@@ -128,7 +128,7 @@ int main()
         // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
         engine::CDebugDrawer::Render( _camera );
 
-        _app->end();
+        _app->endRendering();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
     }

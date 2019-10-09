@@ -91,15 +91,15 @@ int main()
     _scene->addLight( std::unique_ptr< engine::CDirectionalLight >( _light ) );
 
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
-    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->ambient  = { 0.2f, 0.3f, 0.4f };
-    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->diffuse  = { 0.2f, 0.3f, 0.4f };
-    dynamic_cast< engine::CPhongMaterial* >( _plane->material() )->specular = { 0.2f, 0.3f, 0.4f };
+    _plane->material()->ambient  = { 0.2f, 0.3f, 0.4f };
+    _plane->material()->diffuse  = { 0.2f, 0.3f, 0.4f };
+    _plane->material()->specular = { 0.2f, 0.3f, 0.4f };
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _plane ) );
 
     auto _box = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
-    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->ambient  = { 0.7f, 0.5f, 0.3f };
-    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->diffuse  = { 0.7f, 0.5f, 0.3f };
-    dynamic_cast< engine::CPhongMaterial* >( _box->material() )->specular = { 0.7f, 0.5f, 0.3f };
+    _box->material()->ambient  = { 0.7f, 0.5f, 0.3f };
+    _box->material()->diffuse  = { 0.7f, 0.5f, 0.3f };
+    _box->material()->specular = { 0.7f, 0.5f, 0.3f };
     _box->position = { 1.0f, 1.0f, 1.0f };
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _box ) );
 
@@ -125,7 +125,7 @@ int main()
         // set the render target to our framebuffer
         _framebuffer->bind();
 
-        _app->begin();
+        _app->beginRendering();
 
         // let the renderer to the thing :D
         _app->renderScene();
@@ -155,7 +155,7 @@ int main()
         // render the ui on top of everything
         _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

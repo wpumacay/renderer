@@ -12,20 +12,12 @@ namespace engine
                                     CTexture* diffuseMap,
                                     CTexture* specularMap,
                                     CTexture* normalMap )
-        : CIMaterial( name )
+        : CIMaterial( name, 
+                      ambientColor, diffuseColor, specularColor, specularShininess,
+                      diffuseMap, specularMap, normalMap )
     {
         m_type = eMaterialType::PHONG;
-
-        ambient   = ambientColor;
-        diffuse   = diffuseColor;
-        specular  = specularColor;
-        shininess = specularShininess;
-
-        m_diffuseMap  = diffuseMap;
-        m_specularMap = specularMap;
-        m_normalMap   = normalMap;
     }
-
 
     CPhongMaterial::~CPhongMaterial()
     {

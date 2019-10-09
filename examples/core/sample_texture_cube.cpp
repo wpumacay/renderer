@@ -143,7 +143,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->beginRendering();
 
         if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -168,7 +168,7 @@ int main()
 
         _app->renderScene();
         _app->renderUi();
-        _app->end();
+        _app->endRendering();
     }
 
     return 0;

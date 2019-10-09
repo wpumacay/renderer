@@ -23,14 +23,14 @@
 #include <core/CTextureCube.h>
 #include <core/CFrameBuffer.h>
 
-#include <graphics/CShadowMap.h>        // REPLACE IN RENDERER PIPELINE
-#include <graphics/CFog.h>              // REPLACE IN RENDERER PIPELINE
-#include <graphics/CSkybox.h>           // REPLACE IN RENDERER PIPELINE
-#include <graphics/CMeshBuilder.h>      // REPLACE IN RENDERER PIPELINE
-#include <graphics/CIRenderable.h>      // REPLACE IN RENDERER PIPELINE
-#include <graphics/CMesh.h>             // REPLACE IN RENDERER PIPELINE
-#include <graphics/CModel.h>            // REPLACE IN RENDERER PIPELINE
-#include <graphics/CScene.h>            // REPLACE IN RENDERER PIPELINE
+#include <graphics/CShadowMap.h>
+#include <graphics/CFog.h>
+#include <graphics/CSkybox.h>
+#include <graphics/CMeshBuilder.h>
+#include <graphics/CIRenderable.h>
+#include <graphics/CMesh.h>
+#include <graphics/CModel.h>
+#include <graphics/CScene.h>
 
 #include <materials/CIMaterial.h>
 #include <materials/CPhongMaterial.h>

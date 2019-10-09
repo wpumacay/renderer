@@ -135,7 +135,9 @@ private :
         ImGui::Begin( "Material-properties" );
 
         /* diffuse properties (phong and lambert materials) */
-        if ( m_material->type() == engine::eMaterialType::PHONG || m_material->type() == engine::eMaterialType::LAMBERT )
+        if ( m_material->type() == engine::eMaterialType::LAMBERT || 
+             m_material->type() == engine::eMaterialType::PHONG ||
+             m_material->type() == engine::eMaterialType::BLINN_PHONG )
         {
             if ( ImGui::BeginCombo( "Diffuse-map", m_currentDiffuseMapName.c_str() ) )
             {
@@ -157,11 +159,7 @@ private :
                 ImGui::EndCombo();
             }
 
-            if ( m_material->type() == engine::eMaterialType::PHONG )
-                reinterpret_cast< engine::CPhongMaterial* >( m_material )->setDiffuseMap( m_currentDiffuseMap );
-
-            if ( m_material->type() == engine::eMaterialType::LAMBERT )
-                reinterpret_cast< engine::CLambertMaterial* >( m_material )->setDiffuseMap( m_currentDiffuseMap );
+            m_material->setDiffuseMap( m_currentDiffuseMap );
 
             if ( m_currentDiffuseMap )
                 ImGui::Image( (void*)(intptr_t) m_currentDiffuseMap->openglId(), ImVec2( 64, 64 ) );
@@ -170,7 +168,8 @@ private :
         }
 
         /* specular properties (phong material only) */
-        if ( m_material->type() == engine::eMaterialType::PHONG )
+        if ( m_material->type() == engine::eMaterialType::PHONG ||
+             m_material->type() == engine::eMaterialType::BLINN_PHONG )
         {
             if ( ImGui::BeginCombo( "Specular-map", m_currentSpecularMapName.c_str() ) )
             {
@@ -190,7 +189,7 @@ private :
                 }
             }
 
-            reinterpret_cast< engine::CPhongMaterial* >( m_material )->setSpecularMap( m_currentSpecularMap );
+            m_material->setSpecularMap( m_currentSpecularMap );
 
             if ( m_currentSpecularMap )
                 ImGui::Image( (void*)(intptr_t) m_currentSpecularMap->openglId(), ImVec2( 64, 64 ) );
@@ -205,41 +204,20 @@ private :
 
     void _menuUiMaterialDiffuseProps()
     {
-        if ( m_material->type() == engine::eMaterialType::PHONG )
-        {
-            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
-
-            float _cAmbient[3]  = { _materialPhong->ambient.x, _materialPhong->ambient.y, _materialPhong->ambient.z };
-            float _cDiffuse[3]  = { _materialPhong->diffuse.x, _materialPhong->diffuse.y, _materialPhong->diffuse.z };
-            ImGui::ColorEdit3( "cAmbient", _cAmbient );
-            ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-            _materialPhong->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-            _materialPhong->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-        }
-        else if ( m_material->type() == engine::eMaterialType::LAMBERT )
-        {
-            auto _materialLambert = reinterpret_cast< engine::CLambertMaterial* >( m_material );
-
-            float _cAmbient[3]  = { _materialLambert->ambient.x, _materialLambert->ambient.y, _materialLambert->ambient.z };
-            float _cDiffuse[3]  = { _materialLambert->diffuse.x, _materialLambert->diffuse.y, _materialLambert->diffuse.z };
-            ImGui::ColorEdit3( "cAmbient", _cAmbient );
-            ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-            _materialLambert->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-            _materialLambert->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-        }
+        float _cAmbient[3]  = { m_material->ambient.x, m_material->ambient.y, m_material->ambient.z };
+        float _cDiffuse[3]  = { m_material->diffuse.x, m_material->diffuse.y, m_material->diffuse.z };
+        ImGui::ColorEdit3( "cAmbient", _cAmbient );
+        ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
+        m_material->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
+        m_material->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
     }
 
     void _menuUiMaterialSpecularProps()
     {
-        if ( m_material->type() == engine::eMaterialType::PHONG )
-        {
-            auto _materialPhong = reinterpret_cast< engine::CPhongMaterial* >( m_material );
-
-            float _cSpecular[3] = { _materialPhong->specular.x, _materialPhong->specular.y, _materialPhong->specular.z };
-            ImGui::ColorEdit3( "cSpecular", _cSpecular );
-            ImGui::SliderFloat( "cShininess", &_materialPhong->shininess, 32.0f, 256.0f );
-            _materialPhong->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
-        }
+        float _cSpecular[3] = { m_material->specular.x, m_material->specular.y, m_material->specular.z };
+        ImGui::ColorEdit3( "cSpecular", _cSpecular );
+        ImGui::SliderFloat( "cShininess", &m_material->shininess, 32.0f, 256.0f );
+        m_material->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
     }
 
     void _menuUiLight()
@@ -462,7 +440,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->begin();
+        _app->beginRendering();
         _camera->update();
 
         auto _mesh = _ui->selectedMesh();
@@ -597,7 +575,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->end();
+        _app->endRendering();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
     }

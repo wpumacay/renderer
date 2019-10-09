@@ -38,13 +38,17 @@ namespace engine
 
         void init();
 
-        void begin();
+        void update();
+
+        void beginRendering();
 
         void renderScene();
 
         void renderUi();
 
-        void end();
+        void renderDebug();
+
+        void endRendering();
 
         void setScene( std::unique_ptr< CScene > scenePtr ) { m_scenePtr = std::move( scenePtr ); }
 
