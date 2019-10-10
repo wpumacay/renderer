@@ -10,6 +10,7 @@
 #include <graphics/CMesh.h>
 
 #define DEBUG_DRAWER_BATCH_SIZE 1024
+#define DEBUG_DRAWER_SPHERE_DIVISIONS 20
 
 namespace engine
 {
@@ -35,6 +36,8 @@ namespace engine
         static void Render( CICamera* camera );
         static void DrawLine( const CVec3& start, const CVec3& end, const CVec3& color );
         static void DrawBox( const CVec3& size, const CMat4& transform, const CVec3& color );
+        static void DrawSphere( float32 radius, const CMat4& transform );
+        static void DrawSphere( float32 radius, const CMat4& transform, const CVec3& color );
         static void DrawArrow( const CVec3& start, const CVec3& end, const CVec3& color );
         static void DrawClipVolume( const CMat4& clipMatrix, const CVec3& color );
         static void DrawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
@@ -56,6 +59,7 @@ namespace engine
         void _drawLine( const CVec3& start, const CVec3& end, const CVec3& color );
         void _drawArrow( const CVec3& start, const CVec3& end, const CVec3& color );
         void _drawBox( const CVec3& size, const CMat4& transform, const CVec3& color );
+        void _drawSphere( float32 radius, const CMat4& transform, const CVec3& colorXY, const CVec3& colorYZ, const CVec3& colorXZ );
         void _drawClipVolume( const CMat4& clipMatrix, const CVec3& color );
         void _drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
         void _drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );

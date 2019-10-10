@@ -74,6 +74,20 @@ namespace engine
         CDebugDrawer::s_instance->_drawBox( size, transform, color );
     }
 
+    void CDebugDrawer::DrawSphere( float32 radius, const CMat4& transform )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSphere( radius, transform, CVec3::Blue(), CVec3::Red(), CVec3::Green() );
+    }
+
+    void CDebugDrawer::DrawSphere( float32 radius, const CMat4& transform, const CVec3& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSphere( radius, transform, color, color, color );
+    }
+
     void CDebugDrawer::DrawClipVolume( const CMat4& clipMatrix, const CVec3& color )
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
@@ -234,7 +248,6 @@ namespace engine
 
     void CDebugDrawer::_drawBox( const CVec3& size, const CMat4& transform, const CVec3& color )
     {
-
         auto _cornersInWorld = engine::computeBoxCorners( { size, transform } );
 
         _drawLine( _cornersInWorld[0], _cornersInWorld[1], color ); _drawLine( _cornersInWorld[1], _cornersInWorld[2], color );
@@ -254,6 +267,31 @@ namespace engine
 
         _drawLine( _cornersInWorld[1], _cornersInWorld[5], color ); _drawLine( _cornersInWorld[5], _cornersInWorld[4], color );
         _drawLine( _cornersInWorld[4], _cornersInWorld[0], color ); _drawLine( _cornersInWorld[0], _cornersInWorld[1], color );
+    }
+
+    void CDebugDrawer::_drawSphere( float32 radius, const CMat4& transform, const CVec3& colorXY, const CVec3& colorYZ, const CVec3& colorXZ )
+    {
+        for ( size_t i = 0; i < DEBUG_DRAWER_SPHERE_DIVISIONS; i++ )
+        {
+            float32 _dtheta = ( 2.0f * ENGINE_PI / DEBUG_DRAWER_SPHERE_DIVISIONS );
+            // x-y plane
+            CVec3 _pxy0 = { radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ), 0.0f };
+            CVec3 _pxy1 = { radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f };
+            // y-z plane
+            CVec3 _pyz0 = { 0.0f, radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ) };
+            CVec3 _pyz1 = { 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ) };
+            // x-z plane
+            CVec3 _pxz0 = { radius * std::sin( i * _dtheta ), 0.0f, radius * std::cos( i * _dtheta ) };
+            CVec3 _pxz1 = { radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ) };
+
+            // draw the steps using the points after applying world-space transformation
+            _drawLine( CVec3( transform * CVec4( _pxy0, 1.0f ) ), 
+                       CVec3( transform * CVec4( _pxy1, 1.0f ) ), colorXY );
+            _drawLine( CVec3( transform * CVec4( _pyz0, 1.0f ) ), 
+                       CVec3( transform * CVec4( _pyz1, 1.0f ) ), colorYZ );
+            _drawLine( CVec3( transform * CVec4( _pxz0, 1.0f ) ), 
+                       CVec3( transform * CVec4( _pxz1, 1.0f ) ), colorXZ );
+        }
     }
 
     void CDebugDrawer::_drawClipVolume( const CMat4& clipMatrix, const CVec3& color )

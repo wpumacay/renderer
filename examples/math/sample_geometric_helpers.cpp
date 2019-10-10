@@ -32,7 +32,12 @@ ComparatorSignedDistPlane g_signedComparator = { g_plane };
 auto g_box_size = engine::CVec3( 0.8f, 0.8f, 0.8f );
 auto g_box_position = engine::CVec3( 3.0f, 3.0f, 3.0f );
 auto g_box_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
-auto g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEuler( g_box_rotation );
+auto g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_box_rotation );
+
+auto g_sphere_size = 0.5f;
+auto g_sphere_position = engine::CVec3( -1.0f, 1.0f, -1.0f );
+auto g_sphere_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
+auto g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_sphere_rotation );
 
 bool g_use_signed_distance = false;
 bool g_show_comparison_with_frustum = false;
@@ -60,6 +65,7 @@ protected :
     void _renderInternal() override
     {
         _menuUiHandleBox();
+        _menuUiHandleSphere();
         _menuUiHandlePlane();
     }
 
@@ -83,11 +89,32 @@ private :
         g_box_size      = { _bSize[0], _bSize[1], _bSize[2] };
         g_box_position  = { _bPosition[0], _bPosition[1], _bPosition[2] };
         g_box_rotation  = { _bRotation[0], _bRotation[1], _bRotation[2] };
-        g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEuler( g_box_rotation );
+        g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_box_rotation );
 
         ImGui::Spacing();
         ImGui::Text( "world-transform:" );
         ImGui::Text( engine::toString( g_box_transform ).c_str() );
+        ImGui::End();
+    }
+
+    void _menuUiHandleSphere()
+    {
+        ImGui::Begin( "Play around with the sphere" );
+
+        float _sPosition[3] = { g_sphere_position.x, g_sphere_position.y, g_sphere_position.z };
+        float _sRotation[3] = { g_sphere_rotation.x, g_sphere_rotation.y, g_sphere_rotation.z };
+
+        ImGui::SliderFloat( "sSize", &g_sphere_size, 0.2f, 2.0f );
+        ImGui::SliderFloat3( "sPosition", _sPosition, -5.0f, 5.0f );
+        ImGui::SliderFloat3( "sRotation", _sRotation, -ENGINE_PI / 2.0f, ENGINE_PI / 2.0f );
+
+        g_sphere_position  = { _sPosition[0], _sPosition[1], _sPosition[2] };
+        g_sphere_rotation  = { _sRotation[0], _sRotation[1], _sRotation[2] };
+        g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_sphere_rotation );
+
+        ImGui::Spacing();
+        ImGui::Text( "world-transform:" );
+        ImGui::Text( engine::toString( g_sphere_transform ).c_str() );
         ImGui::End();
     }
 
@@ -183,6 +210,8 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
+        engine::CDebugDrawer::DrawClipVolume( _cameraTest->matProj() * _cameraTest->matView(), { 1.0f, 1.0f, 0.0f } );
+
         _app->update();
         _app->beginRendering();
 
@@ -213,7 +242,6 @@ int main()
         else
         {
             engine::CFrustum _frustum( _cameraTest->matProj() * _cameraTest->matView() );
-            engine::CDebugDrawer::DrawClipVolume( _cameraTest->matProj() * _cameraTest->matView(), { 1.0f, 1.0f, 0.0f } );
             for ( size_t i = 0; i < _frustum.planes.size(); i++ )
                 engine::CDebugDrawer::DrawArrow( _frustum.planes[i].position, 
                                                  _frustum.planes[i].position + 0.2f * _frustum.planes[i].normal,
@@ -224,6 +252,15 @@ int main()
                 engine::CDebugDrawer::DrawBox( g_box_size, g_box_transform, { 0.1f, 0.8f, 0.1f } );
             else
                 engine::CDebugDrawer::DrawBox( g_box_size, g_box_transform, { 0.1f, 0.1f, 0.8f } );
+        }
+
+        {
+            engine::CFrustum _frustum( _cameraTest->matProj() * _cameraTest->matView() );
+            // check if sphere is outside the frustum of the test-cam with high chance
+            if ( engine::certainlyOutsideFrustum( _frustum, { g_sphere_size, g_sphere_position } ) )
+                engine::CDebugDrawer::DrawSphere( g_sphere_size, g_sphere_transform, { 0.1f, 0.8f, 0.1f } );
+            else
+                engine::CDebugDrawer::DrawSphere( g_sphere_size, g_sphere_transform, { 0.1f, 0.1f, 0.8f } );
         }
 
         _app->renderScene();

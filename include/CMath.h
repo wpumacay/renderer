@@ -65,6 +65,14 @@ namespace engine
         static CVec3 cross( const CVec3& v1, const CVec3& v2 );
         static float32 dot( const CVec3& v1, const CVec3& v2 );
         static bool equal( const CVec3& v1, const CVec3& v2 );
+
+        static CVec3 Red() { return { 1.0f, 0.0f, 0.0f }; }
+        static CVec3 Green() { return { 0.0f, 1.0f, 0.0f }; }
+        static CVec3 Blue() { return { 0.0f, 0.0f, 1.0f }; }
+
+        static CVec3 X() { return { 1.0f, 0.0f, 0.0f }; }
+        static CVec3 Y() { return { 0.0f, 1.0f, 0.0f }; }
+        static CVec3 Z() { return { 0.0f, 0.0f, 1.0f }; }
     };
 
     std::string toString( const CVec3& v );
@@ -142,6 +150,7 @@ namespace engine
         static CMat4 rotation( float32 theta, const eAxis& axis );
         static CMat4 rotation( float32 theta, const CVec3& axis );
         static CMat4 fromEuler( const CVec3& euler );
+        static CMat4 fromEulerIntrinsicXYZ( const CVec3& euler );
     };
 
     std::string toString( const CMat4& mat );

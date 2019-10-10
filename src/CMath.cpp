@@ -639,24 +639,50 @@ namespace engine
     {
         CMat4 _res;
 
-        float _c1 = std::cos( euler.z );
-        float _s1 = std::sin( euler.z );
-        float _c2 = std::cos( euler.y );
-        float _s2 = std::sin( euler.y );
-        float _c3 = std::cos( euler.x );
-        float _s3 = std::sin( euler.x );
+        float _cz = std::cos( euler.z );
+        float _sz = std::sin( euler.z );
+        float _cy = std::cos( euler.y );
+        float _sy = std::sin( euler.y );
+        float _cx = std::cos( euler.x );
+        float _sx = std::sin( euler.x );
 
-        _res.buff[0] = _c1 * _c2;
-        _res.buff[1] = _s1 * _c2;
-        _res.buff[2] = -_s2;
+        _res.buff[0] = _cz * _cy;
+        _res.buff[1] = _sz * _cy;
+        _res.buff[2] = -_sy;
 
-        _res.buff[4] = _c1 * _s2 * _s3 - _s1 * _c3;
-        _res.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
-        _res.buff[6] = _c2 * _s3;
+        _res.buff[4] = _cz * _sy * _sx - _sz * _cx;
+        _res.buff[5] = _cz * _cx + _sz * _sy * _sx;
+        _res.buff[6] = _cy * _sx;
 
-        _res.buff[8] = _s1 * _s3 + _c1 * _s2 * _c3;
-        _res.buff[9] = _s1 * _s2 * _c3 - _c1 * _s3;
-        _res.buff[10] = _c2 * _c3;
+        _res.buff[8] = _sz * _sx + _cz * _sy * _cx;
+        _res.buff[9] = _sz * _sy * _cx - _cz * _sx;
+        _res.buff[10] = _cy * _cx;
+
+        return _res;
+    }
+
+    CMat4 CMat4::fromEulerIntrinsicXYZ( const CVec3& euler )
+    {
+        CMat4 _res;
+
+        float _cz = std::cos( euler.z );
+        float _sz = std::sin( euler.z );
+        float _cy = std::cos( euler.y );
+        float _sy = std::sin( euler.y );
+        float _cx = std::cos( euler.x );
+        float _sx = std::sin( euler.x );
+
+        _res.buff[0] = _cy * _cz;
+        _res.buff[1] = _cx * _sz + _sx * _sy * _cz;
+        _res.buff[2] = _sx * _sz - _cx * _sy * _cz;
+
+        _res.buff[4] = -_cy * _sz;
+        _res.buff[5] = _cx * _cz - _sx * _sy * _sz;
+        _res.buff[6] = _sx * _cz + _cx * _sy * _sz;
+
+        _res.buff[8] = _sy;
+        _res.buff[9] = -_sx * _cy;
+        _res.buff[10] = _cx * _cy;
 
         return _res;
     }
