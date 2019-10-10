@@ -37,6 +37,8 @@ namespace engine
 
         void render() override;
 
+        static eRenderableType GetStaticType() { return eRenderableType::MESH; }
+
     private :
 
         std::unique_ptr< CVertexBuffer >    m_vbufferVertices; // owned by mesh's vao

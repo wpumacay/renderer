@@ -499,7 +499,7 @@ int main()
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
-                _modelMat = engine::CMat4::translate( _xyz ) * engine::CMat4::rotation( _theta, { 1.0f, 0.3f, 0.5f } );
+                _modelMat = engine::CMat4::translation( _xyz ) * engine::CMat4::rotation( _theta, { 1.0f, 0.3f, 0.5f } );
             }
             else
             {
@@ -507,7 +507,7 @@ int main()
                 int _col = i % 5;
 
                 engine::CVec3 _xyz = { ( _col - 2.0f ) * 2.0f, 0.0f, -( ( _row == 0 ) ? 0.0f : 2.0f ) };
-                _modelMat = engine::CMat4::translate( _xyz );
+                _modelMat = engine::CMat4::translation( _xyz );
             }
 
             _shaderMultipleLights->setMat4( "u_modelMatrix", _modelMat );
@@ -524,7 +524,7 @@ int main()
                 continue;
 
             _shaderGizmo->bind();
-            _shaderGizmo->setMat4( "u_tModel", engine::CMat4::translate( _pointLights[i]->position ) );
+            _shaderGizmo->setMat4( "u_tModel", engine::CMat4::translation( _pointLights[i]->position ) );
             _shaderGizmo->setMat4( "u_tView", _camera->matView() );
             _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
             _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );

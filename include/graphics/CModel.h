@@ -22,6 +22,8 @@ namespace engine
 
         std::vector< CMesh* > meshes() const;
 
+        static eRenderableType GetStaticType() { return eRenderableType::MODEL; }
+
     private :
 
         std::vector< std::unique_ptr< CMesh > > m_meshes;

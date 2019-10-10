@@ -67,6 +67,13 @@ namespace engine
         CDebugDrawer::s_instance->_drawArrow( start, end, color );
     }
 
+    void CDebugDrawer::DrawBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawBox( size, transform, color );
+    }
+
     void CDebugDrawer::DrawClipVolume( const CMat4& clipMatrix, const CVec3& color )
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
@@ -115,6 +122,13 @@ namespace engine
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
 
         CDebugDrawer::s_instance->_drawFrame( frame, size );
+    }
+
+    void CDebugDrawer::DrawPlane( const CPlane& plane, const CVec2& size, const CVec3& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawPlane( plane, size, color );
     }
 
     CDebugDrawer::~CDebugDrawer()
@@ -216,6 +230,30 @@ namespace engine
         _drawLine( end, _p1, color );
         _drawLine( end, _p2, color );
         _drawLine( end, _p3, color );
+    }
+
+    void CDebugDrawer::_drawBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    {
+
+        auto _cornersInWorld = engine::computeBoxCorners( { size, transform } );
+
+        _drawLine( _cornersInWorld[0], _cornersInWorld[1], color ); _drawLine( _cornersInWorld[1], _cornersInWorld[2], color );
+        _drawLine( _cornersInWorld[2], _cornersInWorld[3], color ); _drawLine( _cornersInWorld[3], _cornersInWorld[0], color );
+
+        _drawLine( _cornersInWorld[1], _cornersInWorld[5], color ); _drawLine( _cornersInWorld[5], _cornersInWorld[6], color );
+        _drawLine( _cornersInWorld[6], _cornersInWorld[2], color ); _drawLine( _cornersInWorld[2], _cornersInWorld[1], color );
+
+        _drawLine( _cornersInWorld[5], _cornersInWorld[6], color ); _drawLine( _cornersInWorld[6], _cornersInWorld[7], color );
+        _drawLine( _cornersInWorld[7], _cornersInWorld[4], color ); _drawLine( _cornersInWorld[4], _cornersInWorld[5], color );
+
+        _drawLine( _cornersInWorld[4], _cornersInWorld[7], color ); _drawLine( _cornersInWorld[7], _cornersInWorld[3], color );
+        _drawLine( _cornersInWorld[3], _cornersInWorld[0], color ); _drawLine( _cornersInWorld[0], _cornersInWorld[4], color );
+
+        _drawLine( _cornersInWorld[2], _cornersInWorld[6], color ); _drawLine( _cornersInWorld[6], _cornersInWorld[7], color );
+        _drawLine( _cornersInWorld[7], _cornersInWorld[3], color ); _drawLine( _cornersInWorld[3], _cornersInWorld[2], color );
+
+        _drawLine( _cornersInWorld[1], _cornersInWorld[5], color ); _drawLine( _cornersInWorld[5], _cornersInWorld[4], color );
+        _drawLine( _cornersInWorld[4], _cornersInWorld[0], color ); _drawLine( _cornersInWorld[0], _cornersInWorld[1], color );
     }
 
     void CDebugDrawer::_drawClipVolume( const CMat4& clipMatrix, const CVec3& color )
@@ -380,6 +418,23 @@ namespace engine
         auto _position = frame.getPosition();
 
         _drawAxes( _xAxis, _yAxis, _zAxis, _position, size );
+    }
+
+    void CDebugDrawer::_drawPlane( const CPlane& plane, const CVec2& size, const CVec3& color )
+    {
+        CVec3 _axis1, _axis2, _axis3;
+        _axis1 = plane.normal;
+        computeFrameAxes( _axis1, _axis2, _axis3, { 0.0f, 1.0f, 0.0f } );
+
+        auto _p0 = plane.position - 0.5f * size.x * _axis2 - 0.5f * size.y * _axis3;
+        auto _p1 = plane.position - 0.5f * size.x * _axis2 + 0.5f * size.y * _axis3;
+        auto _p2 = plane.position + 0.5f * size.x * _axis2 + 0.5f * size.y * _axis3;
+        auto _p3 = plane.position + 0.5f * size.x * _axis2 - 0.5f * size.y * _axis3;
+
+        _drawLine( _p0, _p1, color );
+        _drawLine( _p1, _p2, color );
+        _drawLine( _p2, _p3, color );
+        _drawLine( _p3, _p0, color );
     }
 
 }

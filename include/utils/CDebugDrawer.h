@@ -34,6 +34,7 @@ namespace engine
         static void Release();
         static void Render( CICamera* camera );
         static void DrawLine( const CVec3& start, const CVec3& end, const CVec3& color );
+        static void DrawBox( const CVec3& size, const CMat4& transform, const CVec3& color );
         static void DrawArrow( const CVec3& start, const CVec3& end, const CVec3& color );
         static void DrawClipVolume( const CMat4& clipMatrix, const CVec3& color );
         static void DrawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
@@ -42,6 +43,7 @@ namespace engine
         static void DrawNormals( CMesh* meshPtr, const CVec3& color );
         static void DrawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size );
         static void DrawFrame( const CMat4& frame, float32 size );
+        static void DrawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
         ~CDebugDrawer();
 
@@ -53,6 +55,7 @@ namespace engine
 
         void _drawLine( const CVec3& start, const CVec3& end, const CVec3& color );
         void _drawArrow( const CVec3& start, const CVec3& end, const CVec3& color );
+        void _drawBox( const CVec3& size, const CMat4& transform, const CVec3& color );
         void _drawClipVolume( const CMat4& clipMatrix, const CVec3& color );
         void _drawTrailPoints( const std::vector< CVec3 >& trailpoints, const CVec3& color );
         void _drawLinesBatch( const std::vector< CLine >& linesBatch, const CVec3& color );
@@ -60,6 +63,7 @@ namespace engine
         void _drawNormals( CMesh* meshPtr, const CVec3& color );
         void _drawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size );
         void _drawFrame( const CMat4& frame, float32 size );
+        void _drawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
         void _render( CICamera* camera );
         void _renderLinesBatch( CICamera* camera, int numLines );

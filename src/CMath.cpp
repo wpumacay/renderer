@@ -137,12 +137,24 @@ namespace engine
         this->z = z;
     }
 
+    CVec3::CVec3( const CVec4& v4 )
+    {
+        this->x = v4.x;
+        this->y = v4.y;
+        this->z = v4.z;
+    }
+
     void CVec3::normalize()
     {
         float32 _len = std::sqrt( x * x + y * y + z * z );
         x = x / _len;
         y = y / _len;
         z = z / _len;
+    }
+
+    float32 CVec3::length( const CVec3& v )
+    {
+        return std::sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
     }
 
     void CVec3::scale( float32 sx, float32 sy, float32 sz )
@@ -548,7 +560,7 @@ namespace engine
         return _res;
     }
 
-    CMat4 CMat4::translate( const CVec3& v )
+    CMat4 CMat4::translation( const CVec3& v )
     {
         CMat4 _res;
 
@@ -619,6 +631,32 @@ namespace engine
         _res.buff[0] = _x * _x * _ccomp + _c;      _res.buff[4] = _x * _y * _ccomp - _z * _s; _res.buff[8] = _x * _z * _ccomp + _y * _s;
         _res.buff[1] = _y * _x * _ccomp + _z * _s; _res.buff[5] = _y * _y * _ccomp + _c;      _res.buff[9] = _y * _z * _ccomp - _x * _s;
         _res.buff[2] = _z * _x * _ccomp - _y * _s; _res.buff[6] = _z * _y * _ccomp + _x * _s; _res.buff[10] = _z * _z * _ccomp + _c;
+
+        return _res;
+    }
+
+    CMat4 CMat4::fromEuler( const CVec3& euler )
+    {
+        CMat4 _res;
+
+        float _c1 = std::cos( euler.z );
+        float _s1 = std::sin( euler.z );
+        float _c2 = std::cos( euler.y );
+        float _s2 = std::sin( euler.y );
+        float _c3 = std::cos( euler.x );
+        float _s3 = std::sin( euler.x );
+
+        _res.buff[0] = _c1 * _c2;
+        _res.buff[1] = _s1 * _c2;
+        _res.buff[2] = -_s2;
+
+        _res.buff[4] = _c1 * _s2 * _s3 - _s1 * _c3;
+        _res.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
+        _res.buff[6] = _c2 * _s3;
+
+        _res.buff[8] = _s1 * _s3 + _c1 * _s2 * _c3;
+        _res.buff[9] = _s1 * _s2 * _c3 - _c1 * _s3;
+        _res.buff[10] = _c2 * _c3;
 
         return _res;
     }
@@ -715,6 +753,162 @@ namespace engine
         _strRep += " ]";
 
         return _strRep;
+    }
+
+    /**************************************************************************
+    *                           Geometric helpers                             *
+    ***************************************************************************/
+
+    void computeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp )
+    {
+        auto _front = CVec3::normalize( axis1 );
+
+        // in case in the same direction of the world-up vector, just use a standard 
+        // coordinate system, otherwise compute normally using cross products
+        if ( CVec3::equal( _front, worldUp ) )
+        {
+            _front = worldUp;
+            axis2 = { worldUp.z, worldUp.x, worldUp.y };
+            axis3 = { worldUp.y, worldUp.z, worldUp.x };
+        }
+        else if ( CVec3::equal( _front + worldUp, { 0.0f, 0.0f, 0.0f } ) )
+        {
+            _front = -worldUp;
+            axis2 = { worldUp.z, worldUp.x, worldUp.y };
+            axis3 = { worldUp.y, worldUp.z, worldUp.x };
+        }
+        else
+        {
+            axis2 = CVec3::normalize( CVec3::cross( worldUp, _front ) );
+            axis3 = CVec3::normalize( CVec3::cross( _front, axis2 ) );
+        }
+    }
+
+    float32 signedDistToPlane( const CVec3& point, const CPlane& plane )
+    {
+        return CVec3::dot( point - plane.position, CVec3::normalize( plane.normal ) );
+    }
+
+    float32 distToPlane( const CVec3& point, const CPlane& plane )
+    {
+        return std::abs( signedDistToPlane( point, plane ) );
+    }
+
+    CVec3 projInPlane( const CVec3& point, const CPlane& plane )
+    {
+        return point - distToPlane( point, plane ) * CVec3::normalize( plane.normal );
+    }
+
+    std::array< CVec3, 8 > computeBoxCorners( const CBoundingBox& bbox )
+    {
+        std::array< CVec3, 8 > _cornersInModel = { CVec3( -0.5f * bbox.size.x, -0.5f * bbox.size.y, -0.5f * bbox.size.z ),
+                                                   CVec3(  0.5f * bbox.size.x, -0.5f * bbox.size.y, -0.5f * bbox.size.z ),
+                                                   CVec3(  0.5f * bbox.size.x,  0.5f * bbox.size.y, -0.5f * bbox.size.z ),
+                                                   CVec3( -0.5f * bbox.size.x,  0.5f * bbox.size.y, -0.5f * bbox.size.z ),
+                                                   CVec3( -0.5f * bbox.size.x, -0.5f * bbox.size.y,  0.5f * bbox.size.z ),
+                                                   CVec3(  0.5f * bbox.size.x, -0.5f * bbox.size.y,  0.5f * bbox.size.z ),
+                                                   CVec3(  0.5f * bbox.size.x,  0.5f * bbox.size.y,  0.5f * bbox.size.z ),
+                                                   CVec3( -0.5f * bbox.size.x,  0.5f * bbox.size.y,  0.5f * bbox.size.z ) };
+
+        std::array< CVec3, 8 > _cornersInWorld;
+        for ( size_t i = 0; i < _cornersInModel.size(); i++ )
+            _cornersInWorld[i] = CVec3( bbox.worldTransform * CVec4( _cornersInModel[i], 1.0f ) );
+
+        return _cornersInWorld;
+    }
+
+    CFrustum::CFrustum( const CMat4& viewProjMat )
+    {
+        CMat4 _invViewProjMat = viewProjMat.inverse();
+
+        CVec3 _frustumPointsClipSpace[8] = {
+            /*      near plane      */
+            { -1.0f, -1.0f, -1.0f }, 
+            { 1.0f, -1.0f, -1.0f },
+            { 1.0f,  1.0f, -1.0f },
+            { -1.0f,  1.0f, -1.0f },
+            /*      far plane       */
+            { -1.0f, -1.0f, 1.0f }, 
+            { 1.0f, -1.0f, 1.0f },
+            { 1.0f,  1.0f, 1.0f },
+            { -1.0f,  1.0f, 1.0f }
+        };
+
+        // compute corners of the frustum
+        for ( size_t q = 0; q < corners.size(); q++ )
+        {
+            CVec4 _pointFrustum = _invViewProjMat * CVec4( _frustumPointsClipSpace[q], 1.0f );
+            corners[q] = CVec3( _pointFrustum.x / _pointFrustum.w,
+                                _pointFrustum.y / _pointFrustum.w,
+                                _pointFrustum.z / _pointFrustum.w );
+        }
+
+        // compute planes of the frustum
+
+        /* front-plane */
+        planes[0].position = corners[0];
+        planes[0].normal = CVec3::normalize( CVec3::cross( corners[1] - corners[0], corners[3] - corners[0] ) );
+
+        /* back-plane */
+        planes[1].position = corners[5];
+        planes[1].normal = CVec3::normalize( CVec3::cross( corners[4] - corners[5], corners[6] - corners[5] ) );
+
+        /* left-plane */
+        planes[2].position = corners[4];
+        planes[2].normal = CVec3::normalize( CVec3::cross( corners[0] - corners[4], corners[7] - corners[4] ) );
+
+        /* right-plane */
+        planes[3].position = corners[1];
+        planes[3].normal = CVec3::normalize( CVec3::cross( corners[5] - corners[1], corners[2] - corners[1] ) );
+
+        /* up-plane */
+        planes[4].position = corners[2];
+        planes[4].normal = CVec3::normalize( CVec3::cross( corners[6] - corners[2], corners[3] - corners[2] ) );
+
+        /* down-plane */
+        planes[5].position = corners[4];
+        planes[5].normal = CVec3::normalize( CVec3::cross( corners[5] - corners[4], corners[0] - corners[4] ) );
+    }
+
+    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingBox& bbox )
+    {
+        CComparatorSignedDistancePlane _comparator;
+        auto _corners = computeBoxCorners( bbox );
+
+        // Do the check with min-vertex only to discard most-outsiders. For cases in which ...
+        // false is returned, the bbox might be inside, intersecting, or even outside in weird cases, ...
+        // but for culling this does at least removes most of the true fully outsiders. Computing ...
+        // a complete check if inside, outside or intersecting, seems to require quite a bit more of ...
+        // computation, so for now we keep this discard method that removes most outsiders
+        for ( size_t i = 0; i < frustum.planes.size(); i++ )
+        {
+            _comparator.plane = frustum.planes[i];
+            auto _minVertex = *std::min_element( _corners.begin(), _corners.end(), _comparator );
+            if ( signedDistToPlane( _minVertex, frustum.planes[i] ) > 0.0f )
+                return true;
+        }
+
+        return false;
+    }
+
+    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingSphere& bsphere )
+    {
+        // Similarly to the previous case, discard most outsiders
+        for ( size_t i = 0; i < frustum.planes.size(); i++ )
+            if ( signedDistToPlane( bsphere.worldPosition, frustum.planes[i] ) > bsphere.radius )
+                return true;
+
+        return false;
+    }
+
+    void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex )
+    {
+        CComparatorSignedDistancePlane _comparator;
+        auto _corners = computeBoxCorners( bbox );
+        std::sort( _corners.begin(), _corners.end(), _comparator );
+
+        minVertex = _corners.front();
+        maxVertex = _corners.back();
     }
 
     /**************************************************************************

@@ -19,7 +19,8 @@ namespace engine
     {
         BASE = 0,
         MESH,
-        MODEL
+        MODEL,
+        GIZMO
     };
 
     std::string toString( const eRenderableType& renderable );
@@ -38,6 +39,7 @@ namespace engine
 
         virtual void render() = 0;
 
+        void setBoundExtents( const CVec3& extents );
         void setMaterial( std::unique_ptr< CIMaterial > material );
         void setVisibility( bool visibility ) { m_visible = visibility; }
         void setWireframe( bool wireframe ) { m_wireframe = wireframe; }
@@ -47,9 +49,15 @@ namespace engine
         std::string name() const { return m_name; }
         eRenderableType type() const { return m_type; };
         CIMaterial* material() const { return m_material.get(); }
+        CVec3 boundExtents() const { return m_boundExtents; }
         bool visible() const { return m_visible; }
         bool wireframe() const { return m_wireframe; };
         bool castShadow() const { return m_castShadow; }
+
+        CBoundingBox bbox() const;
+        CBoundingSphere bsphere() const;
+
+        static eRenderableType GetStaticType() { return eRenderableType::BASE; }
 
     protected :
 
@@ -58,6 +66,7 @@ namespace engine
         bool                            m_castShadow;
         std::string                     m_name;
         eRenderableType                 m_type;
+        CVec3                           m_boundExtents;
         std::unique_ptr< CIMaterial >   m_material;
 
     };

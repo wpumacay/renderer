@@ -16,15 +16,16 @@ namespace engine
 
     CIRenderable::CIRenderable( const std::string& name )
     {
-        m_name      = name;
-        m_type      = eRenderableType::BASE;
-        m_visible   = true;
-        m_wireframe = false;
-        m_material  = std::unique_ptr< CPhongMaterial >( new CPhongMaterial( name + "_phong_mat",
-                                                                             RENDERABLE_DEFAULT_AMBIENT_COLOR,
-                                                                             RENDERABLE_DEFAULT_DIFFUSE_COLOR,
-                                                                             RENDERABLE_DEFAULT_SPECULAR_COLOR,
-                                                                             RENDERABLE_DEFAULT_SHININESS ) );
+        m_name          = name;
+        m_type          = eRenderableType::BASE;
+        m_visible       = true;
+        m_wireframe     = false;
+        m_boundExtents  = { 0.0f, 0.0f, 0.0f };
+        m_material      = std::unique_ptr< CPhongMaterial >( new CPhongMaterial( name + "_phong_mat",
+                                                                                 RENDERABLE_DEFAULT_AMBIENT_COLOR,
+                                                                                 RENDERABLE_DEFAULT_DIFFUSE_COLOR,
+                                                                                 RENDERABLE_DEFAULT_SPECULAR_COLOR,
+                                                                                 RENDERABLE_DEFAULT_SHININESS ) );
 
         scale       = { 1.0f, 1.0f, 1.0f }; // no scaling by default
         rotation    = CMat4(); // identity
@@ -44,7 +45,17 @@ namespace engine
 
     CMat4 CIRenderable::matModel() const
     {
-        return CMat4::translate( position ) * rotation * CMat4::scale( scale );
+        return CMat4::translation( position ) * rotation * CMat4::scale( scale );
+    }
+
+    CBoundingBox CIRenderable::bbox() const
+    {
+        return { CVec3::scale( m_boundExtents, scale ), CMat4::translation( position ) * rotation };
+    }
+
+    CBoundingSphere CIRenderable::bsphere() const
+    {
+        return { CVec3::length( m_boundExtents ), position };
     }
 
 }

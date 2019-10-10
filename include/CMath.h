@@ -4,6 +4,9 @@
 
 namespace engine
 {
+    struct CVec4;
+    struct CVec3;
+    struct CVec2;
 
     /**************************************************************************
     *                                CVec2                                    *
@@ -48,6 +51,7 @@ namespace engine
 
         CVec3();
         CVec3( float32 x, float32 y, float32 z );
+        CVec3( const CVec4& v4 );
 
         void normalize();
         void scale( float32 sx, float32 sy, float32 sz );
@@ -55,6 +59,7 @@ namespace engine
         float32 length();
 
         static CVec3 normalize( const CVec3& v );
+        static float32 length( const CVec3& v );
         static CVec3 scale( const CVec3& v, float32 val );
         static CVec3 scale( const CVec3& v, const CVec3& vals );
         static CVec3 cross( const CVec3& v1, const CVec3& v2 );
@@ -130,12 +135,13 @@ namespace engine
         static CMat4 ortho( float32 width, float32 height, float32 zNear, float32 zFar );
         static CMat4 lookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp );
         static CMat4 scale( const CVec3& v );
-        static CMat4 translate( const CVec3& v );
+        static CMat4 translation( const CVec3& v );
         static CMat4 rotationX( float32 theta );
         static CMat4 rotationY( float32 theta );
         static CMat4 rotationZ( float32 theta );
         static CMat4 rotation( float32 theta, const eAxis& axis );
         static CMat4 rotation( float32 theta, const CVec3& axis );
+        static CMat4 fromEuler( const CVec3& euler );
     };
 
     std::string toString( const CMat4& mat );
@@ -156,6 +162,59 @@ namespace engine
     };
 
     std::string toString( const CInd3& ind3 );
+
+    /**************************************************************************
+    *                            Geometric helpers                            *
+    ***************************************************************************/
+
+    void computeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp );
+
+    struct CPlane
+    {
+        CVec3 normal;
+        CVec3 position;
+    };
+
+    float32 signedDistToPlane( const CVec3& point, const CPlane& plane );
+    float32 distToPlane( const CVec3& point, const CPlane& plane );
+    CVec3 projInPlane( const CVec3& point, const CPlane& plane );
+
+    struct CBoundingBox
+    {
+        CVec3 size;
+        CMat4 worldTransform;
+    };
+
+    std::array< CVec3, 8 > computeBoxCorners( const CBoundingBox& bbox );
+
+    struct CBoundingSphere
+    {
+        float32 radius;
+        CVec3 worldPosition;
+    };
+
+    struct CFrustum
+    {
+        std::array< CVec3, 8 > corners;
+        std::array< CPlane, 6 > planes;
+
+        CFrustum( const CMat4& viewProjMat );
+    };
+
+    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingBox& bbox );
+    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingSphere& bsphere );
+
+    struct CComparatorSignedDistancePlane
+    {
+        CPlane plane;
+
+        bool operator() ( const CVec3& p1, const CVec3& p2 ) 
+        { 
+            return engine::signedDistToPlane( p1, plane ) < engine::signedDistToPlane( p2, plane );
+        }
+    };
+
+    void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex );
 
     /**************************************************************************
     *                               Helpers                                   *
