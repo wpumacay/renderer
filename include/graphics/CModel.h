@@ -18,16 +18,17 @@ namespace engine
 
         void render() override;
 
-        void addMesh( std::unique_ptr< CMesh > mesh );
+        void addMesh( std::unique_ptr< CMesh > mesh, const CMat4& localTransform );
 
         std::vector< CMesh* > meshes() const;
+        std::vector< CMat4 > localTransforms() const { return m_localTransforms; }
 
         static eRenderableType GetStaticType() { return eRenderableType::MODEL; }
 
     private :
 
         std::vector< std::unique_ptr< CMesh > > m_meshes;
-
+        std::vector< CMat4 > m_localTransforms;
     };
 
 }

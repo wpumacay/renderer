@@ -223,6 +223,21 @@ namespace engine
         }
     };
 
+    struct CComparatorX 
+    { 
+        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.x < v2.x; }
+    };
+
+    struct CComparatorY
+    { 
+        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.y < v2.y; }
+    };
+
+    struct CComparatorZ
+    { 
+        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.z < v2.z; }
+    };
+
     void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex );
 
     /**************************************************************************

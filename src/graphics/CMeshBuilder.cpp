@@ -24,8 +24,10 @@ namespace engine
         std::vector< CInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 
         auto _name = std::string( "plane:" ) + std::to_string( CMeshBuilder::s_numPlanes++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { sizeX, sizeY, 0.2f }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
@@ -79,8 +81,10 @@ namespace engine
         }
 
         auto _name = std::string( "box:" ) + std::to_string( CMeshBuilder::s_numBoxes++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( { sizeX, sizeY, sizeZ } );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
@@ -137,8 +141,10 @@ namespace engine
         }
 
         auto _name = std::string( "sphere:" ) + std::to_string( CMeshBuilder::s_numSpheres++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( { 2.0f * radius, 2.0f * radius, 2.0f * radius } );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
@@ -193,8 +199,10 @@ namespace engine
         }
 
         auto _name = std::string( "ellipsoid:" ) + std::to_string( CMeshBuilder::s_numEllipsoids++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( { 2.0f * radX, 2.0f * radY, 2.0f * radZ } );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
@@ -280,14 +288,14 @@ namespace engine
             _indices.push_back( { _baseIndx, _baseIndx + q + 1, _baseIndx + q } );
 
         auto _name = std::string( "cylinder:" ) + std::to_string( CMeshBuilder::s_numCylinders++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
     {
-        CMesh* _mesh = NULL;
-
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
         std::vector< CVec2 > _texCoords;
@@ -439,8 +447,10 @@ namespace engine
         }
 
         auto _name = std::string( "capsule:" ) + std::to_string( CMeshBuilder::s_numCapsules++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height + 2.0f * radius }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
@@ -607,8 +617,11 @@ namespace engine
         }
 
         auto _name = std::string( "arrow:" ) + std::to_string( CMeshBuilder::s_numArrows++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals,_texCoords, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { 0.2f * length, 0.2f * length, 1.0f * length }, axis ) );
+        _mesh->setBoundCenter( _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * length }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals,_texCoords, _indices );
+        return _mesh;
     }
 
     CModel* CMeshBuilder::createAxes( float length )
@@ -621,26 +634,28 @@ namespace engine
         auto _axisZ         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::Z ) );
         auto _axisCenter    = std::unique_ptr< CMesh >( CMeshBuilder::createSphere( 0.2 * length ) );
 
-        dynamic_cast< CPhongMaterial* >( _axisX->material() )->ambient  = { 1.0, 0.0, 0.0 };
-        dynamic_cast< CPhongMaterial* >( _axisX->material() )->diffuse  = { 1.0, 0.0, 0.0 };
-        dynamic_cast< CPhongMaterial* >( _axisX->material() )->specular = { 1.0, 0.0, 0.0 };
+        _axisX->material()->ambient  = { 1.0, 0.0, 0.0 };
+        _axisX->material()->diffuse  = { 1.0, 0.0, 0.0 };
+        _axisX->material()->specular = { 1.0, 0.0, 0.0 };
 
-        dynamic_cast< CPhongMaterial* >( _axisY->material() )->ambient  = { 0.0, 1.0, 0.0 };
-        dynamic_cast< CPhongMaterial* >( _axisY->material() )->diffuse  = { 0.0, 1.0, 0.0 };
-        dynamic_cast< CPhongMaterial* >( _axisY->material() )->specular = { 0.0, 1.0, 0.0 };
+        _axisY->material()->ambient  = { 0.0, 1.0, 0.0 };
+        _axisY->material()->diffuse  = { 0.0, 1.0, 0.0 };
+        _axisY->material()->specular = { 0.0, 1.0, 0.0 };
 
-        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->ambient  = { 0.0, 0.0, 1.0 };
-        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->diffuse  = { 0.0, 0.0, 1.0 };
-        dynamic_cast< CPhongMaterial* >( _axisZ->material() )->specular = { 0.0, 0.0, 1.0 };
+        _axisZ->material()->ambient  = { 0.0, 0.0, 1.0 };
+        _axisZ->material()->diffuse  = { 0.0, 0.0, 1.0 };
+        _axisZ->material()->specular = { 0.0, 0.0, 1.0 };
 
-        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->ambient  = { 0.3, 0.3, 0.3 };
-        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->diffuse  = { 0.3, 0.3, 0.3 };
-        dynamic_cast< CPhongMaterial* >( _axisCenter->material() )->specular = { 0.3, 0.3, 0.3 };
+        _axisCenter->material()->ambient  = { 0.3, 0.3, 0.3 };
+        _axisCenter->material()->diffuse  = { 0.3, 0.3, 0.3 };
+        _axisCenter->material()->specular = { 0.3, 0.3, 0.3 };
 
-        _axesModel->addMesh( std::move( _axisX ) );
-        _axesModel->addMesh( std::move( _axisY ) );
-        _axesModel->addMesh( std::move( _axisZ ) );
-        _axesModel->addMesh( std::move( _axisCenter ) );
+        _axesModel->addMesh( std::move( _axisX ), CMat4() );
+        _axesModel->addMesh( std::move( _axisY ), CMat4() );
+        _axesModel->addMesh( std::move( _axisZ ), CMat4() );
+        _axesModel->addMesh( std::move( _axisCenter ), CMat4() );
+        _axesModel->setBoundExtents( { 1.2f * length, 1.2f * length, 1.2f * length } );
+        _axesModel->setBoundCenter( { 0.4f * length, 0.4f * length, 0.4f * length } );
 
         return _axesModel;
     }
@@ -758,8 +773,10 @@ namespace engine
         }
 
         auto _name = std::string( "perlinPatch:" ) + std::to_string( CMeshBuilder::s_numPerlinPatches++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoord, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { width, depth, 4.0f }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals, _texCoord, _indices );
+        return _mesh;
     }
 
     CMesh* CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
@@ -775,6 +792,8 @@ namespace engine
 
         ENGINE_CORE_ASSERT( heightData.size() == nWidthSamples * nDepthSamples, "Mismatch in number of heightmap samples" );
 
+        float _maxHeight = -1000000.0f;
+        float _minHeight = 1000000.0f;
         float _minNegHeight = 0.0f; // catch minimum negative heights
         for ( size_t i = 0; i < nWidthSamples - 1; i++ )
         {
@@ -833,11 +852,22 @@ namespace engine
                 _normals.push_back( _nt2 );
                 _normals.push_back( _nt2 );
 
-                // store the minimum height for later usage
+                // store the minimum height for later usage (computing base)
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] );
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] );
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] );
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] );
+
+                // store the minimum and maximum heights for oobb computation
+                _maxHeight = std::max( _maxHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] );
+                _maxHeight = std::max( _maxHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] );
+                _maxHeight = std::max( _maxHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] );
+                _maxHeight = std::max( _maxHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] );
+                
+                _minHeight = std::min( _minHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] );
+                _minHeight = std::min( _minHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] );
+                _minHeight = std::min( _minHeight, heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] );
+                _minHeight = std::min( _minHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] );
             }
         }
 
@@ -937,8 +967,10 @@ namespace engine
         }
 
         auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        return _mesh;
     }
 
     CModel* CMeshBuilder::createModelFromFile( const std::string& filename )
@@ -961,6 +993,28 @@ namespace engine
         // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
         aiReleaseImport( _assimpScenePtr );
 
+        // compute oobb extents
+        float32 _min_x = 1000000.0f;
+        float32 _max_x = -1000000.0f;
+        float32 _min_y = 1000000.0f;
+        float32 _max_y = -1000000.0f;
+        float32 _min_z = 1000000.0f;
+        float32 _max_z = -1000000.0f;
+
+        auto _submeshes = _model->meshes();
+        for ( auto _submesh : _submeshes )
+        {
+            auto _vertices = _submesh->vertices();
+            _min_x = std::min( _min_x, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x );
+            _max_x = std::max( _max_x, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x );
+            _min_y = std::min( _min_y, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y );
+            _max_y = std::max( _max_y, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y );
+            _min_z = std::min( _min_z, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z );
+            _max_z = std::max( _max_z, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z );
+        }
+
+        _model->setBoundExtents( { _max_x - _min_x, _max_y - _min_y, _max_z - _min_z } );
+
         return _model;
     }
 
@@ -972,7 +1026,7 @@ namespace engine
         {
             aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
             auto _meshPtr = std::unique_ptr< CMesh >( _processAssimpMesh( modelPtr, _assimpMeshPtr ) );
-            modelPtr->addMesh( std::move( _meshPtr ) );
+            modelPtr->addMesh( std::move( _meshPtr ), CMat4() );
         }
 
         for ( size_t i = 0; i < assimpNodePtr->mNumChildren; i++ )
@@ -1025,9 +1079,19 @@ namespace engine
             }
         }
 
-        auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
+        // compute bounding box
+        float32 _dx = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x;
+        float32 _dy = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y;
+        float32 _dz = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z;
 
-        return new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        _mesh->setBoundExtents( { _dx, _dy, _dz } );
+
+        return _mesh;
     }
 
     /***********************************************************************

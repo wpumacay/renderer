@@ -39,8 +39,9 @@ namespace engine
 
         virtual void render() = 0;
 
-        void setBoundExtents( const CVec3& extents );
-        void setMaterial( std::unique_ptr< CIMaterial > material );
+        void setBoundExtents( const CVec3& extents ) { m_boundExtents = extents; }
+        void setBoundCenter( const CVec3& center ) { m_boundCenter = center; }
+        void setMaterial( std::unique_ptr< CIMaterial > material ) { m_material = std::move( material ); }
         void setVisibility( bool visibility ) { m_visible = visibility; }
         void setWireframe( bool wireframe ) { m_wireframe = wireframe; }
         void setCastShadow( bool castShadow ) { m_castShadow = castShadow; }
@@ -67,6 +68,7 @@ namespace engine
         std::string                     m_name;
         eRenderableType                 m_type;
         CVec3                           m_boundExtents;
+        CVec3                           m_boundCenter;
         std::unique_ptr< CIMaterial >   m_material;
 
     };

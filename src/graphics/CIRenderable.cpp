@@ -37,12 +37,6 @@ namespace engine
         // nothing to release manually
     }
 
-    void CIRenderable::setMaterial( std::unique_ptr< CIMaterial > material ) 
-    { 
-        // grab ownership of this material
-        m_material = std::move( material ); 
-    }
-
     CMat4 CIRenderable::matModel() const
     {
         return CMat4::translation( position ) * rotation * CMat4::scale( scale );
@@ -50,12 +44,14 @@ namespace engine
 
     CBoundingBox CIRenderable::bbox() const
     {
-        return { CVec3::scale( m_boundExtents, scale ), CMat4::translation( position ) * rotation };
+        return { CVec3::scale( m_boundExtents, scale ),
+                 CMat4::translation( position ) * rotation * CMat4::translation(  CVec3::scale( m_boundCenter, scale ) ) };
     }
 
     CBoundingSphere CIRenderable::bsphere() const
     {
-        return { CVec3::length( m_boundExtents ), position };
+        return { CVec3::length( CVec3::scale( 0.5f * m_boundExtents, scale ) ), 
+                 position + CVec3( rotation * CVec4( CVec3::scale( m_boundCenter, scale ), 1.0f ) ) };
     }
 
 }
