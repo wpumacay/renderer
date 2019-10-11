@@ -53,21 +53,26 @@ namespace engine
                                 CFrameBuffer* targetPtr,
                                 const CRenderOptions& renderOptions )
     {
-////         // (0): setup some defaults
-////         cameraPtr = ( !cameraPtr ) ? scenePtr->currentCamera() : cameraPtr;
-//// 
-////         // (1): grab all renderables and keep only visible ones
-////         auto _renderablesAll = scenePtr->renderables();
-////         auto _renderablesVisible = std::vector< CIRenderable* >();
-////         for ( auto _renderable : _renderablesAll )
-////             if ( _renderable->visible() )
-////                 _renderablesVisible.push_back( _renderable );
-//// 
-////         // (2): frustum culling (if enabled)
-////         auto _renderablesInView = std::vector< CIRenderable* >();
-////         if ( useFrustumCulling )
-////             _collectRenderablesInView( _renderablesVisible, renderOptions.cullingGeom, _renderablesInView );
-//// 
+        // (0): grab all renderables and initialize status string
+        auto _renderablesAll = scenePtr->renderables();
+        m_status = "renderables         : " + std::to_string( _renderablesAll.size() ) + "\n\r";
+
+        // (1): grab all renderables and keep only visible ones
+        auto _renderablesVisible = std::vector< CIRenderable* >();
+        for ( auto _renderable : _renderablesAll )
+            if ( _renderable->visible() )
+                _renderablesVisible.push_back( _renderable );
+        m_status += "renderablesVisible : " + std::to_string( _renderablesVisible.size() ) + "\n\r";
+
+        // (2): frustum culling (if enabled)
+        CFrustum _frustum( cameraPtr->matProj() * cameraPtr->matView() );
+        auto _renderablesInView = std::vector< CIRenderable* >();
+        if ( renderOptions.useFrustumCulling )
+            _collectRenderablesInView( _frustum, renderOptions.cullingGeom, _renderablesVisible, _renderablesInView );
+        else
+            _renderablesInView = _renderablesVisible;
+        m_status += "renderablesInView  : " + std::to_string( _renderablesInView.size() ) + "\n\r";
+
 ////         // (3): group by renderable types (to pass to specific renderers)
 ////         auto _rendGizmos = std::vector< CGizmo* >();
 ////         auto _rendMeshes = std::vector< CMesh* >();
@@ -117,28 +122,35 @@ namespace engine
 ////             renderOptions.renderTargetPtr->unbind();
     }
 
-    void CMainRenderer::_collectRenderablesInView( const std::vector< CIRenderable* >& renderablesToCheck,
+    void CMainRenderer::_collectRenderablesInView( const CFrustum& frustum,
                                                    const eCullingGeom& cullGeometryToUse,
+                                                   const std::vector< CIRenderable* >& renderablesToCheck,
                                                    std::vector< CIRenderable* >& renderablesInView )
     {
         if ( cullGeometryToUse == eCullingGeom::BOUNDING_BOX )
-            _collectRenderablesInView_bbox( renderablesToCheck, renderablesInView );
+            _collectRenderablesInView_bbox( frustum, renderablesToCheck, renderablesInView );
         else if ( cullGeometryToUse == eCullingGeom::BOUNDING_SPHERE )
-            _collectRenderablesInView_bsphere( renderablesToCheck, renderablesInView );
+            _collectRenderablesInView_bsphere( frustum, renderablesToCheck, renderablesInView );
         else
             ENGINE_CORE_WARN( "The given culling method is not supported" );
     }
 
-    void CMainRenderer::_collectRenderablesInView_bbox( const std::vector< CIRenderable* >& renderablesToCheck,
+    void CMainRenderer::_collectRenderablesInView_bbox( const CFrustum& frustum,
+                                                        const std::vector< CIRenderable* >& renderablesToCheck,
                                                         std::vector< CIRenderable* >& renderablesInView )
     {
-
+        for ( auto renderablePtr : renderablesToCheck )
+            if ( !engine::certainlyOutsideFrustum( frustum, renderablePtr->bbox() ) )
+                renderablesInView.push_back( renderablePtr );
     }
 
-    void CMainRenderer::_collectRenderablesInView_bsphere( const std::vector< CIRenderable* >& renderablesToCheck,
+    void CMainRenderer::_collectRenderablesInView_bsphere( const CFrustum& frustum,
+                                                           const std::vector< CIRenderable* >& renderablesToCheck,
                                                            std::vector< CIRenderable* >& renderablesInView )
     {
-
+        for ( auto renderablePtr : renderablesToCheck )
+            if ( !engine::certainlyOutsideFrustum( frustum, renderablePtr->bsphere() ) )
+                renderablesInView.push_back( renderablePtr );
     }
 
 }

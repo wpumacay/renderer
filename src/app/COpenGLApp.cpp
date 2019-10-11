@@ -41,7 +41,7 @@ namespace engine
         m_windowPtr         = nullptr;
         m_scenePtr          = nullptr;
         m_uiPtr             = nullptr;
-        // m_mainRenderer      = nullptr;
+        m_mainRendererPtr   = nullptr;
 
         engine::CTime::Release();
         engine::CDebugDrawer::Release();
@@ -64,7 +64,7 @@ namespace engine
         m_windowPtr         = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( _windowProperties ) );
         m_scenePtr          = std::unique_ptr< CScene >( new CScene() );
         m_uiPtr             = nullptr; // let the user create its own specific UI
-        // m_mainRendererPtr   = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
+        m_mainRendererPtr   = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
 
         engine::CTextureManager::Init();
         engine::CShaderManager::Init();
@@ -131,7 +131,7 @@ namespace engine
 
         // auto _currentCamera = m_scenePtr->currentCamera();
         // if ( _currentCamera )
-        //     m_mainRenderer->render( m_scenePtr, _currentCamera );
+        //     m_mainRendererPtr->render( m_scenePtr, _currentCamera );
 
     }
 

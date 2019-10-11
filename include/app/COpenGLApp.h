@@ -7,7 +7,7 @@
 #include <camera/CFpsCamera.h>
 #include <camera/COrbitCamera.h>
 
-// #include <renderers/CMainRenderer.h>
+#include <renderers/CMainRenderer.h>
 
 #include <assets/CTextureManager.h>
 #include <shaders/CShaderManager.h>
@@ -60,7 +60,7 @@ namespace engine
 
         COpenGLWindow* window() const { return m_windowPtr.get(); }
 
-        // CMainRenderer* renderer() const { return m_mainRenderer.get(); }
+        CMainRenderer* renderer() const { return m_mainRendererPtr.get(); }
 
         bool active() const { return m_windowPtr->active(); }
 
@@ -80,7 +80,7 @@ namespace engine
         std::unique_ptr< CScene >           m_scenePtr;
         std::unique_ptr< CImguiUi >         m_uiPtr;
         std::unique_ptr< COpenGLWindow >    m_windowPtr;
-        // std::unique_ptr< CMainRenderer>     m_mainRendererPtr;
+        std::unique_ptr< CMainRenderer >    m_mainRendererPtr;
 
         float32 m_timeNow;
         float32 m_timeDelta;

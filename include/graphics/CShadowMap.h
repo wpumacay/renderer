@@ -48,7 +48,7 @@ namespace engine
 
         CShadowMapRangeConfig()
         {
-            type            = eShadowRangeType::NONE;
+            type            = eShadowRangeType::FIXED_USER;
             worldUp         = { 0.0f, 1.0f, 0.0f };
             pointLightPtr   = nullptr;
             spotLightPtr    = nullptr;
@@ -61,6 +61,9 @@ namespace engine
             clipSpaceWidth  = 20.0f;
             clipSpaceHeight = 20.0f;
             clipSpaceDepth  = 20.0f;
+            clipSpaceZNear  = 0.1f;
+            clipSpaceZFar   = 15.0f;
+            clipSpaceFov    = 120.0f;
         }
     };
 

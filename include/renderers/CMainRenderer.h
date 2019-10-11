@@ -80,20 +80,25 @@ namespace engine
         ~CMainRenderer();
 
         void render( CScene* scenePtr, 
-                     CICamera* cameraPtr = nullptr, 
-                     CFrameBuffer* targetPtr = nullptr,
+                     CICamera* cameraPtr, 
+                     CFrameBuffer* targetPtr,
                      const CRenderOptions& renderOptions = CRenderOptions() );
+
+        std::string status() const { return m_status; }
 
     private :
 
-        void _collectRenderablesInView( const std::vector< CIRenderable* >& renderablesToCheck,
+        void _collectRenderablesInView( const CFrustum& frustum,
                                         const eCullingGeom& cullGeometryToUse,
+                                        const std::vector< CIRenderable* >& renderablesToCheck,
                                         std::vector< CIRenderable* >& renderablesInView );
 
-        void _collectRenderablesInView_bbox( const std::vector< CIRenderable* >& renderablesToCheck,
+        void _collectRenderablesInView_bbox( const CFrustum& frustum,
+                                             const std::vector< CIRenderable* >& renderablesToCheck,
                                              std::vector< CIRenderable* >& renderablesInView );
 
-        void _collectRenderablesInView_bsphere( const std::vector< CIRenderable* >& renderablesToCheck,
+        void _collectRenderablesInView_bsphere( const CFrustum& frustum,
+                                                const std::vector< CIRenderable* >& renderablesToCheck,
                                                 std::vector< CIRenderable* >& renderablesInView );
 
         template< class T >
@@ -107,6 +112,7 @@ namespace engine
 
     private :
 
+        std::string m_status;
         std::unique_ptr< CShadowMap > m_shadowMap;
 
     };
