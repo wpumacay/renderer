@@ -8,6 +8,7 @@ namespace engine
     {
         if ( type == eRenderableType::MESH ) return "mesh";
         if ( type == eRenderableType::MODEL ) return "model";
+        if ( type == eRenderableType::GIZMO ) return "gizmo";
 
         ENGINE_CORE_ASSERT( false, "Invalid eRenderableType enum given" );
 
@@ -30,6 +31,10 @@ namespace engine
         scale       = { 1.0f, 1.0f, 1.0f }; // no scaling by default
         rotation    = CMat4(); // identity
         position    = { 0.0f, 0.0f, 0.0f }; // origin in model-space
+
+        castsShadows = true;
+        receivesShadows = true;
+        cullFaces = false;
     }
 
     CIRenderable::~CIRenderable()

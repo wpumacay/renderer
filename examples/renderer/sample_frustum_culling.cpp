@@ -158,7 +158,7 @@ int main()
     ENGINE_ASSERT( _shader, "Could not grab the basic3d shader to render the scene :(" );
 
     // configure render options
-    g_renderOptions.mode = engine::eRenderMode::NORMAL;
+    g_renderOptions.mode = engine::eRenderMode::NO_SUBMIT;
     g_renderOptions.useFrustumCulling = true;
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
@@ -166,6 +166,10 @@ int main()
     g_renderOptions.renderGizmos = false;
     g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
     g_renderOptions.viewportHeight = engine::COpenGLApp::GetWindow()->height();
+    g_renderOptions.cameraPtr = _camera;
+    g_renderOptions.lightPtr = nullptr;
+    g_renderOptions.shadowMapPtr = nullptr;
+    g_renderOptions.renderTargetPtr = nullptr;
 
     while( _app->active() )
     {
@@ -191,14 +195,13 @@ int main()
         _app->update();
         _app->beginRendering();
 
-        /* do some custom rendering here */
-
+        /****************************************************/
+        // render the objects with plain colors (just to check)
         renderScene( _camera, _shader, _renderables );
 
         // check if the renderer is culling properly
-        _app->renderer()->render( _app->scene(), _camera, nullptr, g_renderOptions );
-
-        /*********************************/
+        _app->renderer()->render( _app->scene(), g_renderOptions );
+        /****************************************************/
 
         _app->renderScene();
         _app->renderDebug();

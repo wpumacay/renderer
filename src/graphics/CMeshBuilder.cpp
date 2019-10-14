@@ -26,6 +26,7 @@ namespace engine
         auto _name = std::string( "plane:" ) + std::to_string( CMeshBuilder::s_numPlanes++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { sizeX, sizeY, 0.2f }, axis ) );
+        _mesh->cullFaces = false; // don't cull planes, pretty please :(
 
         return _mesh;
     }
@@ -83,6 +84,7 @@ namespace engine
         auto _name = std::string( "box:" ) + std::to_string( CMeshBuilder::s_numBoxes++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { sizeX, sizeY, sizeZ } );
+        _mesh->cullFaces = true;
 
         return _mesh;
     }
@@ -143,6 +145,7 @@ namespace engine
         auto _name = std::string( "sphere:" ) + std::to_string( CMeshBuilder::s_numSpheres++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { 2.0f * radius, 2.0f * radius, 2.0f * radius } );
+        _mesh->cullFaces = true;
 
         return _mesh;
     }
@@ -201,6 +204,7 @@ namespace engine
         auto _name = std::string( "ellipsoid:" ) + std::to_string( CMeshBuilder::s_numEllipsoids++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { 2.0f * radX, 2.0f * radY, 2.0f * radZ } );
+        _mesh->cullFaces = true;
 
         return _mesh;
     }
@@ -290,6 +294,7 @@ namespace engine
         auto _name = std::string( "cylinder:" ) + std::to_string( CMeshBuilder::s_numCylinders++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height }, axis ) );
+        _mesh->cullFaces = true;
 
         return _mesh;
     }
@@ -449,6 +454,7 @@ namespace engine
         auto _name = std::string( "capsule:" ) + std::to_string( CMeshBuilder::s_numCapsules++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height + 2.0f * radius }, axis ) );
+        _mesh->cullFaces = true;
 
         return _mesh;
     }
@@ -620,6 +626,7 @@ namespace engine
         auto _mesh = new CMesh( _name, _vertices, _normals,_texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 0.2f * length, 0.2f * length, 1.0f * length }, axis ) );
         _mesh->setBoundCenter( _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * length }, axis ) );
+        _mesh->cullFaces = false; // don't cull this type of meshes, pretty please :(
 
         return _mesh;
     }
@@ -656,6 +663,7 @@ namespace engine
         _axesModel->addMesh( std::move( _axisCenter ), CMat4() );
         _axesModel->setBoundExtents( { 1.2f * length, 1.2f * length, 1.2f * length } );
         _axesModel->setBoundCenter( { 0.4f * length, 0.4f * length, 0.4f * length } );
+        _axesModel->cullFaces = false; // don't cull planes, pretty please :(
 
         return _axesModel;
     }
@@ -775,6 +783,7 @@ namespace engine
         auto _name = std::string( "perlinPatch:" ) + std::to_string( CMeshBuilder::s_numPerlinPatches++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoord, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { width, depth, 4.0f }, axis ) );
+        _mesh->cullFaces = false; // don't cull perlin patches, pretty please .(
 
         return _mesh;
     }
@@ -969,6 +978,7 @@ namespace engine
         auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
+        _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
 
         return _mesh;
     }
@@ -1014,6 +1024,7 @@ namespace engine
         }
 
         _model->setBoundExtents( { _max_x - _min_x, _max_y - _min_y, _max_z - _min_z } );
+        _model->cullFaces = false; // don't cull models (we don't know if they're closed), pretty please :(
 
         return _model;
     }
@@ -1090,6 +1101,7 @@ namespace engine
         auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { _dx, _dy, _dz } );
+        _mesh->cullFaces = false; // don't cull this submesh (we don't know if it's closed yet), pretty please :(
 
         return _mesh;
     }

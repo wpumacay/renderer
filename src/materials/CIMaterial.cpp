@@ -14,6 +14,7 @@ namespace engine
 
         return "undefined";
     }
+
     CIMaterial::CIMaterial( const std::string& name,
                             const CVec3& ambientColor,
                             const CVec3& diffuseColor,
@@ -30,6 +31,7 @@ namespace engine
         diffuse     = diffuseColor;
         specular    = specularColor;
         shininess   = specularShininess;
+        alpha       = 1.0f;
 
         m_diffuseMap    = diffuseMap;
         m_specularMap   = specularMap;

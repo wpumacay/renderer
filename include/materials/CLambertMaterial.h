@@ -20,6 +20,8 @@ namespace engine
         void bind( CShader* shaderPtr ) override;
         void unbind() override;
 
+        static eMaterialType GetStaticType() { return eMaterialType::LAMBERT; }
+
     protected :
 
         std::string _toStringInternal() override;

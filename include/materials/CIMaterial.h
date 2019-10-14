@@ -28,6 +28,7 @@ namespace engine
         CVec3   diffuse;
         CVec3   specular;
         float32 shininess;
+        float32 alpha;
 
         CIMaterial( const std::string& name,
                     const CVec3& ambientColor,
@@ -55,6 +56,8 @@ namespace engine
 
         std::string name() const { return m_name; }
         eMaterialType type() const { return m_type; }
+
+        static eMaterialType GetStaticType() { return eMaterialType::NONE; }
 
     protected :
 

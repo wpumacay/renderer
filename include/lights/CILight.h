@@ -27,6 +27,7 @@ namespace engine
         CVec3   diffuse;
         CVec3   specular;
         float32 intensity;
+        bool    producesShadows;
 
         CILight( const std::string& name,
                  const CVec3& ambientColor,

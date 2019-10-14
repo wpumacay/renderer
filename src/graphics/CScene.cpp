@@ -53,7 +53,7 @@ namespace engine
         
         // keep access through its name
         m_camerasMap[_cameraPtr->name()] = _cameraPtr;
-        // setup as current if there's no camera in this
+        // setup as current if there's no camera yet
         if ( !m_currentCamera )
             m_currentCamera = _cameraPtr;
     }
@@ -73,6 +73,9 @@ namespace engine
 
         // keep access through its name
         m_lightsMap[_lightPtr->name()] = _lightPtr;
+        // setup as main if there's no lights yet
+        if ( !m_mainLight )
+            m_mainLight = _lightPtr;
 
         // keep access through its type
         if ( _lightPtr->type() == eLightType::DIRECTIONAL )
@@ -101,6 +104,14 @@ namespace engine
             ENGINE_CORE_WARN( "Camera with name {0} couldn't be found", name );
         else
             m_currentCamera = m_camerasMap[name];
+    }
+
+    void CScene::changeMainLight( const std::string& name )
+    {
+        if ( m_lightsMap.find( name ) == m_lightsMap.end() )
+            ENGINE_CORE_WARN( "Light with name {0} couldn't be found", name );
+        else
+            m_mainLight = m_lightsMap[name];
     }
 
     void CScene::update()

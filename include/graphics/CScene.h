@@ -35,7 +35,8 @@ namespace engine
         void addRenderable( std::unique_ptr< CIRenderable > renderable );
 
         void clearScene();
-        void changeToCamera( const std::string& name );
+        void changeToCamera( const std::string& name ); // change current working camera
+        void changeMainLight( const std::string& name ); // change current working light
 
         void update();
         void resize( int32 width, int32 height );
@@ -43,6 +44,7 @@ namespace engine
         CFog* fog() const { return m_fog.get(); }
         CSkybox* skybox() const { return m_skybox.get(); }
         CICamera* currentCamera() const { return m_currentCamera; }
+        CILight* mainLight() const { return m_mainLight; }
 
         std::vector< CIRenderable* > renderables() const;
         std::vector< CICamera* > cameras() const;
@@ -61,6 +63,7 @@ namespace engine
         std::vector< std::unique_ptr< CICamera > >  m_cameras;
         std::map< std::string, CICamera* >          m_camerasMap;
 
+        CILight*                                    m_mainLight;
         std::vector< std::unique_ptr< CILight > >   m_lights;
         std::map< std::string, CILight* >           m_lightsMap;
         std::vector< CDirectionalLight* >           m_directionalLights;

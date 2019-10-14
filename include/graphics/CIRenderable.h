@@ -34,6 +34,10 @@ namespace engine
         CMat4 rotation;
         CVec3 scale;
 
+        bool castsShadows;
+        bool receivesShadows;
+        bool cullFaces;
+
         CIRenderable( const std::string& name );
         virtual ~CIRenderable();
 
@@ -44,7 +48,6 @@ namespace engine
         void setMaterial( std::unique_ptr< CIMaterial > material ) { m_material = std::move( material ); }
         void setVisibility( bool visibility ) { m_visible = visibility; }
         void setWireframe( bool wireframe ) { m_wireframe = wireframe; }
-        void setCastShadow( bool castShadow ) { m_castShadow = castShadow; }
 
         CMat4 matModel() const;
         std::string name() const { return m_name; }
@@ -53,7 +56,6 @@ namespace engine
         CVec3 boundExtents() const { return m_boundExtents; }
         bool visible() const { return m_visible; }
         bool wireframe() const { return m_wireframe; };
-        bool castShadow() const { return m_castShadow; }
 
         CBoundingBox bbox() const;
         CBoundingSphere bsphere() const;
@@ -64,7 +66,6 @@ namespace engine
 
         bool                            m_visible;
         bool                            m_wireframe;
-        bool                            m_castShadow;
         std::string                     m_name;
         eRenderableType                 m_type;
         CVec3                           m_boundExtents;

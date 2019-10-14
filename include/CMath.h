@@ -238,6 +238,26 @@ namespace engine
         bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.z < v2.z; }
     };
 
+    struct CComparatorClosestToPoint
+    {
+        CVec3 point;
+
+        bool operator() ( const CVec3& p1, const CVec3& p2 )
+        {
+            return engine::CVec3::length( p1 - point ) < engine::CVec3::length( p2 - point );
+        }
+    };
+
+    struct CComparatorFarthestFromPoint
+    {
+        CVec3 point;
+
+        bool operator() ( const CVec3& p1, const CVec3& p2 )
+        {
+            return engine::CVec3::length( p1 - point ) > engine::CVec3::length( p2 - point );
+        }
+    };
+
     void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex );
 
     /**************************************************************************

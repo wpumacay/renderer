@@ -24,6 +24,8 @@ namespace engine
         void bind( CShader* shaderPtr ) override;
         void unbind() override;
 
+        static eMaterialType GetStaticType() { return eMaterialType::PHONG; }
+
     protected :
 
         std::string _toStringInternal() override;
