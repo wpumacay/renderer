@@ -13,8 +13,8 @@ struct Material
     vec3 diffuse;
     vec3 specular;
     float shininess;
-    sampler2D diffuseMap;// slot|unit 0
-    int diffuseMapActive;
+    sampler2D albedoMap;// slot|unit 0
+    int albedoMapActive;
     sampler2D specularMap;// slot|unit 1
     int specularMapActive;
     sampler2D normalMap;// slot|unit 2
@@ -230,16 +230,16 @@ vec3 _computeLightSpecularFactor()
 
 vec3 _computeObjectAmbientComp( vec3 lightAmbientComp )
 {
-    if ( u_material.diffuseMapActive == 1 )
-        return vec3( texture( u_material.diffuseMap, fTexcoord ) ) * lightAmbientComp;
+    if ( u_material.albedoMapActive == 1 )
+        return vec3( texture( u_material.albedoMap, fTexcoord ) ) * u_material.ambient * lightAmbientComp;
 
     return u_material.ambient * lightAmbientComp;
 }
 
 vec3 _computeObjectDiffuseComp( vec3 lightDiffuseComp )
 {
-    if ( u_material.diffuseMapActive == 1 )
-        return vec3( texture( u_material.diffuseMap, fTexcoord ) ) * lightDiffuseComp;
+    if ( u_material.albedoMapActive == 1 )
+        return vec3( texture( u_material.albedoMap, fTexcoord ) ) * u_material.diffuse * lightDiffuseComp;
 
     return u_material.diffuse * lightDiffuseComp;
 }
@@ -247,7 +247,7 @@ vec3 _computeObjectDiffuseComp( vec3 lightDiffuseComp )
 vec3 _computeObjectSpecularComp( vec3 lightSpecularComp )
 {
     if ( u_material.specularMapActive == 1 )
-        return vec3( texture( u_material.specularMap, fTexcoord ) ) * lightSpecularComp;
+        return vec3( texture( u_material.specularMap, fTexcoord ) ) * u_material.specular * lightSpecularComp;
 
     return u_material.specular * lightSpecularComp;
 }

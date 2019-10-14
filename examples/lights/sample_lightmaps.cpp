@@ -64,7 +64,7 @@ protected :
 
         m_cachedTextures = engine::CTextureManager::GetAllCachedTextures();
         m_cachedTextures.push_back( nullptr );
-        m_currentDiffuseMapName = "none";
+        m_currentAlbedoMapName = "none";
         m_currentSpecularMapName = "none";
     }
 
@@ -87,17 +87,17 @@ private :
         /* diffuse properties (phong and lambert materials) */
         if ( m_material->type() == engine::eMaterialType::PHONG || m_material->type() == engine::eMaterialType::LAMBERT )
         {
-            if ( ImGui::BeginCombo( "Diffuse-map", m_currentDiffuseMapName.c_str() ) )
+            if ( ImGui::BeginCombo( "Albedo-map", m_currentAlbedoMapName.c_str() ) )
             {
                 for ( auto& _cachedTexture : m_cachedTextures )
                 {
                     std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
-                    bool _isSelected = ( _textureName == m_currentDiffuseMapName );
+                    bool _isSelected = ( _textureName == m_currentAlbedoMapName );
     
                     if ( ImGui::Selectable( _textureName.c_str(), _isSelected ) )
                     {
-                        m_currentDiffuseMap = _cachedTexture;
-                        m_currentDiffuseMapName = _textureName;
+                        m_currentAlbedoMap = _cachedTexture;
+                        m_currentAlbedoMapName = _textureName;
                     }
     
                     if ( _isSelected )
@@ -107,12 +107,12 @@ private :
                 ImGui::EndCombo();
             }
 
-            m_material->setDiffuseMap( m_currentDiffuseMap );
+            m_material->setAlbedoMap( m_currentAlbedoMap );
 
-            if ( m_currentDiffuseMap )
-                ImGui::Image( (void*)(intptr_t) m_currentDiffuseMap->openglId(), ImVec2( 64, 64 ) );
-            else
-                _menuUiDiffuseProps();
+            if ( m_currentAlbedoMap )
+                ImGui::Image( (void*)(intptr_t) m_currentAlbedoMap->openglId(), ImVec2( 64, 64 ) );
+
+            _menuUiDiffuseProps();
         }
 
         /* specular properties (phong material only) */
@@ -140,8 +140,8 @@ private :
 
             if ( m_currentSpecularMap )
                 ImGui::Image( (void*)(intptr_t) m_currentSpecularMap->openglId(), ImVec2( 64, 64 ) );
-            else
-                _menuUiSpecularProps();
+
+            _menuUiSpecularProps();
         }
 
         ImGui::Spacing();
@@ -234,9 +234,9 @@ private :
     engine::CILight* m_light;
     bool m_lightsAnimated;
 
-    std::string m_currentDiffuseMapName;
+    std::string m_currentAlbedoMapName;
     std::string m_currentSpecularMapName;
-    engine::CTexture* m_currentDiffuseMap;
+    engine::CTexture* m_currentAlbedoMap;
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 

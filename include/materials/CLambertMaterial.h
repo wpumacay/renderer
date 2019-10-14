@@ -13,7 +13,7 @@ namespace engine
         CLambertMaterial( const std::string& name,
                           const CVec3& ambientColor,
                           const CVec3& diffuseColor,
-                          CTexture* diffuseMap = nullptr );
+                          CTexture* albedoMap = nullptr );
 
         ~CLambertMaterial();
 

@@ -20,7 +20,7 @@ namespace engine
                             const CVec3& diffuseColor,
                             const CVec3& specularColor,
                             float32 specularShininess,
-                            CTexture* diffuseMap,
+                            CTexture* albedoMap,
                             CTexture* specularMap,
                             CTexture* normalMap )
     {
@@ -33,7 +33,7 @@ namespace engine
         shininess   = specularShininess;
         alpha       = 1.0f;
 
-        m_diffuseMap    = diffuseMap;
+        m_albedoMap     = albedoMap;
         m_specularMap   = specularMap;
         m_normalMap     = normalMap;
     }

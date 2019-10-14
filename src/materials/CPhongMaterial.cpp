@@ -9,12 +9,12 @@ namespace engine
                                     const CVec3& diffuseColor,
                                     const CVec3& specularColor,
                                     float32 specularShininess,
-                                    CTexture* diffuseMap,
+                                    CTexture* albedoMap,
                                     CTexture* specularMap,
                                     CTexture* normalMap )
         : CIMaterial( name, 
                       ambientColor, diffuseColor, specularColor, specularShininess,
-                      diffuseMap, specularMap, normalMap )
+                      albedoMap, specularMap, normalMap )
     {
         m_type = eMaterialType::PHONG;
     }
@@ -31,16 +31,16 @@ namespace engine
         shaderPtr->setVec3( "u_material.specular", specular );
         shaderPtr->setFloat( "u_material.shininess", shininess );
 
-        if ( m_diffuseMap )
+        if ( m_albedoMap )
         {
-            shaderPtr->setInt( "u_material.diffuseMap", 0 );
-            shaderPtr->setInt( "u_material.diffuseMapActive", 1 );
+            shaderPtr->setInt( "u_material.albedoMap", 0 );
+            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
             glActiveTexture( GL_TEXTURE0 );
-            m_diffuseMap->bind();
+            m_albedoMap->bind();
         }
         else
         {
-            shaderPtr->setInt( "u_material.diffuseMapActive", 0 );
+            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
         }
 
         if ( m_specularMap )
@@ -70,8 +70,8 @@ namespace engine
 
     void CPhongMaterial::unbind()
     {
-        if ( m_diffuseMap )
-            m_diffuseMap->unbind();
+        if ( m_albedoMap )
+            m_albedoMap->unbind();
 
         if ( m_specularMap )
             m_specularMap->unbind();
@@ -90,7 +90,7 @@ namespace engine
         _strRep += "diffuse     : " + engine::toString( diffuse ) + "\n\r";
         _strRep += "specular    : " + engine::toString( specular ) + "\n\r";
         _strRep += "shininess   : " + std::to_string( shininess ) + "\n\r";
-        _strRep += "diffuseMap  : " + ( ( m_diffuseMap ) ? m_diffuseMap->name() : "none" ) + "\n\r";
+        _strRep += "albedoMap  : " + ( ( m_albedoMap ) ? m_albedoMap->name() : "none" ) + "\n\r";
         _strRep += "specularMap : " + ( ( m_specularMap ) ? m_specularMap->name() : "none" ) + "\n\r";
         _strRep += "normalMap   : " + ( ( m_normalMap ) ? m_normalMap->name() : "none" ) + "\n\r";
 

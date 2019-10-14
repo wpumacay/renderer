@@ -13,8 +13,8 @@ struct Material
     vec3 diffuse;
     vec3 specular;
     float shininess;
-    sampler2D diffuseMap;
-    int diffuseMapActive;
+    sampler2D albedoMap;
+    int albedoMapActive;
     sampler2D specularMap;
     int specularMapActive;
     sampler2D normalMap;
@@ -172,16 +172,16 @@ vec3 _computeLightSpecularFactor()
 
 vec3 _computeObjectAmbientComp( vec3 lightAmbientComp )
 {
-    if ( u_material.diffuseMapActive == 1 )
-        return vec3( texture( u_material.diffuseMap, fTexcoord ) ) * lightAmbientComp;
+    if ( u_material.albedoMapActive == 1 )
+        return vec3( texture( u_material.albedoMap, fTexcoord ) ) * lightAmbientComp;
 
     return u_material.ambient * lightAmbientComp;
 }
 
 vec3 _computeObjectDiffuseComp( vec3 lightDiffuseComp )
 {
-    if ( u_material.diffuseMapActive == 1 )
-        return vec3( texture( u_material.diffuseMap, fTexcoord ) ) * lightDiffuseComp;
+    if ( u_material.albedoMapActive == 1 )
+        return vec3( texture( u_material.albedoMap, fTexcoord ) ) * lightDiffuseComp;
 
     return u_material.diffuse * lightDiffuseComp;
 }

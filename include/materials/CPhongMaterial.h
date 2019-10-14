@@ -15,7 +15,7 @@ namespace engine
                         const CVec3& diffuseColor,
                         const CVec3& specularColor,
                         float32 specularShininess,
-                        CTexture* diffuseMap = nullptr,
+                        CTexture* albedoMap = nullptr,
                         CTexture* specularMap = nullptr,
                         CTexture* normalMap = nullptr );
 

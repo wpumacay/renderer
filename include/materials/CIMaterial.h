@@ -35,7 +35,7 @@ namespace engine
                     const CVec3& diffuseColor,
                     const CVec3& specularColor,
                     float32 specularShininess,
-                    CTexture* diffuseMap,
+                    CTexture* albedoMap,
                     CTexture* specularMap,
                     CTexture* normalMap );
 
@@ -46,11 +46,11 @@ namespace engine
 
         std::string toString();
 
-        void setDiffuseMap( CTexture* diffuseMap ) { m_diffuseMap = diffuseMap; }
+        void setAlbedoMap( CTexture* albedoMap ) { m_albedoMap = albedoMap; }
         void setSpecularMap( CTexture* specularMap ) { m_specularMap = specularMap; }
         void setNormalMap( CTexture* normalMap ) { m_normalMap = normalMap; }
 
-        CTexture* diffuseMap() const { return m_diffuseMap; }
+        CTexture* albedoMap() const { return m_albedoMap; }
         CTexture* specularMap() const { return m_specularMap; }
         CTexture* normalMap() const { return m_normalMap; }
 
@@ -65,7 +65,7 @@ namespace engine
 
         std::string     m_name;
         eMaterialType   m_type;
-        CTexture*       m_diffuseMap;
+        CTexture*       m_albedoMap;
         CTexture*       m_specularMap;
         CTexture*       m_normalMap;
 
