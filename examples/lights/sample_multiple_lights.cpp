@@ -271,44 +271,39 @@ private :
     {
         ImGui::Checkbox( "enabled", &m_lights[m_lightSelectedIndex]->enabled );
 
-        auto _type = m_lights[m_lightSelectedIndex]->type();
+        auto _light = m_lights[m_lightSelectedIndex];
+        auto _type = _light->type();
         if ( _type == engine::eLightType::DIRECTIONAL )
         {
-            auto _dirlight = reinterpret_cast< engine::CDirectionalLight* >( m_lights[m_lightSelectedIndex] );
-
             float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
             ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
             m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-            _dirlight->direction = engine::CVec3::normalize( m_lightDirection );
+            _light->direction = engine::CVec3::normalize( m_lightDirection );
         }
         else if ( _type == engine::eLightType::POINT )
         {
-            auto _pointLight = reinterpret_cast< engine::CPointLight* >( m_lights[m_lightSelectedIndex] );
-
-            float _vPosition[3] = { _pointLight->position.x, _pointLight->position.y, _pointLight->position.z };
+            float _vPosition[3] = { _light->position.x, _light->position.y, _light->position.z };
             ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-            _pointLight->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+            _light->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
 
-            ImGui::SliderFloat( "attn-linear", &_pointLight->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_pointLight->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-linear", &_light->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_light->atnQuadratic, 0.0f, 1.0f );
         }
         else if ( _type == engine::eLightType::SPOT )
         {
-            auto _spotLight = reinterpret_cast< engine::CSpotLight* >( m_lights[m_lightSelectedIndex] );
-
-            float _vPosition[3] = { _spotLight->position.x, _spotLight->position.y, _spotLight->position.z };
+            float _vPosition[3] = { _light->position.x, _light->position.y, _light->position.z };
             ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-            _spotLight->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+            _light->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
 
             float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
             ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
             m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-            _spotLight->direction = engine::CVec3::normalize( m_lightDirection );
+            _light->direction = engine::CVec3::normalize( m_lightDirection );
 
-            ImGui::SliderFloat( "attn-linear", &_spotLight->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_spotLight->atnQuadratic, 0.0f, 1.0f );
-            ImGui::SliderFloat( "inner-cutoff", &_spotLight->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
-            ImGui::SliderFloat( "outer-cutoff", &_spotLight->outerCutoff, _spotLight->innerCutoff, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "attn-linear", &_light->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_light->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "inner-cutoff", &_light->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "outer-cutoff", &_light->outerCutoff, _light->innerCutoff, ENGINE_PI / 3.0f );
         }
     }
 

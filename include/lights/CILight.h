@@ -29,6 +29,15 @@ namespace engine
         float32 intensity;
         bool    producesShadows;
 
+        /* properties used by specific light types */
+        CVec3   direction;
+        CVec3   position;
+        float32 atnConstant;
+        float32 atnLinear;
+        float32 atnQuadratic;
+        float32 innerCutoff;
+        float32 outerCutoff;
+
         CILight( const std::string& name,
                  const CVec3& ambientColor,
                  const CVec3& diffuseColor,

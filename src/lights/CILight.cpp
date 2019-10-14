@@ -27,6 +27,14 @@ namespace engine
         specular    = specularColor;
         intensity   = 1.0f;
         enabled     = true;
+
+        direction       = { 0.0f, 0.0f, -1.0f };
+        position        = { 0.0f, 0.0f, 1.0f };
+        atnConstant     = 1.0f;
+        atnLinear       = 0.0f;
+        atnQuadratic    = 0.0f;
+        innerCutoff     = 0.0f;
+        outerCutoff     = 0.0f;
     }
 
     CILight::~CILight()

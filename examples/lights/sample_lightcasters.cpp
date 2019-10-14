@@ -254,51 +254,48 @@ private :
 
     void _menuUiLightProperties()
     {
-        auto _type = m_lights[m_lightSelectedIndex]->type();
+        auto _lightPtr = m_lights[m_lightSelectedIndex];
+        auto _type = _lightPtr->type();
         if ( _type == engine::eLightType::DIRECTIONAL )
         {
-            auto _dirlight = reinterpret_cast< engine::CDirectionalLight* >( m_lights[m_lightSelectedIndex] );
             if ( !m_lightLockedToCamera )
             {
                 float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _dirlight->direction = engine::CVec3::normalize( m_lightDirection );
+                _lightPtr->direction = engine::CVec3::normalize( m_lightDirection );
             }
         }
         else if ( _type == engine::eLightType::POINT )
         {
-            auto _pointLight = reinterpret_cast< engine::CPointLight* >( m_lights[m_lightSelectedIndex] );
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _pointLight->position.x, _pointLight->position.y, _pointLight->position.z };
+                float _vPosition[3] = { _lightPtr->position.x, _lightPtr->position.y, _lightPtr->position.z };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-                _pointLight->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+                _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
             }
 
-            ImGui::SliderFloat( "attn-linear", &_pointLight->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_pointLight->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-linear", &_lightPtr->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_lightPtr->atnQuadratic, 0.0f, 1.0f );
         }
         else if ( _type == engine::eLightType::SPOT )
         {
-            auto _spotLight = reinterpret_cast< engine::CSpotLight* >( m_lights[m_lightSelectedIndex] );
-
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _spotLight->position.x, _spotLight->position.y, _spotLight->position.z };
+                float _vPosition[3] = { _lightPtr->position.x, _lightPtr->position.y, _lightPtr->position.z };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-                _spotLight->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+                _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
 
                 float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _spotLight->direction = engine::CVec3::normalize( m_lightDirection );
+                _lightPtr->direction = engine::CVec3::normalize( m_lightDirection );
             }
 
-            ImGui::SliderFloat( "attn-linear", &_spotLight->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_spotLight->atnQuadratic, 0.0f, 1.0f );
-            ImGui::SliderFloat( "inner-cutoff", &_spotLight->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
-            ImGui::SliderFloat( "outer-cutoff", &_spotLight->outerCutoff, _spotLight->innerCutoff, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "attn-linear", &_lightPtr->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_lightPtr->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "inner-cutoff", &_lightPtr->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "outer-cutoff", &_lightPtr->outerCutoff, _lightPtr->innerCutoff, ENGINE_PI / 3.0f );
         }
     }
 
@@ -450,17 +447,17 @@ int main()
         {
             if ( _light->type() == engine::eLightType::DIRECTIONAL )
             {
-                reinterpret_cast< engine::CDirectionalLight* >( _light )->direction = _camera->front();
+                _light->direction = _camera->front();
                 _ui->updateLightDirection( _camera->front() );
             }
             else if ( _light->type() == engine::eLightType::POINT )
             {
-                reinterpret_cast< engine::CPointLight* >( _light )->position = _camera->position();
+                _light->position = _camera->position();
             }
             else if ( _light->type() == engine::eLightType::SPOT )
             {
-                reinterpret_cast< engine::CSpotLight* >( _light )->position = _camera->position();
-                reinterpret_cast< engine::CSpotLight* >( _light )->direction = _camera->front();
+                _light->position = _camera->position();
+                _light->direction = _camera->front();
                 _ui->updateLightDirection( _camera->front() );
             }
         }
@@ -468,16 +465,16 @@ int main()
         _gizmo->setVisibility( !_ui->isLightLockedToCamera() );
 
         if ( _light->type() == engine::eLightType::POINT )
-            _gizmo->position = reinterpret_cast< engine::CPointLight* >( _light )->position;
+            _gizmo->position = _light->position;
         else if ( _light->type() == engine::eLightType::SPOT )
-            _gizmo->position = reinterpret_cast< engine::CSpotLight* >( _light )->position;
+            _gizmo->position = _light->position;
         else
             _gizmo->position = { 2000.0f, 2000.0f, 2000.0f }; 
 
         if ( _light->type() == engine::eLightType::SPOT )
         {
-            auto _position = reinterpret_cast< engine::CSpotLight* >( _light )->position;
-            auto _direction = reinterpret_cast< engine::CSpotLight* >( _light )->direction;
+            auto _position = _light->position;
+            auto _direction = _light->direction;
             engine::CDebugDrawer::DrawLine( _position, _position + 0.1f * _direction, { 0.0f, 1.0f, 1.0f } );
         }
 
@@ -497,7 +494,7 @@ int main()
             _shaderLightCasters->setVec3( "u_directionalLight.diffuse", _light->diffuse );
             _shaderLightCasters->setVec3( "u_directionalLight.specular", _light->specular );
             _shaderLightCasters->setFloat( "u_directionalLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_directionalLight.direction", reinterpret_cast< engine::CDirectionalLight* >( _light )->direction );
+            _shaderLightCasters->setVec3( "u_directionalLight.direction", _light->direction );
         }
         else if ( _light->type() == engine::eLightType::POINT )
         {
@@ -506,10 +503,10 @@ int main()
             _shaderLightCasters->setVec3( "u_pointLight.diffuse", _light->diffuse );
             _shaderLightCasters->setVec3( "u_pointLight.specular", _light->specular );
             _shaderLightCasters->setFloat( "u_pointLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_pointLight.position", reinterpret_cast< engine::CPointLight* >( _light )->position );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk0", reinterpret_cast< engine::CPointLight* >( _light )->atnConstant );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk1", reinterpret_cast< engine::CPointLight* >( _light )->atnLinear );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk2", reinterpret_cast< engine::CPointLight* >( _light )->atnQuadratic );
+            _shaderLightCasters->setVec3( "u_pointLight.position", _light->position );
+            _shaderLightCasters->setFloat( "u_pointLight.attnk0", _light->atnConstant );
+            _shaderLightCasters->setFloat( "u_pointLight.attnk1", _light->atnLinear );
+            _shaderLightCasters->setFloat( "u_pointLight.attnk2", _light->atnQuadratic );
         }
         else if ( _light->type() == engine::eLightType::SPOT )
         {
@@ -518,13 +515,13 @@ int main()
             _shaderLightCasters->setVec3( "u_spotLight.diffuse", _light->diffuse );
             _shaderLightCasters->setVec3( "u_spotLight.specular", _light->specular );
             _shaderLightCasters->setFloat( "u_spotLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_spotLight.position", reinterpret_cast< engine::CSpotLight* >( _light )->position );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk0", reinterpret_cast< engine::CSpotLight* >( _light )->atnConstant );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk1", reinterpret_cast< engine::CSpotLight* >( _light )->atnLinear );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk2", reinterpret_cast< engine::CSpotLight* >( _light )->atnQuadratic );
-            _shaderLightCasters->setVec3( "u_spotLight.direction", reinterpret_cast< engine::CSpotLight* >( _light )->direction );
-            _shaderLightCasters->setFloat( "u_spotLight.innerCutoffCos", std::cos( reinterpret_cast< engine::CSpotLight* >( _light )->innerCutoff ) );
-            _shaderLightCasters->setFloat( "u_spotLight.outerCutoffCos", std::cos( reinterpret_cast< engine::CSpotLight* >( _light )->outerCutoff ) );
+            _shaderLightCasters->setVec3( "u_spotLight.position", _light->position );
+            _shaderLightCasters->setFloat( "u_spotLight.attnk0", _light->atnConstant );
+            _shaderLightCasters->setFloat( "u_spotLight.attnk1", _light->atnLinear );
+            _shaderLightCasters->setFloat( "u_spotLight.attnk2", _light->atnQuadratic );
+            _shaderLightCasters->setVec3( "u_spotLight.direction", _light->direction );
+            _shaderLightCasters->setFloat( "u_spotLight.innerCutoffCos", std::cos( _light->innerCutoff ) );
+            _shaderLightCasters->setFloat( "u_spotLight.outerCutoffCos", std::cos( _light->outerCutoff ) );
         }
 
         _shaderLightCasters->setVec3( "u_viewerPosition", _camera->position() );

@@ -136,9 +136,7 @@ protected :
             m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
 
             g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
-
-            auto _dirLightPtr = reinterpret_cast< engine::CDirectionalLight* >( _lightPtr );
-            _dirLightPtr->direction = g_lightDirDirection;
+            _lightPtr->direction = g_lightDirDirection;
 
             // whether or not to use autofix-to-camera for directional lights shadowmapping
             ImGui::Checkbox( "autofix-to-camera", &g_useAutofixToCamera );
@@ -169,9 +167,7 @@ protected :
 
             g_lightPointDirection = engine::CVec3::normalize( m_lightPointDirection );
             g_lightPointPosition = m_lightPointPosition;
-
-            auto _pointLightPtr = reinterpret_cast< engine::CPointLight* >( _lightPtr );
-            _pointLightPtr->position = g_lightPointPosition;
+            _lightPtr->position = g_lightPointPosition;
 
             ImGui::SliderFloat( "znear", &g_znearPoint, 0.1f, 5.0f );
             ImGui::SliderFloat( "zfar", &g_zfarPoint, g_znearPoint, 20.0f );
@@ -194,9 +190,8 @@ protected :
             g_lightSpotDirection = engine::CVec3::normalize( m_lightSpotDirection );
             g_lightSpotPosition = m_lightSpotPosition;
 
-            auto _spotLightPtr = reinterpret_cast< engine::CSpotLight* >( _lightPtr );
-            _spotLightPtr->direction = g_lightSpotDirection;
-            _spotLightPtr->position = g_lightSpotPosition;
+            _lightPtr->direction = g_lightSpotDirection;
+            _lightPtr->position = g_lightSpotPosition;
 
             ImGui::SliderFloat( "znear", &g_znearSpot, 0.1f, 5.0f );
             ImGui::SliderFloat( "zfar", &g_zfarSpot, g_znearSpot, 20.0f );
@@ -472,11 +467,11 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     engine::CShadowMapRangeConfig _config;
     if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
-        _config.dirLightPtr = reinterpret_cast< engine::CDirectionalLight* >( lightPtr );
+        _config.dirLightPtr = dynamic_cast< engine::CDirectionalLight* >( lightPtr );
     if ( lightPtr->type() == engine::eLightType::POINT )
-        _config.pointLightPtr = reinterpret_cast< engine::CPointLight* >( lightPtr );
+        _config.pointLightPtr = dynamic_cast< engine::CPointLight* >( lightPtr );
     if ( lightPtr->type() == engine::eLightType::SPOT )
-        _config.spotLightPtr = reinterpret_cast< engine::CSpotLight* >( lightPtr );
+        _config.spotLightPtr = dynamic_cast< engine::CSpotLight* >( lightPtr );
 
     if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {
@@ -563,7 +558,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
         shaderPtr->setVec3( "u_directionalLight.diffuse", lightPtr->diffuse );
         shaderPtr->setVec3( "u_directionalLight.specular", lightPtr->specular );
         shaderPtr->setFloat( "u_directionalLight.intensity", lightPtr->intensity );
-        shaderPtr->setVec3( "u_directionalLight.direction", reinterpret_cast< engine::CDirectionalLight* >( lightPtr )->direction );
+        shaderPtr->setVec3( "u_directionalLight.direction", lightPtr->direction );
     }
     else if ( lightPtr->type() == engine::eLightType::POINT )
     {
@@ -572,10 +567,10 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
         shaderPtr->setVec3( "u_pointLight.diffuse", lightPtr->diffuse );
         shaderPtr->setVec3( "u_pointLight.specular", lightPtr->specular );
         shaderPtr->setFloat( "u_pointLight.intensity", lightPtr->intensity );
-        shaderPtr->setVec3( "u_pointLight.position", reinterpret_cast< engine::CPointLight* >( lightPtr )->position );
-        shaderPtr->setFloat( "u_pointLight.attnk0", reinterpret_cast< engine::CPointLight* >( lightPtr )->atnConstant );
-        shaderPtr->setFloat( "u_pointLight.attnk1", reinterpret_cast< engine::CPointLight* >( lightPtr )->atnLinear );
-        shaderPtr->setFloat( "u_pointLight.attnk2", reinterpret_cast< engine::CPointLight* >( lightPtr )->atnQuadratic );
+        shaderPtr->setVec3( "u_pointLight.position", lightPtr->position );
+        shaderPtr->setFloat( "u_pointLight.attnk0", lightPtr->atnConstant );
+        shaderPtr->setFloat( "u_pointLight.attnk1", lightPtr->atnLinear );
+        shaderPtr->setFloat( "u_pointLight.attnk2", lightPtr->atnQuadratic );
     }
     else if ( lightPtr->type() == engine::eLightType::SPOT )
     {
@@ -584,13 +579,13 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
         shaderPtr->setVec3( "u_spotLight.diffuse", lightPtr->diffuse );
         shaderPtr->setVec3( "u_spotLight.specular", lightPtr->specular );
         shaderPtr->setFloat( "u_spotLight.intensity", lightPtr->intensity );
-        shaderPtr->setVec3( "u_spotLight.position", reinterpret_cast< engine::CSpotLight* >( lightPtr )->position );
-        shaderPtr->setFloat( "u_spotLight.attnk0", reinterpret_cast< engine::CSpotLight* >( lightPtr )->atnConstant );
-        shaderPtr->setFloat( "u_spotLight.attnk1", reinterpret_cast< engine::CSpotLight* >( lightPtr )->atnLinear );
-        shaderPtr->setFloat( "u_spotLight.attnk2", reinterpret_cast< engine::CSpotLight* >( lightPtr )->atnQuadratic );
-        shaderPtr->setVec3( "u_spotLight.direction", reinterpret_cast< engine::CSpotLight* >( lightPtr )->direction );
-        shaderPtr->setFloat( "u_spotLight.innerCutoffCos", std::cos( reinterpret_cast< engine::CSpotLight* >( lightPtr )->innerCutoff ) );
-        shaderPtr->setFloat( "u_spotLight.outerCutoffCos", std::cos( reinterpret_cast< engine::CSpotLight* >( lightPtr )->outerCutoff ) );
+        shaderPtr->setVec3( "u_spotLight.position", lightPtr->position );
+        shaderPtr->setFloat( "u_spotLight.attnk0", lightPtr->atnConstant );
+        shaderPtr->setFloat( "u_spotLight.attnk1", lightPtr->atnLinear );
+        shaderPtr->setFloat( "u_spotLight.attnk2", lightPtr->atnQuadratic );
+        shaderPtr->setVec3( "u_spotLight.direction", lightPtr->direction );
+        shaderPtr->setFloat( "u_spotLight.innerCutoffCos", std::cos( lightPtr->innerCutoff ) );
+        shaderPtr->setFloat( "u_spotLight.outerCutoffCos", std::cos( lightPtr->outerCutoff ) );
     }
 
     /* setup the view and proj matrices */
@@ -602,11 +597,11 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
 
     engine::CShadowMapRangeConfig _config;
     if ( lightPtr->type() == engine::eLightType::DIRECTIONAL )
-        _config.dirLightPtr = reinterpret_cast< engine::CDirectionalLight* >( lightPtr );
+        _config.dirLightPtr = dynamic_cast< engine::CDirectionalLight* >( lightPtr );
     if ( lightPtr->type() == engine::eLightType::POINT )
-        _config.pointLightPtr = reinterpret_cast< engine::CPointLight* >( lightPtr );
+        _config.pointLightPtr = dynamic_cast< engine::CPointLight* >( lightPtr );
     if ( lightPtr->type() == engine::eLightType::SPOT )
-        _config.spotLightPtr = reinterpret_cast< engine::CSpotLight* >( lightPtr );
+        _config.spotLightPtr = dynamic_cast< engine::CSpotLight* >( lightPtr );
 
     if ( g_useAutofixToCamera && lightPtr->type() == engine::eLightType::DIRECTIONAL )
     {

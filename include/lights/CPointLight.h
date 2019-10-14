@@ -12,11 +12,6 @@ namespace engine
 
     public :
 
-        CVec3   position;
-        float32 atnConstant;
-        float32 atnLinear;
-        float32 atnQuadratic;
-
         CPointLight( const std::string& name,
                      const CVec3& ambientColor,
                      const CVec3& diffuseColor,
