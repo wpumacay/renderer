@@ -93,7 +93,7 @@ namespace engine
         // (5) start making the actual rendering process (use forward rendering for now)
 
         /* (5.1) render pass for shadow mapping (if enabled) */
-        if ( renderOptions.useShadowMapping )
+        if ( renderOptions.mode == eRenderMode::NORMAL && renderOptions.useShadowMapping )
         {
             // configure the light-space from configuration from user
             renderOptions.shadowMapPtr->setup( renderOptions.shadowMapRangeConfig );
@@ -110,13 +110,24 @@ namespace engine
             renderOptions.renderTargetPtr->bind();
 
         /* (5.3) render pass for the scene itself */
-        if ( renderOptions.useShadowMapping )
+        if ( renderOptions.mode == eRenderMode::NORMAL )
         {
-            m_rendererMeshes->renderWithShadowMap();
+            if ( renderOptions.useShadowMapping )
+            {
+                m_rendererMeshes->renderWithShadowMap();
+            }
+            else
+            {
+                m_rendererMeshes->renderWithoutShadowMap();
+            }
         }
-        else
+        else if ( renderOptions.mode == eRenderMode::DEPTH_ONLY )
         {
-            m_rendererMeshes->renderWithoutShadowMap();
+            m_rendererMeshes->renderDepthOnly();
+        }
+        else if ( renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
+        {
+            m_rendererMeshes->renderSemanticOnly();
         }
 
         /* (5.5) release custom render target in case used */

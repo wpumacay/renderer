@@ -100,6 +100,21 @@ namespace engine
             m_context.fogDistStart  = _fogPtr->distStart;
             m_context.fogDistEnd    = _fogPtr->distEnd;
         }
+        /* depth-view information */
+        if ( renderOptions.mode == eRenderMode::DEPTH_ONLY )
+        {
+            m_context.depthViewZnear        = renderOptions.cameraPtr->projData().zNear;
+            m_context.depthViewZfar         = renderOptions.cameraPtr->projData().zFar;
+            m_context.depthViewZmin         = renderOptions.depthViewZmin;
+            m_context.depthViewZmax         = renderOptions.depthViewZmax;
+            m_context.depthViewZminColor    = renderOptions.depthViewZminColor;
+            m_context.depthViewZmaxColor    = renderOptions.depthViewZmaxColor;
+        }
+        /* semantic-view information */
+        if ( renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
+        {
+            m_context.semanticViewIdMap = renderOptions.semanticViewIdMap;
+        }
     }
 
     void CMeshRenderer::renderToShadowMap()
@@ -172,6 +187,71 @@ namespace engine
         _render_Lambert( _meshesOpaqueLambert, false );
         _render_Phong( _meshesOpaquePhong, false );
         //// _render_BlinnPhong( _meshesOpaqueBlinnPhong, false );
+    }
+
+    void CMeshRenderer::renderDepthOnly()
+    {
+        auto _shaderDepthView = CShaderManager::GetCachedShader( "engine_render_depth_view" );
+
+        _shaderDepthView->bind();
+        _shaderDepthView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
+        _shaderDepthView->setFloat( "u_znear", m_context.depthViewZnear );
+        _shaderDepthView->setFloat( "u_zfar", m_context.depthViewZfar );
+        _shaderDepthView->setFloat( "u_zmin", m_context.depthViewZmin );
+        _shaderDepthView->setFloat( "u_zmax", m_context.depthViewZmax );
+        _shaderDepthView->setVec3( "u_zminColor", m_context.depthViewZminColor );
+        _shaderDepthView->setVec3( "u_zmaxColor", m_context.depthViewZmaxColor );
+
+        for ( auto meshPtr : m_meshesOpaque )
+        {
+            _shaderDepthView->setMat4( "u_modelMatrix", meshPtr->matModel() );
+
+            auto _vao = meshPtr->vertexArray();
+            auto _ibo = _vao->indexBuffer();
+
+            _vao->bind();
+            glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
+            _vao->unbind();
+        }
+
+        _shaderDepthView->unbind();
+    }
+
+    void CMeshRenderer::renderSemanticOnly()
+    {
+        auto _shaderSemanticView = CShaderManager::GetCachedShader( "engine_render_semantic_view" );
+
+        _shaderSemanticView->bind();
+        _shaderSemanticView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
+
+        for ( auto meshPtr : m_meshesOpaque )
+        {
+            if ( m_context.semanticViewIdMap.find( meshPtr->maskId() ) != m_context.semanticViewIdMap.end() )
+            {
+                _shaderSemanticView->setVec3( "u_maskColor", m_context.semanticViewIdMap[meshPtr->maskId()] );
+            }
+            else if ( m_cachedRandomColors.find( meshPtr->maskId() ) != m_cachedRandomColors.end() )
+            {
+                _shaderSemanticView->setVec3( "u_maskColor", m_cachedRandomColors[meshPtr->maskId()] );
+            }
+            else
+            {
+                CVec3 _maskColor = { m_randDist( m_randGen ), m_randDist( m_randGen ), m_randDist( m_randGen ) };
+                m_cachedRandomColors[meshPtr->maskId()] = _maskColor;
+                _shaderSemanticView->setVec3( "u_maskColor", _maskColor );
+            }
+
+            _shaderSemanticView->setMat4( "u_modelMatrix", meshPtr->matModel() );
+
+            auto _vao = meshPtr->vertexArray();
+            auto _ibo = _vao->indexBuffer();
+
+            _vao->bind();
+            glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
+            _vao->unbind();
+        }
+
+        _shaderSemanticView->unbind();
     }
 
     void CMeshRenderer::_render_Lambert( const std::vector< CMesh* >& meshes, bool renderWithShadows )

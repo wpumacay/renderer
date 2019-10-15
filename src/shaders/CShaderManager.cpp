@@ -112,7 +112,9 @@ namespace engine
             "engine_lambert_no_shadows",
             "engine_phong_no_shadows",
             "engine_lambert_shadows",
-            "engine_phong_shadows"
+            "engine_phong_shadows",
+            "engine_render_depth_view",
+            "engine_render_semantic_view"
         };
 
         for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )

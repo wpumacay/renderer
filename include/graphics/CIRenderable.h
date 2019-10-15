@@ -60,6 +60,12 @@ namespace engine
         CBoundingBox bbox() const;
         CBoundingSphere bsphere() const;
 
+        void setMaskId( int32 maskId ) { m_maskId = maskId; }
+        void setObjectId( int32 objectId ) { m_objectId = objectId; }
+
+        int32 maskId() const { return m_maskId; }
+        int32 objectId() const { return m_objectId; }
+
         static eRenderableType GetStaticType() { return eRenderableType::BASE; }
 
     protected :
@@ -71,6 +77,8 @@ namespace engine
         CVec3                           m_boundExtents;
         CVec3                           m_boundCenter;
         std::unique_ptr< CIMaterial >   m_material;
+        int32                           m_maskId; // used for semantic_only rendering
+        int32                           m_objectId; // used for picking
 
     };
 

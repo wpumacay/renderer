@@ -61,6 +61,13 @@ namespace engine
         CShadowMap*             shadowMapPtr;
         CFrameBuffer*           renderTargetPtr;
         CFog*                   fogPtr;
+        /* depth_only-mode parameters */
+        float32                 depthViewZmin;
+        float32                 depthViewZmax;
+        CVec3                   depthViewZminColor;
+        CVec3                   depthViewZmaxColor;
+        /* semantic_only-mode parameters */
+        std::unordered_map< int32, CVec3 > semanticViewIdMap;
 
         CRenderOptions()
         {
@@ -81,6 +88,13 @@ namespace engine
             shadowMapPtr            = nullptr;
             renderTargetPtr         = nullptr;
             fogPtr                  = nullptr;
+
+            depthViewZmin       = 0.0f;
+            depthViewZmax       = 6.0f;
+            depthViewZminColor  = { 1.0f, 1.0f, 1.0f };
+            depthViewZmaxColor  = { 0.0f, 0.0f, 0.0f };
+
+            semanticViewIdMap = std::unordered_map< int32, CVec3 >();
         }
     };
 

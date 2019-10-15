@@ -52,6 +52,15 @@ namespace engine
         float32 fogGradient;
         float32 fogDistStart;
         float32 fogDistEnd;
+        /* when rendering in depth-only mode */
+        float32 depthViewZnear; // from camera frustum
+        float32 depthViewZfar; // from camera frustum
+        float32 depthViewZmin;
+        float32 depthViewZmax;
+        CVec3   depthViewZminColor;
+        CVec3   depthViewZmaxColor;
+        /* when rendering in semantic-only mode */
+        std::unordered_map< int32, CVec3 > semanticViewIdMap;
     };
 
     class CMeshRenderer
@@ -69,6 +78,8 @@ namespace engine
         void renderToShadowMap();
         void renderWithShadowMap();
         void renderWithoutShadowMap();
+        void renderDepthOnly();
+        void renderSemanticOnly();
 
         template< class T >
         void _collectMeshesByMaterial( const std::vector< CMesh* >& meshes,
@@ -101,6 +112,11 @@ namespace engine
 
         std::vector< CMesh* > m_meshesOpaque;
         std::vector< CMesh* > m_meshesTransparent;
+
+        std::default_random_engine m_randGen;
+        std::uniform_real_distribution< float32 > m_randDist;
+
+        std::unordered_map< int32, CVec3 > m_cachedRandomColors;
     };
 
 }

@@ -42,6 +42,14 @@ namespace engine
         _strRep += "viewport-width  : " + std::to_string( renderOptions.viewportWidth ) + "\n\r";
         _strRep += "viewport-height : " + std::to_string( renderOptions.viewportHeight ) + "\n\r";
         _strRep += "render-target   : " + std::string( renderOptions.renderTargetPtr ? "yes" : "no" ) + "\n\r";
+        _strRep += "d-view-zmin     : " + std::to_string( renderOptions.depthViewZmin ) + "\n\r";
+        _strRep += "d-view-zmax     : " + std::to_string( renderOptions.depthViewZmax ) + "\n\r";
+        _strRep += "d-view-zminColor: " + engine::toString( renderOptions.depthViewZminColor ) + "\n\r";
+        _strRep += "d-view-zmaxColor: " + engine::toString( renderOptions.depthViewZmaxColor ) + "\n\r";
+
+        _strRep += "s-view-color-map:\n\r";
+        for ( auto kvPair : renderOptions.semanticViewIdMap )
+            _strRep += "\t(" + std::to_string( kvPair.first ) + "): " + engine::toString( kvPair.second ) + "\n\r";
 
         return _strRep;
     }
