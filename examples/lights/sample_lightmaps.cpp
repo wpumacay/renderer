@@ -61,6 +61,7 @@ protected :
                           "capsuleX", "capsuleY", "capsuleZ", "arrowX", "arrowY", "arrowZ", "axes" };
         m_meshSelectedName = "box";
         m_meshSelectedIndex = 0;
+        m_meshRotationAngle = 0.0f;
 
         m_cachedTextures = engine::CTextureManager::GetAllCachedTextures();
         m_cachedTextures.push_back( nullptr );
@@ -227,6 +228,12 @@ private :
             }
         }
 
+        if ( m_meshSelectedIndex != -1 )
+        {
+            ImGui::SliderFloat( "angle", &m_meshRotationAngle, 0.0f, 2.0f * ENGINE_PI );
+            m_meshes[m_meshSelectedIndex]->rotation = engine::CMat4::rotation( m_meshRotationAngle, { 0.0f, 1.0f, 0.0f } );
+        }
+
         ImGui::End();
     }
 
@@ -244,6 +251,8 @@ private :
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
+
+    float m_meshRotationAngle;
 };
 
 int main()
