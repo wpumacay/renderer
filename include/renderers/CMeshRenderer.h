@@ -5,6 +5,10 @@
 namespace engine
 {
 
+    const int MESH_RENDERER_ALBEDO_MAP_SLOT = 0;
+    const int MESH_RENDERER_SPECULAR_MAP_SLOT = 1;
+    const int MESH_RENDERER_DEPTH_MAP_SLOT = 2;
+
     struct CMeshComparatorFarthestFromPoint
     {
         CVec3 point;
@@ -20,25 +24,34 @@ namespace engine
         /* camera information */
         CMat4   viewMatrix;
         CMat4   projMatrix;
+        CVec3   viewPosition;
         /* light information */
-        eLightType lightType;
-        CVec3   lightAmbient;
-        CVec3   lightDiffuse;
-        CVec3   lightSpecular;
-        float32 lightIntensity;
-        CVec3   lightPosition;
-        CVec3   lightDirection;
-        CVec3   lightInnerCutoffCos;
-        CVec3   lightOuterCutoffCos;
-        CVec3   lightAttnK0;
-        CVec3   lightAttnK1;
-        CVec3   lightAttnK2;
+        eLightType  lightType;
+        CVec3       lightAmbient;
+        CVec3       lightDiffuse;
+        CVec3       lightSpecular;
+        float32     lightIntensity;
+        CVec3       lightPosition;
+        CVec3       lightDirection;
+        float32     lightInnerCutoffCos;
+        float32     lightOuterCutoffCos;
+        float32     lightAttnK0;
+        float32     lightAttnK1;
+        float32     lightAttnK2;
         /* when using shadow mapping */
         CMat4   shadowMappingViewMatrix;
         CMat4   shadowMappingProjMatrix;
         int32   shadowMappingPCFcount;
         int32   shadowMappingSize;
         uint32  shadowMappingTextureId;
+        /* when using fog */
+        int32   fogType;
+        int32   fogEnabled;
+        CVec3   fogColor;
+        float32 fogDensity;
+        float32 fogGradient;
+        float32 fogDistStart;
+        float32 fogDistEnd;
     };
 
     class CMeshRenderer
@@ -49,7 +62,8 @@ namespace engine
         CMeshRenderer();
         ~CMeshRenderer();
 
-        void submit( const std::vector< CMesh* >& meshes, 
+        void submit( const std::vector< CMesh* >& meshesVisible,
+                     const std::vector< CMesh* >& meshesInView, 
                      const CRenderOptions& renderOptions );
 
         void renderToShadowMap();
@@ -66,6 +80,16 @@ namespace engine
         }
 
         std::string status() const { return m_status; }
+
+    private :
+
+        void _render_Lambert( const std::vector< CMesh* >& meshes, bool renderWithShadows );
+        void _render_Phong( const std::vector< CMesh* >& meshes, bool renderWithShadows );
+
+        void _setupRenderState_camera( CShader* shaderPtr );
+        void _setupRenderState_light( CShader* shaderPtr );
+        void _setupRenderState_shadows( CShader* shaderPtr );
+        void _setupRenderState_fog( CShader* shaderPtr );
 
     private :
 

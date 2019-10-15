@@ -20,6 +20,9 @@ namespace engine
         void render( CScene* scenePtr, CRenderOptions renderOptions );
 
         std::string status() const { return m_status; }
+        CShadowMap* shadowMap() const { return m_shadowMap.get(); }
+
+        CMeshRenderer* meshRenderer() const { return m_rendererMeshes.get(); }
 
     private :
 

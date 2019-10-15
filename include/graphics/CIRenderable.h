@@ -10,10 +10,10 @@
 namespace engine
 {
 
-    const CVec3 RENDERABLE_DEFAULT_AMBIENT_COLOR = { 0.5f, 0.5f, 0.5f };
-    const CVec3 RENDERABLE_DEFAULT_DIFFUSE_COLOR = { 0.5f, 0.5f, 0.5f };
-    const CVec3 RENDERABLE_DEFAULT_SPECULAR_COLOR = { 0.5f, 0.5f, 0.5f };
-    const float32 RENDERABLE_DEFAULT_SHININESS = 64.0f;
+    const CVec3 RENDERABLE_DEFAULT_AMBIENT_COLOR = { 1.0f, 0.5f, 0.31f };
+    const CVec3 RENDERABLE_DEFAULT_DIFFUSE_COLOR = { 1.0f, 0.5f, 0.31f };
+    const CVec3 RENDERABLE_DEFAULT_SPECULAR_COLOR = { 1.0f, 0.5f, 0.31f };
+    const float32 RENDERABLE_DEFAULT_SHININESS = 32.0f;
 
     enum class eRenderableType
     {

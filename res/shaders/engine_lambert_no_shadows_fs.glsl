@@ -104,7 +104,7 @@ void main()
     else if ( u_spotLight.enabled == 1 )
         _resultColor = _computeColorWithSpotLight( u_spotLight, _normal );
 
-    if ( u_fog.enabled )
+    if ( u_fog.enabled == 1 )
         _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
 
     fColor = vec4( _resultColor, 1.0f );

@@ -113,7 +113,7 @@ void main()
     else if ( u_spotLight.enabled == 1 )
         _resultColor = _computeColorWithSpotLight( u_spotLight, _normal, _viewDir );
 
-    if ( u_fog.enabled )
+    if ( u_fog.enabled == 1 )
         _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
 
     fColor = vec4( _resultColor, 1.0f );
@@ -205,7 +205,7 @@ vec3 _computeFragmentDiffuseComp( vec3 lightDiffuseComp )
     return u_material.diffuse * lightDiffuseComp;
 }
 
-vec3 _computeObjectSpecularComp( vec3 lightSpecularComp )
+vec3 _computeFragmentSpecularComp( vec3 lightSpecularComp )
 {
     if ( u_material.specularMapActive == 1 )
         return vec3( texture( u_material.specularMap, fTexcoord ) ) * u_material.specular * lightSpecularComp;

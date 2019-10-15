@@ -60,6 +60,7 @@ namespace engine
         CILight*                lightPtr;
         CShadowMap*             shadowMapPtr;
         CFrameBuffer*           renderTargetPtr;
+        CFog*                   fogPtr;
 
         CRenderOptions()
         {
@@ -79,6 +80,7 @@ namespace engine
             lightPtr                = nullptr;
             shadowMapPtr            = nullptr;
             renderTargetPtr         = nullptr;
+            fogPtr                  = nullptr;
         }
     };
 

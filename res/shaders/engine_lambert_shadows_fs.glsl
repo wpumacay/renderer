@@ -72,8 +72,6 @@ struct SpotLight
 };
 uniform SpotLight u_spotLight;
 
-uniform vec3 u_viewerPosition;
-
 struct ShadowMap
 {
     int         size;       // width=depth of the shadow-map texture
@@ -110,7 +108,7 @@ void main()
     // compute some required vectors
     vec3 _normal = normalize( fNormal );
     // compute shadow factor
-    float _shadowFactor = _computeFragmentShadowFactor();
+    float _shadowFactor = _computeFragmentShadowFactor( _normal );
 
     if ( u_directionalLight.enabled == 1 )
         _resultColor = _computeColorWithDirectionalLight( u_directionalLight, _normal, _shadowFactor );
@@ -119,7 +117,7 @@ void main()
     else if ( u_spotLight.enabled == 1 )
         _resultColor = _computeColorWithSpotLight( u_spotLight, _normal, _shadowFactor );
 
-    if ( u_fog.enabled )
+    if ( u_fog.enabled == 1 )
         _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
 
     fColor = vec4( _resultColor, 1.0f );
@@ -141,7 +139,7 @@ vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, flo
            ( 1.0f - shadowFactor ) * _computeFragmentDiffuseComp( _lDiffuseComp );
 }
 
-vec3 _computePointLightContrib( PointLight light, vec3 normal, float shadowFactor )
+vec3 _computeColorWithPointLight( PointLight light, vec3 normal, float shadowFactor )
 {
     // precompute lightdir (fragment to light position) and attenuation factor
     vec3 _lightdir = normalize( light.position - fPosition );
@@ -159,7 +157,7 @@ vec3 _computePointLightContrib( PointLight light, vec3 normal, float shadowFacto
            ( 1.0f - shadowFactor ) * _computeFragmentDiffuseComp( _lDiffuseComp );
 }
 
-vec3 _computeSpotLightContrib( SpotLight light, vec3 normal, float shadowFactor )
+vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, float shadowFactor )
 {
     // precompute lightdir, attenuation factor and soft-edges factor
     vec3 _lightdir = normalize( light.position - fPosition );

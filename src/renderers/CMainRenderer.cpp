@@ -21,12 +21,37 @@ namespace engine
     void CMainRenderer::render( CScene* scenePtr, 
                                 CRenderOptions renderOptions )
     {
-        // (0): grab all renderables, setup default render options, and initialize status string
+        // (0): prepare for rendering
+
+        /* (0.1) grab all renderables, setup default render options, and initialize status string */
         auto _renderablesAll = scenePtr->renderables();
         renderOptions.cameraPtr     = ( !renderOptions.cameraPtr ) ? scenePtr->currentCamera() : renderOptions.cameraPtr;
         renderOptions.lightPtr      = ( !renderOptions.lightPtr ) ? scenePtr->mainLight() : renderOptions.lightPtr;
         renderOptions.shadowMapPtr  = ( !renderOptions.shadowMapPtr ) ? m_shadowMap.get() : renderOptions.shadowMapPtr;
+        renderOptions.fogPtr        = ( !renderOptions.fogPtr ) ? scenePtr->fog() : renderOptions.fogPtr;
         m_status = "renderables         : " + std::to_string( _renderablesAll.size() ) + "\n\r";
+
+        /* (0.2) do some error handling in case some options and some resources don't match */
+        if ( renderOptions.useShadowMapping && !renderOptions.shadowMapPtr )
+        {
+            ENGINE_CORE_WARN( "Renderer was setup to use shadow mapping, but no shadow-map provided" );
+            renderOptions.useShadowMapping = false;
+        }
+        if ( renderOptions.useFog && !renderOptions.fogPtr )
+        {
+            ENGINE_CORE_WARN( "Renderer was setup to use fog, but no fog-struct provided" );
+            renderOptions.useFog = false;
+        }
+        if ( !renderOptions.cameraPtr )
+        {
+            ENGINE_CORE_ERROR( "Renderer requires a camera to render to. Skipping this render pass" );
+            return;
+        }
+        if ( renderOptions.mode == eRenderMode::NORMAL && !renderOptions.lightPtr )
+        {
+            ENGINE_CORE_ERROR( "Renderer requires a light when using NORMAL mode. Skipping this render pass" );
+            return;
+        }
 
         // (1): grab all renderables and keep only visible ones
         auto _renderablesVisible = std::vector< CIRenderable* >();
@@ -45,26 +70,39 @@ namespace engine
         m_status += "renderablesInView  : " + std::to_string( _renderablesInView.size() ) + "\n\r";
 
         // (3): group by renderable types (to pass to specific renderers)
-        auto _rendMeshes = std::vector< CMesh* >();
-        auto _rendModels = std::vector< CModel* >();
-        _collectRenderablesByType< CMesh >( _renderablesInView, _rendMeshes );
-        _collectRenderablesByType< CModel >( _renderablesInView, _rendModels );
-        m_status += "renderables-meshes : " + std::to_string( _rendMeshes.size() ) + "\n\r";
-        m_status += "renderables-models : " + std::to_string( _rendModels.size() ) + "\n\r";
+        auto _rendMeshesVisible = std::vector< CMesh* >();
+        auto _rendModelsVisible = std::vector< CModel* >();
+        _collectRenderablesByType< CMesh >( _renderablesVisible, _rendMeshesVisible );
+        _collectRenderablesByType< CModel >( _renderablesVisible, _rendModelsVisible );
+        auto _rendMeshesInView = std::vector< CMesh* >();
+        auto _rendModelsInView = std::vector< CModel* >();
+        _collectRenderablesByType< CMesh >( _renderablesInView, _rendMeshesInView );
+        _collectRenderablesByType< CModel >( _renderablesInView, _rendModelsInView );
+        m_status += "meshes-visible : " + std::to_string( _rendMeshesVisible.size() ) + "\n\r";
+        m_status += "models-visible : " + std::to_string( _rendModelsVisible.size() ) + "\n\r";
+        m_status += "meshes-in-view : " + std::to_string( _rendMeshesInView.size() ) + "\n\r";
+        m_status += "models-in-view : " + std::to_string( _rendModelsInView.size() ) + "\n\r";
 
         // (3.5) return if only testing functionality above
         if ( renderOptions.mode == eRenderMode::NO_SUBMIT )
             return;
 
         // (4) submit to specific renderers for them to do extra preparations
-        m_rendererMeshes->submit( _rendMeshes, renderOptions );
+        m_rendererMeshes->submit( _rendMeshesVisible, _rendMeshesInView, renderOptions );
 
         // (5) start making the actual rendering process (use forward rendering for now)
 
         /* (5.1) render pass for shadow mapping (if enabled) */
         if ( renderOptions.useShadowMapping )
         {
+            // configure the light-space from configuration from user
+            renderOptions.shadowMapPtr->setup( renderOptions.shadowMapRangeConfig );
+            // bind the shadow-map (change render-target)
+            renderOptions.shadowMapPtr->bind();
+            // do the shadow-mapping render pass
             m_rendererMeshes->renderToShadowMap();
+            // go back to default render-target
+            renderOptions.shadowMapPtr->unbind();
         }
 
         /* (5.2) setup render target if given*/

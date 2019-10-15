@@ -107,7 +107,12 @@ namespace engine
             "phong_textures_no_shadows",
             "phong_textures_shadows",
             "shadow_mapping",
-            "skybox"
+            "skybox",
+            "engine_shadow_mapping",
+            "engine_lambert_no_shadows",
+            "engine_phong_no_shadows",
+            "engine_lambert_shadows",
+            "engine_phong_shadows"
         };
 
         for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )
@@ -138,6 +143,12 @@ namespace engine
 
         uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
 
+        if ( _programOpenglId == 0 )
+        {
+            ENGINE_CORE_ERROR( "An error occured while linking shader with name: {0}", name );
+            return nullptr;
+        }
+
         // keep ownership of the created shaders
         auto _shader = new CShader( name, _programOpenglId );
         std::unique_ptr< CShader > _shaderPtr( _shader );
@@ -160,6 +171,12 @@ namespace engine
         }
 
         uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
+
+        if ( _programOpenglId == 0 )
+        {
+            ENGINE_CORE_ERROR( "An error occured while linking shader with name: {0}", name );
+            return nullptr;
+        }
 
         // keep ownership of the created shaders
         auto _shader = new CShader( name, _programOpenglId );
