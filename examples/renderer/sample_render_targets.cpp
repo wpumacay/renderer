@@ -1,6 +1,11 @@
 
 #include <CEngine.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 engine::CRenderOptions g_renderOptions;
 // render options when using render-targets
 engine::CRenderOptions g_renderOptionsTargetNormal;
@@ -49,6 +54,18 @@ bool g_showRenderTargetDepth = false;
 bool g_showRenderTargetSemantic = false;
 
 float g_target_factor = 2.0f;
+
+void renderShadowMap( engine::CILight* lightPtr,
+                      engine::CVertexArray* quadVAO,
+                      engine::CShader* shaderPtr,
+                      engine::CShadowMap* shadowMapPtr );
+
+std::vector< engine::CMesh* > createScene0();
+std::vector< engine::CMesh* > createScene1();
+
+engine::CFrameBuffer* createRenderTarget();
+
+void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
 class ApplicationUi : public engine::CImguiUi
 {
@@ -216,6 +233,10 @@ private :
         {
             auto _textureAttachment = m_renderTargetNormal->getTextureAttachment( "color_attachment" );
             ImGui::Begin( "normal-view" );
+
+            if ( ImGui::Button( "Save" ) )
+                writeRenderTarget( m_renderTargetNormal, "target-normal.jpg" );
+
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
                           ImVec2( _textureAttachment->width(), 
                                   _textureAttachment->height() ),
@@ -227,6 +248,10 @@ private :
         {
             auto _textureAttachment = m_renderTargetDepth->getTextureAttachment( "color_attachment" );
             ImGui::Begin( "depth-view" );
+
+            if ( ImGui::Button( "Save" ) )
+                writeRenderTarget( m_renderTargetDepth, "target-depth.jpg" );
+
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
                           ImVec2( _textureAttachment->width(), 
                                   _textureAttachment->height() ),
@@ -238,6 +263,10 @@ private :
         {
             auto _textureAttachment = m_renderTargetSemantic->getTextureAttachment( "color_attachment" );
             ImGui::Begin( "semantic-view" );
+
+            if ( ImGui::Button( "Save" ) )
+                writeRenderTarget( m_renderTargetSemantic, "target-semantic.jpg" );
+
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
                           ImVec2( _textureAttachment->width(), 
                                   _textureAttachment->height() ),
@@ -396,16 +425,6 @@ private :
     engine::CFrameBuffer* m_renderTargetDepth;
     engine::CFrameBuffer* m_renderTargetSemantic;
 };
-
-void renderShadowMap( engine::CILight* lightPtr,
-                      engine::CVertexArray* quadVAO,
-                      engine::CShader* shaderPtr,
-                      engine::CShadowMap* shadowMapPtr );
-
-std::vector< engine::CMesh* > createScene0();
-std::vector< engine::CMesh* > createScene1();
-
-engine::CFrameBuffer* createRenderTarget();
 
 int main()
 {
@@ -876,4 +895,23 @@ engine::CFrameBuffer* createRenderTarget()
     _framebuffer->addAttachment( _fbDepthConfig );
 
     return _framebuffer;
+}
+
+void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name )
+{
+    auto _colorAttachment = renderTarget->getTextureAttachment( "color_attachment" );
+    auto _colorAttachmentConfig = renderTarget->getConfigAttachment( "color_attachment" );
+
+    auto _width = _colorAttachmentConfig.width;
+    auto _height = _colorAttachmentConfig.height;
+
+    engine::uint8* _buffer = new engine::uint8[3 * _width * _height];
+
+    renderTarget->bind();
+    glReadPixels( 0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, _buffer );
+    renderTarget->unbind();
+
+    stbi_write_jpg( name.c_str(), _width, _height, 3, _buffer, 100 );
+    
+    delete[] _buffer;
 }
