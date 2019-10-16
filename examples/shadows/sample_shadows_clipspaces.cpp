@@ -88,7 +88,16 @@ protected :
 
     void _renderInternal() override
     {
+        _menuUiRendererStats();
         _menuUiLights();
+    }
+
+    void _menuUiRendererStats()
+    {
+        ImGui::Begin( "statistics" );
+        ImGui::Text( "fps           : %.5f", engine::COpenGLApp::GetInstance()->fps() );
+        ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
+        ImGui::End();
     }
 
     void _menuUiLights()
@@ -132,7 +141,7 @@ protected :
         {
             /* shadow frustum transform in world-space (view) */
             float _direction[3] = { m_lightDirDirection.x, m_lightDirDirection.y, m_lightDirDirection.z };
-            ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
+            ImGui::SliderFloat3( "direction", _direction, -1.0f, 1.0f );
             m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
 
             g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
@@ -180,7 +189,7 @@ protected :
         else if ( _lightPtr->type() == engine::eLightType::SPOT )
         {
             float _direction[3] = { m_lightSpotDirection.x, m_lightSpotDirection.y, m_lightSpotDirection.z };
-            ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
+            ImGui::SliderFloat3( "direction", _direction, -1.0f, 1.0f );
             m_lightSpotDirection = { _direction[0], _direction[1], _direction[2] };
 
             float _position[3] = { m_lightSpotPosition.x, m_lightSpotPosition.y, m_lightSpotPosition.z };

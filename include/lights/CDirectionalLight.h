@@ -12,8 +12,6 @@ namespace engine
 
     public :
 
-        CVec3 direction;
-
         CDirectionalLight( const std::string& name,
                            const CVec3& ambientColor,
                            const CVec3& diffuseColor,
