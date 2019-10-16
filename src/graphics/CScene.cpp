@@ -9,11 +9,15 @@ namespace engine
         m_fog = nullptr;
         m_skybox = nullptr;
         m_currentCamera = nullptr;
+        m_mainLight = nullptr;
     }
 
     CScene::~CScene()
     {
+        m_fog = nullptr;
+        m_skybox = nullptr;
         m_currentCamera = nullptr;
+        m_mainLight = nullptr;
 
         m_camerasMap.clear();
         m_lightsMap.clear();

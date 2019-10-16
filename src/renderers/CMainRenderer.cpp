@@ -93,7 +93,9 @@ namespace engine
         // (5) start making the actual rendering process (use forward rendering for now)
 
         /* (5.1) render pass for shadow mapping (if enabled) */
-        if ( renderOptions.mode == eRenderMode::NORMAL && renderOptions.useShadowMapping )
+        if ( renderOptions.mode == eRenderMode::NORMAL && 
+             renderOptions.useShadowMapping && 
+             renderOptions.redrawShadowMap )
         {
             // configure the light-space from configuration from user
             renderOptions.shadowMapPtr->setup( renderOptions.shadowMapRangeConfig );
@@ -105,9 +107,23 @@ namespace engine
             renderOptions.shadowMapPtr->unbind();
         }
 
+        // cache previous viewport properties
+        int32 _currentViewport[4];
+        glGetIntegerv( GL_VIEWPORT, _currentViewport );
+        int32 _prevViewportX = _currentViewport[0];
+        int32 _prevViewportY = _currentViewport[1];
+        int32 _prevViewportWidth  = _currentViewport[2];
+        int32 _prevViewportHeight = _currentViewport[3];
+
+        // setup the requested viewport
+        glViewport( 0, 0, renderOptions.viewportWidth, renderOptions.viewportHeight );
+
         /* (5.2) setup render target if given*/
         if ( renderOptions.renderTargetPtr )
             renderOptions.renderTargetPtr->bind();
+
+        // prepare for rendering
+        glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
 
         /* (5.3) render pass for the scene itself */
         if ( renderOptions.mode == eRenderMode::NORMAL )
@@ -129,6 +145,9 @@ namespace engine
         {
             m_rendererMeshes->renderSemanticOnly();
         }
+
+        // restore previous viewport
+        glViewport( _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight );
 
         /* (5.5) release custom render target in case used */
         if ( renderOptions.renderTargetPtr )

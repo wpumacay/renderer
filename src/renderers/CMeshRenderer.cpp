@@ -18,8 +18,11 @@ namespace engine
                                 const std::vector< CMesh* >& meshesInView, 
                                 const CRenderOptions& renderOptions )
     {
-        ENGINE_CORE_ASSERT( renderOptions.cameraPtr, "Mesh-renderer requires a valid camera to render" );
-        ENGINE_CORE_ASSERT( renderOptions.lightPtr, "Mesh-renderer requires a valid light to render" );
+        if ( !renderOptions.cameraPtr )
+            ENGINE_CORE_ASSERT( false, "Mesh-renderer requires a valid camera to render" );
+
+        if ( renderOptions.mode == eRenderMode::NORMAL && !renderOptions.lightPtr )
+            ENGINE_CORE_ASSERT( false, "Mesh-renderer requires a valid light to render in normal-mode" );
 
         // (0): clear buffers to store newly submitted meshes, and store render options
         m_meshesCastShadows.clear();

@@ -49,6 +49,7 @@ namespace engine
         eCullingGeom            cullingGeom;
         bool                    useFaceCulling;
         bool                    useShadowMapping;
+        bool                    redrawShadowMap;
         int                     pcfCount;
         bool                    useBlending;
         bool                    useFog;
@@ -76,6 +77,7 @@ namespace engine
             cullingGeom             = eCullingGeom::BOUNDING_SPHERE;
             useFaceCulling          = false;
             useShadowMapping        = false;
+            redrawShadowMap         = true;
             pcfCount                = 2;
             useBlending             = false;
             useFog                  = false;
