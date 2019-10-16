@@ -39,14 +39,8 @@ namespace engine
                                                 const std::vector< CIRenderable* >& renderablesToCheck,
                                                 std::vector< CIRenderable* >& renderablesInView );
 
-        template< class T >
-        void _collectRenderablesByType( const std::vector< CIRenderable* >& renderables,
-                                        std::vector< T* >& renderablesOfGivenType )
-        {
-            for ( auto _renderable : renderables )
-                if ( _renderable->type() == T::GetStaticType() )
-                    renderablesOfGivenType.push_back( dynamic_cast<T*>( _renderable ) );
-        }
+        void _collectMeshes( const std::vector< CIRenderable* >& renderables,
+                             std::vector< CMesh* >& meshes );
 
     private :
 

@@ -71,17 +71,11 @@ namespace engine
 
         // (3): group by renderable types (to pass to specific renderers)
         auto _rendMeshesVisible = std::vector< CMesh* >();
-        auto _rendModelsVisible = std::vector< CModel* >();
-        _collectRenderablesByType< CMesh >( _renderablesVisible, _rendMeshesVisible );
-        _collectRenderablesByType< CModel >( _renderablesVisible, _rendModelsVisible );
-        auto _rendMeshesInView = std::vector< CMesh* >();
-        auto _rendModelsInView = std::vector< CModel* >();
-        _collectRenderablesByType< CMesh >( _renderablesInView, _rendMeshesInView );
-        _collectRenderablesByType< CModel >( _renderablesInView, _rendModelsInView );
+        auto _rendMeshesInView  = std::vector< CMesh* >();
+        _collectMeshes( _renderablesVisible, _rendMeshesVisible );
+        _collectMeshes( _renderablesInView, _rendMeshesInView );
         m_status += "meshes-visible : " + std::to_string( _rendMeshesVisible.size() ) + "\n\r";
-        m_status += "models-visible : " + std::to_string( _rendModelsVisible.size() ) + "\n\r";
         m_status += "meshes-in-view : " + std::to_string( _rendMeshesInView.size() ) + "\n\r";
-        m_status += "models-in-view : " + std::to_string( _rendModelsInView.size() ) + "\n\r";
 
         // (3.5) return if only testing functionality above
         if ( renderOptions.mode == eRenderMode::NO_SUBMIT )
@@ -183,6 +177,39 @@ namespace engine
         for ( auto renderablePtr : renderablesToCheck )
             if ( !engine::certainlyOutsideFrustum( frustum, renderablePtr->bsphere() ) )
                 renderablesInView.push_back( renderablePtr );
+    }
+
+    void CMainRenderer::_collectMeshes( const std::vector< CIRenderable* >& renderables,
+                                        std::vector< CMesh* >& meshes )
+    {
+        for ( auto renderablePtr : renderables )
+        {
+            if ( renderablePtr->type() == eRenderableType::MESH )
+            {
+                meshes.push_back( dynamic_cast< CMesh* >( renderablePtr ) );
+            }
+            else if ( renderablePtr->type() == eRenderableType::MODEL )
+            {
+                auto _submeshes = dynamic_cast< CModel* >( renderablePtr )->meshes();
+                auto _localTransforms = dynamic_cast< CModel* >( renderablePtr )->localTransforms();
+                auto _modelWorldTransform = renderablePtr->matModel();
+                for ( size_t i = 0; i < _submeshes.size(); i++ )
+                {
+                    if ( !_submeshes[i]->visible() )
+                        continue;
+
+                    // @TODO: Should optimize this part, as we'll do the world-transform computation
+                    // again when constructing the model-matrix for this submesh (unpacking and 
+                    // packing the matrix again )
+                    auto _subMeshWorldTransform = _modelWorldTransform * _localTransforms[i];
+                    _submeshes[i]->position = _subMeshWorldTransform.getPosition();
+                    _submeshes[i]->rotation = _subMeshWorldTransform.getRotation();
+                    _submeshes[i]->setMaskId( renderablePtr->maskId() );
+
+                    meshes.push_back( _submeshes[i] );
+                }
+            }
+        }
     }
 
 }

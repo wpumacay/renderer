@@ -17,3 +17,7 @@ tmp/
 # dependencies-exclusions
 ext/imgui*
 ext/spdlog*
+
+# compressed files
+*.zip
+*.rar

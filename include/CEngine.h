@@ -50,8 +50,8 @@
 #include <lights/CPointLight.h>
 #include <lights/CSpotLight.h>
 
-#include <renderers/CMainRenderer.h>     // IMPLEMENT RENDERER PIPELINE
-#include <renderers/CMeshRenderer.h>     // IMPLEMENT RENDERER PIPELINE
+#include <renderers/CMainRenderer.h>        // IMPLEMENT RENDERER PIPELINE
+#include <renderers/CMeshRenderer.h>        // IMPLEMENT RENDERER PIPELINE
 // #include <renderers/CSkyboxRenderer.h>   // IMPLEMENT RENDERER PIPELINE
 // #include <renderers/CGizmosRenderer.h>   // IMPLEMENT RENDERER PIPELINE
 
