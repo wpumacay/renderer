@@ -997,7 +997,7 @@ namespace engine
         auto _name = std::string( "assimpModel:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ );
         auto _model = new CModel( _name );
         // recursively copy the data from assimp to our data structure
-        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr );
+        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr, engine::getFolderpathFromFilePath( filename ) );
 
         // make sure we release the assimp resources
         // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
@@ -1031,12 +1031,13 @@ namespace engine
 
     void CMeshBuilder::_processAssimpNode( CModel* modelPtr, 
                                            aiNode* assimpNodePtr, 
-                                           const aiScene* assimpScenePtr )
+                                           const aiScene* assimpScenePtr,
+                                           const std::string& folderPath )
     {
         for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
         {
             aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
-            auto _meshPtr = std::unique_ptr< CMesh >( _processAssimpMesh( modelPtr, _assimpMeshPtr ) );
+            auto _meshPtr = std::unique_ptr< CMesh >( _processAssimpMesh( modelPtr, _assimpMeshPtr, assimpScenePtr, folderPath ) );
             modelPtr->addMesh( std::move( _meshPtr ), CMat4() );
         }
 
@@ -1044,17 +1045,22 @@ namespace engine
         {
             _processAssimpNode( modelPtr,
                                 assimpNodePtr->mChildren[i],
-                                assimpScenePtr );
+                                assimpScenePtr,
+                                folderPath );
         }
     }
 
     CMesh* CMeshBuilder::_processAssimpMesh( CModel* modelPtr, 
-                                             aiMesh* assimpMeshPtr )
+                                             aiMesh* assimpMeshPtr,
+                                             const aiScene* assimpScenePtr,
+                                             const std::string& folderPath )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
         std::vector< CVec2 > _texCoords;
         std::vector< CInd3 > _indices;
+        CTexture* _albedoMap = nullptr;
+        CTexture* _specularMap = nullptr;
 
         for ( size_t i = 0; i < assimpMeshPtr->mNumVertices; i++ )
         {
@@ -1067,14 +1073,10 @@ namespace engine
                                        assimpMeshPtr->mNormals[i].z ) );
 
             if ( assimpMeshPtr->mTextureCoords[0] )
-            {
                 _texCoords.push_back( CVec2( assimpMeshPtr->mTextureCoords[0][i].x,
                                              assimpMeshPtr->mTextureCoords[0][i].y ) );
-            }
             else
-            {
                 _texCoords.push_back( CVec2( 0.0f, 0.0f ) );
-            }
         }
 
         for ( size_t i = 0; i < assimpMeshPtr->mNumFaces; i++ )
@@ -1090,6 +1092,56 @@ namespace engine
             }
         }
 
+        // collect textures only if required
+        if ( assimpMeshPtr->mMaterialIndex >= 0 )
+        {
+            aiMaterial* _assimpMaterial = assimpScenePtr->mMaterials[assimpMeshPtr->mMaterialIndex];
+            // check for diffuse maps
+            if ( _assimpMaterial->GetTextureCount( aiTextureType_DIFFUSE ) > 0 )
+            {
+                if ( _assimpMaterial->GetTextureCount( aiTextureType_DIFFUSE ) > 1 )
+                    ENGINE_CORE_WARN( "model with name ( {0} ) has more than one diffuse map. Using only first one" );
+
+                aiString _str;
+                _assimpMaterial->GetTexture( aiTextureType_DIFFUSE, 0, &_str );
+                //// ENGINE_CORE_TRACE( "folder-path: {0}", folderPath );
+                //// ENGINE_CORE_TRACE( "path-to-diffuse-map: {0}", folderPath + _str.C_Str() );
+
+                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) ) )
+                {
+                    //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
+                    _albedoMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) );
+                }
+                else
+                {
+                    //// ENGINE_CORE_TRACE( "NOT LOADED YET: {0}", _str.C_Str() );
+                    _albedoMap = CTextureManager::LoadTexture( folderPath + _str.C_Str() );
+                }
+            }
+            // check for specular maps
+            if ( _assimpMaterial->GetTextureCount( aiTextureType_SPECULAR ) > 0 )
+            {
+                if ( _assimpMaterial->GetTextureCount( aiTextureType_SPECULAR ) > 1 )
+                    ENGINE_CORE_WARN( "model with name ( {0} ) has more than one specular map. Using only first one" );
+
+                aiString _str;
+                _assimpMaterial->GetTexture( aiTextureType_SPECULAR, 0, &_str );
+                //// ENGINE_CORE_TRACE( "folder-path: {0}", folderPath );
+                //// ENGINE_CORE_TRACE( "path-to-specular-map: {0}", folderPath + _str.C_Str() );
+
+                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) ) )
+                {
+                    //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
+                    _specularMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) );
+                }
+                else
+                {
+                    //// ENGINE_CORE_TRACE( "NOT LOADED YET: {0}", _str.C_Str() );
+                    _specularMap = CTextureManager::LoadTexture( folderPath + _str.C_Str() );
+                }
+            }
+        }
+
         // compute bounding box
         float32 _dx = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x - 
                       (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x;
@@ -1102,6 +1154,8 @@ namespace engine
         auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { _dx, _dy, _dz } );
         _mesh->cullFaces = false; // don't cull this submesh (we don't know if it's closed yet), pretty please :(
+        _mesh->material()->setAlbedoMap( _albedoMap );
+        _mesh->material()->setSpecularMap( _specularMap );
 
         return _mesh;
     }

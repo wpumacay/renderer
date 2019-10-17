@@ -42,6 +42,12 @@ namespace engine
         static CTexture* GetCachedTexture( const std::string& texId );
         static CTextureCube* GetCachedTextureCube( const std::string& texCubeId );
 
+        static bool HasCachedTextureData( const std::string& texDataId );
+        static bool HasCachedTextureCubeData( const std::string& texCubeDataId );
+
+        static bool HasCachedTexture( const std::string& texId );
+        static bool HasCachedTextureCube( const std::string& texCubeId );
+
         static std::vector< CTextureData* > GetAllCachedTexturesData();
         static std::vector< CTexture* > GetAllCachedTextures();
 
@@ -68,6 +74,12 @@ namespace engine
 
         CTexture* _getCachedTexture( const std::string& texId );
         CTextureCube* _getCachedTextureCube( const std::string& texCubeId );
+
+        bool _hasCachedTextureData( const std::string& texDataId );
+        bool _hasCachedTextureCubeData( const std::string& texCubeDataId );
+
+        bool _hasCachedTexture( const std::string& texId );
+        bool _hasCachedTextureCube( const std::string& texCubeId );
 
         std::vector< CTextureData* > const _getAllCachedTexturesData() { return m_texturesDataList; }
         std::vector< CTextureCubeData* > const _getAllCachedTexturesCubeData() { return m_texturesCubeDataList; }

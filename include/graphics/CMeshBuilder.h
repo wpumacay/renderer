@@ -5,6 +5,7 @@
 #include <CMath.h>
 #include <utils/CLogger.h>
 #include <utils/CNoiseGenerator.h>
+#include <assets/CTextureManager.h>
 #include <graphics/CMesh.h>
 #include <graphics/CModel.h>
 
@@ -155,9 +156,12 @@ namespace engine
 
         static void _processAssimpNode( CModel* modelPtr, 
                                         aiNode* assimpNodePtr, 
-                                        const aiScene* assimpScenePtr );
+                                        const aiScene* assimpScenePtr,
+                                        const std::string& folderPath );
         static CMesh* _processAssimpMesh( CModel* modelPtr, 
-                                          aiMesh* assimpMeshPtr );
+                                          aiMesh* assimpMeshPtr,
+                                          const aiScene* assimpScenePtr,
+                                          const std::string& folderPath );
 
         static CVec3 _rotateToMatchUpAxis( const CVec3& vec, const eAxis& axis );
         static CVec3 _rotateBackFromUpAxis( const CVec3& vec, const eAxis& axis );

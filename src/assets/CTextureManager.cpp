@@ -74,11 +74,11 @@ namespace engine
         return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype, textureUnit } );
     }
 
-    CTextureData* CTextureManager::GetCachedTextureData( const std::string& texdataId )
+    CTextureData* CTextureManager::GetCachedTextureData( const std::string& texDataId )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
-        return CTextureManager::s_instance->_getCachedTextureData( texdataId );
+        return CTextureManager::s_instance->_getCachedTextureData( texDataId );
     }
 
     CTextureCubeData* CTextureManager::GetCachedTextureCubeData( const std::string& texCubeDataId )
@@ -100,6 +100,34 @@ namespace engine
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
         return CTextureManager::s_instance->_getCachedTextureCube( texCubeId );
+    }
+
+    bool CTextureManager::HasCachedTextureData( const std::string& texDataId )
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_hasCachedTextureData( texDataId );
+    }
+
+    bool CTextureManager::HasCachedTextureCubeData( const std::string& texCubeDataId )
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_hasCachedTextureCubeData( texCubeDataId );
+    }
+
+    bool CTextureManager::HasCachedTexture( const std::string& texId )
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_hasCachedTexture( texId );
+    }
+
+    bool CTextureManager::HasCachedTextureCube( const std::string& texCubeId )
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_hasCachedTextureCube( texCubeId );
     }
 
     std::vector< CTextureData* > CTextureManager::GetAllCachedTexturesData()
@@ -457,15 +485,15 @@ namespace engine
         return _textureCube;
     }
 
-    CTextureData* CTextureManager::_getCachedTextureData( const std::string& texdataId )
+    CTextureData* CTextureManager::_getCachedTextureData( const std::string& texDataId )
     {
-        if ( m_texturesData.find( texdataId ) == m_texturesData.end() )
+        if ( m_texturesData.find( texDataId ) == m_texturesData.end() )
         {
-            ENGINE_CORE_WARN( "Texture-data with id {0} hasn't been loaded yet.", texdataId );
+            ENGINE_CORE_WARN( "Texture-data with id {0} hasn't been loaded yet.", texDataId );
             return nullptr;
         }
 
-        return m_texturesData[ texdataId ].get();
+        return m_texturesData[ texDataId ].get();
     }
 
     CTextureCubeData* CTextureManager::_getCachedTextureCubeData( const std::string& texCubeDataId )
@@ -499,6 +527,26 @@ namespace engine
         }
 
         return m_texturesCube[ texCubeId ].get();
+    }
+
+    bool CTextureManager::_hasCachedTextureData( const std::string& texDataId )
+    {
+        return m_texturesData.find( texDataId ) != m_texturesData.end();
+    }
+
+    bool CTextureManager::_hasCachedTextureCubeData( const std::string& texCubeDataId )
+    {
+        return m_texturesCubeData.find( texCubeDataId ) != m_texturesCubeData.end();
+    }
+
+    bool CTextureManager::_hasCachedTexture( const std::string& texId )
+    {
+        return m_textures.find( texId ) != m_textures.end();
+    }
+
+    bool CTextureManager::_hasCachedTextureCube( const std::string& texCubeId )
+    {
+        return m_texturesCube.find( texCubeId ) != m_texturesCube.end();
     }
 
     void CTextureManager::_createBuiltInTextures()

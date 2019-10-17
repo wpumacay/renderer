@@ -31,6 +31,42 @@ namespace engine
         return _res;
     }
 
+    std::string getFilenameFromFilePath(  const std::string& filepath )
+    {
+        return engine::split( filepath, '/' ).back();
+    }
+
+    std::string getFoldernameFromFilePath(  const std::string& filepath )
+    {
+        auto _pathParts = engine::split( filepath, '/' );
+        if ( _pathParts.size() < 2 )
+        {
+            return "./";
+        }
+
+        return _pathParts[ _pathParts.size() - 2 ];
+    }
+
+    std::string getFolderpathFromFilePath( const std::string& filepath )
+    {
+        auto _pathParts = engine::split( filepath, '/' );
+        if ( _pathParts.size() < 2 )
+        {
+            return "./";
+        }
+
+        std::stringstream _ss;
+        for ( size_t i = 0; i < _pathParts.size() - 1; i++ )
+            _ss << _pathParts[i] << "/";
+
+        return _ss.str();
+    }
+
+    std::string getFilenameNoExtensionFromFilePath(  const std::string& filepath )
+    {
+        return engine::split( engine::split( filepath, '/' ).back(), '.' ).front();
+    }
+
     std::string toString( const eAxis& axis )
     {
         if ( axis == eAxis::X ) return "x";

@@ -825,12 +825,12 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->scale = { _scale, _scale, _scale };
 
         renderablePtr->material()->setAlbedoMap( _renderableTexture );
-        if ( renderablePtr->type() == engine::eRenderableType::MODEL )
-        {
-            auto _submeshes = dynamic_cast< engine::CModel* >( renderablePtr )->meshes();
-            for ( auto submeshPtr : _submeshes )
-                submeshPtr->material()->setAlbedoMap( _renderableTexture );
-        }
+////         if ( renderablePtr->type() == engine::eRenderableType::MODEL )
+////         {
+////             auto _submeshes = dynamic_cast< engine::CModel* >( renderablePtr )->meshes();
+////             for ( auto submeshPtr : _submeshes )
+////                 submeshPtr->material()->setAlbedoMap( _renderableTexture );
+////         }
     }
 
     _renderables[15]->scale = { 0.1f, 0.1f, 0.1f };
