@@ -916,7 +916,8 @@ std::vector< engine::CIRenderable* > _createScene0()
     _renderables.push_back( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Z ) );
     _renderables.push_back( engine::CMeshBuilder::createAxes( 0.5f ) );
     _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/chassis.stl" ) ) );
-    _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/nanosuit/nanosuit.obj" ) ) );
+    // _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/nanosuit/nanosuit.obj" ) ) );
+    _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/fox/fox.obj" ) ) );
 
     _renderables[1]->position = { -1.0f, 1.0f, -1.0f };
     _renderables[2]->position = { -1.0f, 1.0f,  1.0f };
@@ -966,15 +967,20 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->scale = { _scale, _scale, _scale };
 
         renderablePtr->material()->setAlbedoMap( _renderableTexture );
-        //// if ( renderablePtr->type() == engine::eRenderableType::MODEL )
-        //// {
-        ////     auto _submeshes = dynamic_cast< engine::CModel* >( renderablePtr )->meshes();
-        ////     for ( auto submeshPtr : _submeshes )
-        ////         submeshPtr->material()->setAlbedoMap( _renderableTexture );
-        //// }
+        if ( renderablePtr->type() == engine::eRenderableType::MODEL )
+        {
+            auto _submeshes = dynamic_cast< engine::CModel* >( renderablePtr )->meshes();
+            for ( auto submeshPtr : _submeshes )
+            {
+                submeshPtr->material()->ambient = { 0.4f, 0.4f, 0.4f };
+                submeshPtr->material()->diffuse = { 0.8f, 0.8f, 0.8f };
+                submeshPtr->material()->specular = { 0.8f, 0.8f, 0.8f };
+                //// submeshPtr->material()->setAlbedoMap( _renderableTexture );
+            }
+        }
     }
 
-    _renderables[15]->scale = { 0.1f, 0.1f, 0.1f };
+    _renderables[15]->scale = { 1.0f, 1.0f, 1.0f };
     _renderables[15]->setMaskId( g_numRenderables );
 
     return _renderables;
