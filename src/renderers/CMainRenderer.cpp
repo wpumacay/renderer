@@ -121,24 +121,13 @@ namespace engine
 
         /* (5.3) render pass for the scene itself */
         if ( renderOptions.mode == eRenderMode::NORMAL )
-        {
-            if ( renderOptions.useShadowMapping )
-            {
-                m_rendererMeshes->renderWithShadowMap();
-            }
-            else
-            {
-                m_rendererMeshes->renderWithoutShadowMap();
-            }
-        }
+            m_rendererMeshes->render( renderOptions.useShadowMapping );
+
         else if ( renderOptions.mode == eRenderMode::DEPTH_ONLY )
-        {
             m_rendererMeshes->renderDepthOnly();
-        }
+
         else if ( renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
-        {
             m_rendererMeshes->renderSemanticOnly();
-        }
 
         // restore previous viewport
         glViewport( _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight );

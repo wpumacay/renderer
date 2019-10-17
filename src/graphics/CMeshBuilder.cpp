@@ -356,7 +356,7 @@ namespace engine
                 _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip1, _baseIndx + _ip2 } );
 
                 if ( j != ( nDiv2 - 1 ) )
-                    _indices.push_back( { _ip0, _ip2, _ip3 } );
+                    _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip2, _baseIndx + _ip3 } );
             }
         }
 
@@ -444,10 +444,10 @@ namespace engine
                 int _ip2 = ( i + 1 ) * ( nDiv2 + 1 ) + ( j + 1 );
                 int _ip3 = ( i + 0 ) * ( nDiv2 + 1 ) + ( j + 1 );
 
-                _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip1, _baseIndx + _ip2 } );
+                _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip2, _baseIndx + _ip1 } );
 
                 if ( j != ( nDiv2 - 1 ) )
-                    _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip2, _baseIndx + _ip3 } );
+                    _indices.push_back( { _baseIndx + _ip0, _baseIndx + _ip3, _baseIndx + _ip2 } );
             }
         }
 

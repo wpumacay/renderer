@@ -54,6 +54,7 @@ bool g_showRenderTargetDepth = false;
 bool g_showRenderTargetSemantic = false;
 
 float g_target_factor = 2.0f;
+bool g_useFaceCulling = false;
 
 void renderShadowMap( engine::CILight* lightPtr,
                       engine::CVertexArray* quadVAO,
@@ -242,6 +243,13 @@ private :
             ImGui::RadioButton( "Sphere", &_cullingGeomOption, 1 );
             g_renderOptions.cullingGeom = ( _cullingGeomOption == 0 ) ? engine::eCullingGeom::BOUNDING_BOX : engine::eCullingGeom::BOUNDING_SPHERE;
         }
+
+        ImGui::Checkbox( "use-face-culling", &g_useFaceCulling );
+
+        g_renderOptions.useFaceCulling = g_useFaceCulling;
+        g_renderOptionsTargetNormal.useFaceCulling = g_useFaceCulling;
+        g_renderOptionsTargetDepth.useFaceCulling = g_useFaceCulling;
+        g_renderOptionsTargetSemantic.useFaceCulling = g_useFaceCulling;
 
         ImGui::Spacing();
         ImGui::Text( m_rendererPtr->status().c_str() );
@@ -713,9 +721,9 @@ int main()
 
         _app->endRendering();
 
-        ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
-                     1.0f / engine::CTime::GetAvgTimeStep(), 
-                     engine::CTime::GetAvgTimeStep() );
+////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
+////                      1.0f / engine::CTime::GetAvgTimeStep(), 
+////                      engine::CTime::GetAvgTimeStep() );
     }
 
     return 0;
@@ -814,9 +822,9 @@ std::vector< engine::CIRenderable* > _createScene0()
             continue;
         }
 
-        renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
+        // renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+        //                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+        //                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
         float _scale = _randomDistribution( _randomGenerator );
         renderablePtr->scale = { _scale, _scale, _scale };
 

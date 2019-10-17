@@ -60,6 +60,8 @@ namespace engine
         }
 
         // (4): prepare context information
+        /* render options */
+        m_context.useFaceCulling = renderOptions.useFaceCulling;
         /* camera-information */
         m_context.viewMatrix                = renderOptions.cameraPtr->matView();
         m_context.projMatrix                = renderOptions.cameraPtr->matProj();
@@ -142,7 +144,7 @@ namespace engine
         _shaderShadowMapping->unbind();
     }
 
-    void CMeshRenderer::renderWithShadowMap()
+    void CMeshRenderer::render( bool useShadowMapping )
     {
         // (0): collect the meshes according to material type
         auto _meshesOpaqueLambert       = std::vector< CMesh* >();
@@ -161,35 +163,45 @@ namespace engine
         _collectMeshesByMaterial< CPhongMaterial >( m_meshesTransparent, _meshesTransparentPhong );
         // _collectMeshesByMaterial< CBlinnPhongMaterial >( m_meshesTransparent, _meshesTransparentBlinnPhong );
 
-        // (1): render opaque meshes
-        _render_Lambert( _meshesOpaqueLambert, true );
-        _render_Phong( _meshesOpaquePhong, true );
-        //// _render_BlinnPhong( _meshesOpaqueBlinnPhong, true );
-    }
+        // (1): group meshes that can be face-culled (if enabled)
+        auto _meshesOpaqueLambert_faceCull = std::vector< CMesh* >();
+        auto _meshesOpaqueLambert_noFaceCull = std::vector< CMesh* >();
+        auto _meshesOpaquePhong_faceCull = std::vector< CMesh* >();
+        auto _meshesOpaquePhong_noFaceCull = std::vector< CMesh* >();
 
-    void CMeshRenderer::renderWithoutShadowMap()
-    {
-        // (0): collect the meshes according to material type
-        auto _meshesOpaqueLambert     = std::vector< CMesh* >();
-        auto _meshesOpaquePhong       = std::vector< CMesh* >();
-        // auto _meshesOpaqueBlinnPhong  = std::vector< CMesh* >();
+        if ( m_context.useFaceCulling )
+        {
+            for ( auto meshPtr : _meshesOpaqueLambert )
+            {
+                if ( meshPtr->cullFaces )
+                    _meshesOpaqueLambert_faceCull.push_back( meshPtr );
+                else
+                    _meshesOpaqueLambert_noFaceCull.push_back( meshPtr );
+            }
 
-        _collectMeshesByMaterial< CLambertMaterial >( m_meshesOpaque, _meshesOpaqueLambert );
-        _collectMeshesByMaterial< CPhongMaterial >( m_meshesOpaque, _meshesOpaquePhong );
-        // _collectMeshesByMaterial< CBlinnPhongMaterial >( m_meshesOpaque, _meshesOpaqueBlinnPhong );
+            for ( auto meshPtr : _meshesOpaquePhong )
+            {
+                if ( meshPtr->cullFaces )
+                    _meshesOpaquePhong_faceCull.push_back( meshPtr );
+                else
+                    _meshesOpaquePhong_noFaceCull.push_back( meshPtr );
+            }
+        }
 
-        auto _meshesTransparentLambert     = std::vector< CMesh* >();
-        auto _meshesTransparentPhong       = std::vector< CMesh* >();
-        // auto _meshesTransparentBlinnPhong  = std::vector< CMesh* >();
+        // (2): render opaque meshes
+        if ( m_context.useFaceCulling )
+        {
+            _render_Lambert( _meshesOpaqueLambert_faceCull, _meshesOpaqueLambert_noFaceCull, useShadowMapping );
+            _render_Phong( _meshesOpaquePhong_faceCull, _meshesOpaquePhong_noFaceCull, useShadowMapping );
+        }
+        else
+        {
+            _render_Lambert( std::vector< CMesh* >(), _meshesOpaqueLambert, useShadowMapping );
+            _render_Phong( std::vector< CMesh* >(), _meshesOpaquePhong, useShadowMapping );
+        }
+        //// _render_BlinnPhong( _meshesOpaqueBlinnPhong, useShadowMapping );
 
-        _collectMeshesByMaterial< CLambertMaterial >( m_meshesTransparent, _meshesTransparentLambert );
-        _collectMeshesByMaterial< CPhongMaterial >( m_meshesTransparent, _meshesTransparentPhong );
-        // _collectMeshesByMaterial< CBlinnPhongMaterial >( m_meshesTransparent, _meshesTransparentBlinnPhong );
-
-        // (1): render opaque meshes
-        _render_Lambert( _meshesOpaqueLambert, false );
-        _render_Phong( _meshesOpaquePhong, false );
-        //// _render_BlinnPhong( _meshesOpaqueBlinnPhong, false );
+        // (3): render transparent meshes
     }
 
     void CMeshRenderer::renderDepthOnly()
@@ -257,7 +269,9 @@ namespace engine
         _shaderSemanticView->unbind();
     }
 
-    void CMeshRenderer::_render_Lambert( const std::vector< CMesh* >& meshes, bool renderWithShadows )
+    void CMeshRenderer::_render_Lambert( const std::vector< CMesh* >& meshesWithFaceCulling, 
+                                         const std::vector< CMesh* >& meshesWithNoFaceCulling,
+                                         bool renderWithShadows )
     {
         auto _shaderLambert = CShaderManager::GetCachedShader( "engine_lambert_shadows" );
 
@@ -270,44 +284,18 @@ namespace engine
         if ( m_context.fogEnabled == 1 )
             _setupRenderState_fog( _shaderLambert );
 
-        for ( auto meshPtr : meshes )
+        if ( m_context.useFaceCulling )
         {
-            // setup material uniforms
-            auto _materialPtr = meshPtr->material();
-            _shaderLambert->setVec3( "u_material.ambient", _materialPtr->ambient );
-            _shaderLambert->setVec3( "u_material.diffuse", _materialPtr->diffuse );
-            if ( _materialPtr->albedoMap() )
-            {
-                _shaderLambert->setInt( "u_material.albedoMapActive", 1 );
-                _shaderLambert->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-                glActiveTexture( GL_TEXTURE0 );
-                glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
-            }
-            else
-            {
-                _shaderLambert->setInt( "u_material.albedoMapActive", 0 );
-            }
+            glEnable( GL_CULL_FACE );
 
-            // setup mesh transforms-uniforms
-            auto _matModel = meshPtr->matModel();
-            _shaderLambert->setMat4( "u_modelMatrix", _matModel );
-            _shaderLambert->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
+            for ( auto meshPtr : meshesWithFaceCulling )
+                _renderMesh_Lambert( meshPtr, _shaderLambert );
 
-            // render the mesh ************************************************
-            auto _vao = meshPtr->vertexArray();
-            auto _ibo = _vao->indexBuffer();
-
-            if ( meshPtr->wireframe() )
-                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-            _vao->bind();
-            glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
-            _vao->unbind();
-
-            if ( meshPtr->wireframe() )
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            //*****************************************************************
+            glDisable( GL_CULL_FACE );
         }
+
+        for ( auto meshPtr : meshesWithNoFaceCulling )
+            _renderMesh_Lambert( meshPtr, _shaderLambert );
 
         // unbind albedo-map and depth-map (end with texture-0 to go back to default-texture 0 
         // being active, in case someone binds this slot without activating it)
@@ -319,7 +307,9 @@ namespace engine
         _shaderLambert->unbind();
     }
 
-    void CMeshRenderer::_render_Phong( const std::vector< CMesh* >& meshes, bool renderWithShadows )
+    void CMeshRenderer::_render_Phong( const std::vector< CMesh* >& meshesWithFaceCulling,
+                                       const std::vector< CMesh* >& meshesWithNoFaceCulling, 
+                                       bool renderWithShadows )
     {
         auto _shaderPhong = CShaderManager::GetCachedShader( "engine_phong_shadows" );
 
@@ -335,58 +325,18 @@ namespace engine
         // configure viewer position (required for specular-calculations)
         _shaderPhong->setVec3( "u_viewerPosition", m_context.viewPosition );
 
-        for ( auto meshPtr : meshes )
+        if ( m_context.useFaceCulling )
         {
-            // setup material uniforms
-            auto _materialPtr = meshPtr->material();
-            _shaderPhong->setVec3( "u_material.ambient", _materialPtr->ambient );
-            _shaderPhong->setVec3( "u_material.diffuse", _materialPtr->diffuse );
-            _shaderPhong->setVec3( "u_material.specular", _materialPtr->specular );
-            _shaderPhong->setFloat( "u_material.shininess", _materialPtr->shininess );
-            if ( _materialPtr->albedoMap() )
-            {
-                _shaderPhong->setInt( "u_material.albedoMapActive", 1 );
-                _shaderPhong->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-                glActiveTexture( GL_TEXTURE0 );
-                glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
-            }
-            else
-            {
-                _shaderPhong->setInt( "u_material.albedoMapActive", 0 );
-            }
+            glEnable( GL_CULL_FACE );
 
-            if ( _materialPtr->specularMap() )
-            {
-                _shaderPhong->setInt( "u_material.specularMapActive", 1 );
-                _shaderPhong->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
-                glActiveTexture( GL_TEXTURE1 );
-                glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
-            }
-            else
-            {
-                _shaderPhong->setInt( "u_material.specularMapActive", 0 );
-            }
+            for ( auto meshPtr : meshesWithFaceCulling )
+                _renderMesh_Phong( meshPtr, _shaderPhong );
 
-            // setup mesh transforms-uniforms
-            auto _matModel = meshPtr->matModel();
-            _shaderPhong->setMat4( "u_modelMatrix", _matModel );
-            _shaderPhong->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
-
-            // render the mesh ************************************************
-            auto _vao = meshPtr->vertexArray();
-            auto _ibo = _vao->indexBuffer();
-
-            if ( meshPtr->wireframe() )
-                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-            _vao->bind();
-            glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
-            _vao->unbind();
-
-            if ( meshPtr->wireframe() )
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            //*****************************************************************
+            glDisable( GL_CULL_FACE );
         }
+
+        for ( auto meshPtr : meshesWithNoFaceCulling )
+            _renderMesh_Phong( meshPtr, _shaderPhong );
 
         // unbind albedo-map, specular-map and depth-map (end with texture-0 to go back to 
         // default-texture 0 being active, in case someone binds this slot without activating it)
@@ -398,6 +348,98 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, 0 );
 
         _shaderPhong->unbind();
+    }
+
+    void CMeshRenderer::_renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr )
+    {
+        // setup material uniforms
+        auto _materialPtr = meshPtr->material();
+        shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
+        shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
+        if ( _materialPtr->albedoMap() )
+        {
+            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
+            shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
+            glActiveTexture( GL_TEXTURE0 );
+            glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
+        }
+        else
+        {
+            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
+        }
+
+        // setup mesh transforms-uniforms
+        auto _matModel = meshPtr->matModel();
+        shaderPtr->setMat4( "u_modelMatrix", _matModel );
+        shaderPtr->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
+
+        // render the mesh ************************************************
+        auto _vao = meshPtr->vertexArray();
+        auto _ibo = _vao->indexBuffer();
+
+        if ( meshPtr->wireframe() )
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+        _vao->bind();
+        glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
+        _vao->unbind();
+
+        if ( meshPtr->wireframe() )
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        //*****************************************************************
+    }
+
+    void CMeshRenderer::_renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr )
+    {
+        // setup material uniforms
+        auto _materialPtr = meshPtr->material();
+        shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
+        shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
+        shaderPtr->setVec3( "u_material.specular", _materialPtr->specular );
+        shaderPtr->setFloat( "u_material.shininess", _materialPtr->shininess );
+        if ( _materialPtr->albedoMap() )
+        {
+            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
+            shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
+            glActiveTexture( GL_TEXTURE0 );
+            glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
+        }
+        else
+        {
+            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
+        }
+
+        if ( _materialPtr->specularMap() )
+        {
+            shaderPtr->setInt( "u_material.specularMapActive", 1 );
+            shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
+            glActiveTexture( GL_TEXTURE1 );
+            glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
+        }
+        else
+        {
+            shaderPtr->setInt( "u_material.specularMapActive", 0 );
+        }
+
+        // setup mesh transforms-uniforms
+        auto _matModel = meshPtr->matModel();
+        shaderPtr->setMat4( "u_modelMatrix", _matModel );
+        shaderPtr->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
+
+        // render the mesh ************************************************
+        auto _vao = meshPtr->vertexArray();
+        auto _ibo = _vao->indexBuffer();
+
+        if ( meshPtr->wireframe() )
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+        _vao->bind();
+        glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
+        _vao->unbind();
+
+        if ( meshPtr->wireframe() )
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        //*****************************************************************
     }
 
     void CMeshRenderer::_setupRenderState_camera( CShader* shaderPtr )

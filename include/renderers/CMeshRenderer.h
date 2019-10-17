@@ -21,6 +21,8 @@ namespace engine
 
     struct CMeshRenderContext
     {
+        /* some render options */
+        bool    useFaceCulling;
         /* camera information */
         CMat4   viewMatrix;
         CMat4   projMatrix;
@@ -76,8 +78,7 @@ namespace engine
                      const CRenderOptions& renderOptions );
 
         void renderToShadowMap();
-        void renderWithShadowMap();
-        void renderWithoutShadowMap();
+        void render( bool useShadowMapping );
         void renderDepthOnly();
         void renderSemanticOnly();
 
@@ -94,8 +95,15 @@ namespace engine
 
     private :
 
-        void _render_Lambert( const std::vector< CMesh* >& meshes, bool renderWithShadows );
-        void _render_Phong( const std::vector< CMesh* >& meshes, bool renderWithShadows );
+        void _render_Lambert( const std::vector< CMesh* >& meshesWithFaceCulling, 
+                              const std::vector< CMesh* >& meshesWithNoFaceCulling,
+                              bool renderWithShadows );
+        void _render_Phong( const std::vector< CMesh* >& meshesWithFaceCulling,
+                            const std::vector< CMesh* >& meshesWithNoFaceCulling, 
+                            bool renderWithShadows );
+
+        void _renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr );
+        void _renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr );
 
         void _setupRenderState_camera( CShader* shaderPtr );
         void _setupRenderState_light( CShader* shaderPtr );
