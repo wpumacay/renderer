@@ -2,6 +2,8 @@
 
 #include <utils/CLogger.h>
 
+#define TIME_NUM_FRAMES_TO_AVERAGE 100
+
 namespace engine
 {
 
@@ -15,7 +17,12 @@ namespace engine
         static void Update( float timestep );
         static float GetTimeStep();
         static float GetRawTimeStep();
+        static float GetAvgTimeStep();
         static float GetWallTime();
+        static float* GetFrameTimes();
+        static float* GetFpsAvgs();
+        static int GetNumFramesForAvg();
+        static int GetFrameTimeIndex();
 
         ~CTime();
 
@@ -33,7 +40,12 @@ namespace engine
 
         float m_timeCurrent;
         float m_timeDelta;
+        float m_timeDeltaAvg;
         float m_timeDeltaRaw;
+
+        float m_frameTimes[TIME_NUM_FRAMES_TO_AVERAGE];
+        float m_fpsTimesAvg[TIME_NUM_FRAMES_TO_AVERAGE];
+        int m_frameTimeIndex;
     };
 
 }

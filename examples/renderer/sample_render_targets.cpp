@@ -179,8 +179,16 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.5f", engine::COpenGLApp::GetInstance()->fps() );
+        ImGui::Text( "fps           : %.2f", engine::COpenGLApp::GetInstance()->fps() );
         ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
+        ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
+        ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
+        ImGui::PlotLines( "fps-avg", 
+                          engine::CTime::GetFpsAvgs(), 
+                          engine::CTime::GetNumFramesForAvg(), 
+                          engine::CTime::GetFrameTimeIndex(),
+                          ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),
+                          0.0f, FLT_MAX, ImVec2( 0, 120 ) );
         ImGui::End();
     }
 
@@ -675,8 +683,8 @@ int main()
         g_renderOptions.shadowMapRangeConfig = _config;
         g_renderOptionsTargetNormal.shadowMapRangeConfig = _config;
 
-        _app->update();
         _app->beginRendering();
+        _app->update();
 
         /****************************************************/
         // render our scene
@@ -704,6 +712,10 @@ int main()
             _app->renderUi();
 
         _app->endRendering();
+
+        ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
+                     1.0f / engine::CTime::GetAvgTimeStep(), 
+                     engine::CTime::GetAvgTimeStep() );
     }
 
     return 0;

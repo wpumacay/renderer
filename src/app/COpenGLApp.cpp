@@ -165,8 +165,9 @@ namespace engine
 
         m_windowPtr->end();
 
-        m_timeDelta = glfwGetTime() - m_timeNow;
-        m_timeNow = glfwGetTime();
+        float _time = glfwGetTime();
+        m_timeDelta = _time - m_timeNow;
+        m_timeNow = _time;
 
         engine::CTime::Update( m_timeDelta );
     }
