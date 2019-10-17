@@ -19,8 +19,7 @@ namespace engine
     {
         BASE = 0,
         MESH,
-        MODEL,
-        GIZMO
+        MODEL
     };
 
     std::string toString( const eRenderableType& renderable );

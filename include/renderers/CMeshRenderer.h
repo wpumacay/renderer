@@ -22,6 +22,7 @@ namespace engine
     struct CMeshRenderContext
     {
         /* some render options */
+        bool    useFog;
         bool    useFaceCulling;
         /* camera information */
         CMat4   viewMatrix;
@@ -48,7 +49,6 @@ namespace engine
         uint32  shadowMappingTextureId;
         /* when using fog */
         int32   fogType;
-        int32   fogEnabled;
         CVec3   fogColor;
         float32 fogDensity;
         float32 fogGradient;
@@ -125,6 +125,20 @@ namespace engine
         std::uniform_real_distribution< float32 > m_randDist;
 
         std::unordered_map< int32, CVec3 > m_cachedRandomColors;
+
+        CShader* m_shaderLambertNoShadowsNoFog;
+        CShader* m_shaderLambertNoShadowsFog;
+        CShader* m_shaderLambertShadowsNoFog;
+        CShader* m_shaderLambertShadowsFog;
+
+        CShader* m_shaderPhongNoShadowsNoFog;
+        CShader* m_shaderPhongNoShadowsFog;
+        CShader* m_shaderPhongShadowsNoFog;
+        CShader* m_shaderPhongShadowsFog;
+
+        CShader* m_shaderDepthView;
+        CShader* m_shaderSemanticView;
+        CShader* m_shaderShadowMapping;
     };
 
 }

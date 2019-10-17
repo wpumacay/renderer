@@ -1,18 +1,20 @@
 #version 330 core
 
-// vertex-pair              : engine_phong_no_shadows_vs
+// vertex-pair              : engine_phong_shadows_fog_vs
 // material                 : phong
 // render-mode              : forward-rendering
 // num-active-lights        : 1 (only one can be active)
-// shadows                  : no
-// fog                      : yes (if enabled)
+// shadows                  : yes
+// fog                      : yes
 // recommended-tex-slots    : order used in the engine
 //              (texture-slot-0): albedoMap
 //              (texture-slot-1): specularMap
+//              (texture-slot-2): depthMap
 
 in vec3 fPosition;               // vertex position
 in vec3 fNormal;                 // vertex normal (not-normalized in fs. due to interpolation)
 in vec2 fTexcoord;               // vertex texture coordinates (uvs)
+in vec4 fLightSpaceClipPosition; // clip-position w.r.t. light frustum
 in vec3 fPositionToCamera;       // position w.r.t. camera (for fog calculation)
 
 out vec4 fColor;
@@ -77,10 +79,17 @@ uniform SpotLight u_spotLight;
 
 uniform vec3 u_viewerPosition;
 
+struct ShadowMap
+{
+    int         size;       // width=depth of the shadow-map texture
+    sampler2D   depthMap;   // texture representing the depthMap
+    int         pcfCount;   // size of pcf window used for smoothing with PCF
+};
+uniform ShadowMap u_shadowMap;
+
 struct Fog
 {
     int type;
-    int enabled;
     vec3 color;
     float density;
     float gradient;
@@ -89,14 +98,15 @@ struct Fog
 };
 uniform Fog u_fog;
 
-vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir );
-vec3 _computeColorWithPointLight( PointLight light, vec3 normal, vec3 viewDir );
-vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, vec3 viewDir );
+vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir, float shadowFactor );
+vec3 _computeColorWithPointLight( PointLight light, vec3 normal, vec3 viewDir, float shadowFactor );
+vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, vec3 viewDir, float shadowFactor );
 
 vec3 _computeFragmentAmbientComp( vec3 lightAmbientComp );
 vec3 _computeFragmentDiffuseComp( vec3 lightDiffuseComp );
 vec3 _computeFragmentSpecularComp( vec3 lightSpecularComp );
 
+float _computeFragmentShadowFactor( vec3 normal );
 float _computeFragmentFogFactor();
 
 void main()
@@ -105,21 +115,22 @@ void main()
     // compute some required vectors
     vec3 _normal = normalize( fNormal );
     vec3 _viewDir = normalize( u_viewerPosition - fPosition );
+    // compute shadow factor
+    float _shadowFactor = _computeFragmentShadowFactor( _normal );
 
     if ( u_directionalLight.enabled == 1 )
-        _resultColor = _computeColorWithDirectionalLight( u_directionalLight, _normal, _viewDir );
+        _resultColor = _computeColorWithDirectionalLight( u_directionalLight, _normal, _viewDir, _shadowFactor );
     else if ( u_pointLight.enabled == 1 )
-        _resultColor = _computeColorWithPointLight( u_pointLight, _normal, _viewDir );
+        _resultColor = _computeColorWithPointLight( u_pointLight, _normal, _viewDir, _shadowFactor );
     else if ( u_spotLight.enabled == 1 )
-        _resultColor = _computeColorWithSpotLight( u_spotLight, _normal, _viewDir );
+        _resultColor = _computeColorWithSpotLight( u_spotLight, _normal, _viewDir, _shadowFactor );
 
-    if ( u_fog.enabled == 1 )
-        _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
+    _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
 
     fColor = vec4( _resultColor, 1.0f );
 }
 
-vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir )
+vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir, float shadowFactor )
 {
     // precompute lightdir (recall this is from fragment to light "position"(inf))
     vec3 _lightdir = normalize( -light.direction );
@@ -136,11 +147,11 @@ vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec
 
     // finally, combine these contributions with the material to get the resulting color
     return _computeFragmentAmbientComp( _lAmbientComp ) + 
-           _computeFragmentDiffuseComp( _lDiffuseComp ) + 
-           _computeFragmentSpecularComp( _lSpecularComp );
+           ( 1.0f - shadowFactor ) * _computeFragmentDiffuseComp( _lDiffuseComp ) + 
+           ( 1.0f - shadowFactor ) * _computeFragmentSpecularComp( _lSpecularComp );
 }
 
-vec3 _computeColorWithPointLight( PointLight light, vec3 normal, vec3 viewDir )
+vec3 _computeColorWithPointLight( PointLight light, vec3 normal, vec3 viewDir, float shadowFactor )
 {
     // precompute lightdir (fragment to light position) and attenuation factor
     vec3 _lightdir = normalize( light.position - fPosition );
@@ -159,11 +170,11 @@ vec3 _computeColorWithPointLight( PointLight light, vec3 normal, vec3 viewDir )
 
     // finally, combine these contributions with the material to get the resulting color
     return _computeFragmentAmbientComp( _lAmbientComp ) + 
-           _computeFragmentDiffuseComp( _lDiffuseComp ) + 
-           _computeFragmentSpecularComp( _lSpecularComp );
+           ( 1.0f - shadowFactor ) * _computeFragmentDiffuseComp( _lDiffuseComp ) + 
+           ( 1.0f - shadowFactor ) * _computeFragmentSpecularComp( _lSpecularComp );
 }
 
-vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, vec3 viewDir )
+vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, vec3 viewDir, float shadowFactor )
 {
     // precompute lightdir, attenuation factor and soft-edges factor
     vec3 _lightdir = normalize( light.position - fPosition );
@@ -185,8 +196,8 @@ vec3 _computeColorWithSpotLight( SpotLight light, vec3 normal, vec3 viewDir )
 
     // finally, combine these contributions with the material to get the resulting color
     return _computeFragmentAmbientComp( _lAmbientComp ) + 
-           _computeFragmentDiffuseComp( _lDiffuseComp ) + 
-           _computeFragmentSpecularComp( _lSpecularComp );
+           ( 1.0f - shadowFactor ) * _computeFragmentDiffuseComp( _lDiffuseComp ) + 
+           ( 1.0f - shadowFactor ) * _computeFragmentSpecularComp( _lSpecularComp );
 }
 
 vec3 _computeFragmentAmbientComp( vec3 lightAmbientComp )
@@ -211,6 +222,48 @@ vec3 _computeFragmentSpecularComp( vec3 lightSpecularComp )
         return vec3( texture( u_material.specularMap, fTexcoord ) ) * u_material.specular * lightSpecularComp;
 
     return u_material.specular * lightSpecularComp;
+}
+
+float _computeFragmentShadowFactor( vec3 normal )
+{
+    /* convert to NDC in order to sample from the depthMap */
+    vec3 _projCoords = fLightSpaceClipPosition.xyz / fLightSpaceClipPosition.w; // perspective divide -> clip-space
+    _projCoords = _projCoords * 0.5 + 0.5; // from clip-space to NDC
+
+    /* fragments outside of the light-space view frustum have depth > 1.0, so discard shadows for those fragments */
+    if ( _projCoords.z > 1.0 )
+        return 0.0;
+
+    /* compute a bias term to avoid peter panning */
+    float _bias = 0.005;
+    if ( u_directionalLight.enabled == 1 )
+        _bias = max( 0.05 * ( 1.0f - dot( normal, -normalize( u_directionalLight.direction ) ) ), 0.005 );
+    else if ( u_pointLight.enabled == 1 ) // point lights seem to need a smaller bias
+        _bias = max( 0.005 * ( 1.0f - dot( normal, normalize( u_pointLight.position - fPosition ) ) ), 0.0005 );
+    else if ( u_spotLight.enabled == 1 ) // spot lights also seem to need a smaller bias
+        _bias = max( 0.005 * ( 1.0f - dot( normal, normalize( u_spotLight.position - fPosition ) ) ), 0.0005 );
+
+    /* grab depths required to check if we are in shadow or not */
+    float _closestDepth = texture( u_shadowMap.depthMap, _projCoords.xy ).r;
+    float _currentDepth = _projCoords.z;
+    float _shadowFactor = ( ( _currentDepth - _bias ) > _closestDepth ) ? 1.0 : 0.0;
+    float _sizeTexels = 1.0f / float(u_shadowMap.size);
+    float _numTexels = ( 2.0f * float(u_shadowMap.pcfCount) + 1.0f ) * ( 2.0f * float(u_shadowMap.pcfCount) + 1.0f );
+
+    /* use PCF to smooth the edges */
+    for ( int x = -u_shadowMap.pcfCount; x <= u_shadowMap.pcfCount; x++ )
+    {
+        for ( int y = -u_shadowMap.pcfCount; y <= u_shadowMap.pcfCount; y++ )
+        {
+            float _sampleDepth = texture( u_shadowMap.depthMap, _projCoords.xy + vec2( x, y ) * _sizeTexels ).r;
+            _shadowFactor += ( ( _currentDepth - _bias ) > _sampleDepth ) ? 1.0 : 0.0;
+        }
+    }
+
+    _shadowFactor /= _numTexels;
+
+    /* ( 1.0 -> in shadow | 0.0 -> no shadow )*/
+    return _shadowFactor;
 }
 
 float _computeFragmentFogFactor()

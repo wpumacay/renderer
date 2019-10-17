@@ -38,7 +38,6 @@ namespace engine
         _strRep += "pcf-filter-size : " + std::to_string( renderOptions.pcfCount ) + "\n\r";
         _strRep += "blending        : " + std::string( renderOptions.useBlending ? "yes" : "no" ) + "\n\r";
         _strRep += "fog             : " + std::string( renderOptions.useFog ? "yes" : "no" ) + "\n\r";
-        _strRep += "render-gizmos   : " + std::string( renderOptions.renderGizmos ? "yes" : "no" ) + "\n\r";
         _strRep += "viewport-width  : " + std::to_string( renderOptions.viewportWidth ) + "\n\r";
         _strRep += "viewport-height : " + std::to_string( renderOptions.viewportHeight ) + "\n\r";
         _strRep += "render-target   : " + std::string( renderOptions.renderTargetPtr ? "yes" : "no" ) + "\n\r";

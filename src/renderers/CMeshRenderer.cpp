@@ -6,12 +6,31 @@ namespace engine
 
     CMeshRenderer::CMeshRenderer()
     {
+        m_shaderLambertNoShadowsNoFog   = CShaderManager::GetCachedShader( "engine_lambert_no_shadows_no_fog" );
+        m_shaderLambertNoShadowsFog     = CShaderManager::GetCachedShader( "engine_lambert_no_shadows_fog" );
+        m_shaderLambertShadowsNoFog     = CShaderManager::GetCachedShader( "engine_lambert_shadows_no_fog" );
+        m_shaderLambertShadowsFog       = CShaderManager::GetCachedShader( "engine_lambert_shadows_fog" );
 
+        m_shaderPhongNoShadowsNoFog   = CShaderManager::GetCachedShader( "engine_phong_no_shadows_no_fog" );
+        m_shaderPhongNoShadowsFog     = CShaderManager::GetCachedShader( "engine_phong_no_shadows_fog" );
+        m_shaderPhongShadowsNoFog     = CShaderManager::GetCachedShader( "engine_phong_shadows_no_fog" );
+        m_shaderPhongShadowsFog       = CShaderManager::GetCachedShader( "engine_phong_shadows_fog" );
+
+        m_shaderShadowMapping   = CShaderManager::GetCachedShader( "engine_shadow_mapping" );
+        m_shaderDepthView       = CShaderManager::GetCachedShader( "engine_render_depth_view" );
+        m_shaderSemanticView    = CShaderManager::GetCachedShader( "engine_render_semantic_view" );
     }
 
     CMeshRenderer::~CMeshRenderer()
     {
-
+        m_shaderLambertNoShadowsNoFog = nullptr;
+        m_shaderLambertNoShadowsFog = nullptr;
+        m_shaderLambertShadowsNoFog = nullptr;
+        m_shaderLambertShadowsFog = nullptr;
+        m_shaderPhongNoShadowsNoFog = nullptr;
+        m_shaderPhongNoShadowsFog = nullptr;
+        m_shaderPhongShadowsNoFog = nullptr;
+        m_shaderPhongShadowsFog = nullptr;
     }
 
     void CMeshRenderer::submit( const std::vector< CMesh* >& meshesVisible,
@@ -61,6 +80,7 @@ namespace engine
 
         // (4): prepare context information
         /* render options */
+        m_context.useFog         = renderOptions.useFog;
         m_context.useFaceCulling = renderOptions.useFaceCulling;
         /* camera-information */
         m_context.viewMatrix                = renderOptions.cameraPtr->matView();
@@ -84,7 +104,7 @@ namespace engine
             m_context.lightAttnK2               = _lightPtr->atnQuadratic;
         }
         /* shadow-mapping information */
-        if ( renderOptions.shadowMapPtr )
+        if ( renderOptions.useShadowMapping && renderOptions.shadowMapPtr )
         {
             auto _shadowMapPtr = renderOptions.shadowMapPtr;
             m_context.shadowMappingViewMatrix   = _shadowMapPtr->lightSpaceMatView();
@@ -94,11 +114,10 @@ namespace engine
             m_context.shadowMappingPCFcount     = renderOptions.pcfCount;
         }
         /* fog information */
-        if ( renderOptions.fogPtr )
+        if ( renderOptions.useFog && renderOptions.fogPtr )
         {
             auto _fogPtr = renderOptions.fogPtr;
             m_context.fogType       = ( _fogPtr->type() == eFogType::EXPONENTIAL ) ? 1 : 0;
-            m_context.fogEnabled    = ( renderOptions.useFog ) ? 1 : 0;
             m_context.fogColor      = _fogPtr->color;
             m_context.fogDensity    = _fogPtr->density;
             m_context.fogGradient   = _fogPtr->gradient;
@@ -124,14 +143,12 @@ namespace engine
 
     void CMeshRenderer::renderToShadowMap()
     {
-        auto _shaderShadowMapping = CShaderManager::GetCachedShader( "engine_shadow_mapping" );
-
-        _shaderShadowMapping->bind();
-        _shaderShadowMapping->setMat4( "u_lightSpaceViewProjMatrix", m_context.shadowMappingProjMatrix *
-                                                                     m_context.shadowMappingViewMatrix );
+        m_shaderShadowMapping->bind();
+        m_shaderShadowMapping->setMat4( "u_lightSpaceViewProjMatrix", m_context.shadowMappingProjMatrix *
+                                                                      m_context.shadowMappingViewMatrix );
         for ( auto meshPtr : m_meshesCastShadows )
         {
-            _shaderShadowMapping->setMat4( "u_modelMatrix", meshPtr->matModel() );
+            m_shaderShadowMapping->setMat4( "u_modelMatrix", meshPtr->matModel() );
             
             meshPtr->vertexArray()->bind();
 
@@ -141,7 +158,7 @@ namespace engine
 
             meshPtr->vertexArray()->unbind();
         }
-        _shaderShadowMapping->unbind();
+        m_shaderShadowMapping->unbind();
     }
 
     void CMeshRenderer::render( bool useShadowMapping )
@@ -206,20 +223,18 @@ namespace engine
 
     void CMeshRenderer::renderDepthOnly()
     {
-        auto _shaderDepthView = CShaderManager::GetCachedShader( "engine_render_depth_view" );
-
-        _shaderDepthView->bind();
-        _shaderDepthView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
-        _shaderDepthView->setFloat( "u_znear", m_context.depthViewZnear );
-        _shaderDepthView->setFloat( "u_zfar", m_context.depthViewZfar );
-        _shaderDepthView->setFloat( "u_zmin", m_context.depthViewZmin );
-        _shaderDepthView->setFloat( "u_zmax", m_context.depthViewZmax );
-        _shaderDepthView->setVec3( "u_zminColor", m_context.depthViewZminColor );
-        _shaderDepthView->setVec3( "u_zmaxColor", m_context.depthViewZmaxColor );
+        m_shaderDepthView->bind();
+        m_shaderDepthView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
+        m_shaderDepthView->setFloat( "u_znear", m_context.depthViewZnear );
+        m_shaderDepthView->setFloat( "u_zfar", m_context.depthViewZfar );
+        m_shaderDepthView->setFloat( "u_zmin", m_context.depthViewZmin );
+        m_shaderDepthView->setFloat( "u_zmax", m_context.depthViewZmax );
+        m_shaderDepthView->setVec3( "u_zminColor", m_context.depthViewZminColor );
+        m_shaderDepthView->setVec3( "u_zmaxColor", m_context.depthViewZmaxColor );
 
         for ( auto meshPtr : m_meshesOpaque )
         {
-            _shaderDepthView->setMat4( "u_modelMatrix", meshPtr->matModel() );
+            m_shaderDepthView->setMat4( "u_modelMatrix", meshPtr->matModel() );
 
             auto _vao = meshPtr->vertexArray();
             auto _ibo = _vao->indexBuffer();
@@ -229,34 +244,32 @@ namespace engine
             _vao->unbind();
         }
 
-        _shaderDepthView->unbind();
+        m_shaderDepthView->unbind();
     }
 
     void CMeshRenderer::renderSemanticOnly()
     {
-        auto _shaderSemanticView = CShaderManager::GetCachedShader( "engine_render_semantic_view" );
-
-        _shaderSemanticView->bind();
-        _shaderSemanticView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
+        m_shaderSemanticView->bind();
+        m_shaderSemanticView->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
 
         for ( auto meshPtr : m_meshesOpaque )
         {
             if ( m_context.semanticViewIdMap.find( meshPtr->maskId() ) != m_context.semanticViewIdMap.end() )
             {
-                _shaderSemanticView->setVec3( "u_maskColor", m_context.semanticViewIdMap[meshPtr->maskId()] );
+                m_shaderSemanticView->setVec3( "u_maskColor", m_context.semanticViewIdMap[meshPtr->maskId()] );
             }
             else if ( m_cachedRandomColors.find( meshPtr->maskId() ) != m_cachedRandomColors.end() )
             {
-                _shaderSemanticView->setVec3( "u_maskColor", m_cachedRandomColors[meshPtr->maskId()] );
+                m_shaderSemanticView->setVec3( "u_maskColor", m_cachedRandomColors[meshPtr->maskId()] );
             }
             else
             {
                 CVec3 _maskColor = { m_randDist( m_randGen ), m_randDist( m_randGen ), m_randDist( m_randGen ) };
                 m_cachedRandomColors[meshPtr->maskId()] = _maskColor;
-                _shaderSemanticView->setVec3( "u_maskColor", _maskColor );
+                m_shaderSemanticView->setVec3( "u_maskColor", _maskColor );
             }
 
-            _shaderSemanticView->setMat4( "u_modelMatrix", meshPtr->matModel() );
+            m_shaderSemanticView->setMat4( "u_modelMatrix", meshPtr->matModel() );
 
             auto _vao = meshPtr->vertexArray();
             auto _ibo = _vao->indexBuffer();
@@ -266,14 +279,18 @@ namespace engine
             _vao->unbind();
         }
 
-        _shaderSemanticView->unbind();
+        m_shaderSemanticView->unbind();
     }
 
     void CMeshRenderer::_render_Lambert( const std::vector< CMesh* >& meshesWithFaceCulling, 
                                          const std::vector< CMesh* >& meshesWithNoFaceCulling,
                                          bool renderWithShadows )
     {
-        auto _shaderLambert = CShaderManager::GetCachedShader( "engine_lambert_shadows" );
+        CShader* _shaderLambert = nullptr;
+        if ( !renderWithShadows && !m_context.useFog ) _shaderLambert = m_shaderLambertNoShadowsNoFog;
+        if ( !renderWithShadows && m_context.useFog ) _shaderLambert = m_shaderLambertNoShadowsFog;
+        if ( renderWithShadows && !m_context.useFog ) _shaderLambert = m_shaderLambertShadowsNoFog;
+        if ( renderWithShadows && m_context.useFog ) _shaderLambert = m_shaderLambertShadowsFog;
 
         // setup render state
         _shaderLambert->bind();
@@ -281,7 +298,7 @@ namespace engine
         _setupRenderState_light( _shaderLambert );
         if ( renderWithShadows )
             _setupRenderState_shadows( _shaderLambert );
-        if ( m_context.fogEnabled == 1 )
+        if ( m_context.useFog )
             _setupRenderState_fog( _shaderLambert );
 
         if ( m_context.useFaceCulling )
@@ -311,7 +328,11 @@ namespace engine
                                        const std::vector< CMesh* >& meshesWithNoFaceCulling, 
                                        bool renderWithShadows )
     {
-        auto _shaderPhong = CShaderManager::GetCachedShader( "engine_phong_shadows" );
+        CShader* _shaderPhong = nullptr;
+        if ( !renderWithShadows && !m_context.useFog ) _shaderPhong = m_shaderPhongNoShadowsNoFog;
+        if ( !renderWithShadows && m_context.useFog ) _shaderPhong = m_shaderPhongNoShadowsFog;
+        if ( renderWithShadows && !m_context.useFog ) _shaderPhong = m_shaderPhongShadowsNoFog;
+        if ( renderWithShadows && m_context.useFog ) _shaderPhong = m_shaderPhongShadowsFog;
 
         // setup render state
         _shaderPhong->bind();
@@ -319,7 +340,7 @@ namespace engine
         _setupRenderState_light( _shaderPhong );
         if ( renderWithShadows )
         _setupRenderState_shadows( _shaderPhong );
-        if ( m_context.fogEnabled == 1 )
+        if ( m_context.useFog )
             _setupRenderState_fog( _shaderPhong );
 
         // configure viewer position (required for specular-calculations)
@@ -444,7 +465,9 @@ namespace engine
 
     void CMeshRenderer::_setupRenderState_camera( CShader* shaderPtr )
     {
-        shaderPtr->setMat4( "u_viewMatrix", m_context.viewMatrix );
+        if ( m_context.useFog )
+            shaderPtr->setMat4( "u_viewMatrix", m_context.viewMatrix );
+
         shaderPtr->setMat4( "u_viewProjMatrix", m_context.projMatrix * 
                                                 m_context.viewMatrix );
     }
@@ -509,7 +532,6 @@ namespace engine
 
     void CMeshRenderer::_setupRenderState_fog( CShader* shaderPtr )
     {
-        shaderPtr->setInt( "u_fog.enabled", m_context.fogEnabled );
         shaderPtr->setInt( "u_fog.type", m_context.fogType );
         shaderPtr->setVec3( "u_fog.color", m_context.fogColor );
         shaderPtr->setFloat( "u_fog.density", m_context.fogDensity );

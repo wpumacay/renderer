@@ -1,9 +1,9 @@
 #version 330 core
 
-// fragment-pair    : engine_phong_shadows_fs
+// fragment-pair    : engine_phong_shadows_fog_fs
 // material         : phong
 // shadows          : yes
-// fog              : yes (if enabled)
+// fog              : yes
 
 layout ( location = 0 ) in vec3 position;
 layout ( location = 1 ) in vec3 normal;

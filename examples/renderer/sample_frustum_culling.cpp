@@ -163,7 +163,6 @@ int main()
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
     g_renderOptions.useShadowMapping = false;
-    g_renderOptions.renderGizmos = false;
     g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
     g_renderOptions.viewportHeight = engine::COpenGLApp::GetWindow()->height();
     g_renderOptions.cameraPtr = _camera;

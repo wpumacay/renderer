@@ -8,7 +8,6 @@ namespace engine
     {
         if ( type == eRenderableType::MESH ) return "mesh";
         if ( type == eRenderableType::MODEL ) return "model";
-        if ( type == eRenderableType::GIZMO ) return "gizmo";
 
         ENGINE_CORE_ASSERT( false, "Invalid eRenderableType enum given" );
 

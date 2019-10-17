@@ -61,16 +61,17 @@ namespace engine
         _windowProperties.callbackMouse = nullptr;
         _windowProperties.callbackMouseMove = nullptr;
 
-        m_windowPtr         = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( _windowProperties ) );
-        m_scenePtr          = std::unique_ptr< CScene >( new CScene() );
-        m_uiPtr             = nullptr; // let the user create its own specific UI
-        m_mainRendererPtr   = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
+        m_windowPtr = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( _windowProperties ) );
 
         engine::CTextureManager::Init();
         engine::CShaderManager::Init();
         engine::CInputHandler::Init();
         engine::CDebugDrawer::Init();
         engine::CNoiseGenerator::Init();
+
+        m_scenePtr          = std::unique_ptr< CScene >( new CScene() );
+        m_uiPtr             = nullptr; // let the user create its own specific UI
+        m_mainRendererPtr   = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
 
         m_windowPtr->registerKeyCallback( engine::CInputHandler::callback_key );
         m_windowPtr->registerMouseCallback( engine::CInputHandler::callback_mouse );

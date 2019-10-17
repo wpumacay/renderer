@@ -56,6 +56,10 @@ bool g_showRenderTargetSemantic = false;
 float g_target_factor = 2.0f;
 bool g_useFaceCulling = false;
 
+bool g_useShadowMapping = true;
+bool g_useFog = true;
+bool g_useSkybox = true;
+
 void renderShadowMap( engine::CILight* lightPtr,
                       engine::CVertexArray* quadVAO,
                       engine::CShader* shaderPtr,
@@ -122,6 +126,8 @@ public :
         m_renderTargetSemantic = target;
     }
 
+    void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
+
     engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
 
 protected :
@@ -170,6 +176,7 @@ protected :
     void _renderInternal() override
     {
         _menuUiRendererStats();
+        _menuUiRendererEffects();
         _menuUiLights();
         _menuUiRendererScene();
         _menuUiRendererShadowMap();
@@ -190,6 +197,76 @@ private :
                           engine::CTime::GetFrameTimeIndex(),
                           ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),
                           0.0f, FLT_MAX, ImVec2( 0, 120 ) );
+        ImGui::End();
+    }
+
+    void _menuUiRendererEffects()
+    {
+        ImGui::Begin( "Effects" );
+
+        ImGui::Checkbox( "use-fog", &g_useFog );
+        g_renderOptions.useFog = g_useFog;
+        g_renderOptionsTargetNormal.useFog = g_useFog;
+        if ( g_useFog && m_fogPtr )
+        {
+            std::vector< std::string > _types = { engine::toString( engine::eFogType::LINEAR ),
+                                                  engine::toString( engine::eFogType::EXPONENTIAL ) };
+            std::string _currentType = engine::toString( m_fogPtr->type() );
+
+            if ( ImGui::BeginCombo( "type", _currentType.c_str() ) )
+            {
+                for ( size_t i = 0; i < _types.size(); i++ )
+                {
+                    std::string _type =_types[i];
+                    bool _isSelected = ( _currentType == _type );
+
+                    if ( ImGui::Selectable( _type.c_str(), _isSelected ) )
+                        _currentType = _type;
+
+                    if ( _isSelected )
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+
+            if ( _currentType == engine::toString( engine::eFogType::LINEAR ) ) m_fogPtr->setType( engine::eFogType::LINEAR );
+            if ( _currentType == engine::toString( engine::eFogType::EXPONENTIAL ) ) m_fogPtr->setType( engine::eFogType::EXPONENTIAL );
+
+            ImGui::Spacing();
+
+            if ( m_fogPtr->type() == engine::eFogType::LINEAR )
+            {
+                ImGui::SliderFloat( "dist-start", &m_fogPtr->distStart, 0.0f, 10.0f );
+                ImGui::SliderFloat( "dist-end", &m_fogPtr->distEnd, m_fogPtr->distStart, 40.0f );
+            }
+            else if ( m_fogPtr->type() == engine::eFogType::EXPONENTIAL )
+            {
+                ImGui::SliderFloat( "density", &m_fogPtr->density, 0.001f, 0.1f );
+                ImGui::SliderFloat( "gradient", &m_fogPtr->gradient, 1.0f, 10.0f );
+                ImGui::SliderFloat( "dist-start", &m_fogPtr->distStart, 0.0f, 10.0f );
+            }
+
+            float _fogColor[3] = { m_fogPtr->color.x, m_fogPtr->color.y, m_fogPtr->color.z };
+            ImGui::ColorEdit3( "color", _fogColor );
+            m_fogPtr->color = { _fogColor[0], _fogColor[1], _fogColor[2] };
+        }
+
+        ImGui::Checkbox( "use-skybox", &g_useSkybox );
+        if ( g_useSkybox )
+        {
+
+        }
+
+        ImGui::Checkbox( "use-shadows", &g_useShadowMapping );
+        g_renderOptions.useShadowMapping = g_useShadowMapping;
+        g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
+        if ( g_useShadowMapping )
+        {
+            ImGui::SliderInt( "pcf-count", &g_renderOptions.pcfCount, 0, 10 );
+            g_renderOptionsTargetNormal.pcfCount = g_renderOptions.pcfCount;
+        }
+
         ImGui::End();
     }
 
@@ -451,6 +528,8 @@ private :
     engine::CFrameBuffer* m_renderTargetNormal;
     engine::CFrameBuffer* m_renderTargetDepth;
     engine::CFrameBuffer* m_renderTargetSemantic;
+
+    engine::CFog* m_fogPtr;
 };
 
 int main()
@@ -482,6 +561,14 @@ int main()
 
     _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
+    auto _fog = new engine::CFog( engine::eFogType::EXPONENTIAL,
+                                  { 0.2f, 0.2f, 0.2f },
+                                  0.05f, 1.5f,
+                                  0.0f, 10.0f );
+
+    _app->scene()->addFog( std::unique_ptr< engine::CFog >( _fog ) );
+    _ui->setFogReference( _fog );
+
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
     auto _shaderShadowMapViz = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_visualization_shader",
@@ -511,7 +598,8 @@ int main()
     g_renderOptions.useFrustumCulling = true;
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
-    g_renderOptions.useShadowMapping = true;
+    g_renderOptions.useFog = g_useFog;
+    g_renderOptions.useShadowMapping = g_useShadowMapping;
     g_renderOptions.redrawShadowMap = true;
     g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
     g_renderOptions.viewportHeight = engine::COpenGLApp::GetWindow()->height();
@@ -543,7 +631,8 @@ int main()
     g_renderOptionsTargetNormal.useFrustumCulling = true;
     g_renderOptionsTargetNormal.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetNormal.useFaceCulling = false;
-    g_renderOptionsTargetNormal.useShadowMapping = true;
+    g_renderOptionsTargetNormal.useFog = g_useFog;
+    g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
     g_renderOptionsTargetNormal.redrawShadowMap = false;
     g_renderOptionsTargetNormal.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
     g_renderOptionsTargetNormal.viewportHeight = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
@@ -557,7 +646,8 @@ int main()
     g_renderOptionsTargetDepth.useFrustumCulling = true;
     g_renderOptionsTargetDepth.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetDepth.useFaceCulling = false;
-    g_renderOptionsTargetDepth.useShadowMapping = true;
+    g_renderOptionsTargetDepth.useFog = false;
+    g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
     g_renderOptionsTargetDepth.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
     g_renderOptionsTargetDepth.viewportHeight = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
@@ -575,6 +665,7 @@ int main()
     g_renderOptionsTargetSemantic.useFrustumCulling = true;
     g_renderOptionsTargetSemantic.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetSemantic.useFaceCulling = false;
+    g_renderOptionsTargetSemantic.useFog = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
     g_renderOptionsTargetSemantic.redrawShadowMap = false;
     g_renderOptionsTargetSemantic.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
@@ -818,9 +909,9 @@ std::vector< engine::CIRenderable* > _createScene0()
             continue;
         }
 
-        // renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-        //                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-        //                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
+        renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
         float _scale = _randomDistribution( _randomGenerator );
         renderablePtr->scale = { _scale, _scale, _scale };
 

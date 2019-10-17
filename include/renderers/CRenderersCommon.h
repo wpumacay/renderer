@@ -53,7 +53,6 @@ namespace engine
         int                     pcfCount;
         bool                    useBlending;
         bool                    useFog;
-        bool                    renderGizmos;
         int32                   viewportWidth;
         int32                   viewportHeight;
         CShadowMapRangeConfig   shadowMapRangeConfig;
@@ -78,10 +77,9 @@ namespace engine
             useFaceCulling          = false;
             useShadowMapping        = false;
             redrawShadowMap         = true;
-            pcfCount                = 2;
+            pcfCount                = 1;
             useBlending             = false;
             useFog                  = false;
-            renderGizmos            = true;
             viewportWidth           = -1;// default (-1) means use current viewport
             viewportHeight          = -1;// default (-1) means use current viewport
             shadowMapRangeConfig    = CShadowMapRangeConfig();

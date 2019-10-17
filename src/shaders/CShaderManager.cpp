@@ -109,10 +109,14 @@ namespace engine
             "shadow_mapping",
             "skybox",
             "engine_shadow_mapping",
-            "engine_lambert_no_shadows",
-            "engine_phong_no_shadows",
-            "engine_lambert_shadows",
-            "engine_phong_shadows",
+            "engine_lambert_no_shadows_no_fog",
+            "engine_lambert_no_shadows_fog",
+            "engine_lambert_shadows_no_fog",
+            "engine_lambert_shadows_fog",
+            "engine_phong_no_shadows_no_fog",
+            "engine_phong_no_shadows_fog",
+            "engine_phong_shadows_no_fog",
+            "engine_phong_shadows_fog",
             "engine_render_depth_view",
             "engine_render_semantic_view"
         };
