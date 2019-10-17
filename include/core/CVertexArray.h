@@ -21,6 +21,7 @@ namespace engine
 
         std::vector< CVertexBuffer* > vertexBuffers() const { return m_vertexBuffers; }
         CIndexBuffer* indexBuffer() const { return m_indexBuffer; }
+        uint32 openglId() const { return m_openglId; }
 
     private :
 

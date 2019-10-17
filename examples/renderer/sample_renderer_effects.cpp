@@ -128,6 +128,8 @@ public :
 
     void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
 
+    void setSkyboxReference( engine::CSkybox* skyboxPtr ) { m_skyboxPtr = skyboxPtr; }
+
     engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
 
 protected :
@@ -171,6 +173,16 @@ protected :
 
         m_lightPointPosition    = g_lightPointPosition;
         m_lightSpotPosition     = g_lightSpotPosition;
+
+        auto _cubemapsPtrs = engine::CTextureManager::GetAllCachedTexturesCube();
+        for ( auto& _cubemapPtr : _cubemapsPtrs )
+        {
+            m_cubemaps.push_back( _cubemapPtr );
+            m_cubemapsNames.push_back( _cubemapPtr->name() );
+        }
+
+        m_cubemapSelectedIndex = 0;
+        m_cubemapSelectedName = ( m_cubemapsNames.size() > 0 ) ? m_cubemapsNames[m_cubemapSelectedIndex] : "undefined";
     }
 
     void _renderInternal() override
@@ -253,9 +265,32 @@ private :
         }
 
         ImGui::Checkbox( "use-skybox", &g_useSkybox );
+        g_renderOptions.useSkybox = g_useSkybox;
+        g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
         if ( g_useSkybox )
         {
+            if ( ImGui::BeginCombo( "Cubemaps", m_cubemapSelectedName.c_str() ) )
+            {
+                for ( size_t i = 0; i < m_cubemaps.size(); i++ )
+                {
+                    std::string _cubemapName = m_cubemapsNames[i];
+                    bool _isSelected = ( _cubemapName == m_cubemapSelectedName );
 
+                    if ( ImGui::Selectable( _cubemapName.c_str(), _isSelected ) )
+                    {
+                        m_cubemapSelectedName = _cubemapName;
+                        m_cubemapSelectedIndex = i;
+                    }
+
+                    if ( _isSelected )
+                        ImGui::SetItemDefaultFocus();
+                }
+    
+                ImGui::EndCombo();
+            }
+            ImGui::Spacing();
+
+            m_skyboxPtr->setCubemap( m_cubemaps[m_cubemapSelectedIndex] );
         }
 
         ImGui::Checkbox( "use-shadows", &g_useShadowMapping );
@@ -530,6 +565,12 @@ private :
     engine::CFrameBuffer* m_renderTargetSemantic;
 
     engine::CFog* m_fogPtr;
+    engine::CSkybox* m_skyboxPtr;
+
+    std::vector< engine::CTextureCube* > m_cubemaps;
+    std::vector< std::string > m_cubemapsNames;
+    std::string m_cubemapSelectedName;
+    int m_cubemapSelectedIndex;
 };
 
 int main()
@@ -569,6 +610,11 @@ int main()
     _app->scene()->addFog( std::unique_ptr< engine::CFog >( _fog ) );
     _ui->setFogReference( _fog );
 
+    auto _skybox = new engine::CSkybox();
+    _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
+    _app->scene()->addSkybox( std::unique_ptr< engine::CSkybox >( _skybox ) );
+    _ui->setSkyboxReference( _skybox );
+
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
     auto _shaderShadowMapViz = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_visualization_shader",
@@ -599,6 +645,7 @@ int main()
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
     g_renderOptions.useFog = g_useFog;
+    g_renderOptions.useSkybox = g_useSkybox;
     g_renderOptions.useShadowMapping = g_useShadowMapping;
     g_renderOptions.redrawShadowMap = true;
     g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
@@ -632,6 +679,7 @@ int main()
     g_renderOptionsTargetNormal.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetNormal.useFaceCulling = false;
     g_renderOptionsTargetNormal.useFog = g_useFog;
+    g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
     g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
     g_renderOptionsTargetNormal.redrawShadowMap = false;
     g_renderOptionsTargetNormal.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
@@ -647,6 +695,7 @@ int main()
     g_renderOptionsTargetDepth.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetDepth.useFaceCulling = false;
     g_renderOptionsTargetDepth.useFog = false;
+    g_renderOptionsTargetDepth.useSkybox = false;
     g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
     g_renderOptionsTargetDepth.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
@@ -666,6 +715,7 @@ int main()
     g_renderOptionsTargetSemantic.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetSemantic.useFaceCulling = false;
     g_renderOptionsTargetSemantic.useFog = false;
+    g_renderOptionsTargetSemantic.useSkybox = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
     g_renderOptionsTargetSemantic.redrawShadowMap = false;
     g_renderOptionsTargetSemantic.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;

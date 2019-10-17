@@ -118,7 +118,9 @@ namespace engine
             "engine_phong_shadows_no_fog",
             "engine_phong_shadows_fog",
             "engine_render_depth_view",
-            "engine_render_semantic_view"
+            "engine_render_semantic_view",
+            "engine_skybox_fog",
+            "engine_skybox_no_fog"
         };
 
         for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )

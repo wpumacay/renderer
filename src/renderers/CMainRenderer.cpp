@@ -10,12 +10,14 @@ namespace engine
                                                                      RENDERER_SHADOWMAP_HEIGHT ) );
 
         m_rendererMeshes = std::unique_ptr< CMeshRenderer >( new CMeshRenderer() );
+        m_rendererSkybox = std::unique_ptr< CSkyboxRenderer >( new CSkyboxRenderer() );
     }
 
     CMainRenderer::~CMainRenderer()
     {
         m_shadowMap = nullptr;
         m_rendererMeshes = nullptr;
+        m_rendererSkybox = nullptr;
     }
 
     void CMainRenderer::render( CScene* scenePtr, 
@@ -29,6 +31,7 @@ namespace engine
         renderOptions.lightPtr      = ( !renderOptions.lightPtr ) ? scenePtr->mainLight() : renderOptions.lightPtr;
         renderOptions.shadowMapPtr  = ( !renderOptions.shadowMapPtr ) ? m_shadowMap.get() : renderOptions.shadowMapPtr;
         renderOptions.fogPtr        = ( !renderOptions.fogPtr ) ? scenePtr->fog() : renderOptions.fogPtr;
+        renderOptions.skyboxPtr     = ( !renderOptions.skyboxPtr ) ? scenePtr->skybox() : renderOptions.skyboxPtr;
         m_status = "renderables         : " + std::to_string( _renderablesAll.size() ) + "\n\r";
 
         /* (0.2) do some error handling in case some options and some resources don't match */
@@ -41,6 +44,11 @@ namespace engine
         {
             ENGINE_CORE_WARN( "Renderer was setup to use fog, but no fog-struct provided" );
             renderOptions.useFog = false;
+        }
+        if ( renderOptions.useSkybox && !renderOptions.skyboxPtr )
+        {
+            ENGINE_CORE_WARN( "Renderer was setup to use a skybox, but no skybox-struct provided" );
+            renderOptions.useSkybox = false;
         }
         if ( !renderOptions.cameraPtr )
         {
@@ -83,6 +91,8 @@ namespace engine
 
         // (4) submit to specific renderers for them to do extra preparations
         m_rendererMeshes->submit( _rendMeshesVisible, _rendMeshesInView, renderOptions );
+        if ( renderOptions.useSkybox )
+            m_rendererSkybox->submit( renderOptions );
 
         // (5) start making the actual rendering process (use forward rendering for now)
 
@@ -128,6 +138,10 @@ namespace engine
 
         else if ( renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
             m_rendererMeshes->renderSemanticOnly();
+
+        /* (5.4) render pass for the skybox */
+        if ( renderOptions.useSkybox )
+            m_rendererSkybox->render();
 
         // restore previous viewport
         glViewport( _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight );

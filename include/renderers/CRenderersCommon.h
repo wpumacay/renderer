@@ -53,6 +53,9 @@ namespace engine
         int                     pcfCount;
         bool                    useBlending;
         bool                    useFog;
+        bool                    useSkybox;
+        float32                 skyboxFogLowerLimit;
+        float32                 skyboxFogUpperLimit;
         int32                   viewportWidth;
         int32                   viewportHeight;
         CShadowMapRangeConfig   shadowMapRangeConfig;
@@ -61,6 +64,7 @@ namespace engine
         CShadowMap*             shadowMapPtr;
         CFrameBuffer*           renderTargetPtr;
         CFog*                   fogPtr;
+        CSkybox*                skyboxPtr;
         /* depth_only-mode parameters */
         float32                 depthViewZmin;
         float32                 depthViewZmax;
@@ -80,6 +84,9 @@ namespace engine
             pcfCount                = 1;
             useBlending             = false;
             useFog                  = false;
+            useSkybox               = false;
+            skyboxFogLowerLimit     = 0.0f;
+            skyboxFogUpperLimit     = 0.25f;
             viewportWidth           = -1;// default (-1) means use current viewport
             viewportHeight          = -1;// default (-1) means use current viewport
             shadowMapRangeConfig    = CShadowMapRangeConfig();
@@ -88,6 +95,7 @@ namespace engine
             shadowMapPtr            = nullptr;
             renderTargetPtr         = nullptr;
             fogPtr                  = nullptr;
+            skyboxPtr               = nullptr;
 
             depthViewZmin       = 0.0f;
             depthViewZmax       = 6.0f;

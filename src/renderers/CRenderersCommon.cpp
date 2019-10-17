@@ -35,9 +35,13 @@ namespace engine
         _strRep += "culling-geom    : " + engine::toString( renderOptions.cullingGeom ) + "\n\r";
         _strRep += "face-culling    : " + std::string( renderOptions.useFaceCulling ? "yes" : "no" ) + "\n\r";
         _strRep += "shadow-mapping  : " + std::string( renderOptions.useShadowMapping ? "yes" : "no" ) + "\n\r";
+        _strRep += "redraw-shadowmap: " + std::string( renderOptions.redrawShadowMap ? "yes" : "no" ) + "\n\r";
         _strRep += "pcf-filter-size : " + std::to_string( renderOptions.pcfCount ) + "\n\r";
         _strRep += "blending        : " + std::string( renderOptions.useBlending ? "yes" : "no" ) + "\n\r";
         _strRep += "fog             : " + std::string( renderOptions.useFog ? "yes" : "no" ) + "\n\r";
+        _strRep += "skybox          : " + std::string( renderOptions.useSkybox ? "yes" : "no" ) + "\n\r";
+        _strRep += "skfog-low-lim   : " + std::to_string( renderOptions.skyboxFogLowerLimit ) + "\n\r";
+        _strRep += "skfog-upper-lim : " + std::to_string( renderOptions.skyboxFogUpperLimit ) + "\n\r";
         _strRep += "viewport-width  : " + std::to_string( renderOptions.viewportWidth ) + "\n\r";
         _strRep += "viewport-height : " + std::to_string( renderOptions.viewportHeight ) + "\n\r";
         _strRep += "render-target   : " + std::string( renderOptions.renderTargetPtr ? "yes" : "no" ) + "\n\r";

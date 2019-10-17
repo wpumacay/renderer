@@ -2,6 +2,7 @@
 
 #include <renderers/CRenderersCommon.h>
 #include <renderers/CMeshRenderer.h>
+#include <renderers/CSkyboxRenderer.h>
 
 namespace engine
 {
@@ -48,7 +49,7 @@ namespace engine
         std::unique_ptr< CShadowMap > m_shadowMap;
 
         std::unique_ptr< CMeshRenderer > m_rendererMeshes;
-
+        std::unique_ptr< CSkyboxRenderer > m_rendererSkybox;
     };
 
 }

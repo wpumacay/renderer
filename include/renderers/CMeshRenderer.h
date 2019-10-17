@@ -19,6 +19,16 @@ namespace engine
         }
     };
 
+    struct CMeshComparatorClosesToPoint
+    {
+        CVec3 point;
+
+        bool operator() ( CMesh* mesh1, CMesh* mesh2 )
+        {
+            return CVec3::length( mesh1->position - point ) < CVec3::length( mesh2->position - point );
+        }
+    };
+
     struct CMeshRenderContext
     {
         /* some render options */
