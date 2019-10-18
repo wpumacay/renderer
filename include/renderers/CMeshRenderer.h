@@ -92,28 +92,25 @@ namespace engine
         void renderDepthOnly();
         void renderSemanticOnly();
 
-        template< class T >
-        void _collectMeshesByMaterial( const std::vector< CMesh* >& meshes,
-                                       std::vector< CMesh* >& meshesOfGivenMaterial )
-        {
-            for ( auto _mesh : meshes )
-                if ( _mesh->material()->type() == T::GetStaticType() )
-                    meshesOfGivenMaterial.push_back( _mesh );
-        }
-
         std::string status() const { return m_status; }
 
     private :
 
-        void _render_Lambert( const std::vector< CMesh* >& meshesWithFaceCulling, 
-                              const std::vector< CMesh* >& meshesWithNoFaceCulling,
-                              bool renderWithShadows );
-        void _render_Phong( const std::vector< CMesh* >& meshesWithFaceCulling,
-                            const std::vector< CMesh* >& meshesWithNoFaceCulling, 
+        void _collectMeshesByMaterial( const std::vector< CMesh* >& meshes,
+                                       const eMaterialType& materialType,
+                                       std::vector< CMesh* >& meshesOfGivenMaterial );
+
+        void _renderMeshes( const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
+                            const std::vector< CMesh* >& meshesLambertWithNoFaceCulling,
+                            const std::vector< CMesh* >& meshesPhongWithFaceCulling, 
+                            const std::vector< CMesh* >& meshesPhongWithNoFaceCulling,
+                            const std::vector< CMesh* >& meshesBlinnPhongWithFaceCulling, 
+                            const std::vector< CMesh* >& meshesBlinnPhongWithNoFaceCulling,
                             bool renderWithShadows );
 
         void _renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr );
         void _renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr );
+        void _renderMesh_BlinnPhong( CMesh* meshPtr, CShader* shaderPtr );
 
         void _setupRenderState_camera( CShader* shaderPtr );
         void _setupRenderState_light( CShader* shaderPtr );
@@ -149,6 +146,12 @@ namespace engine
         CShader* m_shaderDepthView;
         CShader* m_shaderSemanticView;
         CShader* m_shaderShadowMapping;
+
+        // WIP
+        CShader* m_shaderNoShadowsNoFog;
+        CShader* m_shaderNoShadowsFog;
+        CShader* m_shaderShadowsNoFog;
+        CShader* m_shaderShadowsFog;
     };
 
 }

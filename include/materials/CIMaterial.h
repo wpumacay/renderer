@@ -46,6 +46,7 @@ namespace engine
 
         std::string toString();
 
+        void setMaterialType( const eMaterialType& type ) { m_type = type; }
         void setAlbedoMap( CTexture* albedoMap ) { m_albedoMap = albedoMap; }
         void setSpecularMap( CTexture* specularMap ) { m_specularMap = specularMap; }
         void setNormalMap( CTexture* normalMap ) { m_normalMap = normalMap; }

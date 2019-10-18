@@ -108,7 +108,10 @@ namespace engine
             "phong_textures_shadows",
             "shadow_mapping",
             "skybox",
-            "engine_shadow_mapping",
+            "engine_no_shadows_no_fog",
+            "engine_no_shadows_fog",
+            "engine_shadows_no_fog",
+            "engine_shadows_fog",
             "engine_lambert_no_shadows_no_fog",
             "engine_lambert_no_shadows_fog",
             "engine_lambert_shadows_no_fog",
@@ -117,10 +120,11 @@ namespace engine
             "engine_phong_no_shadows_fog",
             "engine_phong_shadows_no_fog",
             "engine_phong_shadows_fog",
-            "engine_render_depth_view",
-            "engine_render_semantic_view",
+            "engine_shadow_mapping",
             "engine_skybox_fog",
-            "engine_skybox_no_fog"
+            "engine_skybox_no_fog",
+            "engine_render_depth_view",
+            "engine_render_semantic_view"
         };
 
         for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )
