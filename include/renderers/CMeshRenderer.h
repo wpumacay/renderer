@@ -7,7 +7,8 @@ namespace engine
 
     const int MESH_RENDERER_ALBEDO_MAP_SLOT = 0;
     const int MESH_RENDERER_SPECULAR_MAP_SLOT = 1;
-    const int MESH_RENDERER_DEPTH_MAP_SLOT = 2;
+    const int MESH_RENDERER_NORMAL_MAP_SLOT = 2;
+    const int MESH_RENDERER_DEPTH_MAP_SLOT = 3;
 
     struct CMeshComparatorFarthestFromPoint
     {
@@ -133,21 +134,10 @@ namespace engine
 
         std::unordered_map< int32, CVec3 > m_cachedRandomColors;
 
-        CShader* m_shaderLambertNoShadowsNoFog;
-        CShader* m_shaderLambertNoShadowsFog;
-        CShader* m_shaderLambertShadowsNoFog;
-        CShader* m_shaderLambertShadowsFog;
-
-        CShader* m_shaderPhongNoShadowsNoFog;
-        CShader* m_shaderPhongNoShadowsFog;
-        CShader* m_shaderPhongShadowsNoFog;
-        CShader* m_shaderPhongShadowsFog;
-
         CShader* m_shaderDepthView;
         CShader* m_shaderSemanticView;
         CShader* m_shaderShadowMapping;
 
-        // WIP
         CShader* m_shaderNoShadowsNoFog;
         CShader* m_shaderNoShadowsFog;
         CShader* m_shaderShadowsNoFog;

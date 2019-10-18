@@ -9,17 +9,26 @@
 namespace engine
 {
 
+    const int MATERIAL_ALBEDO_MAP_SLOT = 0;
+    const int MATERIAL_SPECULAR_MAP_SLOT = 1;
+    const int MATERIAL_NORMAL_MAP_SLOT = 2;
+
+    const CVec3 MATERIAL_DEFAULT_AMBIENT_COLOR = { 1.0f, 0.5f, 0.31f };
+    const CVec3 MATERIAL_DEFAULT_DIFFUSE_COLOR = { 1.0f, 0.5f, 0.31f };
+    const CVec3 MATERIAL_DEFAULT_SPECULAR_COLOR = { 1.0f, 0.5f, 0.31f };
+    const float32 MATERIAL_DEFAULT_SHININESS = 32.0f;
+
     enum class eMaterialType
     {
         NONE = 0,
         LAMBERT, 
         PHONG,
-        BLINN_PHONG // @TODO: not implemented yet
+        BLINN_PHONG
     };
 
     std::string toString( const eMaterialType& shading );
 
-    class CIMaterial
+    class CMaterial
     {
 
     public :
@@ -30,23 +39,24 @@ namespace engine
         float32 shininess;
         float32 alpha;
 
-        CIMaterial( const std::string& name,
-                    const CVec3& ambientColor,
-                    const CVec3& diffuseColor,
-                    const CVec3& specularColor,
-                    float32 specularShininess,
-                    CTexture* albedoMap,
-                    CTexture* specularMap,
-                    CTexture* normalMap );
+        CMaterial( const std::string& name,
+                   const eMaterialType& type,
+                   const CVec3& ambientColor = MATERIAL_DEFAULT_AMBIENT_COLOR,
+                   const CVec3& diffuseColor = MATERIAL_DEFAULT_DIFFUSE_COLOR,
+                   const CVec3& specularColor = MATERIAL_DEFAULT_SPECULAR_COLOR,
+                   float32 specularShininess = MATERIAL_DEFAULT_SHININESS,
+                   CTexture* albedoMap = nullptr,
+                   CTexture* specularMap = nullptr,
+                   CTexture* normalMap = nullptr );
 
-        virtual ~CIMaterial();
+        ~CMaterial();
 
-        virtual void bind( CShader* shaderPtr ) = 0;
-        virtual void unbind() = 0;
+        void bind( CShader* shaderPtr );
+        void unbind();
 
         std::string toString();
 
-        void setMaterialType( const eMaterialType& type ) { m_type = type; }
+        void setType( const eMaterialType& type ) { m_type = type; }
         void setAlbedoMap( CTexture* albedoMap ) { m_albedoMap = albedoMap; }
         void setSpecularMap( CTexture* specularMap ) { m_specularMap = specularMap; }
         void setNormalMap( CTexture* normalMap ) { m_normalMap = normalMap; }
@@ -61,8 +71,6 @@ namespace engine
         static eMaterialType GetStaticType() { return eMaterialType::NONE; }
 
     protected :
-
-        virtual std::string _toStringInternal() = 0;
 
         std::string     m_name;
         eMaterialType   m_type;

@@ -6,21 +6,10 @@ namespace engine
 
     CMeshRenderer::CMeshRenderer()
     {
-        // WIP
         m_shaderNoShadowsNoFog = CShaderManager::GetCachedShader( "engine_no_shadows_no_fog" );
         m_shaderNoShadowsFog = CShaderManager::GetCachedShader( "engine_no_shadows_fog" );
         m_shaderShadowsNoFog = CShaderManager::GetCachedShader( "engine_shadows_no_fog" );
         m_shaderShadowsFog = CShaderManager::GetCachedShader( "engine_shadows_fog" );
-
-        m_shaderLambertNoShadowsNoFog   = CShaderManager::GetCachedShader( "engine_lambert_no_shadows_no_fog" );
-        m_shaderLambertNoShadowsFog     = CShaderManager::GetCachedShader( "engine_lambert_no_shadows_fog" );
-        m_shaderLambertShadowsNoFog     = CShaderManager::GetCachedShader( "engine_lambert_shadows_no_fog" );
-        m_shaderLambertShadowsFog       = CShaderManager::GetCachedShader( "engine_lambert_shadows_fog" );
-
-        m_shaderPhongNoShadowsNoFog   = CShaderManager::GetCachedShader( "engine_phong_no_shadows_no_fog" );
-        m_shaderPhongNoShadowsFog     = CShaderManager::GetCachedShader( "engine_phong_no_shadows_fog" );
-        m_shaderPhongShadowsNoFog     = CShaderManager::GetCachedShader( "engine_phong_shadows_no_fog" );
-        m_shaderPhongShadowsFog       = CShaderManager::GetCachedShader( "engine_phong_shadows_fog" );
 
         m_shaderShadowMapping   = CShaderManager::GetCachedShader( "engine_shadow_mapping" );
         m_shaderDepthView       = CShaderManager::GetCachedShader( "engine_render_depth_view" );
@@ -29,20 +18,14 @@ namespace engine
 
     CMeshRenderer::~CMeshRenderer()
     {
-        // WIP
         m_shaderNoShadowsNoFog = nullptr;
         m_shaderNoShadowsFog = nullptr;
         m_shaderShadowsNoFog = nullptr;
         m_shaderShadowsFog = nullptr;
 
-        m_shaderLambertNoShadowsNoFog = nullptr;
-        m_shaderLambertNoShadowsFog = nullptr;
-        m_shaderLambertShadowsNoFog = nullptr;
-        m_shaderLambertShadowsFog = nullptr;
-        m_shaderPhongNoShadowsNoFog = nullptr;
-        m_shaderPhongNoShadowsFog = nullptr;
-        m_shaderPhongShadowsNoFog = nullptr;
-        m_shaderPhongShadowsFog = nullptr;
+        m_shaderShadowMapping = nullptr;
+        m_shaderDepthView = nullptr;
+        m_shaderSemanticView = nullptr;
     }
 
     void CMeshRenderer::submit( const std::vector< CMesh* >& meshesVisible,
@@ -399,11 +382,11 @@ namespace engine
 
         // unbind albedo-map, specular-map and depth-map (end with texture-0 to go back to 
         // default-texture 0 being active, in case someone binds this slot without activating it)
-        glActiveTexture( GL_TEXTURE2 );
+        glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_DEPTH_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, 0 );
-        glActiveTexture( GL_TEXTURE1 );
+        glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, 0 );
-        glActiveTexture( GL_TEXTURE0 );
+        glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, 0 );
 
         _shader->unbind();
@@ -419,7 +402,7 @@ namespace engine
         {
             shaderPtr->setInt( "u_material.albedoMapActive", 1 );
             shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 );
+            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
             glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
         }
         else
@@ -460,7 +443,7 @@ namespace engine
         {
             shaderPtr->setInt( "u_material.albedoMapActive", 1 );
             shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 );
+            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
             glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
         }
         else
@@ -472,7 +455,7 @@ namespace engine
         {
             shaderPtr->setInt( "u_material.specularMapActive", 1 );
             shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE1 );
+            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
             glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
         }
         else
@@ -513,7 +496,7 @@ namespace engine
         {
             shaderPtr->setInt( "u_material.albedoMapActive", 1 );
             shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 );
+            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
             glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
         }
         else
@@ -525,7 +508,7 @@ namespace engine
         {
             shaderPtr->setInt( "u_material.specularMapActive", 1 );
             shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE1 );
+            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
             glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
         }
         else
@@ -617,7 +600,7 @@ namespace engine
         shaderPtr->setInt( "u_shadowMap.size", m_context.shadowMappingSize );
         shaderPtr->setInt( "u_shadowMap.pcfCount", m_context.shadowMappingPCFcount );
         shaderPtr->setInt( "u_shadowMap.depthMap", MESH_RENDERER_DEPTH_MAP_SLOT );
-        glActiveTexture( GL_TEXTURE2 );
+        glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_DEPTH_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, m_context.shadowMappingTextureId );
     }
 

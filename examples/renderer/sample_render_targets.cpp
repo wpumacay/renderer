@@ -863,42 +863,46 @@ std::vector< engine::CIRenderable* > _createScene1()
     ENGINE_ASSERT( _floorTexture, "Could not retrieve valid texture for the sample - floor" );
     ENGINE_ASSERT( _cubeTexture, "Could not retrieve valid texture for the sample - cube" );
 
-    auto _floorMaterial = new engine::CPhongMaterial( "floor_material",
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      64.0f,
-                                                      _floorTexture,
-                                                      _floorTexture );
+    auto _floorMaterial = new engine::CMaterial( "floor_material",
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 64.0f,
+                                                 _floorTexture,
+                                                 _floorTexture );
 
-    auto _cube1Material = new engine::CPhongMaterial( "cube_material1",
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      64.0f,
-                                                      _floorTexture,
-                                                      _floorTexture );
+    auto _cube1Material = new engine::CMaterial( "cube_material1",
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 64.0f,
+                                                 _floorTexture,
+                                                 _floorTexture );
 
-    auto _cube2Material = new engine::CPhongMaterial( "cube_material2",
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      64.0f,
-                                                      _floorTexture,
-                                                      _floorTexture );
+    auto _cube2Material = new engine::CMaterial( "cube_material2",
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 64.0f,
+                                                 _floorTexture,
+                                                 _floorTexture );
 
-    auto _cube3Material = new engine::CPhongMaterial( "cube_material3",
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      64.0f,
-                                                      _floorTexture,
-                                                      _floorTexture );
+    auto _cube3Material = new engine::CMaterial( "cube_material3",
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 64.0f,
+                                                 _floorTexture,
+                                                 _floorTexture );
 
-    _floor->setMaterial( std::unique_ptr< engine::CPhongMaterial >( _floorMaterial ) );
-    _cube1->setMaterial( std::unique_ptr< engine::CPhongMaterial >( _cube1Material ) );
-    _cube2->setMaterial( std::unique_ptr< engine::CPhongMaterial >( _cube2Material ) );
-    _cube3->setMaterial( std::unique_ptr< engine::CPhongMaterial >( _cube3Material ) );
+    _floor->setMaterial( std::unique_ptr< engine::CMaterial >( _floorMaterial ) );
+    _cube1->setMaterial( std::unique_ptr< engine::CMaterial >( _cube1Material ) );
+    _cube2->setMaterial( std::unique_ptr< engine::CMaterial >( _cube2Material ) );
+    _cube3->setMaterial( std::unique_ptr< engine::CMaterial >( _cube3Material ) );
 
     _renderables = { _floor, _cube1, _cube2, _cube3 };
 

@@ -290,6 +290,10 @@ float _computeFragmentShadowFactor( vec3 normal )
     float _closestDepth = texture( u_shadowMap.depthMap, _projCoords.xy ).r;
     float _currentDepth = _projCoords.z;
     float _shadowFactor = ( ( _currentDepth - _bias ) > _closestDepth ) ? 1.0 : 0.0;
+
+    if ( u_shadowMap.pcfCount == 0 )
+        return _shadowFactor;
+
     float _sizeTexels = 1.0f / float(u_shadowMap.size);
     float _numTexels = ( 2.0f * float(u_shadowMap.pcfCount) + 1.0f ) * ( 2.0f * float(u_shadowMap.pcfCount) + 1.0f );
 

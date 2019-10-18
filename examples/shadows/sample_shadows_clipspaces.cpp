@@ -232,8 +232,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
                              engine::CICamera* cameraPtr, 
                              engine::CShadowMap* shadowMapPtr,
                              engine::CShader* shaderPtr,
-                             engine::CPhongMaterial* floorMaterialPtr,
-                             engine::CPhongMaterial* cubeMaterialPtr,
+                             engine::CMaterial* floorMaterialPtr,
+                             engine::CMaterial* cubeMaterialPtr,
                              engine::CIRenderable* floor,
                              std::vector< engine::CIRenderable* > cubes );
 
@@ -341,21 +341,23 @@ int main()
     ENGINE_ASSERT( _floorTexture, "Could not retrieve valid texture for the sample - floor" );
     ENGINE_ASSERT( _cubeTexture, "Could not retrieve valid texture for the sample - cube" );
 
-    auto _floorMaterial = new engine::CPhongMaterial( "floor_material",
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      { 1.0f, 1.0f, 1.0f },
-                                                      64.0f,
-                                                      _floorTexture,
-                                                      _floorTexture );
+    auto _floorMaterial = new engine::CMaterial( "floor_material",
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 { 1.0f, 1.0f, 1.0f },
+                                                 64.0f,
+                                                 _floorTexture,
+                                                 _floorTexture );
 
-    auto _cubeMaterial = new engine::CPhongMaterial( "cube_material",
-                                                     { 1.0f, 1.0f, 1.0f },
-                                                     { 1.0f, 1.0f, 1.0f },
-                                                     { 1.0f, 1.0f, 1.0f },
-                                                     64.0f,
-                                                     _floorTexture,
-                                                     _floorTexture );
+    auto _cubeMaterial = new engine::CMaterial( "cube_material",
+                                                engine::eMaterialType::PHONG,
+                                                { 1.0f, 1.0f, 1.0f },
+                                                { 1.0f, 1.0f, 1.0f },
+                                                { 1.0f, 1.0f, 1.0f },
+                                                64.0f,
+                                                _floorTexture,
+                                                _floorTexture );
 
     auto _lightTest = new engine::CDirectionalLight( "directional_test",
                                                      { 0.3f, 0.3f, 0.3f },
@@ -546,8 +548,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
                              engine::CICamera* cameraPtr, 
                              engine::CShadowMap* shadowMapPtr,
                              engine::CShader* shaderPtr,
-                             engine::CPhongMaterial* floorMaterialPtr,
-                             engine::CPhongMaterial* cubeMaterialPtr,
+                             engine::CMaterial* floorMaterialPtr,
+                             engine::CMaterial* cubeMaterialPtr,
                              engine::CIRenderable* floor,
                              std::vector< engine::CIRenderable* > cubes )
 {

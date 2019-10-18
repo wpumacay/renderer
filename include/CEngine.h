@@ -32,9 +32,7 @@
 #include <graphics/CModel.h>
 #include <graphics/CScene.h>
 
-#include <materials/CIMaterial.h>
-#include <materials/CPhongMaterial.h>
-#include <materials/CLambertMaterial.h>
+#include <materials/CMaterial.h>
 
 #include <shaders/CShaderUniforms.h>
 #include <shaders/CShader.h>

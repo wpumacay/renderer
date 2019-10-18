@@ -26,7 +26,7 @@ public :
         m_cachedTextures.clear();
     }
 
-    void setMaterial( engine::CIMaterial* material )
+    void setMaterial( engine::CMaterial* material )
     {
         m_material = material;
     }
@@ -334,7 +334,7 @@ private :
         ImGui::End();
     }
 
-    engine::CIMaterial* m_material;
+    engine::CMaterial* m_material;
 
     std::string m_currentAlbedoMapName;
     std::string m_currentSpecularMapName;
@@ -399,11 +399,12 @@ int main()
     ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     /* create material properties */
-    auto _phongMaterial = new engine::CPhongMaterial( "phong_material", 
-                                                      { 1.0f, 0.5f, 0.31f },
-                                                      { 1.0f, 0.5f, 0.31f },
-                                                      { 1.0f, 0.5f, 0.31f },
-                                                      32.0f );
+    auto _phongMaterial = new engine::CMaterial( "phong_material", 
+                                                 engine::eMaterialType::PHONG,
+                                                 { 1.0f, 0.5f, 0.31f },
+                                                 { 1.0f, 0.5f, 0.31f },
+                                                 { 1.0f, 0.5f, 0.31f },
+                                                 32.0f );
 
     _ui->setMaterial( _phongMaterial );
 
