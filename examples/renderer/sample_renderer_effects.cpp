@@ -348,23 +348,23 @@ private :
         for ( auto renderablePtr : m_renderablesScene2 )
             renderablePtr->setVisibility( ( g_sceneId == 2 ) );
 
-//         ImGui::TextColored( ImVec4( 1.0f, 1.0f, 1.0f, 1.0f ), "Material:" );
-//         ImGui::RadioButton( "Lambert", &g_materialId, 0 ); ImGui::SameLine();
-//         ImGui::RadioButton( "Phong", &g_materialId, 1 ); ImGui::SameLine();
-//         ImGui::RadioButton( "Blinn-phong", &g_materialId, 2 ); ImGui::Spacing();
-// 
-//         engine::eMaterialType _type = ( g_materialId == 2 ) ? engine::eMaterialType::BLINN_PHONG : 
-//                                                               ( ( g_materialId == 1 ) ? engine::eMaterialType::PHONG :
-//                                                                                         engine::eMaterialType::LAMBERT );
-// 
-//         for ( auto renderablePtr : m_renderablesScene0 )
-//             renderablePtr->material()->setType( _type );
-// 
-//         for ( auto renderablePtr : m_renderablesScene1 )
-//             renderablePtr->material()->setType( _type );
-// 
-//         for ( auto renderablePtr : m_renderablesScene2 )
-//             renderablePtr->material()->setType( _type );
+        ImGui::TextColored( ImVec4( 1.0f, 1.0f, 1.0f, 1.0f ), "Material:" );
+        ImGui::RadioButton( "Lambert", &g_materialId, 0 ); ImGui::SameLine();
+        ImGui::RadioButton( "Phong", &g_materialId, 1 ); ImGui::SameLine();
+        ImGui::RadioButton( "Blinn-phong", &g_materialId, 2 ); ImGui::Spacing();
+
+        engine::eMaterialType _type = ( g_materialId == 2 ) ? engine::eMaterialType::BLINN_PHONG : 
+                                                              ( ( g_materialId == 1 ) ? engine::eMaterialType::PHONG :
+                                                                                        engine::eMaterialType::LAMBERT );
+
+        for ( auto renderablePtr : m_renderablesScene0 )
+            renderablePtr->material()->setType( _type );
+
+        for ( auto renderablePtr : m_renderablesScene1 )
+            renderablePtr->material()->setType( _type );
+
+        for ( auto renderablePtr : m_renderablesScene2 )
+            renderablePtr->material()->setType( _type );
 
         ImGui::Checkbox( "use-frustum-culling", &g_renderOptions.useFrustumCulling );
         if ( g_renderOptions.useFrustumCulling )
