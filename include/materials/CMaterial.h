@@ -37,6 +37,7 @@ namespace engine
         CVec3   diffuse;
         CVec3   specular;
         float32 shininess;
+        bool    transparent;
         float32 alpha;
 
         CMaterial( const std::string& name,

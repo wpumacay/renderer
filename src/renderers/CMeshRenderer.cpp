@@ -58,7 +58,7 @@ namespace engine
         //      > Note: check only in-view meshes, as they are going to be rendered w.r.t. our view
         for ( auto meshPtr : meshesInView )
         {
-            if ( renderOptions.useBlending && meshPtr->material()->alpha < 1.0f )
+            if ( renderOptions.useBlending && meshPtr->material()->transparent && meshPtr->material()->alpha < 1.0f )
                 m_meshesTransparent.push_back( meshPtr );
             else
                 m_meshesOpaque.push_back( meshPtr );
@@ -77,6 +77,7 @@ namespace engine
         /* render options */
         m_context.useFog         = renderOptions.useFog;
         m_context.useFaceCulling = renderOptions.useFaceCulling;
+        m_context.useBlending    = renderOptions.useBlending;
         /* camera-information */
         m_context.viewMatrix                = renderOptions.cameraPtr->matView();
         m_context.projMatrix                = renderOptions.cameraPtr->matProj();
@@ -210,29 +211,58 @@ namespace engine
             }
         }
 
+        // define which shader we'll be using for the render passes
+        CShader* _shader = nullptr;
+        if ( !useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
+        if ( !useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
+        if ( useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
+        if ( useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
+
         // (2): render opaque meshes
         if ( m_context.useFaceCulling )
         {
-            _renderMeshes( _meshesOpaqueLambert_faceCull, 
+            _renderMeshes( _shader,
+                           _meshesOpaqueLambert_faceCull, 
                            _meshesOpaqueLambert_noFaceCull,
                            _meshesOpaquePhong_faceCull, 
                            _meshesOpaquePhong_noFaceCull,
                            _meshesOpaqueBlinnPhong_faceCull,
                            _meshesOpaqueBlinnPhong_noFaceCull,
-                           useShadowMapping );
+                           useShadowMapping,
+                           false, /* don't use blending for this pass */
+                           true, /* setup render state uniforms for this pass */
+                           !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
         }
         else
         {
-            _renderMeshes( std::vector< CMesh* >(), 
+            _renderMeshes( _shader,
+                           std::vector< CMesh* >(), 
                            _meshesOpaqueLambert,
                            std::vector< CMesh* >(), 
                            _meshesOpaquePhong,
                            std::vector< CMesh* >(),
                            _meshesOpaqueBlinnPhong,
-                           useShadowMapping );
+                           useShadowMapping,
+                           false, /* don't use blending for this pass */
+                           true, /* setup render state uniforms for this pass */
+                           !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
         }
 
         // (3): render transparent meshes
+        if ( m_context.useBlending )
+        {
+            _renderMeshes( _shader,
+                           std::vector< CMesh* >(),
+                           _meshesTransparentLambert,
+                           std::vector< CMesh* >(),
+                           _meshesTransparentPhong,
+                           std::vector< CMesh* >(),
+                           _meshesTransparentBlinnPhong,
+                           useShadowMapping,
+                           true, /* use blending for this pass */
+                           false,  /* use previously set render state uniforms */
+                           true /* release render state uniforms once this pass is finished */ );
+        }
     }
 
     void CMeshRenderer::renderDepthOnly()
@@ -313,72 +343,97 @@ namespace engine
                 meshesOfGivenMaterial.push_back( meshPtr );
     }
 
-    void CMeshRenderer::_renderMeshes( const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
+    void CMeshRenderer::_renderMeshes( CShader* shaderPtr,
+                                       const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
                                        const std::vector< CMesh* >& meshesLambertWithNoFaceCulling,
                                        const std::vector< CMesh* >& meshesPhongWithFaceCulling, 
                                        const std::vector< CMesh* >& meshesPhongWithNoFaceCulling,
                                        const std::vector< CMesh* >& meshesBlinnPhongWithFaceCulling, 
                                        const std::vector< CMesh* >& meshesBlinnPhongWithNoFaceCulling,
-                                       bool renderWithShadows )
+                                       bool renderWithShadows,
+                                       bool renderWithBlending,
+                                       bool setupRenderState,
+                                       bool releaseRenderState )
     {
-        CShader* _shader = nullptr;
-        if ( !renderWithShadows && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
-        if ( !renderWithShadows && m_context.useFog ) _shader = m_shaderNoShadowsFog;
-        if ( renderWithShadows && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
-        if ( renderWithShadows && m_context.useFog ) _shader = m_shaderShadowsFog;
+        // setup render state (if required for this pass)
+        if ( setupRenderState )
+        {
+            shaderPtr->bind();
+            _setupRenderState_camera( shaderPtr );
+            _setupRenderState_light( shaderPtr );
+            if ( renderWithShadows )
+                _setupRenderState_shadows( shaderPtr );
+            if ( m_context.useFog )
+                _setupRenderState_fog( shaderPtr );
 
-        // setup render state
-        _shader->bind();
-        _setupRenderState_camera( _shader );
-        _setupRenderState_light( _shader );
-        if ( renderWithShadows )
-            _setupRenderState_shadows( _shader );
-        if ( m_context.useFog )
-            _setupRenderState_fog( _shader );
+            // configure viewer position (required for specular-calculations)
+            shaderPtr->setVec3( "u_viewerPosition", m_context.viewPosition );
+        }
 
-        // configure viewer position (required for specular-calculations)
-        _shader->setVec3( "u_viewerPosition", m_context.viewPosition );
+        if ( renderWithBlending )
+        {
+            glEnable( GL_BLEND );
+            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            glDepthMask( GL_FALSE );
+            shaderPtr->setInt( "u_material.transparent", 1 );
+        }
+        else
+        {
+            shaderPtr->setInt( "u_material.transparent", 0 );
+        }
 
-        if ( m_context.useFaceCulling )
+        if ( m_context.useFaceCulling && !renderWithBlending ) // if using blending, skip this section
         {
             glEnable( GL_CULL_FACE );
 
             // setup common uniforms for lambert materials
-            _shader->setInt( "u_material.type", 0 );
-            _shader->setInt( "u_material.specularMapActive", 0 );
-            _shader->setVec3( "u_material.specular", { 0.0f, 0.0f, 0.0f } );
-            _shader->setFloat( "u_material.shininess", 32.0f );
+            shaderPtr->setInt( "u_material.type", 0 );
+            shaderPtr->setInt( "u_material.specularMapActive", 0 );
+            shaderPtr->setVec3( "u_material.specular", { 0.0f, 0.0f, 0.0f } );
+            shaderPtr->setFloat( "u_material.shininess", 32.0f );
             for ( auto meshPtr : meshesLambertWithFaceCulling )
-                _renderMesh_Lambert( meshPtr, _shader );
+                _renderMesh_Lambert( meshPtr, shaderPtr );
 
             // setup common uniforms for phong materials
-            _shader->setInt( "u_material.type", 1 );
+            shaderPtr->setInt( "u_material.type", 1 );
             for ( auto meshPtr : meshesPhongWithFaceCulling )
-                _renderMesh_Phong( meshPtr, _shader );
+                _renderMesh_Phong( meshPtr, shaderPtr );
 
             // setup common uniforms for blinn-phong materials
-            _shader->setInt( "u_material.type", 2 );
+            shaderPtr->setInt( "u_material.type", 2 );
             for ( auto meshPtr : meshesBlinnPhongWithFaceCulling )
-                _renderMesh_BlinnPhong( meshPtr, _shader );
+                _renderMesh_BlinnPhong( meshPtr, shaderPtr );
 
             glDisable( GL_CULL_FACE );
         }
 
         // setup common uniforms for lambert materials
-        _shader->setInt( "u_material.type", 0 );
-        _shader->setInt( "u_material.specularMapActive", 0 );
+        shaderPtr->setInt( "u_material.type", 0 );
+        shaderPtr->setInt( "u_material.specularMapActive", 0 );
         for ( auto meshPtr : meshesLambertWithNoFaceCulling )
-            _renderMesh_Lambert( meshPtr, _shader );
+        {
+            if ( renderWithBlending ) 
+                shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
+            _renderMesh_Lambert( meshPtr, shaderPtr );
+        }
 
         // setup common uniforms for phong materials
-        _shader->setInt( "u_material.type", 1 );
+        shaderPtr->setInt( "u_material.type", 1 );
         for ( auto meshPtr : meshesPhongWithNoFaceCulling )
-            _renderMesh_Phong( meshPtr, _shader );
+        {
+            if ( renderWithBlending ) 
+                shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
+            _renderMesh_Phong( meshPtr, shaderPtr );
+        }
 
         // setup common uniforms for blinn-phong materials
-        _shader->setInt( "u_material.type", 2 );
+        shaderPtr->setInt( "u_material.type", 2 );
         for ( auto meshPtr : meshesBlinnPhongWithNoFaceCulling )
-            _renderMesh_BlinnPhong( meshPtr, _shader );
+        {
+            if ( renderWithBlending ) 
+                shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
+            _renderMesh_BlinnPhong( meshPtr, shaderPtr );
+        }
 
         // unbind albedo-map, specular-map and depth-map (end with texture-0 to go back to 
         // default-texture 0 being active, in case someone binds this slot without activating it)
@@ -389,7 +444,14 @@ namespace engine
         glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, 0 );
 
-        _shader->unbind();
+        if ( releaseRenderState )
+            shaderPtr->unbind();
+
+        if ( renderWithBlending )
+        {
+            glDepthMask( GL_TRUE );
+            glDisable( GL_BLEND );
+        }
     }
 
     void CMeshRenderer::_renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr )

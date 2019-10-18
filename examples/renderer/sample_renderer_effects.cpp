@@ -59,6 +59,9 @@ bool g_useFaceCulling = false;
 bool g_useShadowMapping = true;
 bool g_useFog = true;
 bool g_useSkybox = true;
+bool g_useBlending = false;
+float g_alpha = 1.0f;
+bool g_useWireframe = false;
 
 int g_materialId = 0; // 0: lambert, 1: phong, 2: blinn-phong
 
@@ -142,7 +145,7 @@ protected :
         m_meshRendererPtr = nullptr;
 
         auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                        { 0.2f, 0.2f, 0.2f },
+                                                        { 0.4f, 0.4f, 0.4f },
                                                         { 0.4f, 0.4f, 0.4f },
                                                         { 0.8f, 0.8f, 0.8f },
                                                         g_lightDirDirection );
@@ -347,6 +350,66 @@ private :
 
         for ( auto renderablePtr : m_renderablesScene2 )
             renderablePtr->setVisibility( ( g_sceneId == 2 ) );
+
+        ImGui::Checkbox( "wireframe", &g_useWireframe );
+        for ( auto renderablePtr : m_renderablesScene0 )
+            renderablePtr->setWireframe( g_useWireframe );
+
+        for ( auto renderablePtr : m_renderablesScene1 )
+            renderablePtr->setWireframe( g_useWireframe );
+
+        for ( auto renderablePtr : m_renderablesScene2 )
+            renderablePtr->setWireframe( g_useWireframe );
+
+        ImGui::Checkbox( "use-blending", &g_useBlending );
+        g_renderOptions.useBlending = g_useBlending;
+        g_renderOptionsTargetNormal.useBlending = g_useBlending;
+        if ( g_useBlending )
+        {
+            ImGui::SliderFloat( "alpha", &g_alpha, 0.1f, 1.0f );
+
+            for ( auto renderablePtr : m_renderablesScene0 )
+            {
+                if ( renderablePtr->objectId() == 1000 )
+                    continue;
+                renderablePtr->material()->alpha = g_alpha;
+            }
+
+            for ( auto renderablePtr : m_renderablesScene1 )
+            {
+                if ( renderablePtr->objectId() == 1000 )
+                    continue;
+                renderablePtr->material()->alpha = g_alpha;
+            }
+
+            for ( auto renderablePtr : m_renderablesScene2 )
+            {
+                if ( renderablePtr->objectId() == 1000 )
+                    continue;
+                renderablePtr->material()->alpha = g_alpha;
+            }
+        }
+
+        for ( auto renderablePtr : m_renderablesScene0 )
+        {
+            if ( renderablePtr->objectId() == 1000 )
+                continue;
+            renderablePtr->material()->transparent = g_useBlending;
+        }
+
+        for ( auto renderablePtr : m_renderablesScene1 )
+        {
+            if ( renderablePtr->objectId() == 1000 )
+                continue;
+            renderablePtr->material()->transparent = g_useBlending;
+        }
+
+        for ( auto renderablePtr : m_renderablesScene2 )
+        {
+            if ( renderablePtr->objectId() == 1000 )
+                continue;
+            renderablePtr->material()->transparent = g_useBlending;
+        }
 
         ImGui::TextColored( ImVec4( 1.0f, 1.0f, 1.0f, 1.0f ), "Material:" );
         ImGui::RadioButton( "Lambert", &g_materialId, 0 ); ImGui::SameLine();
@@ -651,7 +714,11 @@ int main()
     _ui->setRenderablesScene2( _renderablesScene2 );
 
     for ( auto renderablePtr : _renderablesScene0 )
+    {
+        if ( renderablePtr->objectId() == 1000 )
+            continue;
         renderablePtr->setVisibility( ( g_sceneId == 0 ) );
+    }
 
     for ( auto renderablePtr : _renderablesScene1 )
         renderablePtr->setVisibility( ( g_sceneId == 1 ) );
@@ -664,6 +731,7 @@ int main()
     g_renderOptions.useFrustumCulling = true;
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
+    g_renderOptions.useBlending = g_useBlending;
     g_renderOptions.useFog = g_useFog;
     g_renderOptions.useSkybox = g_useSkybox;
     g_renderOptions.useShadowMapping = g_useShadowMapping;
@@ -698,6 +766,7 @@ int main()
     g_renderOptionsTargetNormal.useFrustumCulling = true;
     g_renderOptionsTargetNormal.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetNormal.useFaceCulling = false;
+    g_renderOptionsTargetNormal.useBlending = g_useBlending;
     g_renderOptionsTargetNormal.useFog = g_useFog;
     g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
     g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
@@ -714,6 +783,7 @@ int main()
     g_renderOptionsTargetDepth.useFrustumCulling = true;
     g_renderOptionsTargetDepth.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetDepth.useFaceCulling = false;
+    g_renderOptionsTargetDepth.useBlending = false;
     g_renderOptionsTargetDepth.useFog = false;
     g_renderOptionsTargetDepth.useSkybox = false;
     g_renderOptionsTargetDepth.useShadowMapping = false;
@@ -734,6 +804,7 @@ int main()
     g_renderOptionsTargetSemantic.useFrustumCulling = true;
     g_renderOptionsTargetSemantic.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetSemantic.useFaceCulling = false;
+    g_renderOptionsTargetSemantic.useBlending = false;
     g_renderOptionsTargetSemantic.useFog = false;
     g_renderOptionsTargetSemantic.useSkybox = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
@@ -969,6 +1040,9 @@ std::vector< engine::CIRenderable* > _createScene0()
 
     auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
 
+    // give the floor a specific id to avoid setting transparency to it
+    _renderables[0]->setObjectId( 1000 );
+
     // give the renderables a little rotation and scale
     std::default_random_engine _randomGenerator;
     std::uniform_real_distribution< float > _randomDistribution( 0.5f, 1.0f );
@@ -1110,12 +1184,28 @@ std::vector< engine::CIRenderable* > _createScene2()
         _renderablePtr->material()->setAlbedoMap( _renderableTexture );
 
         _renderables.push_back( _renderablePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr) );
+        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
+
+        // create a cube inside the sphere
+        auto _cubePtr = engine::CMeshBuilder::createBox( 0.5f, 0.5f, 0.5f );
+        _cubePtr->position = _renderablePtr->position;
+        _cubePtr->rotation = _renderablePtr->rotation;
+        _cubePtr->scale = 0.5f * _renderablePtr->scale;
+
+        _cubePtr->setObjectId( 1000 );
+
+        _cubePtr->material()->ambient = { 0.8f, 0.1f, 0.1f };
+        _cubePtr->material()->diffuse = { 0.8f, 0.1f, 0.1f };
+        _cubePtr->material()->specular = { 0.8f, 0.1f, 0.1f };
+
+        _renderables.push_back( _cubePtr );
+        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
     _floor->material()->setAlbedoMap( _renderableTexture );
+    _floor->setObjectId( 1000 );
     _renderables.push_back( _floor );
     engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
 

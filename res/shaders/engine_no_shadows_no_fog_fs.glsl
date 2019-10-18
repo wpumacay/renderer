@@ -19,6 +19,8 @@ out vec4 fColor;
 struct Material
 {
     int type; // 0: lambert, 1: phong, 2: blinn-phong
+    int transparent; // 0: opaque, 1: transparent
+    float alpha; // transparency factor
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -99,7 +101,10 @@ void main()
     else if ( u_spotLight.enabled == 1 )
         _resultColor = _computeColorWithSpotLight( u_spotLight, _normal, _viewDir );
 
-    fColor = vec4( _resultColor, 1.0f );
+    if ( u_material.transparent == 0 )
+        fColor = vec4( _resultColor, 1.0f );
+    else
+        fColor = vec4( _resultColor, u_material.alpha );
 }
 
 vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir )

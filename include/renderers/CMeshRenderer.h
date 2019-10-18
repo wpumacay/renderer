@@ -35,6 +35,7 @@ namespace engine
         /* some render options */
         bool    useFog;
         bool    useFaceCulling;
+        bool    useBlending;
         /* camera information */
         CMat4   viewMatrix;
         CMat4   projMatrix;
@@ -101,13 +102,17 @@ namespace engine
                                        const eMaterialType& materialType,
                                        std::vector< CMesh* >& meshesOfGivenMaterial );
 
-        void _renderMeshes( const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
+        void _renderMeshes( CShader* shaderPtr,
+                            const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
                             const std::vector< CMesh* >& meshesLambertWithNoFaceCulling,
                             const std::vector< CMesh* >& meshesPhongWithFaceCulling, 
                             const std::vector< CMesh* >& meshesPhongWithNoFaceCulling,
                             const std::vector< CMesh* >& meshesBlinnPhongWithFaceCulling, 
                             const std::vector< CMesh* >& meshesBlinnPhongWithNoFaceCulling,
-                            bool renderWithShadows );
+                            bool renderWithShadows,
+                            bool renderWithBlending,
+                            bool setupRenderState,
+                            bool releaseRenderState );
 
         void _renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr );
         void _renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr );

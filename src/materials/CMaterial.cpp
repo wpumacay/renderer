@@ -32,6 +32,7 @@ namespace engine
         diffuse     = diffuseColor;
         specular    = specularColor;
         shininess   = specularShininess;
+        transparent = false;
         alpha       = 1.0f;
 
         m_albedoMap     = albedoMap;

@@ -48,6 +48,8 @@ namespace engine
         static void DrawFrame( const CMat4& frame, float32 size );
         static void DrawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
+        static void DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color );
+
         ~CDebugDrawer();
 
     private :
@@ -68,6 +70,8 @@ namespace engine
         void _drawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size );
         void _drawFrame( const CMat4& frame, float32 size );
         void _drawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
+
+        void _drawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color );
 
         void _render( CICamera* camera );
         void _renderLinesBatch( CICamera* camera, int numLines );

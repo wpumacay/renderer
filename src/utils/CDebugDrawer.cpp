@@ -145,6 +145,13 @@ namespace engine
         CDebugDrawer::s_instance->_drawPlane( plane, size, color );
     }
 
+    void CDebugDrawer::DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidBox( size, transform, color );
+    }
+
     CDebugDrawer::~CDebugDrawer()
     {
         m_linesPositions.clear();
@@ -473,6 +480,11 @@ namespace engine
         _drawLine( _p1, _p2, color );
         _drawLine( _p2, _p3, color );
         _drawLine( _p3, _p0, color );
+    }
+
+    void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    {
+
     }
 
 }

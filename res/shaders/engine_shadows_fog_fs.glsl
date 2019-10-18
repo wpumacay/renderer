@@ -22,6 +22,8 @@ out vec4 fColor;
 struct Material
 {
     int type; // 0: lambert, 1: phong, 2: blinn-phong
+    int transparent; // 0: opaque, 1: transparent
+    float alpha; // transparency factor
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -116,8 +118,8 @@ void main()
     // compute some required vectors
     vec3 _normal = normalize( fNormal );
     vec3 _viewDir = normalize( u_viewerPosition - fPosition );
-    // compute shadow factor
-    float _shadowFactor = _computeFragmentShadowFactor( _normal );
+    // compute shadow factor (transparent objects dont cast shadows)
+    float _shadowFactor = ( u_material.transparent == 1 ) ? 0.0f : _computeFragmentShadowFactor( _normal );
 
     if ( u_directionalLight.enabled == 1 )
         _resultColor = _computeColorWithDirectionalLight( u_directionalLight, _normal, _viewDir, _shadowFactor );
@@ -128,7 +130,10 @@ void main()
 
     _resultColor = mix( _resultColor, u_fog.color, _computeFragmentFogFactor() ); // res_color * (1-factor) + fog_color * (factor)
 
-    fColor = vec4( _resultColor, 1.0f );
+    if ( u_material.transparent == 0 )
+        fColor = vec4( _resultColor, 1.0f );
+    else
+        fColor = vec4( _resultColor, u_material.alpha );
 }
 
 vec3 _computeColorWithDirectionalLight( DirectionalLight light, vec3 normal, vec3 viewDir, float shadowFactor )
