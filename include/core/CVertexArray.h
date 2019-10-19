@@ -13,7 +13,7 @@ namespace engine
         CVertexArray();
         ~CVertexArray();
 
-        void addVertexBuffer( CVertexBuffer* vertexBuffer );
+        void addVertexBuffer( CVertexBuffer* vertexBuffer, bool isInstanced = false );
         void setIndexBuffer( CIndexBuffer* indexBuffer );
 
         void bind();

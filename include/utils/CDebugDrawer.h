@@ -14,13 +14,13 @@
 
 namespace engine
 {
-    struct LDLinePositions
+    struct CLinePositions
     {
         CVec3 vStart;
         CVec3 vEnd;
     };
 
-    struct LDLinePositionsColors
+    struct CLineColors
     {
         CVec3 cStart;
         CVec3 cEnd;
@@ -76,11 +76,11 @@ namespace engine
         void _render( CICamera* camera );
         void _renderLinesBatch( CICamera* camera, int numLines );
 
-        std::vector< LDLinePositions > m_linesRenderBufferPositions;
-        std::vector< LDLinePositionsColors > m_linesRenderBufferColors;
+        std::vector< CLinePositions > m_linesRenderBufferPositions;
+        std::vector< CLineColors > m_linesRenderBufferColors;
 
-        std::vector< LDLinePositions > m_linesPositions;
-        std::vector< LDLinePositionsColors > m_linesColors;
+        std::vector< CLinePositions > m_linesPositions;
+        std::vector< CLineColors > m_linesColors;
 
         std::unique_ptr< CVertexBuffer >    m_linesPositionsVBO;
         std::unique_ptr< CVertexBuffer >    m_linesColorsVBO;

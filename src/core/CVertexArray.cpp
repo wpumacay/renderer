@@ -22,7 +22,7 @@ namespace engine
         m_vertexBuffers.clear();
     }
 
-    void CVertexArray::addVertexBuffer( CVertexBuffer* vertexBuffer )
+    void CVertexArray::addVertexBuffer( CVertexBuffer* vertexBuffer, bool isInstanced )
     {
         // setup the VBO within our VAO according to its layout
         auto _buffLayout = vertexBuffer->layout();
@@ -40,6 +40,8 @@ namespace engine
                                    _buffElements[i].normalized ? GL_TRUE : GL_FALSE,
                                    _buffLayout.stride(),
                                    (const void*) (intptr_t) _buffElements[i].offset );
+            if ( isInstanced )
+                glVertexAttribDivisor( m_numAttribIndx, 1 );
 
             m_numAttribIndx++;
         }

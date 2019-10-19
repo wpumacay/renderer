@@ -10,16 +10,16 @@ namespace engine
     {
         m_shaderPtr = CShaderManager::GetCachedShader( "debug_drawing_3d" );
 
-        m_linesRenderBufferPositions = std::vector< LDLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
-        m_linesRenderBufferColors = std::vector< LDLinePositionsColors >( DEBUG_DRAWER_BATCH_SIZE );
+        m_linesRenderBufferPositions = std::vector< CLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
+        m_linesRenderBufferColors = std::vector< CLineColors >( DEBUG_DRAWER_BATCH_SIZE );
 
         m_linesPositionsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
                                                                                    eBufferUsage::DYNAMIC,
-                                                                                   sizeof( LDLinePositions ) * m_linesRenderBufferPositions.size(),
+                                                                                   sizeof( CLinePositions ) * m_linesRenderBufferPositions.size(),
                                                                                    (float32*) m_linesRenderBufferPositions.data() ) );
         m_linesColorsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "color", eElementType::Float3, false } },
                                                                                 eBufferUsage::DYNAMIC,
-                                                                                sizeof( LDLinePositionsColors ) * m_linesRenderBufferColors.size(),
+                                                                                sizeof( CLineColors ) * m_linesRenderBufferColors.size(),
                                                                                 (float32*) m_linesRenderBufferColors.data() ) );
 
         m_linesVAO = std::unique_ptr< CVertexArray >( new CVertexArray() );
@@ -194,8 +194,8 @@ namespace engine
     {
         m_linesVAO->bind();
 
-        m_linesPositionsVBO->updateData( numLines * sizeof( LDLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
-        m_linesColorsVBO->updateData( numLines * sizeof( LDLinePositionsColors ), ( float32* ) m_linesRenderBufferColors.data() );
+        m_linesPositionsVBO->updateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
+        m_linesColorsVBO->updateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
         m_shaderPtr->bind();
         m_shaderPtr->setMat4( "u_tView", camera->matView() );
@@ -210,13 +210,13 @@ namespace engine
 
     void CDebugDrawer::_drawLine( const CVec3& start, const CVec3& end, const CVec3& color )
     {
-        LDLinePositions _linePos;
+        CLinePositions _linePos;
         _linePos.vStart = start;
         _linePos.vEnd = end;
 
         m_linesPositions.push_back( _linePos );
 
-        LDLinePositionsColors _lineCol;
+        CLineColors _lineCol;
         _lineCol.cStart = color;
         _lineCol.cEnd = color;
 
