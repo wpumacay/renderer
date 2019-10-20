@@ -116,7 +116,9 @@ namespace engine
             "engine_skybox_fog",
             "engine_skybox_no_fog",
             "engine_render_depth_view",
-            "engine_render_semantic_view"
+            "engine_render_semantic_view",
+            "engine_debug_drawing_3d_solid_lighting",
+            "engine_debug_drawing_3d_solid_no_lighting"
         };
 
         for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )

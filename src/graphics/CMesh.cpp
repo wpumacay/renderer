@@ -47,6 +47,7 @@ namespace engine
 
     CMesh::~CMesh()
     {
+        m_varray            = nullptr;
         m_vbufferVertices   = nullptr;
         m_vbufferNormals    = nullptr;
         m_vbufferUVs        = nullptr;

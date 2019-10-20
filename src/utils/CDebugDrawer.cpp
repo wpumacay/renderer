@@ -8,7 +8,8 @@ namespace engine
 
     CDebugDrawer::CDebugDrawer()
     {
-        m_shaderPtr = CShaderManager::GetCachedShader( "debug_drawing_3d" );
+        m_shaderLinesPtr = CShaderManager::GetCachedShader( "debug_drawing_3d" );
+        ENGINE_CORE_ASSERT( m_shaderLinesPtr, "Could not load debug_drawing_3d shader required for drawing lines" );
 
         m_linesRenderBufferPositions = std::vector< CLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
         m_linesRenderBufferColors = std::vector< CLineColors >( DEBUG_DRAWER_BATCH_SIZE );
@@ -25,13 +26,83 @@ namespace engine
         m_linesVAO = std::unique_ptr< CVertexArray >( new CVertexArray() );
         m_linesVAO->addVertexBuffer( m_linesPositionsVBO.get() );
         m_linesVAO->addVertexBuffer( m_linesColorsVBO.get() );
+
+        /* setup resources for rendering solid objects */
+        m_shaderSolidLightingPtr = CShaderManager::GetCachedShader( "engine_debug_drawing_3d_solid_lighting" );
+        ENGINE_CORE_ASSERT( m_shaderSolidLightingPtr, 
+                            "Could not load engine_debug_drawing_3d_solid_lighting shader required for drawing solid cubes with lighting" );
+
+        m_shaderSolidNoLightingPtr = CShaderManager::GetCachedShader( "engine_debug_drawing_3d_solid_no_lighting" );
+        ENGINE_CORE_ASSERT( m_shaderSolidNoLightingPtr, 
+                            "Could not load engine_debug_drawing_3d_solid_no_lighting shader required for drawing solid cubes without lighting" );
+
+        // create a dummy mesh to grab the geometry (vertices, ...)
+        auto _dummyCubeMesh = CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
+        auto _cubeVertices = _dummyCubeMesh->vertices();
+        auto _cubeNormals = _dummyCubeMesh->normals();
+        auto _cubeIndices = _dummyCubeMesh->indices();
+        delete _dummyCubeMesh;
+
+        // setup vbos and vaos for cube instanced-rendering
+        {
+            auto _vboPositions = new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                                    eBufferUsage::STATIC,
+                                                    sizeof( CVec3 ) * _cubeVertices.size(),
+                                                    (float32*) _cubeVertices.data() );
+
+            auto _vboNormals = new CVertexBuffer( { { "normal", eElementType::Float3, true } },
+                                                  eBufferUsage::STATIC,
+                                                  sizeof( CVec3 ) * _cubeNormals.size(),
+                                                  (float32*) _cubeNormals.data() );
+
+            auto _ibo = new CIndexBuffer( eBufferUsage::STATIC,
+                                          3 * _cubeIndices.size(),
+                                          (uint32*) _cubeIndices.data() );
+
+            auto _vboInstancesColors = new CVertexBuffer( { { "color", eElementType::Float4, false } },
+                                                          eBufferUsage::DYNAMIC,
+                                                          DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 ),
+                                                          NULL );
+
+            auto _vboInstancesModelMats = new CVertexBuffer( { { "modelMatrix-col0", eElementType::Float4, false },
+                                                               { "modelMatrix-col1", eElementType::Float4, false },
+                                                               { "modelMatrix-col2", eElementType::Float4, false },
+                                                               { "modelMatrix-col3", eElementType::Float4, false } },
+                                                             eBufferUsage::DYNAMIC,
+                                                             DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
+                                                             NULL );
+
+            auto _vboInstancesNormalMats = new CVertexBuffer( { { "normalMatrix-col0", eElementType::Float4, false },
+                                                                { "normalMatrix-col1", eElementType::Float4, false },
+                                                                { "normalMatrix-col2", eElementType::Float4, false },
+                                                                { "normalMatrix-col3", eElementType::Float4, false } },
+                                                              eBufferUsage::DYNAMIC,
+                                                              DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
+                                                              NULL );
+
+            auto _vao = new CVertexArray();
+            _vao->addVertexBuffer( _vboPositions );
+            _vao->addVertexBuffer( _vboNormals );
+            _vao->addVertexBuffer( _vboInstancesColors, true );
+            _vao->addVertexBuffer( _vboInstancesModelMats, true );
+            _vao->addVertexBuffer( _vboInstancesNormalMats, true );
+            _vao->setIndexBuffer( _ibo );
+
+            m_cubeVBOpositions = std::unique_ptr< CVertexBuffer >( _vboPositions );
+            m_cubeVBOnormals = std::unique_ptr< CVertexBuffer >( _vboNormals );
+            m_cubeVBOinstancesColors = std::unique_ptr< CVertexBuffer >( _vboInstancesColors );
+            m_cubeVBOinstancesModelMats = std::unique_ptr< CVertexBuffer >( _vboInstancesModelMats );
+            m_cubeVBOinstancesNormalMats = std::unique_ptr< CVertexBuffer >( _vboInstancesNormalMats );
+            m_cubeIBO = std::unique_ptr< CIndexBuffer >( _ibo );
+            m_cubeVAO = std::unique_ptr< CVertexArray >( _vao );
+        }
     }
 
     void CDebugDrawer::Init()
     {
         if ( CDebugDrawer::s_instance )
         {
-            ENGINE_CORE_WARN( "Attempting to initiliaze debug-drawer twice" );
+            ENGINE_CORE_WARN( "Attempting to initialize debug-drawer twice" );
             return;
         }
 
@@ -51,6 +122,13 @@ namespace engine
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
 
         CDebugDrawer::s_instance->_render( camera );
+    }
+
+    void CDebugDrawer::Render( CICamera* camera, CILight* light )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_render( camera, light );
     }
 
     void CDebugDrawer::DrawLine( const CVec3& start, const CVec3& end, const CVec3& color )
@@ -145,7 +223,7 @@ namespace engine
         CDebugDrawer::s_instance->_drawPlane( plane, size, color );
     }
 
-    void CDebugDrawer::DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    void CDebugDrawer::DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color )
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
 
@@ -163,49 +241,188 @@ namespace engine
         m_linesVAO = nullptr;
         m_linesPositionsVBO = nullptr;
         m_linesColorsVBO = nullptr;
+
+        m_cubeVAO = nullptr;
+        m_cubeIBO = nullptr;
+        m_cubeVBOpositions = nullptr;
+        m_cubeVBOnormals = nullptr;
+        m_cubeVBOinstancesColors = nullptr;
+        m_cubeVBOinstancesModelMats = nullptr;
+        m_cubeVBOinstancesNormalMats = nullptr;
     }
 
     void CDebugDrawer::_render( CICamera* camera )
     {
+        _renderSolidBoxes( camera );
+        _renderLines( camera );
+    }
+
+    void CDebugDrawer::_render( CICamera* camera, CILight* light )
+    {
+        _renderSolidBoxes( camera, light );
+        _renderLines( camera );
+    }
+
+    void CDebugDrawer::_renderLines( CICamera* camera )
+    {
+        /* setup render state */
+        m_shaderLinesPtr->bind();
+        m_shaderLinesPtr->setMat4( "u_tView", camera->matView() );
+        m_shaderLinesPtr->setMat4( "u_tProj", camera->matProj() );
         glLineWidth( 2.0f );
 
+        // render lines in batches *****************************************************************
         for ( size_t q = 0; q < m_linesPositions.size(); q++ )
         {
             m_linesRenderBufferPositions[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_linesPositions[q];
             m_linesRenderBufferColors[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_linesColors[q];
 
             if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
-                _renderLinesBatch( camera, DEBUG_DRAWER_BATCH_SIZE );
+                _renderBatchOfLines( DEBUG_DRAWER_BATCH_SIZE );
         }
 
         int _remainingCountLines = m_linesPositions.size() % DEBUG_DRAWER_BATCH_SIZE;
 
         // Draw remaining lines (the ones that didn't get a batch)
         if ( _remainingCountLines != 0 )
-            _renderLinesBatch( camera, _remainingCountLines );
+            _renderBatchOfLines( _remainingCountLines );
 
+        // clear our containers for later usage
         m_linesPositions.clear();
         m_linesColors.clear();
+        //******************************************************************************************
 
         glLineWidth( 1.0f );
+        m_shaderLinesPtr->unbind();
     }
 
-    void CDebugDrawer::_renderLinesBatch( CICamera* camera, int numLines )
+    void CDebugDrawer::_renderBatchOfLines( int numLines )
     {
         m_linesVAO->bind();
 
         m_linesPositionsVBO->updateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
         m_linesColorsVBO->updateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
-        m_shaderPtr->bind();
-        m_shaderPtr->setMat4( "u_tView", camera->matView() );
-        m_shaderPtr->setMat4( "u_tProj", camera->matProj() );
-
         glDrawArrays( GL_LINES, 0, numLines * 2 );
 
-        m_shaderPtr->unbind();
-
         m_linesVAO->unbind();
+    }
+
+    void CDebugDrawer::_renderSolidBoxes( CICamera* camera )
+    {
+        m_shaderSolidNoLightingPtr->bind();
+        m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+
+        // render boxes in batches *****************************************************************
+        for ( size_t q = 0; q < m_cubesColors.size(); q++ )
+        {
+            m_renderBufferCubesColors[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesColors[q];
+            m_renderBufferCubesModelMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesModelMats[q];
+            m_renderBufferCubesNormalMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesNormalMats[q];
+
+            if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                _renderBatchOfSolidBoxes( DEBUG_DRAWER_BATCH_SIZE, true );
+        }
+
+        int _remainingCountBoxes = m_cubesColors.size() % DEBUG_DRAWER_BATCH_SIZE;
+
+        // Draw remaining boxes (the ones that didn't get a batch)
+        if ( _remainingCountBoxes != 0 )
+            _renderBatchOfSolidBoxes( _remainingCountBoxes, true );
+
+        // clear our containers for later usage
+        m_cubesColors.clear();
+        m_cubesModelMats.clear();
+        m_cubesNormalMats.clear();
+        //******************************************************************************************
+
+        m_shaderSolidNoLightingPtr->unbind();
+    }
+
+    void CDebugDrawer::_renderSolidBoxes( CICamera* camera, CILight* light )
+    {
+        m_shaderSolidLightingPtr->bind();
+        m_shaderSolidLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+        // disable all light-types
+        m_shaderSolidLightingPtr->setInt( "u_directionalLight.enabled", 0 );
+        m_shaderSolidLightingPtr->setInt( "u_pointLight.enabled", 0 );
+        m_shaderSolidLightingPtr->setInt( "u_spotLight.enabled", 0 );
+
+        // setup appropriate light uniforms given the light-type
+        if ( light->type() == eLightType::DIRECTIONAL )
+        {
+            m_shaderSolidLightingPtr->setInt( "u_directionalLight.enabled", 1 );
+            m_shaderSolidLightingPtr->setVec3( "u_directionalLight.ambient", light->ambient );
+            m_shaderSolidLightingPtr->setVec3( "u_directionalLight.diffuse", light->diffuse );
+            m_shaderSolidLightingPtr->setVec3( "u_directionalLight.specular", light->specular );
+            m_shaderSolidLightingPtr->setFloat( "u_directionalLight.intensity", light->intensity );
+            m_shaderSolidLightingPtr->setVec3( "u_directionalLight.direction", light->direction );
+        }
+        else if ( light->type() == eLightType::POINT )
+        {
+            m_shaderSolidLightingPtr->setInt( "u_pointLight.enabled", 1 );
+            m_shaderSolidLightingPtr->setVec3( "u_pointLight.ambient", light->ambient );
+            m_shaderSolidLightingPtr->setVec3( "u_pointLight.diffuse", light->diffuse );
+            m_shaderSolidLightingPtr->setVec3( "u_pointLight.specular", light->specular );
+            m_shaderSolidLightingPtr->setFloat( "u_pointLight.intensity", light->intensity );
+            m_shaderSolidLightingPtr->setVec3( "u_pointLight.position", light->position );
+            m_shaderSolidLightingPtr->setFloat( "u_pointLight.attnk0", light->atnConstant );
+            m_shaderSolidLightingPtr->setFloat( "u_pointLight.attnk1", light->atnLinear );
+            m_shaderSolidLightingPtr->setFloat( "u_pointLight.attnk2", light->atnQuadratic );
+        }
+        else if ( light->type() == eLightType::SPOT )
+        {
+            m_shaderSolidLightingPtr->setInt( "u_spotLight.enabled", 1 );
+            m_shaderSolidLightingPtr->setVec3( "u_spotLight.ambient", light->ambient );
+            m_shaderSolidLightingPtr->setVec3( "u_spotLight.diffuse", light->diffuse );
+            m_shaderSolidLightingPtr->setVec3( "u_spotLight.specular", light->specular );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.intensity", light->intensity );
+            m_shaderSolidLightingPtr->setVec3( "u_spotLight.position", light->position );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.attnk0", light->atnConstant );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.attnk1", light->atnLinear );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.attnk2", light->atnQuadratic );
+            m_shaderSolidLightingPtr->setVec3( "u_spotLight.direction", light->direction );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.innerCutoffCos", std::cos( light->innerCutoff ) );
+            m_shaderSolidLightingPtr->setFloat( "u_spotLight.outerCutoffCos", std::cos( light->outerCutoff ) );
+        }
+
+        // render boxes in batches *****************************************************************
+        for ( size_t q = 0; q < m_cubesColors.size(); q++ )
+        {
+            m_renderBufferCubesColors[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesColors[q];
+            m_renderBufferCubesModelMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesModelMats[q];
+            m_renderBufferCubesNormalMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesNormalMats[q];
+
+            if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                _renderBatchOfSolidBoxes( DEBUG_DRAWER_BATCH_SIZE, true );
+        }
+
+        int _remainingCountBoxes = m_cubesColors.size() % DEBUG_DRAWER_BATCH_SIZE;
+
+        // Draw remaining boxes (the ones that didn't get a batch)
+        if ( _remainingCountBoxes != 0 )
+            _renderBatchOfSolidBoxes( _remainingCountBoxes, true );
+
+        // clear our containers for later usage
+        m_cubesColors.clear();
+        m_cubesModelMats.clear();
+        m_cubesNormalMats.clear();
+        //******************************************************************************************
+
+        m_shaderSolidLightingPtr->unbind();
+    }
+
+    void CDebugDrawer::_renderBatchOfSolidBoxes( int numBoxes, bool usePlainColor )
+    {
+        m_cubeVAO->bind();
+
+        m_cubeVBOinstancesColors->updateData( numBoxes * sizeof( CVec4 ), (float32*) m_renderBufferCubesColors.data() );
+        m_cubeVBOinstancesModelMats->updateData( numBoxes * sizeof( CMat4 ), (float32*) m_renderBufferCubesModelMats.data() );
+        m_cubeVBOinstancesNormalMats->updateData( numBoxes * sizeof( CMat4 ), (float32*) m_renderBufferCubesNormalMats.data() );
+
+        glDrawElementsInstanced( GL_TRIANGLES, m_cubeIBO->count(), GL_UNSIGNED_INT, 0, numBoxes );
+
+        m_cubeVAO->unbind();
     }
 
     void CDebugDrawer::_drawLine( const CVec3& start, const CVec3& end, const CVec3& color )
@@ -482,9 +699,12 @@ namespace engine
         _drawLine( _p3, _p0, color );
     }
 
-    void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color )
+    void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color )
     {
-
+        // keep the cube-information for later rendering
+        m_cubesModelMats.push_back( transform * CMat4::scale( size ) );
+        m_cubesNormalMats.push_back( ( transform.inverse() ).transpose() );
+        m_cubesColors.push_back( color );
     }
 
 }

@@ -7,7 +7,9 @@
 #include <core/CVertexBuffer.h>
 #include <core/CVertexArray.h>
 #include <camera/CICamera.h>
+#include <lights/CILight.h>
 #include <graphics/CMesh.h>
+#include <graphics/CMeshBuilder.h>
 
 #define DEBUG_DRAWER_BATCH_SIZE 1024
 #define DEBUG_DRAWER_SPHERE_DIVISIONS 20
@@ -34,6 +36,7 @@ namespace engine
         static void Init();
         static void Release();
         static void Render( CICamera* camera );
+        static void Render( CICamera* camera, CILight* light );
         static void DrawLine( const CVec3& start, const CVec3& end, const CVec3& color );
         static void DrawBox( const CVec3& size, const CMat4& transform, const CVec3& color );
         static void DrawSphere( float32 radius, const CMat4& transform );
@@ -48,7 +51,7 @@ namespace engine
         static void DrawFrame( const CMat4& frame, float32 size );
         static void DrawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
-        static void DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color );
+        static void DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color );
 
         ~CDebugDrawer();
 
@@ -71,10 +74,17 @@ namespace engine
         void _drawFrame( const CMat4& frame, float32 size );
         void _drawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
-        void _drawSolidBox( const CVec3& size, const CMat4& transform, const CVec3& color );
+        void _drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color );
 
         void _render( CICamera* camera );
-        void _renderLinesBatch( CICamera* camera, int numLines );
+        void _render( CICamera* camera, CILight* light );
+
+        void _renderLines( CICamera* camera );
+        void _renderBatchOfLines( int numLines );
+
+        void _renderSolidBoxes( CICamera* camera );
+        void _renderSolidBoxes( CICamera* camera, CILight* light );
+        void _renderBatchOfSolidBoxes( int numBoxes, bool updateNormals );
 
         std::vector< CLinePositions > m_linesRenderBufferPositions;
         std::vector< CLineColors > m_linesRenderBufferColors;
@@ -86,8 +96,31 @@ namespace engine
         std::unique_ptr< CVertexBuffer >    m_linesColorsVBO;
         std::unique_ptr< CVertexArray >     m_linesVAO;
 
-        CShader* m_shaderPtr;
+        CShader* m_shaderLinesPtr;
 
+        /* resources required to render solid objects *******************************/
+
+        /// shaders used for rendering solid objects
+        CShader* m_shaderSolidLightingPtr;
+        CShader* m_shaderSolidNoLightingPtr;
+
+        // solid cubes resources (each aligned in its own buffer to copy without much extra work)
+        std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesModelMats;
+        std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesNormalMats;
+        std::array< CVec4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesColors;
+        std::vector< CMat4 > m_cubesModelMats;
+        std::vector< CMat4 > m_cubesNormalMats;
+        std::vector< CVec4 > m_cubesColors;
+
+        std::unique_ptr< CVertexArray > m_cubeVAO;
+        std::unique_ptr< CIndexBuffer > m_cubeIBO;
+        std::unique_ptr< CVertexBuffer > m_cubeVBOpositions;
+        std::unique_ptr< CVertexBuffer > m_cubeVBOnormals;
+        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesColors;
+        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesModelMats;
+        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesNormalMats;
+
+        /****************************************************************************/
     };
 
 }

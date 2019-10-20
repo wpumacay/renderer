@@ -139,8 +139,14 @@ namespace engine
     void COpenGLApp::renderDebug()
     {
         auto _currentCamera = m_scenePtr->currentCamera();
+        auto _mainLight = m_scenePtr->mainLight();
         if ( _currentCamera )
-            engine::CDebugDrawer::Render( _currentCamera );
+        {
+            if ( _mainLight )
+                engine::CDebugDrawer::Render( _currentCamera, _mainLight );
+            else
+                engine::CDebugDrawer::Render( _currentCamera );
+        }
     }
 
     void COpenGLApp::renderUi()
