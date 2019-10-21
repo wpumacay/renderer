@@ -36,6 +36,7 @@ namespace engine
         bool    useFog;
         bool    useFaceCulling;
         bool    useBlending;
+        bool    useShadowMapping;
         /* camera information */
         CMat4   viewMatrix;
         CMat4   projMatrix;
@@ -90,7 +91,8 @@ namespace engine
                      const CRenderOptions& renderOptions );
 
         void renderToShadowMap();
-        void render( bool useShadowMapping );
+        void renderMeshesOpaque();
+        void renderMeshesTransparent();
         void renderDepthOnly();
         void renderSemanticOnly();
 
@@ -133,6 +135,21 @@ namespace engine
 
         std::vector< CMesh* > m_meshesOpaque;
         std::vector< CMesh* > m_meshesTransparent;
+
+        std::vector< CMesh* > m_meshesOpaqueLambert;
+        std::vector< CMesh* > m_meshesOpaquePhong;
+        std::vector< CMesh* > m_meshesOpaqueBlinnPhong;
+
+        std::vector< CMesh* > m_meshesOpaqueLambert_noFaceCull;
+        std::vector< CMesh* > m_meshesOpaquePhong_noFaceCull;
+        std::vector< CMesh* > m_meshesOpaqueBlinnPhong_noFaceCull;
+        std::vector< CMesh* > m_meshesOpaqueLambert_faceCull;
+        std::vector< CMesh* > m_meshesOpaquePhong_faceCull;
+        std::vector< CMesh* > m_meshesOpaqueBlinnPhong_faceCull;
+
+        std::vector< CMesh* > m_meshesTransparentLambert;
+        std::vector< CMesh* > m_meshesTransparentPhong;
+        std::vector< CMesh* > m_meshesTransparentBlinnPhong;
 
         std::default_random_engine m_randGen;
         std::uniform_real_distribution< float32 > m_randDist;

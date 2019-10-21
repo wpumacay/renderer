@@ -73,11 +73,64 @@ namespace engine
             std::sort( m_meshesTransparent.begin(), m_meshesTransparent.end(), _comparator );
         }
 
-        // (4): prepare context information
+        // (4.1): collect the meshes according to material type
+        m_meshesOpaqueLambert.clear();
+        m_meshesOpaquePhong.clear();
+        m_meshesOpaqueBlinnPhong.clear();
+
+        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::LAMBERT, m_meshesOpaqueLambert );
+        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::PHONG, m_meshesOpaquePhong );
+        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::BLINN_PHONG, m_meshesOpaqueBlinnPhong );
+
+        m_meshesTransparentLambert.clear();
+        m_meshesTransparentPhong.clear();
+        m_meshesTransparentBlinnPhong.clear();
+
+        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::LAMBERT, m_meshesTransparentLambert );
+        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::PHONG, m_meshesTransparentPhong );
+        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::BLINN_PHONG, m_meshesTransparentBlinnPhong );
+
+        // (4.2): collect opaque meshes that require culling and those who don't in separate containers
+        m_meshesOpaqueLambert_faceCull.clear();
+        m_meshesOpaqueLambert_noFaceCull.clear();
+        m_meshesOpaquePhong_faceCull.clear();
+        m_meshesOpaquePhong_noFaceCull.clear();
+        m_meshesOpaqueBlinnPhong_faceCull.clear();
+        m_meshesOpaqueBlinnPhong_noFaceCull.clear();
+
+        if ( renderOptions.useFaceCulling )
+        {
+            for ( auto meshPtr : m_meshesOpaqueLambert )
+            {
+                if ( meshPtr->cullFaces )
+                    m_meshesOpaqueLambert_faceCull.push_back( meshPtr );
+                else
+                    m_meshesOpaqueLambert_noFaceCull.push_back( meshPtr );
+            }
+
+            for ( auto meshPtr : m_meshesOpaquePhong )
+            {
+                if ( meshPtr->cullFaces )
+                    m_meshesOpaquePhong_faceCull.push_back( meshPtr );
+                else
+                    m_meshesOpaquePhong_noFaceCull.push_back( meshPtr );
+            }
+
+            for ( auto meshPtr : m_meshesOpaqueBlinnPhong )
+            {
+                if ( meshPtr->cullFaces )
+                    m_meshesOpaqueBlinnPhong_faceCull.push_back( meshPtr );
+                else
+                    m_meshesOpaqueBlinnPhong_noFaceCull.push_back( meshPtr );
+            }
+        }
+
+        // (5): prepare context information
         /* render options */
-        m_context.useFog         = renderOptions.useFog;
-        m_context.useFaceCulling = renderOptions.useFaceCulling;
-        m_context.useBlending    = renderOptions.useBlending;
+        m_context.useFog            = renderOptions.useFog;
+        m_context.useFaceCulling    = renderOptions.useFaceCulling;
+        m_context.useBlending       = renderOptions.useBlending;
+        m_context.useShadowMapping  = renderOptions.useShadowMapping;
         /* camera-information */
         m_context.viewMatrix                = renderOptions.cameraPtr->matView();
         m_context.projMatrix                = renderOptions.cameraPtr->matProj();
@@ -157,78 +210,26 @@ namespace engine
         m_shaderShadowMapping->unbind();
     }
 
-    void CMeshRenderer::render( bool useShadowMapping )
+    void CMeshRenderer::renderMeshesOpaque()
     {
-        // (0): collect the meshes according to material type
-        auto _meshesOpaqueLambert       = std::vector< CMesh* >();
-        auto _meshesOpaquePhong         = std::vector< CMesh* >();
-        auto _meshesOpaqueBlinnPhong    = std::vector< CMesh* >();
-
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::LAMBERT, _meshesOpaqueLambert );
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::PHONG, _meshesOpaquePhong );
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::BLINN_PHONG, _meshesOpaqueBlinnPhong );
-
-        auto _meshesTransparentLambert      = std::vector< CMesh* >();
-        auto _meshesTransparentPhong        = std::vector< CMesh* >();
-        auto _meshesTransparentBlinnPhong   = std::vector< CMesh* >();
-
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::LAMBERT, _meshesTransparentLambert );
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::PHONG, _meshesTransparentPhong );
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::BLINN_PHONG, _meshesTransparentBlinnPhong );
-
-        // (1): group meshes that can be face-culled (if enabled)
-        auto _meshesOpaqueLambert_faceCull = std::vector< CMesh* >();
-        auto _meshesOpaqueLambert_noFaceCull = std::vector< CMesh* >();
-        auto _meshesOpaquePhong_faceCull = std::vector< CMesh* >();
-        auto _meshesOpaquePhong_noFaceCull = std::vector< CMesh* >();
-        auto _meshesOpaqueBlinnPhong_faceCull = std::vector< CMesh* >();
-        auto _meshesOpaqueBlinnPhong_noFaceCull = std::vector< CMesh* >();
-
-        if ( m_context.useFaceCulling )
-        {
-            for ( auto meshPtr : _meshesOpaqueLambert )
-            {
-                if ( meshPtr->cullFaces )
-                    _meshesOpaqueLambert_faceCull.push_back( meshPtr );
-                else
-                    _meshesOpaqueLambert_noFaceCull.push_back( meshPtr );
-            }
-
-            for ( auto meshPtr : _meshesOpaquePhong )
-            {
-                if ( meshPtr->cullFaces )
-                    _meshesOpaquePhong_faceCull.push_back( meshPtr );
-                else
-                    _meshesOpaquePhong_noFaceCull.push_back( meshPtr );
-            }
-
-            for ( auto meshPtr : _meshesOpaqueBlinnPhong )
-            {
-                if ( meshPtr->cullFaces )
-                    _meshesOpaqueBlinnPhong_faceCull.push_back( meshPtr );
-                else
-                    _meshesOpaqueBlinnPhong_noFaceCull.push_back( meshPtr );
-            }
-        }
-
         // define which shader we'll be using for the render passes
         CShader* _shader = nullptr;
-        if ( !useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
-        if ( !useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
-        if ( useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
-        if ( useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
+        if ( !m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
+        if ( !m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
+        if ( m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
+        if ( m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
 
         // (2): render opaque meshes
         if ( m_context.useFaceCulling )
         {
             _renderMeshes( _shader,
-                           _meshesOpaqueLambert_faceCull, 
-                           _meshesOpaqueLambert_noFaceCull,
-                           _meshesOpaquePhong_faceCull, 
-                           _meshesOpaquePhong_noFaceCull,
-                           _meshesOpaqueBlinnPhong_faceCull,
-                           _meshesOpaqueBlinnPhong_noFaceCull,
-                           useShadowMapping,
+                           m_meshesOpaqueLambert_faceCull, 
+                           m_meshesOpaqueLambert_noFaceCull,
+                           m_meshesOpaquePhong_faceCull, 
+                           m_meshesOpaquePhong_noFaceCull,
+                           m_meshesOpaqueBlinnPhong_faceCull,
+                           m_meshesOpaqueBlinnPhong_noFaceCull,
+                           m_context.useShadowMapping,
                            false, /* don't use blending for this pass */
                            true, /* setup render state uniforms for this pass */
                            !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
@@ -237,32 +238,41 @@ namespace engine
         {
             _renderMeshes( _shader,
                            std::vector< CMesh* >(), 
-                           _meshesOpaqueLambert,
+                           m_meshesOpaqueLambert,
                            std::vector< CMesh* >(), 
-                           _meshesOpaquePhong,
+                           m_meshesOpaquePhong,
                            std::vector< CMesh* >(),
-                           _meshesOpaqueBlinnPhong,
-                           useShadowMapping,
+                           m_meshesOpaqueBlinnPhong,
+                           m_context.useShadowMapping,
                            false, /* don't use blending for this pass */
                            true, /* setup render state uniforms for this pass */
                            !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
         }
+    }
 
-        // (3): render transparent meshes
-        if ( m_context.useBlending )
-        {
-            _renderMeshes( _shader,
-                           std::vector< CMesh* >(),
-                           _meshesTransparentLambert,
-                           std::vector< CMesh* >(),
-                           _meshesTransparentPhong,
-                           std::vector< CMesh* >(),
-                           _meshesTransparentBlinnPhong,
-                           useShadowMapping,
-                           true, /* use blending for this pass */
-                           false,  /* use previously set render state uniforms */
-                           true /* release render state uniforms once this pass is finished */ );
-        }
+    void CMeshRenderer::renderMeshesTransparent()
+    {
+        if ( !m_context.useBlending )
+            return;
+
+        // define which shader we'll be using for the render passes
+        CShader* _shader = nullptr;
+        if ( !m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
+        if ( !m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
+        if ( m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
+        if ( m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
+
+        _renderMeshes( _shader,
+                       std::vector< CMesh* >(),
+                       m_meshesTransparentLambert,
+                       std::vector< CMesh* >(),
+                       m_meshesTransparentPhong,
+                       std::vector< CMesh* >(),
+                       m_meshesTransparentBlinnPhong,
+                       m_context.useShadowMapping,
+                       true, /* use blending for this pass */
+                       false,  /* use previously set render state uniforms */
+                       true /* release render state uniforms once this pass is finished */ );
     }
 
     void CMeshRenderer::renderDepthOnly()
@@ -375,6 +385,7 @@ namespace engine
             glEnable( GL_BLEND );
             glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
             glDepthMask( GL_FALSE );
+            glEnable( GL_CULL_FACE );// @hack: culling back-faces for blending to avoid artifacts
             shaderPtr->setInt( "u_material.transparent", 1 );
         }
         else
@@ -449,6 +460,7 @@ namespace engine
 
         if ( renderWithBlending )
         {
+            glDisable( GL_CULL_FACE );// @hack: culling back-faces for blending to avoid artifacts
             glDepthMask( GL_TRUE );
             glDisable( GL_BLEND );
         }

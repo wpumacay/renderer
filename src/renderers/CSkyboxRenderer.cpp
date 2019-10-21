@@ -65,7 +65,7 @@ namespace engine
     {
         auto _shader = ( m_context.useFog ) ? m_shaderSkyboxFog : m_shaderSkyboxNoFog;
 
-        glDepthFunc( GL_LEQUAL );
+        glDepthMask( GL_FALSE );
         _shader->bind();
         _shader->setMat4( "u_viewProjMatrix", m_context.projMatrix * m_context.viewMatrix );
         if ( m_context.useFog )
@@ -84,7 +84,7 @@ namespace engine
         glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 
         _shader->unbind();
-        glDepthFunc( GL_LESS );
+        glDepthMask( GL_TRUE );
     }
 
 }

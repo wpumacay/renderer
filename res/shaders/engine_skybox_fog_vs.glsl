@@ -10,7 +10,6 @@ void main()
 {
     /* direction used for sampling the cube */
     fSampleDir = position;
-
-    /* position in clip space (with a slight trick to obtain maximum depth > w / w = 1.0) */
-    gl_Position = ( u_viewProjMatrix * vec4( position, 1.0f ) ).xyww;
+    /* position in clip space */
+    gl_Position = u_viewProjMatrix * vec4( position, 1.0f );
 }
