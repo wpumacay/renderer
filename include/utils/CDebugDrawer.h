@@ -13,6 +13,7 @@
 
 #define DEBUG_DRAWER_BATCH_SIZE 1024
 #define DEBUG_DRAWER_SPHERE_DIVISIONS 20
+#define DEBUG_DRAWER_PRIMITIVE_TYPES 11
 
 namespace engine
 {
@@ -27,6 +28,18 @@ namespace engine
         CVec3 cStart;
         CVec3 cEnd;
     };
+
+    const int DD_PRIMITIVE_BOX = 0;
+    const int DD_PRIMITIVE_SPHERE = 1;
+    const int DD_PRIMITIVE_CYLINDER_X = 2;
+    const int DD_PRIMITIVE_CYLINDER_Y = 3;
+    const int DD_PRIMITIVE_CYLINDER_Z = 4;
+    const int DD_PRIMITIVE_CAPSULE_X = 5;
+    const int DD_PRIMITIVE_CAPSULE_Y = 6;
+    const int DD_PRIMITIVE_CAPSULE_Z = 7;
+    const int DD_PRIMITIVE_ARROW_X = 8;
+    const int DD_PRIMITIVE_ARROW_Y = 9;
+    const int DD_PRIMITIVE_ARROW_Z = 10;
 
     class CDebugDrawer
     {
@@ -52,6 +65,11 @@ namespace engine
         static void DrawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
         static void DrawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color );
+        static void DrawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color );
+        static void DrawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        static void DrawSolidCapsule( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        static void DrawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        static void DrawSolidAxes( float32 length, const CMat4& transform, float32 alpha );
 
         ~CDebugDrawer();
 
@@ -75,6 +93,13 @@ namespace engine
         void _drawPlane( const CPlane& plane, const CVec2& size, const CVec3& color );
 
         void _drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color );
+        void _drawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color );
+        void _drawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        void _drawSolidCapsule( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        void _drawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color );
+        void _drawSolidAxes( float32 length, const CMat4& transform, float32 alpha );
+
+        void _createInstancedBuffers( int primitive );
 
         void _render( CICamera* camera );
         void _render( CICamera* camera, CILight* light );
@@ -82,9 +107,9 @@ namespace engine
         void _renderLines( CICamera* camera );
         void _renderBatchOfLines( int numLines );
 
-        void _renderSolidBoxes( CICamera* camera );
-        void _renderSolidBoxes( CICamera* camera, CILight* light );
-        void _renderBatchOfSolidBoxes( int numBoxes, bool updateNormals );
+        void _renderSolidPrimitives( CICamera* camera );
+        void _renderSolidPrimitives( CICamera* camera, CILight* light );
+        void _renderBatchOfSolidPrimitives( int primitive, int numPrimitives, bool updateNormals );
 
         std::vector< CLinePositions > m_linesRenderBufferPositions;
         std::vector< CLineColors > m_linesRenderBufferColors;
@@ -104,22 +129,21 @@ namespace engine
         CShader* m_shaderSolidLightingPtr;
         CShader* m_shaderSolidNoLightingPtr;
 
-        // solid cubes resources (each aligned in its own buffer to copy without much extra work)
-        std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesModelMats;
-        std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesNormalMats;
-        std::array< CVec4, DEBUG_DRAWER_BATCH_SIZE > m_renderBufferCubesColors;
-        std::vector< CMat4 > m_cubesModelMats;
-        std::vector< CMat4 > m_cubesNormalMats;
-        std::vector< CVec4 > m_cubesColors;
+        std::array< std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_renderBufferPrimitivesModelMats;
+        std::array< std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_renderBufferPrimitivesNormalMats;
+        std::array< std::array< CVec4, DEBUG_DRAWER_BATCH_SIZE >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_renderBufferPrimitivesColors;
 
-        std::unique_ptr< CVertexArray > m_cubeVAO;
-        std::unique_ptr< CIndexBuffer > m_cubeIBO;
-        std::unique_ptr< CVertexBuffer > m_cubeVBOpositions;
-        std::unique_ptr< CVertexBuffer > m_cubeVBOnormals;
-        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesColors;
-        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesModelMats;
-        std::unique_ptr< CVertexBuffer > m_cubeVBOinstancesNormalMats;
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesModelMats;
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesNormalMats;
+        std::array< std::vector< CVec4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesColors;
 
+        std::array< std::unique_ptr< CVertexArray >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVAO;
+        std::array< std::unique_ptr< CIndexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesIBO;
+        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOpositions;
+        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOnormals;
+        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesColors;
+        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesModelMats;
+        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesNormalMats;
         /****************************************************************************/
     };
 

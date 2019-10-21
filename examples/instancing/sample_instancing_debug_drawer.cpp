@@ -69,6 +69,19 @@ int g_num_rows = 10;
 int g_num_cols = 10;
 int g_num_floors = 10;
 
+int g_debug_drawer_demo = 0; // 0: boxes, 1: spheres, 2: cylinders, 3: capsules, 4: arrows, 5: axes
+int g_debug_drawer_axis = 1; // 0: x, 1: y, 2: z
+engine::eAxis g_debug_drawer_axis_enum = engine::eAxis::Y;
+
+float g_debug_drawer_angle = 0.0f;
+float g_debug_drawer_primitives_color[4] = { 0.7f, 0.5f, 0.3f, 1.0f };
+float g_debug_drawer_box_size[3] = { 0.4f, 0.4f, 0.4f };
+float g_debug_drawer_sphere_radius = 0.2f;
+float g_debug_drawer_cylinder_size[2] = { 0.2f, 0.4f };
+float g_debug_drawer_capsule_size[2] = { 0.2f, 0.4f };
+float g_debug_drawer_arrow_length = 0.4f;
+float g_debug_drawer_axes_length = 0.4f;
+
 void renderShadowMap( engine::CILight* lightPtr,
                       engine::CVertexArray* quadVAO,
                       engine::CShader* shaderPtr,
@@ -88,10 +101,7 @@ class ApplicationUi : public engine::CImguiUi
 public :
 
     ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        
-    }
+        : engine::CImguiUi( context ) {}
 
     ~ApplicationUi() {}
 
@@ -197,6 +207,7 @@ protected :
     void _renderInternal() override
     {
         _menuUiRendererStats();
+        _menuUiDebugDrawer();
         _menuUiRendererEffects();
         _menuUiLights();
         _menuUiRendererScene();
@@ -218,6 +229,51 @@ private :
                           engine::CTime::GetFrameTimeIndex(),
                           ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),
                           0.0f, FLT_MAX, ImVec2( 0, 120 ) );
+        ImGui::End();
+    }
+
+    void _menuUiDebugDrawer()
+    {
+        ImGui::Begin( "Demo-debug-drawer" );
+
+        ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), "primitives-type" );
+        ImGui::RadioButton( "boxes", &g_debug_drawer_demo, 0 ); ImGui::SameLine();
+        ImGui::RadioButton( "spheres", &g_debug_drawer_demo, 1 ); ImGui::SameLine();
+        ImGui::RadioButton( "cylinders", &g_debug_drawer_demo, 2 ); ImGui::SameLine();
+        ImGui::RadioButton( "capsules", &g_debug_drawer_demo, 3 ); ImGui::SameLine();
+        ImGui::RadioButton( "arrows", &g_debug_drawer_demo, 4 ); ImGui::SameLine();
+        ImGui::RadioButton( "axes", &g_debug_drawer_demo, 5 ); ImGui::Spacing();
+
+        ImGui::SliderFloat( "rot-angle", &g_debug_drawer_angle, 0.0f, 2.0f * ENGINE_PI );
+        ImGui::SliderFloat4( "primitive-color", g_debug_drawer_primitives_color, 0.0f, 1.0f );
+
+        if ( g_debug_drawer_demo == 0 )
+            ImGui::SliderFloat3( "box-size", g_debug_drawer_box_size, 0.1f, 1.0f );
+        else if ( g_debug_drawer_demo == 1 )
+            ImGui::SliderFloat( "sphere-radius", &g_debug_drawer_sphere_radius, 0.1f, 1.0f );
+        else if ( g_debug_drawer_demo == 2 )
+            ImGui::SliderFloat2( "cyl-rad-height", g_debug_drawer_cylinder_size, 0.1f, 1.0f );
+        else if ( g_debug_drawer_demo == 3 )
+            ImGui::SliderFloat2( "cap-rad-height", g_debug_drawer_capsule_size, 0.1f, 1.0f );
+        else if ( g_debug_drawer_demo == 4 )
+            ImGui::SliderFloat( "arrow-length", &g_debug_drawer_arrow_length, 0.1f, 1.0f );
+        else if ( g_debug_drawer_demo == 5 )
+            ImGui::SliderFloat( "axes-length", &g_debug_drawer_axes_length, 0.1f, 1.0f );
+
+        if ( g_debug_drawer_demo == 2 || g_debug_drawer_demo == 3 || g_debug_drawer_demo == 4 )
+        {
+            ImGui::RadioButton( "axis-X", &g_debug_drawer_axis, 0 ); ImGui::SameLine();
+            ImGui::RadioButton( "axis-Y", &g_debug_drawer_axis, 1 ); ImGui::SameLine();
+            ImGui::RadioButton( "axis-Z", &g_debug_drawer_axis, 2 ); ImGui::Spacing();
+
+            if ( g_debug_drawer_axis == 0 )
+                g_debug_drawer_axis_enum = engine::eAxis::X;
+            else if ( g_debug_drawer_axis == 1 )
+                g_debug_drawer_axis_enum = engine::eAxis::Y;
+            else if ( g_debug_drawer_axis == 2 )
+                g_debug_drawer_axis_enum = engine::eAxis::Z;
+        }
+
         ImGui::End();
     }
 
@@ -884,10 +940,57 @@ int main()
                     float _y = 10.0f * ( ( (float)i ) / ( g_num_rows - 1 ) - 0.5f );    // range [-5, 5]
                     float _z = 10.0f * ( ( (float)k ) / ( g_num_floors - 1 ) - 0.5f );  // range [-5, 5]
 
-                    engine::CDebugDrawer::DrawSolidBox( { 0.2f, 0.3f, 0.4f }, 
-                                                        engine::CMat4::translation( { _x, _y + 10.0f, _z } ) * 
-                                                          engine::CMat4::rotation( ENGINE_PI / 4.0f, { 1.0f, 1.0f, 1.0f } ), 
-                                                        { 0.3f, 0.5f, 0.7f, 1.0f } );
+                    auto _transform = engine::CMat4::translation( { _x, _y + 10.0f, _z } ) * 
+                                      engine::CMat4::rotation( g_debug_drawer_angle, { 1.0f, 1.0f, 1.0f } );
+                    auto _color = engine::CVec4( g_debug_drawer_primitives_color[0],
+                                                 g_debug_drawer_primitives_color[1],
+                                                 g_debug_drawer_primitives_color[2],
+                                                 g_debug_drawer_primitives_color[3] );
+
+                    if ( g_debug_drawer_demo == 0 )
+                    {
+                        engine::CDebugDrawer::DrawSolidBox( { g_debug_drawer_box_size[0],
+                                                              g_debug_drawer_box_size[1],
+                                                              g_debug_drawer_box_size[2] }, 
+                                                            _transform, 
+                                                            _color );
+                    }
+                    else if ( g_debug_drawer_demo == 1 )
+                    {
+                        engine::CDebugDrawer::DrawSolidSphere( g_debug_drawer_sphere_radius, 
+                                                               _transform, 
+                                                               _color );
+                    }
+                    else if ( g_debug_drawer_demo == 2 )
+                    {
+                        engine::CDebugDrawer::DrawSolidCylinder( g_debug_drawer_cylinder_size[0], 
+                                                                 g_debug_drawer_cylinder_size[1], 
+                                                                 g_debug_drawer_axis_enum,
+                                                                 _transform, 
+                                                                 _color );
+                    }
+                    else if ( g_debug_drawer_demo == 3 )
+                    {
+                        engine::CDebugDrawer::DrawSolidCapsule( g_debug_drawer_capsule_size[0], 
+                                                                g_debug_drawer_capsule_size[1], 
+                                                                g_debug_drawer_axis_enum,
+                                                                _transform, 
+                                                                _color );
+                    }
+                    else if ( g_debug_drawer_demo == 4 )
+                    {
+                        engine::CDebugDrawer::DrawSolidArrow( g_debug_drawer_arrow_length,
+                                                              g_debug_drawer_axis_enum,
+                                                              _transform,
+                                                              _color );
+                    }
+                    else if ( g_debug_drawer_demo == 5 )
+                    {
+                        engine::CDebugDrawer::DrawSolidAxes( g_debug_drawer_axes_length,
+                                                             _transform,
+                                                             _color.w );
+                    }
+
                 }
             }
         }

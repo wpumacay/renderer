@@ -36,66 +36,18 @@ namespace engine
         ENGINE_CORE_ASSERT( m_shaderSolidNoLightingPtr, 
                             "Could not load engine_debug_drawing_3d_solid_no_lighting shader required for drawing solid cubes without lighting" );
 
-        // create a dummy mesh to grab the geometry (vertices, ...)
-        auto _dummyCubeMesh = CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
-        auto _cubeVertices = _dummyCubeMesh->vertices();
-        auto _cubeNormals = _dummyCubeMesh->normals();
-        auto _cubeIndices = _dummyCubeMesh->indices();
-        delete _dummyCubeMesh;
-
-        // setup vbos and vaos for cube instanced-rendering
-        {
-            auto _vboPositions = new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                    eBufferUsage::STATIC,
-                                                    sizeof( CVec3 ) * _cubeVertices.size(),
-                                                    (float32*) _cubeVertices.data() );
-
-            auto _vboNormals = new CVertexBuffer( { { "normal", eElementType::Float3, true } },
-                                                  eBufferUsage::STATIC,
-                                                  sizeof( CVec3 ) * _cubeNormals.size(),
-                                                  (float32*) _cubeNormals.data() );
-
-            auto _ibo = new CIndexBuffer( eBufferUsage::STATIC,
-                                          3 * _cubeIndices.size(),
-                                          (uint32*) _cubeIndices.data() );
-
-            auto _vboInstancesColors = new CVertexBuffer( { { "color", eElementType::Float4, false } },
-                                                          eBufferUsage::DYNAMIC,
-                                                          DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 ),
-                                                          NULL );
-
-            auto _vboInstancesModelMats = new CVertexBuffer( { { "modelMatrix-col0", eElementType::Float4, false },
-                                                               { "modelMatrix-col1", eElementType::Float4, false },
-                                                               { "modelMatrix-col2", eElementType::Float4, false },
-                                                               { "modelMatrix-col3", eElementType::Float4, false } },
-                                                             eBufferUsage::DYNAMIC,
-                                                             DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
-                                                             NULL );
-
-            auto _vboInstancesNormalMats = new CVertexBuffer( { { "normalMatrix-col0", eElementType::Float4, false },
-                                                                { "normalMatrix-col1", eElementType::Float4, false },
-                                                                { "normalMatrix-col2", eElementType::Float4, false },
-                                                                { "normalMatrix-col3", eElementType::Float4, false } },
-                                                              eBufferUsage::DYNAMIC,
-                                                              DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
-                                                              NULL );
-
-            auto _vao = new CVertexArray();
-            _vao->addVertexBuffer( _vboPositions );
-            _vao->addVertexBuffer( _vboNormals );
-            _vao->addVertexBuffer( _vboInstancesColors, true );
-            _vao->addVertexBuffer( _vboInstancesModelMats, true );
-            _vao->addVertexBuffer( _vboInstancesNormalMats, true );
-            _vao->setIndexBuffer( _ibo );
-
-            m_cubeVBOpositions = std::unique_ptr< CVertexBuffer >( _vboPositions );
-            m_cubeVBOnormals = std::unique_ptr< CVertexBuffer >( _vboNormals );
-            m_cubeVBOinstancesColors = std::unique_ptr< CVertexBuffer >( _vboInstancesColors );
-            m_cubeVBOinstancesModelMats = std::unique_ptr< CVertexBuffer >( _vboInstancesModelMats );
-            m_cubeVBOinstancesNormalMats = std::unique_ptr< CVertexBuffer >( _vboInstancesNormalMats );
-            m_cubeIBO = std::unique_ptr< CIndexBuffer >( _ibo );
-            m_cubeVAO = std::unique_ptr< CVertexArray >( _vao );
-        }
+        // create resources to handle instanced rendering of solid primitives
+        _createInstancedBuffers( DD_PRIMITIVE_BOX );
+        _createInstancedBuffers( DD_PRIMITIVE_SPHERE );
+        _createInstancedBuffers( DD_PRIMITIVE_CYLINDER_X );
+        _createInstancedBuffers( DD_PRIMITIVE_CYLINDER_Y );
+        _createInstancedBuffers( DD_PRIMITIVE_CYLINDER_Z );
+        _createInstancedBuffers( DD_PRIMITIVE_CAPSULE_X );
+        _createInstancedBuffers( DD_PRIMITIVE_CAPSULE_Y );
+        _createInstancedBuffers( DD_PRIMITIVE_CAPSULE_Z );
+        _createInstancedBuffers( DD_PRIMITIVE_ARROW_X );
+        _createInstancedBuffers( DD_PRIMITIVE_ARROW_Y );
+        _createInstancedBuffers( DD_PRIMITIVE_ARROW_Z );
     }
 
     void CDebugDrawer::Init()
@@ -201,7 +153,6 @@ namespace engine
         CDebugDrawer::s_instance->_drawNormals( meshPtr, color );
     }
 
-    
     void CDebugDrawer::DrawAxes( const CVec3& xAxis, const CVec3& yAxis, const CVec3& zAxis, const CVec3& position, float32 size )
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
@@ -230,6 +181,42 @@ namespace engine
         CDebugDrawer::s_instance->_drawSolidBox( size, transform, color );
     }
 
+    void CDebugDrawer::DrawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidSphere( radius, transform, color );
+    }
+
+    void CDebugDrawer::DrawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidCylinder( radius, height, axis, transform, color );
+    }
+
+    void CDebugDrawer::DrawSolidCapsule( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidCapsule( radius, height, axis, transform, color );
+    }
+
+    void CDebugDrawer::DrawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidArrow( length, axis, transform, color );
+    }
+
+    void CDebugDrawer::DrawSolidAxes( float32 length, const CMat4& transform, float32 alpha )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
+
+        CDebugDrawer::s_instance->_drawSolidAxes( length, transform, alpha );
+    }
+
+
     CDebugDrawer::~CDebugDrawer()
     {
         m_linesPositions.clear();
@@ -241,25 +228,110 @@ namespace engine
         m_linesVAO = nullptr;
         m_linesPositionsVBO = nullptr;
         m_linesColorsVBO = nullptr;
+    }
 
-        m_cubeVAO = nullptr;
-        m_cubeIBO = nullptr;
-        m_cubeVBOpositions = nullptr;
-        m_cubeVBOnormals = nullptr;
-        m_cubeVBOinstancesColors = nullptr;
-        m_cubeVBOinstancesModelMats = nullptr;
-        m_cubeVBOinstancesNormalMats = nullptr;
+    void CDebugDrawer::_createInstancedBuffers( int primitive )
+    {
+        // get the vertices|normals|indices required for this primitive
+        auto _vertices = std::vector< CVec3 >();
+        auto _normals = std::vector< CVec3 >();
+        auto _indices = std::vector< CInd3 >();
+
+        // create dummy meshes to grab the geometry (vertices, ...)
+        CMesh* _dummyMesh = nullptr;
+        if ( primitive == DD_PRIMITIVE_BOX )
+            _dummyMesh = CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
+        else if ( primitive == DD_PRIMITIVE_SPHERE )
+            _dummyMesh = CMeshBuilder::createSphere( 1.0f );
+        else if ( primitive == DD_PRIMITIVE_CYLINDER_X )
+            _dummyMesh = CMeshBuilder::createCylinder( 1.0f, 1.0f, eAxis::X );
+        else if ( primitive == DD_PRIMITIVE_CYLINDER_Y )
+            _dummyMesh = CMeshBuilder::createCylinder( 1.0f, 1.0f, eAxis::Y );
+        else if ( primitive == DD_PRIMITIVE_CYLINDER_Z )
+            _dummyMesh = CMeshBuilder::createCylinder( 1.0f, 1.0f, eAxis::Z );
+        else if ( primitive == DD_PRIMITIVE_CAPSULE_X )
+            _dummyMesh = CMeshBuilder::createCapsule( 1.0f, 1.0f, eAxis::X );
+        else if ( primitive == DD_PRIMITIVE_CAPSULE_Y )
+            _dummyMesh = CMeshBuilder::createCapsule( 1.0f, 1.0f, eAxis::Y );
+        else if ( primitive == DD_PRIMITIVE_CAPSULE_Z )
+            _dummyMesh = CMeshBuilder::createCapsule( 1.0f, 1.0f, eAxis::Z );
+        else if ( primitive == DD_PRIMITIVE_ARROW_X )
+            _dummyMesh = CMeshBuilder::createArrow( 1.0f, eAxis::X );
+        else if ( primitive == DD_PRIMITIVE_ARROW_Y )
+            _dummyMesh = CMeshBuilder::createArrow( 1.0f, eAxis::Y );
+        else if ( primitive == DD_PRIMITIVE_ARROW_Z )
+            _dummyMesh = CMeshBuilder::createArrow( 1.0f, eAxis::Z );
+        else
+            ENGINE_CORE_ASSERT( false, "Invalid primitive id given while constructing instanced buffers" );
+
+        _vertices = _dummyMesh->vertices();
+        _normals = _dummyMesh->normals();
+        _indices = _dummyMesh->indices();
+        delete _dummyMesh;
+
+        auto _vboPositions = new CVertexBuffer( { { "position", eElementType::Float3, false } },
+                                                eBufferUsage::STATIC,
+                                                sizeof( CVec3 ) * _vertices.size(),
+                                                (float32*) _vertices.data() );
+
+        auto _vboNormals = new CVertexBuffer( { { "normal", eElementType::Float3, true } },
+                                              eBufferUsage::STATIC,
+                                              sizeof( CVec3 ) * _normals.size(),
+                                              (float32*) _normals.data() );
+
+        auto _ibo = new CIndexBuffer( eBufferUsage::STATIC,
+                                      3 * _indices.size(),
+                                      (uint32*) _indices.data() );
+
+        auto _vboInstancesColors = new CVertexBuffer( { { "color", eElementType::Float4, false } },
+                                                      eBufferUsage::DYNAMIC,
+                                                      DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 ),
+                                                      NULL );
+
+        auto _vboInstancesModelMats = new CVertexBuffer( { { "modelMatrix-col0", eElementType::Float4, false },
+                                                           { "modelMatrix-col1", eElementType::Float4, false },
+                                                           { "modelMatrix-col2", eElementType::Float4, false },
+                                                           { "modelMatrix-col3", eElementType::Float4, false } },
+                                                         eBufferUsage::DYNAMIC,
+                                                         DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
+                                                         NULL );
+
+        auto _vboInstancesNormalMats = new CVertexBuffer( { { "normalMatrix-col0", eElementType::Float4, false },
+                                                            { "normalMatrix-col1", eElementType::Float4, false },
+                                                            { "normalMatrix-col2", eElementType::Float4, false },
+                                                            { "normalMatrix-col3", eElementType::Float4, false } },
+                                                          eBufferUsage::DYNAMIC,
+                                                          DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
+                                                          NULL );
+
+        auto _vao = new CVertexArray();
+        _vao->addVertexBuffer( _vboPositions );
+        _vao->addVertexBuffer( _vboNormals );
+        _vao->addVertexBuffer( _vboInstancesColors, true );
+        _vao->addVertexBuffer( _vboInstancesModelMats, true );
+        _vao->addVertexBuffer( _vboInstancesNormalMats, true );
+        _vao->setIndexBuffer( _ibo );
+
+        m_primitivesVBOpositions[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboPositions ) );
+        m_primitivesVBOnormals[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboNormals ) );
+        m_primitivesVBOinstancesColors[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesColors ) );
+        m_primitivesVBOinstancesModelMats[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesModelMats ) );
+        m_primitivesVBOinstancesNormalMats[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesNormalMats ) );
+        m_primitivesIBO[primitive] = std::move( std::unique_ptr< CIndexBuffer >( _ibo ) );
+        m_primitivesVAO[primitive] = std::move( std::unique_ptr< CVertexArray >( _vao ) );
     }
 
     void CDebugDrawer::_render( CICamera* camera )
     {
-        _renderSolidBoxes( camera );
+        //// _renderSolidBoxes( camera );
+        _renderSolidPrimitives( camera );
         _renderLines( camera );
     }
 
     void CDebugDrawer::_render( CICamera* camera, CILight* light )
     {
-        _renderSolidBoxes( camera, light );
+        //// _renderSolidBoxes( camera, light );
+        _renderSolidPrimitives( camera, light );
         _renderLines( camera );
     }
 
@@ -308,38 +380,42 @@ namespace engine
         m_linesVAO->unbind();
     }
 
-    void CDebugDrawer::_renderSolidBoxes( CICamera* camera )
+    void CDebugDrawer::_renderSolidPrimitives( CICamera* camera )
     {
+        std::cout << "rendering primitives" << std::endl;
         m_shaderSolidNoLightingPtr->bind();
         m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
 
-        // render boxes in batches *****************************************************************
-        for ( size_t q = 0; q < m_cubesColors.size(); q++ )
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
         {
-            m_renderBufferCubesColors[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesColors[q];
-            m_renderBufferCubesModelMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesModelMats[q];
-            m_renderBufferCubesNormalMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesNormalMats[q];
+            // render primitives in batches ************************************************************
+            for ( size_t q = 0; q < m_primitivesColors[prim_id].size(); q++ )
+            {
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesNormalMats[prim_id][q];
 
-            if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
-                _renderBatchOfSolidBoxes( DEBUG_DRAWER_BATCH_SIZE, true );
+                if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                    _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
+            }
+
+            int _remainingCountPrimitives = m_primitivesColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+
+            // Draw remaining boxes (the ones that didn't get a batch)
+            if ( _remainingCountPrimitives != 0 )
+                _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
+
+            // clear our containers for later usage
+            m_primitivesColors[prim_id].clear();
+            m_primitivesModelMats[prim_id].clear();
+            m_primitivesNormalMats[prim_id].clear();
+            //******************************************************************************************
         }
-
-        int _remainingCountBoxes = m_cubesColors.size() % DEBUG_DRAWER_BATCH_SIZE;
-
-        // Draw remaining boxes (the ones that didn't get a batch)
-        if ( _remainingCountBoxes != 0 )
-            _renderBatchOfSolidBoxes( _remainingCountBoxes, true );
-
-        // clear our containers for later usage
-        m_cubesColors.clear();
-        m_cubesModelMats.clear();
-        m_cubesNormalMats.clear();
-        //******************************************************************************************
 
         m_shaderSolidNoLightingPtr->unbind();
     }
 
-    void CDebugDrawer::_renderSolidBoxes( CICamera* camera, CILight* light )
+    void CDebugDrawer::_renderSolidPrimitives( CICamera* camera, CILight* light )
     {
         m_shaderSolidLightingPtr->bind();
         m_shaderSolidLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
@@ -386,43 +462,49 @@ namespace engine
             m_shaderSolidLightingPtr->setFloat( "u_spotLight.outerCutoffCos", std::cos( light->outerCutoff ) );
         }
 
-        // render boxes in batches *****************************************************************
-        for ( size_t q = 0; q < m_cubesColors.size(); q++ )
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
         {
-            m_renderBufferCubesColors[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesColors[q];
-            m_renderBufferCubesModelMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesModelMats[q];
-            m_renderBufferCubesNormalMats[ q % DEBUG_DRAWER_BATCH_SIZE ] = m_cubesNormalMats[q];
+            // render primitives in batches ************************************************************
+            for ( size_t q = 0; q < m_primitivesColors[prim_id].size(); q++ )
+            {
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesNormalMats[prim_id][q];
 
-            if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
-                _renderBatchOfSolidBoxes( DEBUG_DRAWER_BATCH_SIZE, true );
+                if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                    _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
+            }
+
+            int _remainingCountPrimitives = m_primitivesColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+
+            // Draw remaining boxes (the ones that didn't get a batch)
+            if ( _remainingCountPrimitives != 0 )
+                _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
+
+            // clear our containers for later usage
+            m_primitivesColors[prim_id].clear();
+            m_primitivesModelMats[prim_id].clear();
+            m_primitivesNormalMats[prim_id].clear();
+            //******************************************************************************************
         }
-
-        int _remainingCountBoxes = m_cubesColors.size() % DEBUG_DRAWER_BATCH_SIZE;
-
-        // Draw remaining boxes (the ones that didn't get a batch)
-        if ( _remainingCountBoxes != 0 )
-            _renderBatchOfSolidBoxes( _remainingCountBoxes, true );
-
-        // clear our containers for later usage
-        m_cubesColors.clear();
-        m_cubesModelMats.clear();
-        m_cubesNormalMats.clear();
-        //******************************************************************************************
 
         m_shaderSolidLightingPtr->unbind();
     }
 
-    void CDebugDrawer::_renderBatchOfSolidBoxes( int numBoxes, bool usePlainColor )
+    void CDebugDrawer::_renderBatchOfSolidPrimitives( int primitive, int numPrimitives, bool updateNormals )
     {
-        m_cubeVAO->bind();
+        //// std::cout << "primitive: " << primitive << std::endl;
+        ENGINE_CORE_ASSERT( ( primitive >= 0 ) && ( primitive < DEBUG_DRAWER_PRIMITIVE_TYPES ), "Invalid primitive id given for rendering" );
 
-        m_cubeVBOinstancesColors->updateData( numBoxes * sizeof( CVec4 ), (float32*) m_renderBufferCubesColors.data() );
-        m_cubeVBOinstancesModelMats->updateData( numBoxes * sizeof( CMat4 ), (float32*) m_renderBufferCubesModelMats.data() );
-        m_cubeVBOinstancesNormalMats->updateData( numBoxes * sizeof( CMat4 ), (float32*) m_renderBufferCubesNormalMats.data() );
+        m_primitivesVAO[primitive]->bind();
 
-        glDrawElementsInstanced( GL_TRIANGLES, m_cubeIBO->count(), GL_UNSIGNED_INT, 0, numBoxes );
+        m_primitivesVBOinstancesColors[primitive]->updateData( numPrimitives * sizeof ( CVec4 ), (float32*) m_renderBufferPrimitivesColors[primitive].data() );
+        m_primitivesVBOinstancesModelMats[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesModelMats[primitive].data() );
+        m_primitivesVBOinstancesNormalMats[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesNormalMats[primitive].data() );
 
-        m_cubeVAO->unbind();
+        glDrawElementsInstanced( GL_TRIANGLES, m_primitivesIBO[primitive]->count(), GL_UNSIGNED_INT, 0, numPrimitives );
+
+        m_primitivesVAO[primitive]->unbind();
     }
 
     void CDebugDrawer::_drawLine( const CVec3& start, const CVec3& end, const CVec3& color )
@@ -702,9 +784,91 @@ namespace engine
     void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color )
     {
         // keep the cube-information for later rendering
-        m_cubesModelMats.push_back( transform * CMat4::scale( size ) );
-        m_cubesNormalMats.push_back( ( transform.inverse() ).transpose() );
-        m_cubesColors.push_back( color );
+        m_primitivesModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
+        m_primitivesNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
+        m_primitivesColors[DD_PRIMITIVE_BOX].push_back( color );
     }
+
+    void CDebugDrawer::_drawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color )
+    {
+        m_primitivesModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
+        m_primitivesNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
+        m_primitivesColors[DD_PRIMITIVE_SPHERE].push_back( color );
+    }
+
+    void CDebugDrawer::_drawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        if ( axis == eAxis::X )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
+        }
+        else if ( axis == eAxis::Y )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
+        }
+        else if ( axis == eAxis::Z )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
+        }
+    }
+
+    void CDebugDrawer::_drawSolidCapsule( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        if ( axis == eAxis::X )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_X].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CAPSULE_X].push_back( color );
+        }
+        else if ( axis == eAxis::Y )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_Y].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CAPSULE_Y].push_back( color );
+        }
+        else if ( axis == eAxis::Z )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_Z].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_CAPSULE_Z].push_back( color );
+        }
+    }
+
+    void CDebugDrawer::_drawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color )
+    {
+        if ( axis == eAxis::X )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_ARROW_X].push_back( color );
+        }
+        else if ( axis == eAxis::Y )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
+        }
+        else if ( axis == eAxis::Z )
+        {
+            m_primitivesModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
+            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
+        }
+    }
+
+    void CDebugDrawer::_drawSolidAxes( float32 length, const CMat4& transform, float32 alpha )
+    {
+        _drawSolidArrow( length, eAxis::X, transform, CVec4( CVec3::Red(), alpha ) );
+        _drawSolidArrow( length, eAxis::Y, transform, CVec4( CVec3::Green(), alpha ) );
+        _drawSolidArrow( length, eAxis::Z, transform, CVec4( CVec3::Blue(), alpha ) );
+        _drawSolidSphere( 0.2 * length, transform, { 0.3f, 0.3f, 0.3f, alpha } );
+    }
+
 
 }
