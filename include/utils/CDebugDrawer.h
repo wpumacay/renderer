@@ -133,9 +133,13 @@ namespace engine
         std::array< std::array< CMat4, DEBUG_DRAWER_BATCH_SIZE >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_renderBufferPrimitivesNormalMats;
         std::array< std::array< CVec4, DEBUG_DRAWER_BATCH_SIZE >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_renderBufferPrimitivesColors;
 
-        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesModelMats;
-        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesNormalMats;
-        std::array< std::vector< CVec4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesColors;
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesOpaqueModelMats;
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesOpaqueNormalMats;
+        std::array< std::vector< CVec4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesOpaqueColors;
+
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesTransparentModelMats;
+        std::array< std::vector< CMat4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesTransparentNormalMats;
+        std::array< std::vector< CVec4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesTransparentColors;
 
         std::array< std::unique_ptr< CVertexArray >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVAO;
         std::array< std::unique_ptr< CIndexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesIBO;

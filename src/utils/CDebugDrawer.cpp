@@ -382,36 +382,72 @@ namespace engine
 
     void CDebugDrawer::_renderSolidPrimitives( CICamera* camera )
     {
-        std::cout << "rendering primitives" << std::endl;
         m_shaderSolidNoLightingPtr->bind();
         m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+        glEnable( GL_CULL_FACE );
 
+        // render opaque primitives first
         for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
         {
             // render primitives in batches ************************************************************
-            for ( size_t q = 0; q < m_primitivesColors[prim_id].size(); q++ )
+            for ( size_t q = 0; q < m_primitivesOpaqueColors[prim_id].size(); q++ )
             {
-                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesColors[prim_id][q];
-                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesModelMats[prim_id][q];
-                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesNormalMats[prim_id][q];
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueNormalMats[prim_id][q];
 
                 if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
                     _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
             }
 
-            int _remainingCountPrimitives = m_primitivesColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+            int _remainingCountPrimitives = m_primitivesOpaqueColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
 
             // Draw remaining boxes (the ones that didn't get a batch)
             if ( _remainingCountPrimitives != 0 )
                 _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
 
             // clear our containers for later usage
-            m_primitivesColors[prim_id].clear();
-            m_primitivesModelMats[prim_id].clear();
-            m_primitivesNormalMats[prim_id].clear();
+            m_primitivesOpaqueColors[prim_id].clear();
+            m_primitivesOpaqueModelMats[prim_id].clear();
+            m_primitivesOpaqueNormalMats[prim_id].clear();
             //******************************************************************************************
         }
 
+        // render transparent primitives (without depth-writing, not perfect, I know :( )
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDepthMask( GL_FALSE );
+
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
+        {
+            // render primitives in batches ************************************************************
+            for ( size_t q = 0; q < m_primitivesTransparentColors[prim_id].size(); q++ )
+            {
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentNormalMats[prim_id][q];
+
+                if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                    _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
+            }
+
+            int _remainingCountPrimitives = m_primitivesTransparentColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+
+            // Draw remaining boxes (the ones that didn't get a batch)
+            if ( _remainingCountPrimitives != 0 )
+                _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
+
+            // clear our containers for later usage
+            m_primitivesTransparentColors[prim_id].clear();
+            m_primitivesTransparentModelMats[prim_id].clear();
+            m_primitivesTransparentNormalMats[prim_id].clear();
+            //******************************************************************************************
+        }
+
+        glDepthMask( GL_TRUE );
+        glDisable( GL_BLEND );
+
+        glDisable( GL_CULL_FACE );
         m_shaderSolidNoLightingPtr->unbind();
     }
 
@@ -461,33 +497,70 @@ namespace engine
             m_shaderSolidLightingPtr->setFloat( "u_spotLight.innerCutoffCos", std::cos( light->innerCutoff ) );
             m_shaderSolidLightingPtr->setFloat( "u_spotLight.outerCutoffCos", std::cos( light->outerCutoff ) );
         }
+        glEnable( GL_CULL_FACE );
 
+        // render opaque primitives first
         for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
         {
             // render primitives in batches ************************************************************
-            for ( size_t q = 0; q < m_primitivesColors[prim_id].size(); q++ )
+            for ( size_t q = 0; q < m_primitivesOpaqueColors[prim_id].size(); q++ )
             {
-                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesColors[prim_id][q];
-                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesModelMats[prim_id][q];
-                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesNormalMats[prim_id][q];
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesOpaqueNormalMats[prim_id][q];
 
                 if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
                     _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
             }
 
-            int _remainingCountPrimitives = m_primitivesColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+            int _remainingCountPrimitives = m_primitivesOpaqueColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
 
             // Draw remaining boxes (the ones that didn't get a batch)
             if ( _remainingCountPrimitives != 0 )
                 _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
 
             // clear our containers for later usage
-            m_primitivesColors[prim_id].clear();
-            m_primitivesModelMats[prim_id].clear();
-            m_primitivesNormalMats[prim_id].clear();
+            m_primitivesOpaqueColors[prim_id].clear();
+            m_primitivesOpaqueModelMats[prim_id].clear();
+            m_primitivesOpaqueNormalMats[prim_id].clear();
             //******************************************************************************************
         }
 
+        // render transparent primitives (without depth-writing, not perfect, I know :( )
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDepthMask( GL_FALSE );
+
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
+        {
+            // render primitives in batches ************************************************************
+            for ( size_t q = 0; q < m_primitivesTransparentColors[prim_id].size(); q++ )
+            {
+                m_renderBufferPrimitivesColors[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentColors[prim_id][q];
+                m_renderBufferPrimitivesModelMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentModelMats[prim_id][q];
+                m_renderBufferPrimitivesNormalMats[prim_id][ q % DEBUG_DRAWER_BATCH_SIZE ] = m_primitivesTransparentNormalMats[prim_id][q];
+
+                if ( ( q + 1 ) % DEBUG_DRAWER_BATCH_SIZE == 0 )
+                    _renderBatchOfSolidPrimitives( prim_id, DEBUG_DRAWER_BATCH_SIZE, true );
+            }
+
+            int _remainingCountPrimitives = m_primitivesTransparentColors[prim_id].size() % DEBUG_DRAWER_BATCH_SIZE;
+
+            // Draw remaining boxes (the ones that didn't get a batch)
+            if ( _remainingCountPrimitives != 0 )
+                _renderBatchOfSolidPrimitives( prim_id, _remainingCountPrimitives, true );
+
+            // clear our containers for later usage
+            m_primitivesTransparentColors[prim_id].clear();
+            m_primitivesTransparentModelMats[prim_id].clear();
+            m_primitivesTransparentNormalMats[prim_id].clear();
+            //******************************************************************************************
+        }
+
+        glDepthMask( GL_TRUE );
+        glDisable( GL_BLEND );
+
+        glDisable( GL_CULL_FACE );
         m_shaderSolidLightingPtr->unbind();
     }
 
@@ -784,81 +857,138 @@ namespace engine
     void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color )
     {
         // keep the cube-information for later rendering
-        m_primitivesModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
-        m_primitivesNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
-        m_primitivesColors[DD_PRIMITIVE_BOX].push_back( color );
+        if ( color.w < 1.0f ) // transparent are stored separately
+        {
+            m_primitivesTransparentModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
+            m_primitivesTransparentNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesTransparentColors[DD_PRIMITIVE_BOX].push_back( color );
+        }
+        else
+        {
+            m_primitivesOpaqueModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
+            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesOpaqueColors[DD_PRIMITIVE_BOX].push_back( color );
+        }
     }
 
     void CDebugDrawer::_drawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color )
     {
-        m_primitivesModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
-        m_primitivesNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
-        m_primitivesColors[DD_PRIMITIVE_SPHERE].push_back( color );
+        if ( color.w < 1.0f )
+        {
+            m_primitivesTransparentModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
+            m_primitivesTransparentNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesTransparentColors[DD_PRIMITIVE_SPHERE].push_back( color );
+        }
+        else
+        {
+            m_primitivesOpaqueModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
+            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesOpaqueColors[DD_PRIMITIVE_SPHERE].push_back( color );
+        }
     }
 
     void CDebugDrawer::_drawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
     {
-        if ( axis == eAxis::X )
+        if ( color.w < 1.0f )
         {
-            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
+            if ( axis == eAxis::X )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
+            }
+            else if ( axis == eAxis::Y )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
+            }
+            else if ( axis == eAxis::Z )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
+            }
         }
-        else if ( axis == eAxis::Y )
+        else
         {
-            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
-        }
-        else if ( axis == eAxis::Z )
-        {
-            m_primitivesModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
+            if ( axis == eAxis::X )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
+            }
+            else if ( axis == eAxis::Y )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
+            }
+            else if ( axis == eAxis::Z )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
+            }
         }
     }
 
     void CDebugDrawer::_drawSolidCapsule( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
     {
-        if ( axis == eAxis::X )
-        {
-            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_X].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CAPSULE_X].push_back( color );
-        }
-        else if ( axis == eAxis::Y )
-        {
-            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_Y].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CAPSULE_Y].push_back( color );
-        }
-        else if ( axis == eAxis::Z )
-        {
-            m_primitivesModelMats[DD_PRIMITIVE_CAPSULE_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_CAPSULE_Z].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_CAPSULE_Z].push_back( color );
-        }
+        _drawSolidCylinder( radius, height, axis, transform, color );
+
+        CVec3 _trans;
+        if ( axis == eAxis::X ) _trans = { 0.5f * height, 0.0f, 0.0f };
+        if ( axis == eAxis::Y ) _trans = { 0.0f, 0.5f * height, 0.0f };
+        if ( axis == eAxis::Z ) _trans = { 0.0f, 0.0f, 0.5f * height };
+
+        _drawSolidSphere( radius, transform * engine::CMat4::translation( _trans ), color );
+        _drawSolidSphere( radius, transform * engine::CMat4::translation( -_trans ), color );
     }
 
     void CDebugDrawer::_drawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color )
     {
-        if ( axis == eAxis::X )
+        if ( color.w < 1.0f )
         {
-            m_primitivesModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_ARROW_X].push_back( color );
+            if ( axis == eAxis::X )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_X].push_back( color );
+            }
+            else if ( axis == eAxis::Y )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
+            }
+            else if ( axis == eAxis::Z )
+            {
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
+            }
         }
-        else if ( axis == eAxis::Y )
+        else
         {
-            m_primitivesModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
-        }
-        else if ( axis == eAxis::Z )
-        {
-            m_primitivesModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
-            m_primitivesNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
-            m_primitivesColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
+            if ( axis == eAxis::X )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_X].push_back( color );
+            }
+            else if ( axis == eAxis::Y )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
+            }
+            else if ( axis == eAxis::Z )
+            {
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
+            }
         }
     }
 

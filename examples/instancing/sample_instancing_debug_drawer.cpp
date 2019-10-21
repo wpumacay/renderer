@@ -72,6 +72,7 @@ int g_num_floors = 10;
 int g_debug_drawer_demo = 0; // 0: boxes, 1: spheres, 2: cylinders, 3: capsules, 4: arrows, 5: axes
 int g_debug_drawer_axis = 1; // 0: x, 1: y, 2: z
 engine::eAxis g_debug_drawer_axis_enum = engine::eAxis::Y;
+bool g_debug_drawer_use_lighting = true;
 
 float g_debug_drawer_angle = 0.0f;
 float g_debug_drawer_primitives_color[4] = { 0.7f, 0.5f, 0.3f, 1.0f };
@@ -244,6 +245,7 @@ private :
         ImGui::RadioButton( "arrows", &g_debug_drawer_demo, 4 ); ImGui::SameLine();
         ImGui::RadioButton( "axes", &g_debug_drawer_demo, 5 ); ImGui::Spacing();
 
+        ImGui::Checkbox( "use-lighting", &g_debug_drawer_use_lighting );
         ImGui::SliderFloat( "rot-angle", &g_debug_drawer_angle, 0.0f, 2.0f * ENGINE_PI );
         ImGui::SliderFloat4( "primitive-color", g_debug_drawer_primitives_color, 0.0f, 1.0f );
 
@@ -1069,7 +1071,10 @@ int main()
 
         _app->renderScene();
         //// _app->renderDebug();
-        engine::CDebugDrawer::Render( _camera, lightPtr );
+        if ( g_debug_drawer_use_lighting )
+            engine::CDebugDrawer::Render( _camera, lightPtr );
+        else
+            engine::CDebugDrawer::Render( _camera );
 
         if ( !_camera->active() )
             _app->renderUi();
