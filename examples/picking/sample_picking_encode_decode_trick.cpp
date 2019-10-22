@@ -85,6 +85,7 @@ float g_debug_drawer_axes_length = 0.4f;
 
 bool g_usePicking = true;
 int g_pickingMode = 0; // 0: normal, 1: visualization
+engine::CIRenderable* g_objectPicked = nullptr;
 
 void renderShadowMap( engine::CILight* lightPtr,
                       engine::CVertexArray* quadVAO,
@@ -290,6 +291,8 @@ private :
         ImGui::Checkbox( "use-picking", &g_usePicking );
         if ( g_usePicking )
         {
+            engine::CObjectPicker::SetMode( engine::ePickerMode::NORMAL );
+
             ImGui::TextColored( ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ), "Picking-mode:" );
             ImGui::RadioButton( "normal", &g_pickingMode, 0 ); ImGui::SameLine();
             ImGui::RadioButton( "visualize", &g_pickingMode, 1 ); ImGui::Spacing();
@@ -303,9 +306,26 @@ private :
             auto _texEncoding = _fboEncoding->getTextureAttachment( "color_attachment" );
 
             ImGui::Image( (void*)(intptr_t) _texEncoding->openglId(),
-                          ImVec2( _texEncoding->width() / 2.0f, 
-                                  _texEncoding->height() / 2.0f ),
+                          ImVec2( _texEncoding->width() / 5.0f, 
+                                  _texEncoding->height() / 5.0f ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
+
+            if ( g_objectPicked )
+            {
+                ImGui::Text( "object-name: %s", g_objectPicked->name().c_str() );
+
+                float _position[3] = { g_objectPicked->position.x, g_objectPicked->position.y, g_objectPicked->position.z };
+                ImGui::SliderFloat3( "position", _position, -5.0f, 5.0f );
+                g_objectPicked->position = { _position[0], _position[1], _position[2] };
+
+                float _scale[3] = { g_objectPicked->scale.x, g_objectPicked->scale.y, g_objectPicked->scale.z };
+                ImGui::SliderFloat3( "scale", _scale, 0.1f, 5.0f );
+                g_objectPicked->scale = { _scale[0], _scale[1], _scale[2] };
+            }
+        }
+        else
+        {
+            engine::CObjectPicker::SetMode( engine::ePickerMode::STOPPED );
         }
 
         ImGui::End();
@@ -1106,10 +1126,13 @@ int main()
         /****************************************************/
 
         engine::CObjectPicker::Submit( _app->scene()->renderables(), _camera );
-        engine::CObjectPicker::GetObjectPicked( engine::CInputHandler::GetCursorPosition().x,
-                                                engine::CInputHandler::GetCursorPosition().y,
-                                                engine::COpenGLApp::GetWindow()->width(),
-                                                engine::COpenGLApp::GetWindow()->height() );
+        if ( engine::CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+        {
+            g_objectPicked = engine::CObjectPicker::GetObjectPicked( engine::CInputHandler::GetCursorPosition().x,
+                                                                     engine::CInputHandler::GetCursorPosition().y,
+                                                                     engine::COpenGLApp::GetWindow()->width(),
+                                                                     engine::COpenGLApp::GetWindow()->height() );
+        }
 
         //// _app->renderScene();
         //// _app->renderDebug();

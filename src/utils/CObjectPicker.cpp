@@ -188,13 +188,21 @@ namespace engine
 
         m_fboObjsIds->bind();
 
-        // grab the pixel-encoding at the requested position
+        /* grab the pixel-encoding at the requested position */
         uint8 _encoding[3];
         glReadPixels( (int)_xx, (int)_yy, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, _encoding );
 
         //// ENGINE_CORE_TRACE( "encoding: ({0},{1},{2})", _encoding[0], _encoding[1], _encoding[2] );
 
         m_fboObjsIds->unbind();
+
+        /* decode the rgb color into an object id */
+        int _objectId = ( _encoding[0] << 0 ) + ( _encoding[1] << 8 ) + ( _encoding[2] << 16 ) - 1;
+
+        ENGINE_CORE_TRACE( "object-id: {0}", _objectId );
+
+        if ( ( _objectId >= 0 ) && ( _objectId < m_renderablesInView.size() ) )
+            return m_renderablesInView[_objectId];
 
         return nullptr;
     }
