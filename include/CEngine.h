@@ -9,6 +9,7 @@
 #include <utils/CImguiUiDemo.h>
 #include <utils/CNoiseGenerator.h>
 #include <utils/CDebugDrawer.h>
+#include <utils/CObjectPicker.h>
 
 #include <input/CInputCallbacks.h>
 #include <input/CInputKey.h>
@@ -48,9 +49,9 @@
 #include <lights/CPointLight.h>
 #include <lights/CSpotLight.h>
 
-#include <renderers/CMainRenderer.h>        // IMPLEMENT RENDERER PIPELINE
-#include <renderers/CMeshRenderer.h>        // IMPLEMENT RENDERER PIPELINE
-// #include <renderers/CSkyboxRenderer.h>   // IMPLEMENT RENDERER PIPELINE
+#include <renderers/CMainRenderer.h>
+#include <renderers/CMeshRenderer.h>
+#include <renderers/CSkyboxRenderer.h>
 
 #include <assets/CTextureManager.h>
 
