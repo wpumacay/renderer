@@ -35,21 +35,13 @@ float g_extraWidth = 1.0f;
 float g_extraHeight = 1.0f;
 float g_extraDepth = 1.0f;
 
-class ApplicationUi : public engine::CImguiUi
+class ShadowsUtilsLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() {}
-
-    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
-
-protected :
-
-    void _initInternal() override
+    ShadowsUtilsLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         auto _dirlight = new engine::CDirectionalLight( "directional",
                                                         { 0.2f, 0.2f, 0.2f },
@@ -85,12 +77,33 @@ protected :
 
         m_lightPointPosition    = g_lightPointPosition;
         m_lightSpotPosition     = g_lightSpotPosition;
+
+        m_wantsToCaptureMouse = false;
     }
 
-    void _renderInternal() override
+    ~ShadowsUtilsLayer() {}
+
+    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
+
+    void render() override
     {
+        m_wantsToCaptureMouse = false;
+
         _menuUiLights();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
     }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
+    }
+
+private :
 
     void _menuUiLights()
     {
@@ -212,6 +225,8 @@ protected :
 
     engine::CVec3 m_lightPointPosition;
     engine::CVec3 m_lightSpotPosition;
+
+    bool m_wantsToCaptureMouse;
 };
 
 void renderToShadowMap( engine::CILight* lightPtr,
@@ -508,12 +523,8 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new ShadowsUtilsLayer( "Shadows-utils" );
+    _app->addGuiLayer( std::unique_ptr< ShadowsUtilsLayer >( _uiLayer ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
@@ -621,7 +632,7 @@ int main()
 
     /**********************************************************************************************/
 
-    auto _currentLight = _ui->selectedLight();
+    auto _currentLight = _uiLayer->selectedLight();
     auto _shadowmap = new engine::CShadowMap( 4096, 4096 );
 
     engine::float32 _quad_buffData[] = {
@@ -678,7 +689,7 @@ int main()
         engine::CDebugDrawer::DrawNormals( _cube3, { 0.0f, 0.0f, 1.0f } );
 
         /* use the light selected by the user */
-        _currentLight = _ui->selectedLight();
+        _currentLight = _uiLayer->selectedLight();
 
         float _t = glfwGetTime();
         float _scaler = 1.0f;
@@ -691,6 +702,7 @@ int main()
 
         showDirectionalLightVolume( _cameraTest, engine::CVec3::normalize( _testDirection ) );
 
+        _app->update();
         _app->begin();
         _camera->update();
 
@@ -707,11 +719,7 @@ int main()
 
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
 
         // ENGINE_TRACE( "frame_time: {0} - fps: {1}", 
@@ -929,5 +937,5 @@ void renderShadowMapVisualization( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }

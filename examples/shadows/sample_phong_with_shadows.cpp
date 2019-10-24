@@ -1,29 +1,6 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
-{
-
-public :
-
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() {}
-
-protected :
-
-    void _initInternal() override
-    {
-        // nothing for now
-    }
-
-    void _renderInternal() override
-    {
-        // nothing for now
-    }
-};
-
 void renderToShadowMap( engine::CILight* lightPtr,
                         engine::CShadowMap* shadowMapPtr,
                         engine::CShader* shaderPtr,
@@ -49,12 +26,6 @@ engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
@@ -212,6 +183,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
+        _app->update();
         _app->begin();
         _camera->update();
 
@@ -228,11 +200,7 @@ int main()
 
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
     }
 
@@ -384,5 +352,5 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }
