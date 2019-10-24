@@ -28,104 +28,19 @@ namespace engine
         m_shaderSemanticView = nullptr;
     }
 
-    void CMeshRenderer::submit( const std::vector< CMesh* >& meshesVisible,
-                                const std::vector< CMesh* >& meshesInView, 
-                                const CRenderOptions& renderOptions )
+    void CMeshRenderer::begin( const CRenderOptions& renderOptions )
     {
+        // (0): sanity checks: make sure we have the right resources
         if ( !renderOptions.cameraPtr )
             ENGINE_CORE_ASSERT( false, "Mesh-renderer requires a valid camera to render" );
 
         if ( renderOptions.mode == eRenderMode::NORMAL && !renderOptions.lightPtr )
             ENGINE_CORE_ASSERT( false, "Mesh-renderer requires a valid light to render in normal-mode" );
 
-        // (0): clear buffers to store newly submitted meshes, and store render options
-        m_meshesCastShadows.clear();
-        m_meshesDontCastShadows.clear();
-        m_meshesOpaque.clear();
-        m_meshesTransparent.clear();
+        /* (1): Prepare context information from render options. We're grabbing required info to
+                potentially separate rendering in another thread without touching high-level 
+                objects like lights, cameras, etc., which the user might still update during simulation */
 
-        // (1): separate the ones that cast shadows from the ones that don't (for shadow-map pass)
-        //      > Note: check all visible meshes, as they could cast shadow even outside view frustum
-        for ( auto meshPtr : meshesVisible )
-        {
-            if ( meshPtr->castsShadows )
-                m_meshesCastShadows.push_back( meshPtr );
-            else 
-                m_meshesDontCastShadows.push_back( meshPtr );
-        }
-
-        // (2): separate the ones that are opaque from the ones that are transparent (for blending)
-        //      > Note: check only in-view meshes, as they are going to be rendered w.r.t. our view
-        for ( auto meshPtr : meshesInView )
-        {
-            if ( renderOptions.useBlending && meshPtr->material()->transparent && meshPtr->material()->alpha < 1.0f )
-                m_meshesTransparent.push_back( meshPtr );
-            else
-                m_meshesOpaque.push_back( meshPtr );
-        }
-
-        // (3): sort the transparent meshes by distance to the camera
-        if ( renderOptions.useBlending )
-        {
-            CMeshComparatorFarthestFromPoint _comparator;
-            _comparator.point = renderOptions.cameraPtr->position();
-
-            std::sort( m_meshesTransparent.begin(), m_meshesTransparent.end(), _comparator );
-        }
-
-        // (4.1): collect the meshes according to material type
-        m_meshesOpaqueLambert.clear();
-        m_meshesOpaquePhong.clear();
-        m_meshesOpaqueBlinnPhong.clear();
-
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::LAMBERT, m_meshesOpaqueLambert );
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::PHONG, m_meshesOpaquePhong );
-        _collectMeshesByMaterial( m_meshesOpaque, eMaterialType::BLINN_PHONG, m_meshesOpaqueBlinnPhong );
-
-        m_meshesTransparentLambert.clear();
-        m_meshesTransparentPhong.clear();
-        m_meshesTransparentBlinnPhong.clear();
-
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::LAMBERT, m_meshesTransparentLambert );
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::PHONG, m_meshesTransparentPhong );
-        _collectMeshesByMaterial( m_meshesTransparent, eMaterialType::BLINN_PHONG, m_meshesTransparentBlinnPhong );
-
-        // (4.2): collect opaque meshes that require culling and those who don't in separate containers
-        m_meshesOpaqueLambert_faceCull.clear();
-        m_meshesOpaqueLambert_noFaceCull.clear();
-        m_meshesOpaquePhong_faceCull.clear();
-        m_meshesOpaquePhong_noFaceCull.clear();
-        m_meshesOpaqueBlinnPhong_faceCull.clear();
-        m_meshesOpaqueBlinnPhong_noFaceCull.clear();
-
-        if ( renderOptions.useFaceCulling )
-        {
-            for ( auto meshPtr : m_meshesOpaqueLambert )
-            {
-                if ( meshPtr->cullFaces )
-                    m_meshesOpaqueLambert_faceCull.push_back( meshPtr );
-                else
-                    m_meshesOpaqueLambert_noFaceCull.push_back( meshPtr );
-            }
-
-            for ( auto meshPtr : m_meshesOpaquePhong )
-            {
-                if ( meshPtr->cullFaces )
-                    m_meshesOpaquePhong_faceCull.push_back( meshPtr );
-                else
-                    m_meshesOpaquePhong_noFaceCull.push_back( meshPtr );
-            }
-
-            for ( auto meshPtr : m_meshesOpaqueBlinnPhong )
-            {
-                if ( meshPtr->cullFaces )
-                    m_meshesOpaqueBlinnPhong_faceCull.push_back( meshPtr );
-                else
-                    m_meshesOpaqueBlinnPhong_noFaceCull.push_back( meshPtr );
-            }
-        }
-
-        // (5): prepare context information
         /* render options */
         m_context.useFog            = renderOptions.useFog;
         m_context.useFaceCulling    = renderOptions.useFaceCulling;
@@ -188,6 +103,37 @@ namespace engine
         {
             m_context.semanticViewIdMap = renderOptions.semanticViewIdMap;
         }
+
+        /* (2): clear buffers to store newly submitted meshes, and store render options */
+        m_meshesCastShadows.clear();
+        m_meshesDontCastShadows.clear();
+
+        m_meshesOpaque.clear();
+        m_meshesTransparent.clear();
+    }
+
+    void CMeshRenderer::submit( const std::vector< CMesh* >& meshesVisible,
+                                const std::vector< CMesh* >& meshesInView )
+    {
+        // (1): separate the ones that cast shadows from the ones that don't (for shadow-map pass)
+        //      > Note: check all visible meshes, as they could cast shadow even outside view frustum
+        for ( auto meshPtr : meshesVisible )
+        {
+            if ( meshPtr->castsShadows )
+                m_meshesCastShadows.push_back( meshPtr );
+            else 
+                m_meshesDontCastShadows.push_back( meshPtr );
+        }
+
+        // (2): separate the ones that are opaque from the ones that are transparent (for blending)
+        //      > Note: check only in-view meshes, as they are going to be rendered w.r.t. our view
+        for ( auto meshPtr : meshesInView )
+        {
+            if ( m_context.useBlending && meshPtr->material()->transparent && meshPtr->material()->alpha < 1.0f )
+                m_meshesTransparent.push_back( meshPtr );
+            else
+                m_meshesOpaque.push_back( meshPtr );
+        }
     }
 
     void CMeshRenderer::renderToShadowMap()
@@ -212,67 +158,76 @@ namespace engine
 
     void CMeshRenderer::renderMeshesOpaque()
     {
-        // define which shader we'll be using for the render passes
+        // if there are no transparent objects, just skip to avoid setting render state
+        if ( m_meshesOpaque.size() < 1 )
+            return;
+
+        // (0): define which shader we'll be using for the render passes
         CShader* _shader = nullptr;
         if ( !m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
         if ( !m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
         if ( m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
         if ( m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
 
-        // (2): render opaque meshes
+        // (1): render opaque meshes according to face-culling options
         if ( m_context.useFaceCulling )
         {
+            // separate meshes according to face-culling settings
+            auto _meshesOpaque_faceCull = std::vector< CMesh* >();
+            auto _meshesOpaque_noFaceCull = std::vector< CMesh* >();
+
+            for ( auto meshPtr : m_meshesOpaque )
+            {
+                if ( meshPtr->cullFaces )
+                    _meshesOpaque_faceCull.push_back( meshPtr );
+                else
+                    _meshesOpaque_noFaceCull.push_back( meshPtr );
+            }
+
             _renderMeshes( _shader,
-                           m_meshesOpaqueLambert_faceCull, 
-                           m_meshesOpaqueLambert_noFaceCull,
-                           m_meshesOpaquePhong_faceCull, 
-                           m_meshesOpaquePhong_noFaceCull,
-                           m_meshesOpaqueBlinnPhong_faceCull,
-                           m_meshesOpaqueBlinnPhong_noFaceCull,
-                           m_context.useShadowMapping,
-                           false, /* don't use blending for this pass */
-                           true, /* setup render state uniforms for this pass */
-                           !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
+                           _meshesOpaque_faceCull, 
+                           _meshesOpaque_noFaceCull,
+                           false /* don't use blending for this pass */);
         }
         else
         {
             _renderMeshes( _shader,
                            std::vector< CMesh* >(), 
-                           m_meshesOpaqueLambert,
-                           std::vector< CMesh* >(), 
-                           m_meshesOpaquePhong,
-                           std::vector< CMesh* >(),
-                           m_meshesOpaqueBlinnPhong,
-                           m_context.useShadowMapping,
-                           false, /* don't use blending for this pass */
-                           true, /* setup render state uniforms for this pass */
-                           !m_context.useBlending /* don't release render state uniforms if transparent objs' pass comes next */ );
+                           m_meshesOpaque,
+                           false /* don't use blending for this pass */);
         }
     }
 
     void CMeshRenderer::renderMeshesTransparent()
     {
         if ( !m_context.useBlending )
+        {
+            ENGINE_CORE_WARN( "Tried rendering transparent objects without configuring blending" );
+            return;
+        }
+
+        // if there are no transparent objects, just skip to avoid setting render state
+        if ( m_meshesTransparent.size() < 1 )
             return;
 
-        // define which shader we'll be using for the render passes
+        // (0): define which shader we'll be using for the render passes
         CShader* _shader = nullptr;
         if ( !m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderNoShadowsNoFog;
         if ( !m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderNoShadowsFog;
         if ( m_context.useShadowMapping && !m_context.useFog ) _shader = m_shaderShadowsNoFog;
         if ( m_context.useShadowMapping && m_context.useFog ) _shader = m_shaderShadowsFog;
 
+        // (1): sort the transparent meshes by distance to the camera
+        CMeshComparatorFarthestFromPoint _comparator;
+        _comparator.point = m_context.viewPosition;
+
+        std::sort( m_meshesTransparent.begin(), m_meshesTransparent.end(), _comparator );
+
+        // (2): do the actual render call (reusing previously set render-state)
         _renderMeshes( _shader,
                        std::vector< CMesh* >(),
-                       m_meshesTransparentLambert,
-                       std::vector< CMesh* >(),
-                       m_meshesTransparentPhong,
-                       std::vector< CMesh* >(),
-                       m_meshesTransparentBlinnPhong,
-                       m_context.useShadowMapping,
-                       true, /* use blending for this pass */
-                       false,  /* use previously set render state uniforms */
-                       true /* release render state uniforms once this pass is finished */ );
+                       m_meshesTransparent,
+                       true /* use blending for this pass */);
     }
 
     void CMeshRenderer::renderDepthOnly()
@@ -344,48 +299,31 @@ namespace engine
         m_shaderSemanticView->unbind();
     }
 
-    void CMeshRenderer::_collectMeshesByMaterial( const std::vector< CMesh* >& meshes,
-                                                  const eMaterialType& materialType,
-                                                  std::vector< CMesh* >& meshesOfGivenMaterial )
-    {
-        for ( auto meshPtr : meshes )
-            if ( meshPtr->material()->type() == materialType )
-                meshesOfGivenMaterial.push_back( meshPtr );
-    }
-
     void CMeshRenderer::_renderMeshes( CShader* shaderPtr,
-                                       const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
-                                       const std::vector< CMesh* >& meshesLambertWithNoFaceCulling,
-                                       const std::vector< CMesh* >& meshesPhongWithFaceCulling, 
-                                       const std::vector< CMesh* >& meshesPhongWithNoFaceCulling,
-                                       const std::vector< CMesh* >& meshesBlinnPhongWithFaceCulling, 
-                                       const std::vector< CMesh* >& meshesBlinnPhongWithNoFaceCulling,
-                                       bool renderWithShadows,
-                                       bool renderWithBlending,
-                                       bool setupRenderState,
-                                       bool releaseRenderState )
+                                       const std::vector< CMesh* >& meshesWithFaceCulling, 
+                                       const std::vector< CMesh* >& meshesWithNoFaceCulling,
+                                       bool renderWithBlending )
     {
         // setup render state (if required for this pass)
-        if ( setupRenderState )
-        {
-            shaderPtr->bind();
-            _setupRenderState_camera( shaderPtr );
-            _setupRenderState_light( shaderPtr );
-            if ( renderWithShadows )
-                _setupRenderState_shadows( shaderPtr );
-            if ( m_context.useFog )
-                _setupRenderState_fog( shaderPtr );
+        shaderPtr->bind();
+        _setupRenderState_camera( shaderPtr );
+        _setupRenderState_light( shaderPtr );
+        if ( m_context.useShadowMapping )
+            _setupRenderState_shadows( shaderPtr );
+        if ( m_context.useFog )
+            _setupRenderState_fog( shaderPtr );
 
-            // configure viewer position (required for specular-calculations)
-            shaderPtr->setVec3( "u_viewerPosition", m_context.viewPosition );
-        }
+        // configure viewer position (required for specular-calculations)
+        shaderPtr->setVec3( "u_viewerPosition", m_context.viewPosition );
 
         if ( renderWithBlending )
         {
             glEnable( GL_BLEND );
             glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            // @hack: disable writing to depthbuffer to avoid artifacts :(
             glDepthMask( GL_FALSE );
-            glEnable( GL_CULL_FACE );// @hack: culling back-faces for blending to avoid artifacts
+            // @hack: culling back-faces for blending to avoid artifacts :(
+            glEnable( GL_CULL_FACE );
             shaderPtr->setInt( "u_material.transparent", 1 );
         }
         else
@@ -393,57 +331,23 @@ namespace engine
             shaderPtr->setInt( "u_material.transparent", 0 );
         }
 
-        if ( m_context.useFaceCulling && !renderWithBlending ) // if using blending, skip this section
+        // render meshes that require face-culling
+        if ( m_context.useFaceCulling && ( meshesWithFaceCulling.size() > 0 ) )
         {
             glEnable( GL_CULL_FACE );
 
-            // setup common uniforms for lambert materials
-            shaderPtr->setInt( "u_material.type", 0 );
-            shaderPtr->setInt( "u_material.specularMapActive", 0 );
-            shaderPtr->setVec3( "u_material.specular", { 0.0f, 0.0f, 0.0f } );
-            shaderPtr->setFloat( "u_material.shininess", 32.0f );
-            for ( auto meshPtr : meshesLambertWithFaceCulling )
-                _renderMesh_Lambert( meshPtr, shaderPtr );
-
-            // setup common uniforms for phong materials
-            shaderPtr->setInt( "u_material.type", 1 );
-            for ( auto meshPtr : meshesPhongWithFaceCulling )
-                _renderMesh_Phong( meshPtr, shaderPtr );
-
-            // setup common uniforms for blinn-phong materials
-            shaderPtr->setInt( "u_material.type", 2 );
-            for ( auto meshPtr : meshesBlinnPhongWithFaceCulling )
-                _renderMesh_BlinnPhong( meshPtr, shaderPtr );
+            for ( auto meshPtr : meshesWithFaceCulling )
+                _renderMesh( shaderPtr, meshPtr );
 
             glDisable( GL_CULL_FACE );
         }
 
-        // setup common uniforms for lambert materials
-        shaderPtr->setInt( "u_material.type", 0 );
-        shaderPtr->setInt( "u_material.specularMapActive", 0 );
-        for ( auto meshPtr : meshesLambertWithNoFaceCulling )
+        // render meshes that don't require face-culling
+        for ( auto meshPtr : meshesWithNoFaceCulling )
         {
             if ( renderWithBlending ) 
                 shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
-            _renderMesh_Lambert( meshPtr, shaderPtr );
-        }
-
-        // setup common uniforms for phong materials
-        shaderPtr->setInt( "u_material.type", 1 );
-        for ( auto meshPtr : meshesPhongWithNoFaceCulling )
-        {
-            if ( renderWithBlending ) 
-                shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
-            _renderMesh_Phong( meshPtr, shaderPtr );
-        }
-
-        // setup common uniforms for blinn-phong materials
-        shaderPtr->setInt( "u_material.type", 2 );
-        for ( auto meshPtr : meshesBlinnPhongWithNoFaceCulling )
-        {
-            if ( renderWithBlending ) 
-                shaderPtr->setFloat( "u_material.alpha", meshPtr->material()->alpha );
-            _renderMesh_BlinnPhong( meshPtr, shaderPtr );
+            _renderMesh( shaderPtr, meshPtr );
         }
 
         // unbind albedo-map, specular-map and depth-map (end with texture-0 to go back to 
@@ -455,139 +359,73 @@ namespace engine
         glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
         glBindTexture( GL_TEXTURE_2D, 0 );
 
-        if ( releaseRenderState )
-            shaderPtr->unbind();
+        shaderPtr->unbind();
 
         if ( renderWithBlending )
         {
-            glDisable( GL_CULL_FACE );// @hack: culling back-faces for blending to avoid artifacts
+            glDisable( GL_CULL_FACE );
             glDepthMask( GL_TRUE );
             glDisable( GL_BLEND );
         }
     }
 
-    void CMeshRenderer::_renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr )
+    void CMeshRenderer::_renderMesh( CShader* shaderPtr, CMesh* meshPtr )
     {
         // setup material uniforms
         auto _materialPtr = meshPtr->material();
-        shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
-        shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
-        if ( _materialPtr->albedoMap() )
+        if ( _materialPtr->type() == eMaterialType::LAMBERT )
         {
-            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
-            shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
-        }
-        else
-        {
-            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
-        }
+            shaderPtr->setInt( "u_material.type", 0 );
+            shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
+            shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
 
-        // setup mesh transforms-uniforms
-        auto _matModel = meshPtr->matModel();
-        shaderPtr->setMat4( "u_modelMatrix", _matModel );
-        shaderPtr->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
+            if ( _materialPtr->albedoMap() )
+            {
+                shaderPtr->setInt( "u_material.albedoMapActive", 1 );
+                shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
+                glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
+                glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
+            }
+            else
+            {
+                shaderPtr->setInt( "u_material.albedoMapActive", 0 );
+            }
 
-        // render the mesh ************************************************
-        auto _vao = meshPtr->vertexArray();
-        auto _ibo = _vao->indexBuffer();
-
-        if ( meshPtr->wireframe() )
-            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-        _vao->bind();
-        glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
-        _vao->unbind();
-
-        if ( meshPtr->wireframe() )
-            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        //*****************************************************************
-    }
-
-    void CMeshRenderer::_renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr )
-    {
-        // setup material uniforms
-        auto _materialPtr = meshPtr->material();
-        shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
-        shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
-        shaderPtr->setVec3( "u_material.specular", _materialPtr->specular );
-        shaderPtr->setFloat( "u_material.shininess", _materialPtr->shininess );
-        if ( _materialPtr->albedoMap() )
-        {
-            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
-            shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
-        }
-        else
-        {
-            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
-        }
-
-        if ( _materialPtr->specularMap() )
-        {
-            shaderPtr->setInt( "u_material.specularMapActive", 1 );
-            shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
-        }
-        else
-        {
+            // no specular-maps in lambert materials
             shaderPtr->setInt( "u_material.specularMapActive", 0 );
         }
-
-        // setup mesh transforms-uniforms
-        auto _matModel = meshPtr->matModel();
-        shaderPtr->setMat4( "u_modelMatrix", _matModel );
-        shaderPtr->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
-
-        // render the mesh ************************************************
-        auto _vao = meshPtr->vertexArray();
-        auto _ibo = _vao->indexBuffer();
-
-        if ( meshPtr->wireframe() )
-            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-        _vao->bind();
-        glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
-        _vao->unbind();
-
-        if ( meshPtr->wireframe() )
-            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        //*****************************************************************
-    }
-
-    void CMeshRenderer::_renderMesh_BlinnPhong( CMesh* meshPtr, CShader* shaderPtr )
-    {
-        // setup material uniforms
-        auto _materialPtr = meshPtr->material();
-        shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
-        shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
-        shaderPtr->setVec3( "u_material.specular", _materialPtr->specular );
-        shaderPtr->setFloat( "u_material.shininess", _materialPtr->shininess );
-        if ( _materialPtr->albedoMap() )
+        else if ( _materialPtr->type() == eMaterialType::PHONG ||
+                  _materialPtr->type() == eMaterialType::BLINN_PHONG )
         {
-            shaderPtr->setInt( "u_material.albedoMapActive", 1 );
-            shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
-            glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
-        }
-        else
-        {
-            shaderPtr->setInt( "u_material.albedoMapActive", 0 );
-        }
+            shaderPtr->setInt( "u_material.type", ( _materialPtr->type() == eMaterialType::PHONG ) ? 1 : 2 );
+            shaderPtr->setVec3( "u_material.ambient", _materialPtr->ambient );
+            shaderPtr->setVec3( "u_material.diffuse", _materialPtr->diffuse );
+            shaderPtr->setVec3( "u_material.specular", _materialPtr->specular );
+            shaderPtr->setFloat( "u_material.shininess", _materialPtr->shininess );
 
-        if ( _materialPtr->specularMap() )
-        {
-            shaderPtr->setInt( "u_material.specularMapActive", 1 );
-            shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
-            glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
-        }
-        else
-        {
-            shaderPtr->setInt( "u_material.specularMapActive", 0 );
+            if ( _materialPtr->albedoMap() )
+            {
+                shaderPtr->setInt( "u_material.albedoMapActive", 1 );
+                shaderPtr->setInt( "u_material.albedoMap", MESH_RENDERER_ALBEDO_MAP_SLOT );
+                glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_ALBEDO_MAP_SLOT );
+                glBindTexture( GL_TEXTURE_2D, _materialPtr->albedoMap()->openglId() );
+            }
+            else
+            {
+                shaderPtr->setInt( "u_material.albedoMapActive", 0 );
+            }
+
+            if ( _materialPtr->specularMap() )
+            {
+                shaderPtr->setInt( "u_material.specularMapActive", 1 );
+                shaderPtr->setInt( "u_material.specularMap", MESH_RENDERER_SPECULAR_MAP_SLOT );
+                glActiveTexture( GL_TEXTURE0 + MESH_RENDERER_SPECULAR_MAP_SLOT );
+                glBindTexture( GL_TEXTURE_2D, _materialPtr->specularMap()->openglId() );
+            }
+            else
+            {
+                shaderPtr->setInt( "u_material.specularMapActive", 0 );
+            }
         }
 
         // setup mesh transforms-uniforms

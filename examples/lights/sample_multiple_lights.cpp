@@ -423,11 +423,11 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
             _camera->setActiveMode( false );
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
             _camera->setActiveMode( true );
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );

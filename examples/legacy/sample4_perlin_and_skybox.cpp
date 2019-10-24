@@ -84,15 +84,15 @@ int main()
 
         _model->rotation = _model->rotation * engine::CMat4::rotationX( 0.01f );
 
-        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_SPACE ) )
+        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_SPACE ) )
             _scene->getCurrentCamera()->setActiveMode( false );
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ENTER ) )
             _scene->getCurrentCamera()->setActiveMode( true );
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_L ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_L ) )
             _patch->setWireframeMode( true );
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_N ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_N ) )
             _patch->setWireframeMode( false );
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
         _app->beginRendering();

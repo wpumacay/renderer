@@ -337,6 +337,9 @@ namespace engine
 
     void CDebugDrawer::_renderLines( CICamera* camera )
     {
+        if ( m_linesPositions.size() < 1 )
+            return;
+
         /* setup render state */
         m_shaderLinesPtr->bind();
         m_shaderLinesPtr->setMat4( "u_tView", camera->matView() );
@@ -382,6 +385,16 @@ namespace engine
 
     void CDebugDrawer::_renderSolidPrimitives( CICamera* camera )
     {
+        int _numPrimitives = 0;
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
+        {
+            _numPrimitives += m_primitivesOpaqueColors[prim_id].size();
+            _numPrimitives += m_primitivesTransparentColors[prim_id].size();
+        }
+
+        if ( _numPrimitives < 1 )
+            return;
+
         m_shaderSolidNoLightingPtr->bind();
         m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
         glEnable( GL_CULL_FACE );
@@ -453,6 +466,16 @@ namespace engine
 
     void CDebugDrawer::_renderSolidPrimitives( CICamera* camera, CILight* light )
     {
+        int _numPrimitives = 0;
+        for ( size_t prim_id = 0; prim_id < DEBUG_DRAWER_PRIMITIVE_TYPES; prim_id++ )
+        {
+            _numPrimitives += m_primitivesOpaqueColors[prim_id].size();
+            _numPrimitives += m_primitivesTransparentColors[prim_id].size();
+        }
+
+        if ( _numPrimitives < 1 )
+            return;
+        
         m_shaderSolidLightingPtr->bind();
         m_shaderSolidLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
         // disable all light-types

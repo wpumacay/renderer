@@ -86,9 +86,9 @@ namespace engine
         CMeshRenderer();
         ~CMeshRenderer();
 
+        void begin( const CRenderOptions& renderOptions );
         void submit( const std::vector< CMesh* >& meshesVisible,
-                     const std::vector< CMesh* >& meshesInView, 
-                     const CRenderOptions& renderOptions );
+                     const std::vector< CMesh* >& meshesInView );
 
         void renderToShadowMap();
         void renderMeshesOpaque();
@@ -100,30 +100,17 @@ namespace engine
 
     private :
 
-        void _collectMeshesByMaterial( const std::vector< CMesh* >& meshes,
-                                       const eMaterialType& materialType,
-                                       std::vector< CMesh* >& meshesOfGivenMaterial );
-
-        void _renderMeshes( CShader* shaderPtr,
-                            const std::vector< CMesh* >& meshesLambertWithFaceCulling, 
-                            const std::vector< CMesh* >& meshesLambertWithNoFaceCulling,
-                            const std::vector< CMesh* >& meshesPhongWithFaceCulling, 
-                            const std::vector< CMesh* >& meshesPhongWithNoFaceCulling,
-                            const std::vector< CMesh* >& meshesBlinnPhongWithFaceCulling, 
-                            const std::vector< CMesh* >& meshesBlinnPhongWithNoFaceCulling,
-                            bool renderWithShadows,
-                            bool renderWithBlending,
-                            bool setupRenderState,
-                            bool releaseRenderState );
-
-        void _renderMesh_Lambert( CMesh* meshPtr, CShader* shaderPtr );
-        void _renderMesh_Phong( CMesh* meshPtr, CShader* shaderPtr );
-        void _renderMesh_BlinnPhong( CMesh* meshPtr, CShader* shaderPtr );
-
         void _setupRenderState_camera( CShader* shaderPtr );
         void _setupRenderState_light( CShader* shaderPtr );
         void _setupRenderState_shadows( CShader* shaderPtr );
         void _setupRenderState_fog( CShader* shaderPtr );
+
+        void _renderMeshes( CShader* shaderPtr,
+                            const std::vector< CMesh* >& meshesWithFaceCulling,
+                            const std::vector< CMesh* >& meshesWitNoFaceCulling,
+                            bool renderWithBlending );
+
+        void _renderMesh( CShader* shaderPtr, CMesh* meshPtr );
 
     private :
 
@@ -135,21 +122,6 @@ namespace engine
 
         std::vector< CMesh* > m_meshesOpaque;
         std::vector< CMesh* > m_meshesTransparent;
-
-        std::vector< CMesh* > m_meshesOpaqueLambert;
-        std::vector< CMesh* > m_meshesOpaquePhong;
-        std::vector< CMesh* > m_meshesOpaqueBlinnPhong;
-
-        std::vector< CMesh* > m_meshesOpaqueLambert_noFaceCull;
-        std::vector< CMesh* > m_meshesOpaquePhong_noFaceCull;
-        std::vector< CMesh* > m_meshesOpaqueBlinnPhong_noFaceCull;
-        std::vector< CMesh* > m_meshesOpaqueLambert_faceCull;
-        std::vector< CMesh* > m_meshesOpaquePhong_faceCull;
-        std::vector< CMesh* > m_meshesOpaqueBlinnPhong_faceCull;
-
-        std::vector< CMesh* > m_meshesTransparentLambert;
-        std::vector< CMesh* > m_meshesTransparentPhong;
-        std::vector< CMesh* > m_meshesTransparentBlinnPhong;
 
         std::default_random_engine m_randGen;
         std::uniform_real_distribution< float32 > m_randDist;

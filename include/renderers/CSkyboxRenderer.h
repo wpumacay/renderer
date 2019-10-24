@@ -28,7 +28,7 @@ namespace engine
         CSkyboxRenderer();
         ~CSkyboxRenderer();
 
-        void submit( const CRenderOptions& renderOptions );
+        void begin( const CRenderOptions& renderOptions );
         void render();
 
     private :

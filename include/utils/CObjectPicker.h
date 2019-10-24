@@ -28,25 +28,20 @@ namespace engine
 
     public :
 
-        static void Init( int viewportWidth, int viewportHeight );
-        static void Release();
-        static void SetMode( const ePickerMode& mode );
-        static void Submit( const std::vector< CIRenderable* >& renderables, CICamera* camera );
-        static CIRenderable* GetObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight );
-        static CFrameBuffer* GetFbo();
-
+        CObjectPicker( int viewportWidth, int viewportHeight );
         ~CObjectPicker();
+
+        void setMode( const ePickerMode& mode );
+
+        void begin( CICamera* camera );
+        void submit( const std::vector< CIRenderable* >& renderables );
+        void render();
+
+        CIRenderable* getObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight );
+        CFrameBuffer* getFbo();
 
     private :
 
-        static CObjectPicker* s_instance;
-
-        CObjectPicker( int viewportWidth, int viewportHeight );
-
-        void _setMode( const ePickerMode& mode );
-        void _submit( const std::vector< CIRenderable* >& renderables, CICamera* camera );
-        CIRenderable* _getObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight );
-        CFrameBuffer* _getFbo();
 
         CVec3 _createNormalEncoding( int objId );
         CVec3 _createVisualizationEncoding( int objId );
@@ -54,10 +49,14 @@ namespace engine
         void _encodeMesh( CMesh* meshPtr );
         void _encodeModel( CModel* modelPtr );
         
+    private :
+
         CShader*                        m_shaderObjIdEncoder;   // shader used to render with ids encoded into colors
         ePickerMode                     m_mode;                 // which mode should the picker be working on
         std::unique_ptr< CFrameBuffer > m_fboObjsIds;           // fbo in which we'll render color-encoded ids
         std::vector< CIRenderable* >    m_renderablesInView;    // list of renderables encoded in the fbo
+        std::unique_ptr< CFrustum >     m_viewFrustum;
+        CMat4                           m_viewProjMatrix;
 
         int m_viewportWidth;
         int m_viewportHeight;

@@ -319,19 +319,19 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
         {
             break;
         }
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
         }
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
         }
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_P ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
         {
             _moveLight = !_moveLight;
             ENGINE_INFO( "Light state: {0}", ( _moveLight ) ? "moving" : "fixed" );

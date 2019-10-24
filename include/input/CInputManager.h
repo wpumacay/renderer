@@ -9,7 +9,7 @@
 
 namespace engine
 {
-    class CInputHandler
+    class CInputManager
     {
 
     public :
@@ -17,12 +17,12 @@ namespace engine
         static void Init();
         static void Release();
 
-        ~CInputHandler();
+        ~CInputManager();
 
-        static void callback_key( int key, int action );
-        static void callback_mouse( int button, int action, double x, double y );
-        static void callback_mouseMove( double x, double y );
-        static void callback_scroll( double xOff, double yOff );
+        static void Callback_key( int key, int action );
+        static void Callback_mouse( int button, int action, double x, double y );
+        static void Callback_mouseMove( double x, double y );
+        static void Callback_scroll( double xOff, double yOff );
 
         static bool IsKeyDown( int key );
         static bool CheckSingleKeyPress( int key );
@@ -35,9 +35,9 @@ namespace engine
 
     private :
 
-        static CInputHandler* s_instance;
+        static CInputManager* s_instance;
 
-        CInputHandler();
+        CInputManager();
 
         bool _isKeyDown( int key );
         bool _checkSingleKeyPress( int key );

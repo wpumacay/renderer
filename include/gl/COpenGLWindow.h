@@ -7,9 +7,7 @@
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
 #include <input/CInputCallbacks.h>
-
-#include <app/COpenGLContext.h>
-#include <utils/CLogger.h>
+#include <gl/COpenGLContext.h>
 
 namespace engine
 {

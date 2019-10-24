@@ -18,7 +18,9 @@ namespace engine
         CMainRenderer();
         ~CMainRenderer();
 
-        void render( CScene* scenePtr, CRenderOptions renderOptions );
+        void begin( const CRenderOptions& renderOptions );
+        void submit( const std::vector< CIRenderable* >& renderables );
+        void render();
 
         std::string status() const { return m_status; }
         CShadowMap* shadowMap() const { return m_shadowMap.get(); }
@@ -45,11 +47,13 @@ namespace engine
 
     private :
 
+        bool m_hasValidInfo;
         std::string m_status;
-        std::unique_ptr< CShadowMap > m_shadowMap;
+        CRenderOptions m_renderOptions;
 
-        std::unique_ptr< CMeshRenderer > m_rendererMeshes;
-        std::unique_ptr< CSkyboxRenderer > m_rendererSkybox;
+        std::unique_ptr< CShadowMap >       m_shadowMap;
+        std::unique_ptr< CMeshRenderer >    m_rendererMeshes;
+        std::unique_ptr< CSkyboxRenderer >  m_rendererSkybox;
     };
 
 }

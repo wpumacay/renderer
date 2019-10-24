@@ -46,7 +46,7 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
         _app->beginRendering();

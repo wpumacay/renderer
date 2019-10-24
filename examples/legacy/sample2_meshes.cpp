@@ -188,21 +188,21 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_SPACE ) )
+        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_SPACE ) )
             _scene->getCurrentCamera()->setActiveMode( false );
 
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ENTER ) )
             _scene->getCurrentCamera()->setActiveMode( true );
 
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_L ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_L ) )
             for ( size_t i = 0; i < _renderables.size(); i++ )
                 _renderables[i]->setWireframeMode( true );
 
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_N ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_N ) )
             for ( size_t i = 0; i < _renderables.size(); i++ )
                 _renderables[i]->setWireframeMode( false );
 
-        else if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
 //         std::cout << "cam-info *****************" << std::endl;
@@ -212,10 +212,10 @@ int main()
 //         std::cout << "view-mat: " << std::endl;
 //         std::cout << engine::toString( _camera->matView() ) << std::endl;
 
-//         std::cout << "scroll-off-x          : " << std::to_string( engine::CInputHandler::GetScrollOffX() ) << std::endl;
-//         std::cout << "scroll-off-y          : " << std::to_string( engine::CInputHandler::GetScrollOffY() ) << std::endl;
-//         std::cout << "scroll-accum-x        : " << std::to_string( engine::CInputHandler::GetScrollAccumValueX() ) << std::endl;
-//         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputHandler::GetScrollAccumValueY() ) << std::endl;
+//         std::cout << "scroll-off-x          : " << std::to_string( engine::CInputManager::GetScrollOffX() ) << std::endl;
+//         std::cout << "scroll-off-y          : " << std::to_string( engine::CInputManager::GetScrollOffY() ) << std::endl;
+//         std::cout << "scroll-accum-x        : " << std::to_string( engine::CInputManager::GetScrollAccumValueX() ) << std::endl;
+//         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputManager::GetScrollAccumValueY() ) << std::endl;
 
         _app->beginRendering();
         _app->renderScene();

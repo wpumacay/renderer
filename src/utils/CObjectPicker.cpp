@@ -16,55 +16,6 @@ namespace engine
         return "undefined";
     }
 
-    CObjectPicker* CObjectPicker::s_instance = nullptr;
-
-    void CObjectPicker::Init( int viewportWidth, int viewportHeight )
-    {
-        if ( CObjectPicker::s_instance )
-        {
-            ENGINE_CORE_WARN( "Attempting to initialize object-picker twice" );
-            return;
-        }
-
-        CObjectPicker::s_instance = new CObjectPicker( viewportWidth, viewportHeight );
-    }
-
-    void CObjectPicker::Release()
-    {
-        ENGINE_CORE_ASSERT( CObjectPicker::s_instance, "Tried to release object-picker more than once" );
-
-        delete CObjectPicker::s_instance;
-        CObjectPicker::s_instance = nullptr;
-    }
-
-    void CObjectPicker::SetMode( const ePickerMode& mode )
-    {
-        ENGINE_CORE_ASSERT( CObjectPicker::s_instance, "Must initialize object-picker before using it" );
-
-        CObjectPicker::s_instance->_setMode( mode );
-    }
-
-    void CObjectPicker::Submit( const std::vector< CIRenderable* >& renderables, CICamera* camera )
-    {
-        ENGINE_CORE_ASSERT( CObjectPicker::s_instance, "Must initialize object-picker before using it" );
-
-        CObjectPicker::s_instance->_submit( renderables, camera );
-    }
-
-    CIRenderable* CObjectPicker::GetObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight )
-    {
-        ENGINE_CORE_ASSERT( CObjectPicker::s_instance, "Must initialize object-picker before using it" );
-
-        return CObjectPicker::s_instance->_getObjectPicked( x, y, srcViewportWidth, srcViewportHeight );
-    }
-
-    CFrameBuffer* CObjectPicker::GetFbo()
-    {
-        ENGINE_CORE_ASSERT( CObjectPicker::s_instance, "Must initialize object-picker before using it" );
-
-        return CObjectPicker::s_instance->_getFbo();
-    }
-
     CObjectPicker::CObjectPicker( int viewportWidth, int viewportHeight )
     {
         m_viewportWidth = viewportWidth;
@@ -108,40 +59,60 @@ namespace engine
         m_shaderObjIdEncoder = nullptr;
     }
 
-    void CObjectPicker::_setMode( const ePickerMode& mode )
+    void CObjectPicker::setMode( const ePickerMode& mode )
     {
         m_mode = mode;
     }
 
-    void CObjectPicker::_submit( const std::vector< CIRenderable* >& renderables, CICamera* camera )
+    void CObjectPicker::begin( CICamera* camera )
     {
         if ( m_mode == ePickerMode::STOPPED )
             return;
 
-        // create view-frustum object for frustum-culling
-        CMat4 _viewProjMatrix = camera->matProj() * camera->matView();
-        CFrustum _frustum( _viewProjMatrix );
+        // clear buffers for submissions
+        m_renderablesInView.clear();
+
+        // configure view-proj matrix to be used
+        m_viewProjMatrix = camera->matProj() * camera->matView();
+
+        // create view-frustum to be used for culling
+        m_viewFrustum = std::unique_ptr< CFrustum >( new CFrustum( m_viewProjMatrix ) );
+    }
+
+    void CObjectPicker::submit( const std::vector< CIRenderable* >& renderables )
+    {
+        if ( m_mode == ePickerMode::STOPPED )
+            return;
 
         // collect all in-view objects
-        m_renderablesInView.clear();
         for ( auto renderablePtr : renderables )
         {
             if ( !renderablePtr->visible() )
                 continue;
 
-            if ( engine::certainlyOutsideFrustum( _frustum, renderablePtr->bbox() ) )
+            if ( engine::certainlyOutsideFrustum( *m_viewFrustum, renderablePtr->bbox() ) )
                 continue;
 
             m_renderablesInView.push_back( renderablePtr );
         }
+    }
 
-        // render the objects to the fbo with obj-ids encoded as colors (0: background, 1->: objects)
+    void CObjectPicker::render()
+    {
+        if ( m_mode == ePickerMode::STOPPED )
+            return;
+
+        /* render the objects to the fbo with obj-ids encoded in rgb (0: background, 1->: objects) */
+
+        // bind the target we want to use for storing the rendering results
         m_fboObjsIds->bind();
+
         glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
         glEnable( GL_CULL_FACE ); // either front or back faces give the same result
+
         m_shaderObjIdEncoder->bind();
-        m_shaderObjIdEncoder->setMat4( "u_viewProjMatrix", _viewProjMatrix );
+        m_shaderObjIdEncoder->setMat4( "u_viewProjMatrix", m_viewProjMatrix );
 
         for ( size_t i = 0; i < m_renderablesInView.size(); i++ )
         {
@@ -164,6 +135,7 @@ namespace engine
 
         m_shaderObjIdEncoder->unbind();
         glDisable( GL_CULL_FACE );
+
         m_fboObjsIds->unbind();
 
         // request to send render commands to gpu, and wait till everything has finished, which
@@ -172,7 +144,7 @@ namespace engine
         glFinish();
     }
 
-    CIRenderable* CObjectPicker::_getObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight )
+    CIRenderable* CObjectPicker::getObjectPicked( float x, float y, int srcViewportWidth, int srcViewportHeight )
     {
         if ( m_mode != ePickerMode::NORMAL )
             return nullptr;
@@ -199,7 +171,7 @@ namespace engine
         /* decode the rgb color into an object id */
         int _objectId = ( _encoding[0] << 0 ) + ( _encoding[1] << 8 ) + ( _encoding[2] << 16 ) - 1;
 
-        ENGINE_CORE_TRACE( "object-id: {0}", _objectId );
+        //// ENGINE_CORE_TRACE( "object-id: {0}", _objectId );
 
         if ( ( _objectId >= 0 ) && ( _objectId < m_renderablesInView.size() ) )
             return m_renderablesInView[_objectId];
@@ -207,7 +179,7 @@ namespace engine
         return nullptr;
     }
 
-    CFrameBuffer* CObjectPicker::_getFbo()
+    CFrameBuffer* CObjectPicker::getFbo()
     {
         return m_fboObjsIds.get();
     }

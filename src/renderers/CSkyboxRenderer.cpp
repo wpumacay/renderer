@@ -19,7 +19,7 @@ namespace engine
         m_shaderSkyboxNoFog = nullptr;
     }
 
-    void CSkyboxRenderer::submit( const CRenderOptions& renderOptions )
+    void CSkyboxRenderer::begin( const CRenderOptions& renderOptions )
     {
         if ( !renderOptions.cameraPtr )
             ENGINE_CORE_ASSERT( false, "Skybox-renderer requires a valid camera to render" );

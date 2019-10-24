@@ -1,5 +1,5 @@
 
-#include <app/COpenGLWindow.h>
+#include <gl/COpenGLWindow.h>
 
 using namespace std;
 
@@ -27,7 +27,7 @@ namespace engine
         if ( !m_glfwWindowPtr )
         {
             glfwTerminate();
-            ENGINE_CORE_ASSERT( false, "ERROR: Couldnt initialize glfw" );
+            return;
         }
 
         m_glContext = new COpenGLContext( m_glfwWindowPtr );
@@ -99,8 +99,6 @@ namespace engine
                       m_properties.clearColor.y,
                       m_properties.clearColor.z,
                       m_properties.clearColor.w );
-
-        ENGINE_CORE_INFO( "Successfully created opengl-window" );
     }
 
     COpenGLWindow::~COpenGLWindow()

@@ -61,29 +61,29 @@ namespace engine
 
         if ( m_cameraState == eOrbitCameraState::IDLE )
         {
-            if ( CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
+            if ( CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
             {
                 m_cameraState = eOrbitCameraState::DRAGGING;
 
-                m_cursor0 = CInputHandler::GetCursorPosition();
-                m_cursor = CInputHandler::GetCursorPosition();
+                m_cursor0 = CInputManager::GetCursorPosition();
+                m_cursor = CInputManager::GetCursorPosition();
 
                 m_phi0 = m_phi;
                 m_theta0 = m_theta;
             }
-            else if ( CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+            else if ( CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
             {
                 m_cameraState = eOrbitCameraState::MOVING_TARGET;
 
-                m_cursor0 = CInputHandler::GetCursorPosition();
-                m_cursor = CInputHandler::GetCursorPosition();
+                m_cursor0 = CInputManager::GetCursorPosition();
+                m_cursor = CInputManager::GetCursorPosition();
 
                 m_targetPoint0 = m_targetPoint;
             }
         }
         else if ( m_cameraState == eOrbitCameraState::DRAGGING )
         {
-            m_cursor = CInputHandler::GetCursorPosition();
+            m_cursor = CInputManager::GetCursorPosition();
 
             float _dx = m_cursor.x - m_cursor0.x;
             float _dy = m_cursor.y - m_cursor0.y;
@@ -94,12 +94,12 @@ namespace engine
             m_theta = m_theta0 + _dtheta;
             m_phi = m_phi0 + _dphi;
 
-            if ( !CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
+            if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
         }
         else if ( m_cameraState == eOrbitCameraState::MOVING_TARGET )
         {
-            m_cursor = CInputHandler::GetCursorPosition();
+            m_cursor = CInputManager::GetCursorPosition();
 
             float _dx = -( m_cursor.x - m_cursor0.x );
             float _dy = m_cursor.y - m_cursor0.y;
@@ -108,11 +108,11 @@ namespace engine
             m_targetPoint.y = m_targetPoint0.y + ( m_right.y * _dx + m_up.y * _dy ) * 0.005f;
             m_targetPoint.z = m_targetPoint0.z;
 
-            if ( !CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+            if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
         }
 
-        m_rho = m_rho0 - CInputHandler::GetScrollAccumValueY() * 0.25f;
+        m_rho = m_rho0 - CInputManager::GetScrollAccumValueY() * 0.25f;
 
         _computePositionFromSphericals();
         _updateCameraVectors();

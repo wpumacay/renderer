@@ -20,98 +20,111 @@ namespace engine
         m_rendererSkybox = nullptr;
     }
 
-    void CMainRenderer::render( CScene* scenePtr, 
-                                CRenderOptions renderOptions )
+    void CMainRenderer::begin( const CRenderOptions& renderOptions )
     {
-        // (0): prepare for rendering
+        // keep a copy for later usage
+        m_renderOptions = renderOptions;
+        // assume we have valid info, and check if options given are correct
+        m_hasValidInfo = true;
 
-        /* (0.1) grab all renderables, setup default render options, and initialize status string */
-        auto _renderablesAll = scenePtr->renderables();
-        renderOptions.cameraPtr     = ( !renderOptions.cameraPtr ) ? scenePtr->currentCamera() : renderOptions.cameraPtr;
-        renderOptions.lightPtr      = ( !renderOptions.lightPtr ) ? scenePtr->mainLight() : renderOptions.lightPtr;
-        renderOptions.shadowMapPtr  = ( !renderOptions.shadowMapPtr ) ? m_shadowMap.get() : renderOptions.shadowMapPtr;
-        renderOptions.fogPtr        = ( !renderOptions.fogPtr ) ? scenePtr->fog() : renderOptions.fogPtr;
-        renderOptions.skyboxPtr     = ( !renderOptions.skyboxPtr ) ? scenePtr->skybox() : renderOptions.skyboxPtr;
-        m_status = "renderables         : " + std::to_string( _renderablesAll.size() ) + "\n\r";
-
-        /* (0.2) do some error handling in case some options and some resources don't match */
-        if ( renderOptions.useShadowMapping && !renderOptions.shadowMapPtr )
+        /* do some error handling in case some options/resources are not correctly specified */
+        if ( m_renderOptions.useShadowMapping && !m_renderOptions.shadowMapPtr )
         {
             ENGINE_CORE_WARN( "Renderer was setup to use shadow mapping, but no shadow-map provided" );
-            renderOptions.useShadowMapping = false;
+            m_renderOptions.useShadowMapping = false;
         }
-        if ( renderOptions.useFog && !renderOptions.fogPtr )
+        if ( m_renderOptions.useFog && !m_renderOptions.fogPtr )
         {
             ENGINE_CORE_WARN( "Renderer was setup to use fog, but no fog-struct provided" );
-            renderOptions.useFog = false;
+            m_renderOptions.useFog = false;
         }
-        if ( renderOptions.useSkybox && !renderOptions.skyboxPtr )
+        if ( m_renderOptions.useSkybox && !m_renderOptions.skyboxPtr )
         {
             ENGINE_CORE_WARN( "Renderer was setup to use a skybox, but no skybox-struct provided" );
-            renderOptions.useSkybox = false;
+            m_renderOptions.useSkybox = false;
         }
-        if ( !renderOptions.cameraPtr )
+
+        /* check these options and invalidate this render request if not enough valid information is given */
+        if ( !m_renderOptions.cameraPtr )
         {
-            ENGINE_CORE_ERROR( "Renderer requires a camera to render to. Skipping this render pass" );
+            m_hasValidInfo = false;
             return;
         }
-        if ( renderOptions.mode == eRenderMode::NORMAL && !renderOptions.lightPtr )
+        if ( m_renderOptions.mode == eRenderMode::NORMAL && !m_renderOptions.lightPtr )
         {
-            ENGINE_CORE_ERROR( "Renderer requires a light when using NORMAL mode. Skipping this render pass" );
+            m_hasValidInfo = false;
             return;
         }
 
-        // (1): grab all renderables and keep only visible ones
+        // prepare shadowmap (configure its light-space matrices)
+        if ( m_renderOptions.useShadowMapping )
+            m_renderOptions.shadowMapPtr->setup( m_renderOptions.shadowMapRangeConfig );
+
+        // prepare the mesh and skybox renderers
+        m_rendererMeshes->begin( m_renderOptions );
+        if ( m_renderOptions.useSkybox )
+            m_rendererSkybox->begin( m_renderOptions );
+    }
+
+    void CMainRenderer::submit( const std::vector< CIRenderable* >& renderables )
+    {
+        if ( !m_hasValidInfo )
+            return;
+
+        // (0): keep visible renderables
         auto _renderablesVisible = std::vector< CIRenderable* >();
-        for ( auto _renderable : _renderablesAll )
+        for ( auto _renderable : renderables )
             if ( _renderable->visible() )
                 _renderablesVisible.push_back( _renderable );
-        m_status += "renderablesVisible : " + std::to_string( _renderablesVisible.size() ) + "\n\r";
 
-        // (2): frustum culling (if enabled)
-        CFrustum _frustum( renderOptions.cameraPtr->matProj() * renderOptions.cameraPtr->matView() );
+        // (1): frustum culling (if enabled)
+        CFrustum _frustum( m_renderOptions.cameraPtr->matProj() * m_renderOptions.cameraPtr->matView() );
         auto _renderablesInView = std::vector< CIRenderable* >();
-        if ( renderOptions.useFrustumCulling )
-            _collectRenderablesInView( _frustum, renderOptions.cullingGeom, _renderablesVisible, _renderablesInView );
+        if ( m_renderOptions.useFrustumCulling )
+            _collectRenderablesInView( _frustum, m_renderOptions.cullingGeom, _renderablesVisible, _renderablesInView );
         else
             _renderablesInView = _renderablesVisible;
-        m_status += "renderablesInView  : " + std::to_string( _renderablesInView.size() ) + "\n\r";
 
         // (3): group by renderable types (to pass to specific renderers)
         auto _rendMeshesVisible = std::vector< CMesh* >();
         auto _rendMeshesInView  = std::vector< CMesh* >();
         _collectMeshes( _renderablesVisible, _rendMeshesVisible );
         _collectMeshes( _renderablesInView, _rendMeshesInView );
-        m_status += "meshes-visible : " + std::to_string( _rendMeshesVisible.size() ) + "\n\r";
-        m_status += "meshes-in-view : " + std::to_string( _rendMeshesInView.size() ) + "\n\r";
 
         // (3.5) return if only testing functionality above
-        if ( renderOptions.mode == eRenderMode::NO_SUBMIT )
+        if ( m_renderOptions.mode == eRenderMode::NO_SUBMIT )
             return;
 
         // (4) submit to specific renderers for them to do extra preparations
-        m_rendererMeshes->submit( _rendMeshesVisible, _rendMeshesInView, renderOptions );
-        if ( renderOptions.useSkybox )
-            m_rendererSkybox->submit( renderOptions );
+        m_rendererMeshes->submit( _rendMeshesVisible, _rendMeshesInView );
+    }
 
-        // (5) start making the actual rendering process (use forward rendering for now)
+    void CMainRenderer::render()
+    {
+        if ( !m_hasValidInfo )
+            return;
 
-        /* (5.1) render pass for shadow mapping (if enabled) */
-        if ( renderOptions.mode == eRenderMode::NORMAL && 
-             renderOptions.useShadowMapping && 
-             renderOptions.redrawShadowMap )
+        if ( m_renderOptions.mode == eRenderMode::NO_SUBMIT )
+            return;
+
+        // Start making the actual rendering process (use forward rendering for now)
+
+        /* (1): render pass for shadow mapping (if enabled) ***************************************/
+        if ( m_renderOptions.mode == eRenderMode::NORMAL && 
+             m_renderOptions.useShadowMapping && 
+             m_renderOptions.redrawShadowMap )
         {
-            // configure the light-space from configuration from user
-            renderOptions.shadowMapPtr->setup( renderOptions.shadowMapRangeConfig );
             // bind the shadow-map (change render-target)
-            renderOptions.shadowMapPtr->bind();
+            m_renderOptions.shadowMapPtr->bind();
             // do the shadow-mapping render pass
             m_rendererMeshes->renderToShadowMap();
             // go back to default render-target
-            renderOptions.shadowMapPtr->unbind();
+            m_renderOptions.shadowMapPtr->unbind();
         }
 
-        // cache previous viewport properties
+        /* (2): start actual render pass for the objects ******************************************/
+
+        /* (2.1): cache previous viewport properties */
         int32 _currentViewport[4];
         glGetIntegerv( GL_VIEWPORT, _currentViewport );
         int32 _prevViewportX = _currentViewport[0];
@@ -119,41 +132,42 @@ namespace engine
         int32 _prevViewportWidth  = _currentViewport[2];
         int32 _prevViewportHeight = _currentViewport[3];
 
-        // setup the requested viewport
-        glViewport( 0, 0, renderOptions.viewportWidth, renderOptions.viewportHeight );
+        /* (2.2): setup the requested viewport */
+        glViewport( 0, 0, m_renderOptions.viewportWidth, m_renderOptions.viewportHeight );
 
-        /* (5.2) setup render target if given*/
-        if ( renderOptions.renderTargetPtr )
-            renderOptions.renderTargetPtr->bind();
+        /* (2.3): setup render target (if given) */
+        if ( m_renderOptions.renderTargetPtr )
+            m_renderOptions.renderTargetPtr->bind();
 
         // prepare for rendering
-        glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        /* (5.3) render pass for the skybox (normal mode only)*/
-        if ( renderOptions.mode == eRenderMode::NORMAL && renderOptions.useSkybox )
+        /* (2.4): render skybox first (normal mode only) to play nicely with blending */
+        if ( m_renderOptions.mode == eRenderMode::NORMAL && m_renderOptions.useSkybox )
             m_rendererSkybox->render();
 
-        /* (5.4) render the scene according to the render mode requested */
-        if ( renderOptions.mode == eRenderMode::NORMAL )
+        /* (2.5): render the scene according to the render mode requested */
+        if ( m_renderOptions.mode == eRenderMode::NORMAL )
         {
             m_rendererMeshes->renderMeshesOpaque();
-            m_rendererMeshes->renderMeshesTransparent();
+            if ( m_renderOptions.useBlending )
+                m_rendererMeshes->renderMeshesTransparent();
         }
-        else if ( renderOptions.mode == eRenderMode::DEPTH_ONLY )
+        else if ( m_renderOptions.mode == eRenderMode::DEPTH_ONLY )
         {
             m_rendererMeshes->renderDepthOnly();
         }
-        else if ( renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
+        else if ( m_renderOptions.mode == eRenderMode::SEMANTIC_ONLY )
         {
             m_rendererMeshes->renderSemanticOnly();
         }
 
-        // restore previous viewport
+        /* (2.6): be nice and restore previous viewport */
         glViewport( _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight );
 
-        /* (5.6) release custom render target in case used */
-        if ( renderOptions.renderTargetPtr )
-            renderOptions.renderTargetPtr->unbind();
+        /* (2.7): release custom render target (in case used) */
+        if ( m_renderOptions.renderTargetPtr )
+            m_renderOptions.renderTargetPtr->unbind();
     }
 
     void CMainRenderer::_collectRenderablesInView( const CFrustum& frustum,

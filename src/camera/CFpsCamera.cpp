@@ -51,20 +51,20 @@ namespace engine
         m_camSpeedFront = 0.0f;
         m_camSpeedRight = 0.0f;
 
-        if ( CInputHandler::IsKeyDown( ENGINE_KEY_W ) )
+        if ( CInputManager::IsKeyDown( ENGINE_KEY_W ) )
             m_camSpeedFront = m_camSpeed;
 
-        else if ( CInputHandler::IsKeyDown( ENGINE_KEY_S ) )
+        else if ( CInputManager::IsKeyDown( ENGINE_KEY_S ) )
             m_camSpeedFront = -m_camSpeed;
 
-        else if ( CInputHandler::IsKeyDown( ENGINE_KEY_D ) )
+        else if ( CInputManager::IsKeyDown( ENGINE_KEY_D ) )
             m_camSpeedRight = m_camSpeed;
 
-        else if ( CInputHandler::IsKeyDown( ENGINE_KEY_A ) )
+        else if ( CInputManager::IsKeyDown( ENGINE_KEY_A ) )
             m_camSpeedRight = -m_camSpeed;
 
         /* compute camera angles from user cursor */
-        CVec2 _currentCursorPos = CInputHandler::GetCursorPosition();
+        CVec2 _currentCursorPos = CInputManager::GetCursorPosition();
         float _xOff = _currentCursorPos.x - m_lastCursorPos.x;
         float _yOff = m_lastCursorPos.y - _currentCursorPos.y;
 

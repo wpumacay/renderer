@@ -2,7 +2,7 @@
 
 #include <camera/CICamera.h>
 #include <utils/CTime.h>
-#include <input/CInputHandler.h>
+#include <input/CInputManager.h>
 
 namespace engine
 {

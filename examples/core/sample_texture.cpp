@@ -102,7 +102,7 @@ int main()
     {
         _app->beginRendering();
 
-        if ( engine::CInputHandler::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
         _shader->bind();

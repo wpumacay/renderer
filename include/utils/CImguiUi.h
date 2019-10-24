@@ -3,7 +3,7 @@
 #include <CCommon.h>
 #include <CMath.h>
 #include <utils/CLogger.h>
-#include <app/COpenGLContext.h>
+#include <gl/COpenGLContext.h>
 
 #include <GLFW/glfw3.h>
 

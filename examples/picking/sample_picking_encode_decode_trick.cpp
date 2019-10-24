@@ -968,11 +968,11 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
             _camera->setActiveMode( false );
-        else if ( engine::CInputHandler::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
             _camera->setActiveMode( true );
 
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
@@ -1126,10 +1126,10 @@ int main()
         /****************************************************/
 
         engine::CObjectPicker::Submit( _app->scene()->renderables(), _camera );
-        if ( engine::CInputHandler::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+        if ( engine::CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
         {
-            g_objectPicked = engine::CObjectPicker::GetObjectPicked( engine::CInputHandler::GetCursorPosition().x,
-                                                                     engine::CInputHandler::GetCursorPosition().y,
+            g_objectPicked = engine::CObjectPicker::GetObjectPicked( engine::CInputManager::GetCursorPosition().x,
+                                                                     engine::CInputManager::GetCursorPosition().y,
                                                                      engine::COpenGLApp::GetWindow()->width(),
                                                                      engine::COpenGLApp::GetWindow()->height() );
         }

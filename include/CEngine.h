@@ -11,10 +11,15 @@
 #include <utils/CDebugDrawer.h>
 #include <utils/CObjectPicker.h>
 
+#include <gui/CImGuiManager.h>
+#include <gui/CImGuiLayer.h>
+#include <gui/CImGuiSceneLayer.h>
+#include <gui/CImGuiUtilsLayer.h>
+
 #include <input/CInputCallbacks.h>
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
-#include <input/CInputHandler.h>
+#include <input/CInputManager.h>
 
 #include <core/CVertexBuffer.h>
 #include <core/CVertexBufferLayout.h>
@@ -55,8 +60,9 @@
 
 #include <assets/CTextureManager.h>
 
-#include <app/COpenGLWindow.h>
-#include <app/COpenGLContext.h>
-#include <app/COpenGLApp.h>
+#include <gl/COpenGLWindow.h>
+#include <gl/COpenGLContext.h>
+
+#include <app/CApplication.h>
 
 
