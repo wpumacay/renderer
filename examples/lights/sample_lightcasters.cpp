@@ -1,60 +1,13 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
+class GuiLightCastersLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() 
-    {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
-        for ( auto _light : m_lights )
-            delete _light;
-
-        m_meshes.clear();
-        m_lights.clear();
-        m_cachedTextures.clear();
-    }
-
-    void setMaterial( engine::CMaterial* material )
-    {
-        m_material = material;
-    }
-
-    engine::CIRenderable* selectedMesh()
-    {
-        return m_meshes[ m_meshSelectedIndex ];
-    }
-
-    engine::CILight* selectedLight()
-    {
-        return m_lights[ m_lightSelectedIndex ];
-    }
-
-    bool useRandomPattern()
-    {
-        return m_meshesUseRandomPattern;
-    }
-
-    bool isLightLockedToCamera()
-    {
-        return m_lightLockedToCamera;
-    }
-
-    void updateLightDirection( const engine::CVec3& direction )
-    {
-        m_lightDirection = direction;
-    }
-
-protected :
-
-    void _initInternal() override
+    GuiLightCastersLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_material = nullptr;
 
@@ -116,13 +69,72 @@ protected :
         m_lightSelectedIndex = 0;
         m_lightLockedToCamera = false;
         m_lightDirection = { -0.2f, -1.0f, -0.3f };
+
+        m_anyMenuHovered = false;
     }
 
-    void _renderInternal() override
+    ~GuiLightCastersLayer() 
     {
+        for ( auto _mesh : m_meshes )
+            delete _mesh;
+
+        for ( auto _light : m_lights )
+            delete _light;
+
+        m_meshes.clear();
+        m_lights.clear();
+        m_cachedTextures.clear();
+    }
+
+    void setMaterial( engine::CMaterial* material )
+    {
+        m_material = material;
+    }
+
+    engine::CIRenderable* selectedMesh()
+    {
+        return m_meshes[ m_meshSelectedIndex ];
+    }
+
+    engine::CILight* selectedLight()
+    {
+        return m_lights[ m_lightSelectedIndex ];
+    }
+
+    bool useRandomPattern()
+    {
+        return m_meshesUseRandomPattern;
+    }
+
+    bool isLightLockedToCamera()
+    {
+        return m_lightLockedToCamera;
+    }
+
+    void updateLightDirection( const engine::CVec3& direction )
+    {
+        m_lightDirection = direction;
+    }
+
+    void render() override
+    {
+        m_anyMenuHovered = false;
+        m_wantsToCaptureMouse = false;
+
         _menuUiMaterial();
         _menuUiGeometry();
         _menuUiLight();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_anyMenuHovered || m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -199,6 +211,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_material->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -249,6 +264,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_lights[ m_lightSelectedIndex ]->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -323,6 +341,8 @@ private :
             }
         }
 
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -346,17 +366,16 @@ private :
     int m_lightSelectedIndex;
     bool m_lightLockedToCamera;
     engine::CVec3 m_lightDirection;
+
+    bool m_anyMenuHovered;
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new GuiLightCastersLayer( "LightCasters-utils" );
+    _app->addGuiLayer( std::unique_ptr< GuiLightCastersLayer >( _uiLayer ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -399,7 +418,7 @@ int main()
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    _ui->setMaterial( _phongMaterial );
+    _uiLayer->setMaterial( _phongMaterial );
 
     std::vector< engine::CVec3 > _meshPositions =  {
         {  0.0f,  0.0f,  0.0f },
@@ -423,10 +442,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
+            _uiLayer->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
+            _uiLayer->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
         {
@@ -441,15 +462,15 @@ int main()
         _app->begin();
         _camera->update();
 
-        auto _mesh = _ui->selectedMesh();
-        auto _light = _ui->selectedLight();
+        auto _mesh = _uiLayer->selectedMesh();
+        auto _light = _uiLayer->selectedLight();
 
-        if ( _ui->isLightLockedToCamera() )
+        if ( _uiLayer->isLightLockedToCamera() )
         {
             if ( _light->type() == engine::eLightType::DIRECTIONAL )
             {
                 _light->direction = _camera->front();
-                _ui->updateLightDirection( _camera->front() );
+                _uiLayer->updateLightDirection( _camera->front() );
             }
             else if ( _light->type() == engine::eLightType::POINT )
             {
@@ -459,11 +480,11 @@ int main()
             {
                 _light->position = _camera->position();
                 _light->direction = _camera->front();
-                _ui->updateLightDirection( _camera->front() );
+                _uiLayer->updateLightDirection( _camera->front() );
             }
         }
 
-        _gizmo->setVisibility( !_ui->isLightLockedToCamera() );
+        _gizmo->setVisibility( !_uiLayer->isLightLockedToCamera() );
 
         if ( _light->type() == engine::eLightType::POINT )
             _gizmo->position = _light->position;
@@ -531,7 +552,7 @@ int main()
         {
             engine::CMat4 _modelMat;
 
-            if ( _ui->useRandomPattern() )
+            if ( _uiLayer->useRandomPattern() )
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
@@ -568,11 +589,7 @@ int main()
         }
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );

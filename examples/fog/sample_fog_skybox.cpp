@@ -299,7 +299,7 @@ int main()
     auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     /* load the shader used to render the scene with fog */
     std::string _baseNamePhongWithFog = std::string( ENGINE_EXAMPLES_PATH ) + "fog/shaders/phong_with_fog";

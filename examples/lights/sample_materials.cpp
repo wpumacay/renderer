@@ -1,32 +1,13 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
+class GuiMaterialsLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        m_material = nullptr;
-    }
-
-    ~ApplicationUi() {}
-
-    void setMaterial( engine::CMaterial* material )
-    {
-        m_material = material;
-    }
-
-    void setLight( engine::CILight* light )
-    {
-        m_light = light;
-    }
-
-protected :
-
-    void _initInternal() override
+    GuiMaterialsLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_light = nullptr;
         m_material = nullptr;
@@ -57,12 +38,44 @@ protected :
                             { "redRubber"     , engine::eMaterialType::PHONG, { 0.05, 0.0, 0.0 }, { 0.5, 0.4, 0.4 }, { 0.7, 0.04, 0.04 }, 0.078125 * 128 },
                             { "whiteRubber"   , engine::eMaterialType::PHONG, { 0.05, 0.05, 0.05 }, { 0.5, 0.5, 0.5 }, { 0.7, 0.7, 0.7 }, 0.078125 * 128 },
                             { "yelloRubber"   , engine::eMaterialType::PHONG, { 0.05, 0.05, 0.0 }, { 0.5, 0.5, 0.4 }, { 0.7, 0.7, 0.04 }, 0.078125 * 128 } };
+
+        m_anyMenuHovered = false;
     }
 
-    void _renderInternal() override
+    ~GuiMaterialsLayer() 
     {
+        m_light = nullptr;
+        m_material = nullptr;
+    }
+
+    void setMaterial( engine::CMaterial* material )
+    {
+        m_material = material;
+    }
+
+    void setLight( engine::CILight* light )
+    {
+        m_light = light;
+    }
+
+    void render() override
+    {
+        m_anyMenuHovered = false;
+        m_wantsToCaptureMouse = false;
+
         _menuUiMaterial();
         _menuUiLight();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_anyMenuHovered || m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -117,6 +130,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_material->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -155,6 +171,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_light->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -163,17 +182,16 @@ private :
     std::vector< engine::CMaterial > m_materialsList;
     int m_materialSelectedIndex;
     bool m_lightsAnimated;
+
+    bool m_anyMenuHovered;
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new GuiMaterialsLayer( "Material-utils" );
+    _app->addGuiLayer( std::unique_ptr< GuiMaterialsLayer >( _uiLayer ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -198,8 +216,8 @@ int main()
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_materials";
     auto _shaderLighting = engine::CShaderManager::CreateShaderFromFiles( "phong_material_shader",
-                                                                       _baseNamePhong + "_vs.glsl",
-                                                                       _baseNamePhong + "_fs.glsl" );
+                                                                          _baseNamePhong + "_vs.glsl",
+                                                                          _baseNamePhong + "_fs.glsl" );
 
     ENGINE_ASSERT( _shaderLighting, "Could not load phong-material shader for our tests :(" );
 
@@ -228,8 +246,8 @@ int main()
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    _ui->setMaterial( _phongMaterial );
-    _ui->setLight( _pointLight );
+    _uiLayer->setMaterial( _phongMaterial );
+    _uiLayer->setLight( _pointLight );
 
     while( _app->active() )
     {
@@ -240,10 +258,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
+            _uiLayer->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
+            _uiLayer->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
         {
@@ -303,11 +323,7 @@ int main()
         /********************************************/
 
         // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );

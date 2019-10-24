@@ -155,7 +155,7 @@ int main()
     auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;

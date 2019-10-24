@@ -1,64 +1,13 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
+class GuiMultipleLightsLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() 
-    {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
-        for ( auto _light : m_lights )
-            delete _light;
-
-        m_directionalLight = nullptr;
-        m_spotLight = nullptr;
-
-        m_meshes.clear();
-        m_lights.clear();
-        m_pointLights.clear();
-        m_cachedTextures.clear();
-    }
-
-    void setMaterial( engine::CMaterial* material )
-    {
-        m_material = material;
-    }
-
-    engine::CIRenderable* selectedMesh()
-    {
-        return m_meshes[ m_meshSelectedIndex ];
-    }
-
-    std::vector< engine::CPointLight* > pointLights()
-    {
-        return m_pointLights;
-    }
-
-    engine::CDirectionalLight* directionalLight()
-    {
-        return m_directionalLight;
-    }
-
-    engine::CSpotLight* spotLight()
-    {
-        return m_spotLight;
-    }
-
-    bool useRandomPattern()
-    {
-        return m_meshesUseRandomPattern;
-    }
-
-protected :
-
-    void _initInternal() override
+    GuiMultipleLightsLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_material = nullptr;
 
@@ -135,13 +84,76 @@ protected :
         m_lightSelectedName = m_directionalLight->name();
         m_lightSelectedIndex = 0;
         m_lightDirection = { -0.2f, -1.0f, -0.3f };
+
+        m_anyMenuHovered = false;
     }
 
-    void _renderInternal() override
+    ~GuiMultipleLightsLayer() 
     {
+        for ( auto _mesh : m_meshes )
+            delete _mesh;
+
+        for ( auto _light : m_lights )
+            delete _light;
+
+        m_directionalLight = nullptr;
+        m_spotLight = nullptr;
+
+        m_meshes.clear();
+        m_lights.clear();
+        m_pointLights.clear();
+        m_cachedTextures.clear();
+    }
+
+    void setMaterial( engine::CMaterial* material )
+    {
+        m_material = material;
+    }
+
+    engine::CIRenderable* selectedMesh()
+    {
+        return m_meshes[ m_meshSelectedIndex ];
+    }
+
+    std::vector< engine::CPointLight* > pointLights()
+    {
+        return m_pointLights;
+    }
+
+    engine::CDirectionalLight* directionalLight()
+    {
+        return m_directionalLight;
+    }
+
+    engine::CSpotLight* spotLight()
+    {
+        return m_spotLight;
+    }
+
+    bool useRandomPattern()
+    {
+        return m_meshesUseRandomPattern;
+    }
+
+    void render() override
+    {
+        m_anyMenuHovered = false;
+        m_wantsToCaptureMouse = false;
+
         _menuUiMaterial();
         _menuUiGeometry();
         _menuUiLight();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_anyMenuHovered || m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -215,6 +227,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_material->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -264,6 +279,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_lights[ m_lightSelectedIndex ]->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -331,6 +349,8 @@ private :
             }
         }
 
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -356,17 +376,16 @@ private :
     std::string m_lightSelectedName;
     int m_lightSelectedIndex;
     engine::CVec3 m_lightDirection;
+
+    bool m_anyMenuHovered;
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new GuiMultipleLightsLayer( "MultipleLight-utils" );
+    _app->addGuiLayer( std::unique_ptr< GuiMultipleLightsLayer >( _uiLayer ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -406,7 +425,7 @@ int main()
                                                  { 1.0f, 0.5f, 0.31f },
                                                  32.0f );
 
-    _ui->setMaterial( _phongMaterial );
+    _uiLayer->setMaterial( _phongMaterial );
 
     std::vector< engine::CVec3 > _meshPositions =  {
         {  0.0f,  0.0f,  0.0f },
@@ -424,11 +443,19 @@ int main()
     while( _app->active() )
     {
         if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        {
             break;
+        }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        {
             _camera->setActiveMode( false );
+            _uiLayer->setActive( true );
+        }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        {
             _camera->setActiveMode( true );
+            _uiLayer->setActive( false );
+        }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
@@ -437,17 +464,17 @@ int main()
         _app->begin();
         _camera->update();
 
-        auto _mesh = _ui->selectedMesh();
+        auto _mesh = _uiLayer->selectedMesh();
 
         /* do our thing here ************************/
         _shaderMultipleLights->bind();
         _shaderMultipleLights->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
         _shaderMultipleLights->setVec3( "u_viewerPosition", _camera->position() );
-        _shaderMultipleLights->setInt( "u_numberOfPointLights", _ui->pointLights().size() );
+        _shaderMultipleLights->setInt( "u_numberOfPointLights", _uiLayer->pointLights().size() );
         _shaderMultipleLights->setInt( "u_numberOfSpotLights", 1 );
 
         // set directional light uniforms
-        auto _directionalLight = _ui->directionalLight();
+        auto _directionalLight = _uiLayer->directionalLight();
         _shaderMultipleLights->setInt( "u_directionalLight.enabled", ( _directionalLight->enabled ) ? 1 : 0 );
         _shaderMultipleLights->setVec3( "u_directionalLight.ambient", _directionalLight->ambient );
         _shaderMultipleLights->setVec3( "u_directionalLight.diffuse", _directionalLight->diffuse );
@@ -456,7 +483,7 @@ int main()
         _shaderMultipleLights->setVec3( "u_directionalLight.direction", _directionalLight->direction );
 
         // set all point light uniforms
-        auto _pointLights = _ui->pointLights();
+        auto _pointLights = _uiLayer->pointLights();
         for ( size_t i = 0; i < _pointLights.size(); i++ )
         {
             _shaderMultipleLights->setInt( "u_pointLights[" + std::to_string( i ) + "].enabled", ( _pointLights[i]->enabled ) ? 1 : 0 );
@@ -471,7 +498,7 @@ int main()
         }
 
         // set spot light uniforms
-        auto _spotLight = _ui->spotLight();
+        auto _spotLight = _uiLayer->spotLight();
         _shaderMultipleLights->setInt( "u_spotLights[0].enabled", ( _spotLight->enabled ) ? 1 : 0 );
         _shaderMultipleLights->setVec3( "u_spotLights[0].ambient", _spotLight->ambient );
         _shaderMultipleLights->setVec3( "u_spotLights[0].diffuse", _spotLight->diffuse );
@@ -491,7 +518,7 @@ int main()
         {
             engine::CMat4 _modelMat;
 
-            if ( _ui->useRandomPattern() )
+            if ( _uiLayer->useRandomPattern() )
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
@@ -531,11 +558,7 @@ int main()
         }
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );

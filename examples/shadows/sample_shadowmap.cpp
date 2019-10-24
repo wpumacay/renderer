@@ -50,7 +50,7 @@ int main()
     auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightcasters";

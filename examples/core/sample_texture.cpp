@@ -78,7 +78,6 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
-        _app->render();
         _app->end();
     }
 

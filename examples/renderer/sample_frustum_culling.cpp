@@ -72,7 +72,7 @@ int main()
     auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
     _ui->setRenderer( _app->renderer() );
 
     auto _cameraProjData = engine::CCameraProjData();

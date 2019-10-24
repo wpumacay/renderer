@@ -1,41 +1,13 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
+class GuiLightmapsLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() 
-    {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
-        m_meshes.clear();
-        m_cachedTextures.clear();
-    }
-
-    void setMaterial( engine::CMaterial* material )
-    {
-        m_material = material;
-    }
-
-    void setLight( engine::CILight* light )
-    {
-        m_light = light;
-    }
-
-    engine::CIRenderable* selectedMesh()
-    {
-        return m_meshes[ m_meshSelectedIndex ];
-    }
-
-protected :
-
-    void _initInternal() override
+    GuiLightmapsLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_light = nullptr;
         m_material = nullptr;
@@ -67,13 +39,56 @@ protected :
         m_cachedTextures.push_back( nullptr );
         m_currentAlbedoMapName = "none";
         m_currentSpecularMapName = "none";
+        m_currentAlbedoMap = nullptr;
+        m_currentSpecularMap = nullptr;
+
+        m_anyMenuHovered = false;
+        m_wantsToCaptureMouse = false;
     }
 
-    void _renderInternal() override
+    ~GuiLightmapsLayer() 
     {
+        for ( auto _mesh : m_meshes )
+            delete _mesh;
+
+        m_meshes.clear();
+        m_cachedTextures.clear();
+    }
+
+    void setMaterial( engine::CMaterial* material )
+    {
+        m_material = material;
+    }
+
+    void setLight( engine::CILight* light )
+    {
+        m_light = light;
+    }
+
+    engine::CIRenderable* selectedMesh()
+    {
+        return m_meshes[ m_meshSelectedIndex ];
+    }
+
+    void render() override
+    {
+        m_anyMenuHovered = false;
+        m_wantsToCaptureMouse = false;
+
         _menuUiMaterial();
         _menuUiLight();
         _menuUiGeometry();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_anyMenuHovered || m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -147,6 +162,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_material->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -203,6 +221,9 @@ private :
 
         ImGui::Spacing();
         ImGui::Text( m_light->toString().c_str() );
+
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -234,6 +255,8 @@ private :
             m_meshes[m_meshSelectedIndex]->rotation = engine::CMat4::rotation( m_meshRotationAngle, { 0.0f, 1.0f, 0.0f } );
         }
 
+        m_anyMenuHovered |= ImGui::IsWindowHovered();
+
         ImGui::End();
     }
 
@@ -253,17 +276,16 @@ private :
     int m_meshSelectedIndex;
 
     float m_meshRotationAngle;
+
+    bool m_anyMenuHovered;
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new GuiLightmapsLayer( "Lightmaps-utils" );
+    _app->addGuiLayer( std::unique_ptr< GuiLightmapsLayer >( _uiLayer ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -314,8 +336,8 @@ int main()
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    _ui->setMaterial( _phongMaterial );
-    _ui->setLight( _pointLight );
+    _uiLayer->setMaterial( _phongMaterial );
+    _uiLayer->setLight( _pointLight );
 
     while( _app->active() )
     {
@@ -326,10 +348,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
+            _uiLayer->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
+            _uiLayer->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
         {
@@ -341,6 +365,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
+        _app->update();
         _app->begin();
         _camera->update();
 
@@ -355,7 +380,7 @@ int main()
             _pointLight->position.z = 0.0f;
         }
 
-        auto _mesh = _ui->selectedMesh();
+        auto _mesh = _uiLayer->selectedMesh();
 
         _gizmo->position = _pointLight->position;
 
@@ -388,11 +413,7 @@ int main()
         _shaderGizmo->unbind();
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
 
         // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );

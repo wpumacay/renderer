@@ -254,7 +254,7 @@ int main()
     auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
-    _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
+    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";

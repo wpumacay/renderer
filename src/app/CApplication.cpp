@@ -91,7 +91,8 @@ namespace engine
 
         // update all gui-layers
         for ( auto& layer : m_guiLayers )
-            layer->update();
+            if ( layer->active() )
+                layer->update();
     }
 
     void CApplication::begin()
@@ -135,7 +136,8 @@ namespace engine
 
         // render all gui-layers
         for ( auto& layer : m_guiLayers )
-            layer->render();
+            if ( layer->active() )
+                layer->render();
 
         // render all commands requested to the debug drawer
         auto _camera = m_scene->currentCamera();
@@ -175,8 +177,13 @@ namespace engine
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
             for ( auto& _layer : _layers )
+            {
+                if ( !_layer->active() )
+                    continue;
+
                 if ( _layer->onEvent( _ev ) )
                     return;
+            }
         }
         else if ( action == ENGINE_KEY_RELEASED ) 
         {
@@ -184,8 +191,13 @@ namespace engine
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
             for ( auto& _layer : _layers )
+            {
+                if ( !_layer->active() )
+                    continue;
+
                 if ( _layer->onEvent( _ev ) )
                     return;
+            }
         }
         else if ( action == ENGINE_KEY_REPEAT ) 
         {
@@ -193,8 +205,13 @@ namespace engine
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
             for ( auto& _layer : _layers )
+            {
+                if ( !_layer->active() )
+                    continue;
+
                 if ( _layer->onEvent( _ev ) )
                     return;
+            }
         }
 
         CInputManager::Callback_key( key, action );
@@ -215,6 +232,9 @@ namespace engine
 
             for ( auto& _layer : _layers )
             {
+                if ( !_layer->active() )
+                    continue;
+
                 _handled = _layer->onEvent( _ev );
                 if ( _handled )
                     break;
@@ -227,6 +247,9 @@ namespace engine
 
             for ( auto& _layer : _layers )
             {
+                if ( !_layer->active() )
+                    continue;
+
                 _handled = _layer->onEvent( _ev );
                 if ( _handled )
                     break;
@@ -249,8 +272,13 @@ namespace engine
         //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
         for ( auto& _layer : _layers )
+        {
+            if ( !_layer->active() )
+                continue;
+
             if ( _layer->onEvent( _ev ) )
                 return;
+        }
 
         CInputManager::Callback_mouseMove( x, y );
     }
@@ -265,8 +293,13 @@ namespace engine
         //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
         for ( auto& _layer : _layers )
+        {
+            if ( !_layer->active() )
+                continue;
+
             if ( _layer->onEvent( _ev ) )
                 return;
+        }
 
         CInputManager::Callback_scroll( xOff, yOff );
     }
@@ -281,6 +314,7 @@ namespace engine
         auto _ev = CResizeEvent( _name, width, height );
         //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
 
+        /* all layers should receive the resize-event */
         for ( auto& _layer : _layers )
             _layer->onEvent( _ev );
 

@@ -4,7 +4,6 @@
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;

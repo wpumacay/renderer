@@ -22,6 +22,7 @@ namespace engine
         virtual void render();
         virtual bool onEvent( const CInputEvent& event );
 
+        void setActive( bool active ) { m_active = active; }
         bool active() const { return m_active; }
         std::string name() const { return m_name; }
 
