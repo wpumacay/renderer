@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
@@ -45,7 +45,7 @@ int main()
 
     while( _app->active() )
     {
-        _app->beginRendering();
+        _app->begin();
 
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -58,7 +58,7 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

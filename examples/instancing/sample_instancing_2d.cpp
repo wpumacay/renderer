@@ -23,7 +23,7 @@ void drawGrid_Instancing( engine::CShader* shader,
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
     /* load the shader used for instancing-2d */
@@ -49,14 +49,14 @@ int main()
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
-        _app->beginRendering();
+        _app->begin();
 
         if ( g_useInstancing )
             drawGrid_Instancing( _shaderInstancing2d, g_quadVAO_Instancing, _bufferPositions );
         else
             drawGrid_noInstancing( _shaderNoInstancing2d, g_quadVAO_NoInstancing );
 
-        _app->endRendering();
+        _app->end();
     }
 
     auto _vbos_noInstancing = g_quadVAO_NoInstancing->vertexBuffers();

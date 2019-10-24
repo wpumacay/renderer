@@ -24,7 +24,7 @@ void drawGrid_Instancing( engine::CShader* shader,
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
     /* load the shader used for instancing-3d */
@@ -48,7 +48,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
@@ -57,8 +57,8 @@ int main()
                                              { 0.0f, 0.0f, 0.0f },
                                              engine::eAxis::Y,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     while( _app->active() )
     {
@@ -72,14 +72,14 @@ int main()
 
         _camera->update();
 
-        _app->beginRendering();
+        _app->begin();
 
         if ( g_useInstancing )
             drawGrid_Instancing( _shaderInstancing3d, _camera, g_cubeVAO_Instancing, _bufferModelMatrices );
         else
             drawGrid_noInstancing( _shaderNoInstancing3d, _camera, g_cubeVAO_NoInstancing );
 
-        _app->endRendering();
+        _app->end();
     }
 
     auto _vbos_noInstancing = g_cubeVAO_NoInstancing->vertexBuffers();

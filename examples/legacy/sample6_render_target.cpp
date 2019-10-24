@@ -34,7 +34,7 @@ void checkPointClip( engine::CMat4 proj, engine::CMat4 view, engine::CVec4 world
 
 int main()
 {
-    auto _app = new Application();
+    auto _app = new engine::CApplication();
     _app->init();
 
     auto _scene = _app->scene();
@@ -134,14 +134,14 @@ int main()
 
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
     // // @TODO: Still presents some weird behaviour. It should be width - height, but that 
     // //        clips everything in the wrong way.
     // _cameraProjData.projection  = engine::eCameraProjection::ORTHOGRAPHIC;
-    // _cameraProjData.width       = 4.0f * engine::COpenGLApp::GetWindow()->aspect();
+    // _cameraProjData.width       = 4.0f * _app->window()->aspect();
     // _cameraProjData.height      = 4.0f;
     // _cameraProjData.zNear       = 0.1f;
     // _cameraProjData.zFar        = 100.0f;
@@ -170,8 +170,8 @@ int main()
                                              engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     // make a sample light source
     auto _light = new engine::CDirectionalLight( "directional_1",
@@ -190,8 +190,8 @@ int main()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = engine::COpenGLApp::GetWindow()->width();
-    _fbColorConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbColorConfig.width                = _app->window()->width();
+    _fbColorConfig.height               = _app->window()->height();
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -201,8 +201,8 @@ int main()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = engine::COpenGLApp::GetWindow()->width();
-    _fbDepthConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbDepthConfig.width                = _app->window()->width();
+    _fbDepthConfig.height               = _app->window()->height();
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
@@ -283,7 +283,7 @@ int main()
 //         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputManager::GetScrollAccumValueY() ) << std::endl;
 
         // _framebuffer->bind();
-        _app->beginRendering();
+        _app->begin();
         _app->renderScene();
         // _framebuffer->unbind();
 
@@ -310,7 +310,7 @@ int main()
         _app->showRenderTarget( _framebuffer );
         _app->renderUi();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

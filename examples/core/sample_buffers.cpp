@@ -152,8 +152,7 @@ engine::CVertexArray* createGeometryVer2Indices()
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
-    _app->init();
+    auto _app = new engine::CApplication();
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
 
@@ -168,7 +167,7 @@ int main()
 
     while( _app->active() )
     {
-        _app->beginRendering();
+        _app->begin();
 
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -186,7 +185,7 @@ int main()
 
         _shader->unbind();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

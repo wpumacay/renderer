@@ -4,46 +4,9 @@
 #include <core/CTexture.h>
 #include <assets/CTextureManager.h>
 
-class ApplicationUi : public engine::CImguiUi
-{
-
-
-
-};
-
-class Application : public engine::COpenGLApp
-{
-
-public :
-
-    Application() : engine::COpenGLApp() {}
-    ~Application() {}
-
-    void setTextureToShow( engine::CTexture* texture )
-    {
-        if ( !m_uiPtr )
-            return;
-
-        dynamic_cast< engine::CImguiUiDemo* >( m_uiPtr.get() )->showTexture( texture );
-    }
-
-protected :
-
-    void _initUser() override
-    {
-        ENGINE_TRACE( "Initializing custom ui" );
-        // m_uiPtr = new ApplicationUi( m_windowPtr->context() );
-        m_uiPtr.reset( new engine::CImguiUiDemo( m_windowPtr->context() ) );
-        m_uiPtr->init();
-    }
-
-};
-
-
 int main()
 {
-    auto _app = new Application();
-    _app->init();
+    auto _app = new engine::CApplication();
 
     auto _textureDataJpg = engine::CTextureManager::GetCachedTextureData( "img_container" );
     auto _textureDataPng = engine::CTextureManager::GetCachedTextureData( "img_smiley" );
@@ -96,11 +59,9 @@ int main()
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_textures" );
 
-    _app->setTextureToShow( _textureContainer );
-
     while( _app->active() )
     {
-        _app->beginRendering();
+        _app->begin();
 
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -117,9 +78,8 @@ int main()
         _varray->unbind();
         _shader->unbind();
 
-        _app->renderScene();
-        _app->renderUi();
-        _app->endRendering();
+        _app->render();
+        _app->end();
     }
 
     return 0;

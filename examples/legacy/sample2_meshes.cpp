@@ -28,7 +28,7 @@ void checkPointClip( engine::CMat4 proj, engine::CMat4 view, engine::CVec4 world
 
 int main()
 {
-    auto _app = new Application();
+    auto _app = new engine::CApplication();
     _app->init();
 
     auto _scene = _app->scene();
@@ -128,14 +128,14 @@ int main()
 
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
     // // @TODO: Still presents some weird behaviour. It should be width - height, but that 
     // //        clips everything in the wrong way.
     // _cameraProjData.projection  = engine::eCameraProjection::ORTHOGRAPHIC;
-    // _cameraProjData.width       = 4.0f * engine::COpenGLApp::GetWindow()->aspect();
+    // _cameraProjData.width       = 4.0f * _app->window()->aspect();
     // _cameraProjData.height      = 4.0f;
     // _cameraProjData.zNear       = 0.1f;
     // _cameraProjData.zFar        = 100.0f;
@@ -164,8 +164,8 @@ int main()
                                              engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     // make a sample light source
     auto _light = new engine::CDirectionalLight( "directional_1",
@@ -217,10 +217,10 @@ int main()
 //         std::cout << "scroll-accum-x        : " << std::to_string( engine::CInputManager::GetScrollAccumValueX() ) << std::endl;
 //         std::cout << "scroll-accum-y        : " << std::to_string( engine::CInputManager::GetScrollAccumValueY() ) << std::endl;
 
-        _app->beginRendering();
+        _app->begin();
         _app->renderScene();
         _app->renderUi();
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

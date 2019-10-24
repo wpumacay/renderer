@@ -5,14 +5,13 @@
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
-    _app->init();
+    auto _app = new engine::CApplication();
 
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = engine::COpenGLApp::GetWindow()->width();
-    _fbColorConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbColorConfig.width                = _app->window()->width();
+    _fbColorConfig.height               = _app->window()->height();
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -22,8 +21,8 @@ int main()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = engine::COpenGLApp::GetWindow()->width();
-    _fbDepthConfig.height               = engine::COpenGLApp::GetWindow()->height();
+    _fbDepthConfig.width                = _app->window()->width();
+    _fbDepthConfig.height               = _app->window()->height();
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
@@ -70,7 +69,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
@@ -79,8 +78,8 @@ int main()
                                              { 0.0f, 0.0f, 0.0f },
                                              engine::eAxis::Z,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
     _scene->addCamera( std::unique_ptr< engine::COrbitCamera >( _camera ) );
 
     auto _light = new engine::CDirectionalLight( "directional_1",
@@ -120,15 +119,17 @@ int main()
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
+        _app->update();
+
         /* Render to a custom target given by our framebuffer */
 
         // set the render target to our framebuffer
         _framebuffer->bind();
 
-        _app->beginRendering();
+        _app->begin();
 
         // let the renderer to the thing :D
-        _app->renderScene();
+        _app->render();
 
         // release our render targets
         _framebuffer->unbind();
@@ -151,11 +152,8 @@ int main()
         _framebuffer->getTextureAttachment( "color_attachment" )->unbind();
         _shaderTex2d->unbind();
         glEnable( GL_DEPTH_TEST );
-        
-        // render the ui on top of everything
-        _app->renderUi();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

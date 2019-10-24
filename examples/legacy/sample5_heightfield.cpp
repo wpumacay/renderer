@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
     auto _scene = _app->scene();
@@ -52,7 +52,7 @@ int main()
 
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
@@ -80,8 +80,8 @@ int main()
                                              engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     _camera->setPosition( { -1.77f, -4.12f, 4.37f } );
 
@@ -120,10 +120,10 @@ int main()
         else if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
-        _app->beginRendering();
+        _app->begin();
         _app->renderScene();
         _app->renderUi();
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

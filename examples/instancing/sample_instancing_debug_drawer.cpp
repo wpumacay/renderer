@@ -720,10 +720,10 @@ private :
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
-    auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
+    auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
     _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
@@ -733,7 +733,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
@@ -742,8 +742,8 @@ int main()
                                              { 0.0f, 0.0f, 0.0f },
                                              engine::eAxis::Y,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
@@ -798,8 +798,8 @@ int main()
     g_renderOptions.useSkybox = g_useSkybox;
     g_renderOptions.useShadowMapping = g_useShadowMapping;
     g_renderOptions.redrawShadowMap = true;
-    g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
-    g_renderOptions.viewportHeight = engine::COpenGLApp::GetWindow()->height();
+    g_renderOptions.viewportWidth = _app->window()->width();
+    g_renderOptions.viewportHeight = _app->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = _ui->selectedLight();
     g_renderOptions.shadowMapPtr = nullptr;
@@ -833,8 +833,8 @@ int main()
     g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
     g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
     g_renderOptionsTargetNormal.redrawShadowMap = false;
-    g_renderOptionsTargetNormal.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
-    g_renderOptionsTargetNormal.viewportHeight = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
+    g_renderOptionsTargetNormal.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetNormal.viewportHeight = _app->window()->height() / g_target_factor;
     g_renderOptionsTargetNormal.cameraPtr = _camera;
     g_renderOptionsTargetNormal.lightPtr = _ui->selectedLight();
     g_renderOptionsTargetNormal.shadowMapPtr = nullptr;
@@ -850,8 +850,8 @@ int main()
     g_renderOptionsTargetDepth.useSkybox = false;
     g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
-    g_renderOptionsTargetDepth.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
-    g_renderOptionsTargetDepth.viewportHeight = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
+    g_renderOptionsTargetDepth.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetDepth.viewportHeight = _app->window()->height() / g_target_factor;
     g_renderOptionsTargetDepth.cameraPtr = _camera;
     g_renderOptionsTargetDepth.lightPtr = nullptr;
     g_renderOptionsTargetDepth.shadowMapPtr = nullptr;
@@ -871,8 +871,8 @@ int main()
     g_renderOptionsTargetSemantic.useSkybox = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
     g_renderOptionsTargetSemantic.redrawShadowMap = false;
-    g_renderOptionsTargetSemantic.viewportWidth = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
-    g_renderOptionsTargetSemantic.viewportHeight = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportHeight = _app->window()->height() / g_target_factor;
     g_renderOptionsTargetSemantic.cameraPtr = _camera;
     g_renderOptionsTargetSemantic.lightPtr = nullptr;
     g_renderOptionsTargetSemantic.shadowMapPtr = nullptr;
@@ -922,9 +922,9 @@ int main()
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
         {
             if ( _camera->active() )
-                engine::COpenGLApp::GetWindow()->disableCursor();
+                _app->window()->disableCursor();
             else
-                engine::COpenGLApp::GetWindow()->enableCursor();
+                _app->window()->enableCursor();
         }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
@@ -1047,7 +1047,7 @@ int main()
         g_renderOptions.shadowMapRangeConfig = _config;
         g_renderOptionsTargetNormal.shadowMapRangeConfig = _config;
 
-        _app->beginRendering();
+        _app->begin();
         _app->update();
 
         /****************************************************/
@@ -1079,7 +1079,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->endRendering();
+        _app->end();
 
 ////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
 ////                      1.0f / engine::CTime::GetAvgTimeStep(), 
@@ -1117,7 +1117,7 @@ void renderShadowMap( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, engine::COpenGLApp::GetWindow()->width(), engine::COpenGLApp::GetWindow()->height() );
+    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
 }
 
 std::vector< engine::CIRenderable* > _createScene0()
@@ -1349,8 +1349,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
-    _fbColorConfig.height               = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
+    _fbColorConfig.width                = _app->window()->width() / g_target_factor;
+    _fbColorConfig.height               = _app->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -1360,8 +1360,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = engine::COpenGLApp::GetWindow()->width() / g_target_factor;
-    _fbDepthConfig.height               = engine::COpenGLApp::GetWindow()->height() / g_target_factor;
+    _fbDepthConfig.width                = _app->window()->width() / g_target_factor;
+    _fbDepthConfig.height               = _app->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;

@@ -66,10 +66,10 @@ void renderScene( engine::CICamera* cameraPtr,
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
-    auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
+    auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
     _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
@@ -78,7 +78,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
@@ -87,8 +87,8 @@ int main()
                                              { 0.0f, 0.0f, 0.0f },
                                              engine::eAxis::Y,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
@@ -163,8 +163,8 @@ int main()
     g_renderOptions.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptions.useFaceCulling = false;
     g_renderOptions.useShadowMapping = false;
-    g_renderOptions.viewportWidth = engine::COpenGLApp::GetWindow()->width();
-    g_renderOptions.viewportHeight = engine::COpenGLApp::GetWindow()->height();
+    g_renderOptions.viewportWidth = _app->window()->width();
+    g_renderOptions.viewportHeight = _app->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = nullptr;
     g_renderOptions.shadowMapPtr = nullptr;
@@ -182,9 +182,9 @@ int main()
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
         {
             if ( _camera->active() )
-                engine::COpenGLApp::GetWindow()->disableCursor();
+                _app->window()->disableCursor();
             else
-                engine::COpenGLApp::GetWindow()->enableCursor();
+                _app->window()->enableCursor();
         }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
@@ -192,7 +192,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         _app->update();
-        _app->beginRendering();
+        _app->begin();
 
         /****************************************************/
         // render the objects with plain colors (just to check)
@@ -208,7 +208,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

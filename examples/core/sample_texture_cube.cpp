@@ -4,25 +4,6 @@
 #include <core/CTexture.h>
 #include <assets/CTextureManager.h>
 
-class Application : public engine::COpenGLApp
-{
-
-public :
-
-    Application() : engine::COpenGLApp() {}
-    ~Application() {}
-
-protected :
-
-    void _initUser() override
-    {
-        ENGINE_TRACE( "Initializing custom ui" );
-        m_uiPtr.reset( new engine::CImguiUiDemo( m_windowPtr->context() ) );
-        m_uiPtr->init();
-    }
-
-};
-
 engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 {
     if ( axis == engine::eAxis::X ) return engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
@@ -34,8 +15,7 @@ engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 
 int main()
 {
-    auto _app = new Application();
-    _app->init();
+    auto _app = new engine::CApplication();
 
     auto _textureCubeDataCloudtop   = engine::CTextureManager::GetCachedTextureCubeData( "cloudtop" );
     auto _textureCubeDataStarfield  = engine::CTextureManager::GetCachedTextureCubeData( "starfield" );
@@ -117,7 +97,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
@@ -126,8 +106,8 @@ int main()
                                              engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                              engine::eAxis::Z,
                                              _cameraProjData,
-                                             engine::COpenGLApp::GetWindow()->width(),
-                                             engine::COpenGLApp::GetWindow()->height() );
+                                             _app->window()->width(),
+                                             _app->window()->height() );
 
     _scene->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
@@ -143,7 +123,10 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->beginRendering();
+        _app->update();
+
+        _app->begin();
+        _app->render();
 
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
@@ -166,9 +149,7 @@ int main()
 
         glDepthFunc( GL_LESS );
 
-        _app->renderScene();
-        _app->renderUi();
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;

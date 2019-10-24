@@ -48,10 +48,10 @@ engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
 
 int main()
 {
-    auto _app = new engine::COpenGLApp();
+    auto _app = new engine::CApplication();
     _app->init();
 
-    auto _ui = new ApplicationUi( engine::COpenGLApp::GetWindow()->context() );
+    auto _ui = new ApplicationUi( _app->window()->context() );
     _ui->init();
 
     _app->setUi( std::unique_ptr< ApplicationUi >( _ui ) );
@@ -82,7 +82,7 @@ int main()
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = engine::COpenGLApp::GetWindow()->aspect();
+    _cameraProjData.aspect      = _app->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
@@ -91,8 +91,8 @@ int main()
     //                                          { 0.0f, 0.0f, 0.0f },
     //                                          engine::eAxis::Y,
     //                                          _cameraProjData,
-    //                                          engine::COpenGLApp::GetWindow()->width(),
-    //                                          engine::COpenGLApp::GetWindow()->height() );
+    //                                          _app->window()->width(),
+    //                                          _app->window()->height() );
 
     const float _cameraSensitivity  = 0.25f;
     const float _cameraSpeed        = 250.0f;
@@ -203,16 +203,16 @@ int main()
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
         {
             if ( _camera->active() )
-                engine::COpenGLApp::GetWindow()->disableCursor();
+                _app->window()->disableCursor();
             else
-                engine::COpenGLApp::GetWindow()->enableCursor();
+                _app->window()->enableCursor();
         }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        _app->beginRendering();
+        _app->begin();
         _camera->update();
 
         /* do our thing here ************************/
@@ -233,7 +233,7 @@ int main()
         if ( !_camera->active() )
             _app->renderUi();
 
-        _app->endRendering();
+        _app->end();
     }
 
     return 0;
@@ -384,5 +384,5 @@ void renderShadowMapVisualization( engine::CVertexArray* quadVAO,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, engine::COpenGLApp::GetWindow()->width(), engine::COpenGLApp::GetWindow()->height() );
+    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
 }
