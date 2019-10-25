@@ -69,18 +69,56 @@ engine::CFrameBuffer* createRenderTarget();
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
-class ApplicationUi : public engine::CImguiUi
+class RenderTargetsGuiLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
+    RenderTargetsGuiLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
-        
+        m_rendererPtr = nullptr;
+        m_meshRendererPtr = nullptr;
+
+        auto _dirlight = new engine::CDirectionalLight( "directional",
+                                                        { 0.2f, 0.2f, 0.2f },
+                                                        { 0.4f, 0.4f, 0.4f },
+                                                        { 0.8f, 0.8f, 0.8f },
+                                                        g_lightDirDirection );
+
+        auto _pointlight = new engine::CPointLight( "point",
+                                                    { 0.2f, 0.2f, 0.2f },
+                                                    { 0.5f, 0.5f, 0.5f },
+                                                    { 0.8f, 0.8f, 0.8f },
+                                                    g_lightPointPosition,
+                                                    1.0f, 0.05f, 0.005f );
+
+        auto _spotLight = new engine::CSpotLight( "spot",
+                                                  { 0.2f, 0.2f, 0.2f },
+                                                  { 0.5f, 0.5f, 0.5f },
+                                                  { 0.8f, 0.8f, 0.8f },
+                                                  g_lightSpotPosition,
+                                                  g_lightSpotDirection,
+                                                  1.0f, 0.05f, 0.005f,
+                                                  ENGINE_PI / 4.0f,
+                                                  ENGINE_PI / 3.0f );
+
+        m_lights = { _dirlight, _pointlight, _spotLight };
+        m_lightsNames = { "directional", "point", "spot" };
+        m_lightSelectedIndex = 2;
+        m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
+
+        m_lightDirDirection     = g_lightDirDirection;
+        m_lightPointDirection   = g_lightPointDirection;
+        m_lightSpotDirection    = g_lightSpotDirection;
+
+        m_lightPointPosition    = g_lightPointPosition;
+        m_lightSpotPosition     = g_lightSpotPosition;
+
+        m_wantsToCaptureMouse = false;
     }
 
-    ~ApplicationUi() {}
+    ~RenderTargetsGuiLayer() {}
 
     void setRenderer( engine::CMainRenderer* rendererPtr )
     {
@@ -124,55 +162,25 @@ public :
 
     engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
 
-protected :
-
-    void _initInternal() override
+    void render() override
     {
-        m_rendererPtr = nullptr;
-        m_meshRendererPtr = nullptr;
+        m_wantsToCaptureMouse = false;
 
-        auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                        { 0.2f, 0.2f, 0.2f },
-                                                        { 0.4f, 0.4f, 0.4f },
-                                                        { 0.8f, 0.8f, 0.8f },
-                                                        g_lightDirDirection );
-
-        auto _pointlight = new engine::CPointLight( "point",
-                                                    { 0.2f, 0.2f, 0.2f },
-                                                    { 0.5f, 0.5f, 0.5f },
-                                                    { 0.8f, 0.8f, 0.8f },
-                                                    g_lightPointPosition,
-                                                    1.0f, 0.05f, 0.005f );
-
-        auto _spotLight = new engine::CSpotLight( "spot",
-                                                  { 0.2f, 0.2f, 0.2f },
-                                                  { 0.5f, 0.5f, 0.5f },
-                                                  { 0.8f, 0.8f, 0.8f },
-                                                  g_lightSpotPosition,
-                                                  g_lightSpotDirection,
-                                                  1.0f, 0.05f, 0.005f,
-                                                  ENGINE_PI / 4.0f,
-                                                  ENGINE_PI / 3.0f );
-
-        m_lights = { _dirlight, _pointlight, _spotLight };
-        m_lightsNames = { "directional", "point", "spot" };
-        m_lightSelectedIndex = 2;
-        m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
-
-        m_lightDirDirection     = g_lightDirDirection;
-        m_lightPointDirection   = g_lightPointDirection;
-        m_lightSpotDirection    = g_lightSpotDirection;
-
-        m_lightPointPosition    = g_lightPointPosition;
-        m_lightSpotPosition     = g_lightSpotPosition;
-    }
-
-    void _renderInternal() override
-    {
         _menuUiRendererStats();
         _menuUiLights();
         _menuUiRendererScene();
         _menuUiRendererShadowMap();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -180,8 +188,6 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.2f", engine::COpenGLApp::GetInstance()->fps() );
-        ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
         ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
         ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
         ImGui::PlotLines( "fps-avg", 
@@ -451,17 +457,15 @@ private :
     engine::CFrameBuffer* m_renderTargetNormal;
     engine::CFrameBuffer* m_renderTargetDepth;
     engine::CFrameBuffer* m_renderTargetSemantic;
+
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _ui = new RenderTargetsGuiLayer( "RenderTargets-utils" );
+    _app->addGuiLayer( std::unique_ptr< RenderTargetsGuiLayer >( _ui ) );
     _ui->setRenderer( _app->renderer() );
     _ui->setMeshRenderer( _app->renderer()->meshRenderer() );
 
@@ -517,7 +521,7 @@ int main()
     g_renderOptions.viewportHeight = _app->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = _ui->selectedLight();
-    g_renderOptions.shadowMapPtr = nullptr;
+    g_renderOptions.shadowMapPtr = _app->renderer()->shadowMap();
     g_renderOptions.renderTargetPtr = nullptr;
 
     g_renderOptions.depthViewZmin = 0.0f;
@@ -549,7 +553,7 @@ int main()
     g_renderOptionsTargetNormal.viewportHeight = _app->window()->height() / g_target_factor;
     g_renderOptionsTargetNormal.cameraPtr = _camera;
     g_renderOptionsTargetNormal.lightPtr = _ui->selectedLight();
-    g_renderOptionsTargetNormal.shadowMapPtr = nullptr;
+    g_renderOptionsTargetNormal.shadowMapPtr = _app->renderer()->shadowMap();
     g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal;
 
     // configure render-target - depth-render mode
@@ -557,7 +561,7 @@ int main()
     g_renderOptionsTargetDepth.useFrustumCulling = true;
     g_renderOptionsTargetDepth.cullingGeom = engine::eCullingGeom::BOUNDING_BOX;
     g_renderOptionsTargetDepth.useFaceCulling = false;
-    g_renderOptionsTargetDepth.useShadowMapping = true;
+    g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
     g_renderOptionsTargetDepth.viewportWidth = _app->window()->width() / g_target_factor;
     g_renderOptionsTargetDepth.viewportHeight = _app->window()->height() / g_target_factor;
@@ -691,30 +695,37 @@ int main()
         _app->update();
 
         /****************************************************/
-        // render our scene
-        _app->renderer()->render( _app->scene(), g_renderOptions );
 
         // render to the targets
         if ( g_showRenderTargetDepth )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetDepth );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetDepth );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetSemantic )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetSemantic );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetSemantic );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetNormal )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetNormal );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetNormal );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
+
+        // render our scene
+        _app->renderer()->begin( g_renderOptions );
+        _app->render();
 
         //// // visualize the shadow-map
         //// renderShadowMap( lightPtr, _quad_varray, _shaderShadowMapViz, _app->renderer()->shadowMap() );
 
         /****************************************************/
-
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
         _app->end();
 
 ////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
@@ -753,7 +764,7 @@ void renderShadowMap( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }
 
 std::vector< engine::CIRenderable* > _createScene0()
@@ -802,7 +813,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -912,7 +923,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     return _renderables;
@@ -943,14 +954,14 @@ std::vector< engine::CIRenderable* > _createScene2()
         _renderablePtr->material()->setAlbedoMap( _renderableTexture );
 
         _renderables.push_back( _renderablePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
     _floor->material()->setAlbedoMap( _renderableTexture );
     _renderables.push_back( _floor );
-    engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
 
     return _renderables;
 }
@@ -960,8 +971,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = _app->window()->width() / g_target_factor;
-    _fbColorConfig.height               = _app->window()->height() / g_target_factor;
+    _fbColorConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbColorConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -971,8 +982,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = _app->window()->width() / g_target_factor;
-    _fbDepthConfig.height               = _app->window()->height() / g_target_factor;
+    _fbDepthConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbDepthConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;

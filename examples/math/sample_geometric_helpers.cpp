@@ -42,31 +42,35 @@ auto g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engi
 bool g_use_signed_distance = false;
 bool g_show_comparison_with_frustum = false;
 
-class ApplicationUi : public engine::CImguiUi
+class GeometricHelpersLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
+    GeometricHelpersLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) {}
+
+    ~GeometricHelpersLayer() {}
+
+
+    void render() override
     {
-        
-    }
+        m_wantsToCaptureMouse = false;
 
-    ~ApplicationUi() {}
-
-protected :
-
-    void _initInternal() override
-    {
-        // nothing for now
-    }
-
-    void _renderInternal() override
-    {
         _menuUiHandleBox();
         _menuUiHandleSphere();
         _menuUiHandlePlane();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -145,17 +149,15 @@ private :
         ImGui::Text( ( "size        : " + engine::toString( g_plane_size ) ).c_str() );
         ImGui::End();
     }
+
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new GeometricHelpersLayer( "GeometricHelpers-utils" );
+    _app->addGuiLayer( std::unique_ptr< GeometricHelpersLayer >( _uiLayer ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -222,17 +224,17 @@ int main()
             engine::CDebugDrawer::DrawLine( _point, engine::projInPlane( _point, g_plane ), { 0.1f, 0.1f, 0.8f } );
             engine::CDebugDrawer::DrawLine( g_plane.position, engine::projInPlane( _point, g_plane ), { 0.8f, 0.1f, 0.1f } );
 
-////              auto _boxCorners = engine::computeBoxCorners( { g_box_size, g_box_transform } );
-////              if ( g_use_signed_distance )
-////                  std::sort( _boxCorners.begin(), _boxCorners.end(), g_signedComparator );
-////              else
-////                  std::sort( _boxCorners.begin(), _boxCorners.end(), g_comparator );
-////      
-////              auto _minVertex = _boxCorners.front();
-////              auto _maxVertex = _boxCorners.back();
+            auto _boxCorners = engine::computeBoxCorners( { g_box_size, g_box_transform } );
+            if ( g_use_signed_distance )
+                std::sort( _boxCorners.begin(), _boxCorners.end(), g_signedComparator );
+            else
+                std::sort( _boxCorners.begin(), _boxCorners.end(), g_comparator );
 
-            engine::CVec3 _minVertex, _maxVertex;
-            engine::computeMinMaxVertexToPlane( g_plane, { g_box_size, g_box_transform }, _minVertex, _maxVertex );
+            auto _minVertex = _boxCorners.front();
+            auto _maxVertex = _boxCorners.back();
+
+            //// engine::CVec3 _minVertex, _maxVertex;
+            //// engine::computeMinMaxVertexToPlane( g_plane, { g_box_size, g_box_transform }, _minVertex, _maxVertex );
 
             engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _minVertex, { 0.8f, 0.8f, 0.2f } );
             engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, _maxVertex, { 0.8f, 0.2f, 0.8f } );
@@ -263,12 +265,7 @@ int main()
                 engine::CDebugDrawer::DrawSphere( g_sphere_size, g_sphere_transform, { 0.1f, 0.1f, 0.8f } );
         }
 
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
     }
 

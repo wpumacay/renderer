@@ -1,35 +1,6 @@
 
 #include <CEngine.h>
 
-class ApplicationUi : public engine::CImguiUi
-{
-
-public :
-
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        
-    }
-
-    ~ApplicationUi() {}
-
-protected :
-
-    void _initInternal() override
-    {
-        // nothing for now
-    }
-
-    void _renderInternal() override
-    {
-        // nothing for now
-    }
-
-private :
-
-};
-
 void renderScene( engine::CICamera* cameraPtr,
                   engine::CShader* shaderPtr,
                   const std::vector< engine::CIRenderable* >& renderables );
@@ -37,12 +8,6 @@ void renderScene( engine::CICamera* cameraPtr,
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -153,12 +118,7 @@ int main()
 
         /*********************************/
 
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
     }
 

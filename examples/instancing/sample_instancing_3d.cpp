@@ -25,7 +25,6 @@ void drawGrid_Instancing( engine::CShader* shader,
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
 
     /* load the shader used for instancing-3d */
     std::string _baseNameInstancing3d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/instancing_3d";
@@ -60,6 +59,8 @@ int main()
                                              _app->window()->width(),
                                              _app->window()->height() );
 
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+
     while( _app->active() )
     {
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
@@ -70,8 +71,7 @@ int main()
             std::cout << std::string( g_useInstancing ? "using instancing" : "not using instancing" ) << std::endl;
         }
 
-        _camera->update();
-
+        _app->update();
         _app->begin();
 
         if ( g_useInstancing )
@@ -79,6 +79,7 @@ int main()
         else
             drawGrid_noInstancing( _shaderNoInstancing3d, _camera, g_cubeVAO_NoInstancing );
 
+        _app->render();
         _app->end();
     }
 

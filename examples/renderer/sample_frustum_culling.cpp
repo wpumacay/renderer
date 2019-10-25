@@ -3,34 +3,40 @@
 
 engine::CRenderOptions g_renderOptions;
 
-class ApplicationUi : public engine::CImguiUi
+class FrustumCullingGuiLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
+    FrustumCullingGuiLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
-        
+        m_rendererPtr = nullptr;
     }
 
-    ~ApplicationUi() {}
+    ~FrustumCullingGuiLayer() {}
 
     void setRenderer( engine::CMainRenderer* rendererPtr )
     {
         m_rendererPtr = rendererPtr;
     }
 
-protected :
-
-    void _initInternal() override
+    void render() override
     {
-        m_rendererPtr = nullptr;
+        m_wantsToCaptureMouse = false;
+
+        _menuUiRendererFrustumCulling();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
     }
 
-    void _renderInternal() override
+    bool onEvent( const engine::CInputEvent& event ) override
     {
-        _menuUiRendererFrustumCulling();
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -58,6 +64,8 @@ private :
     }
 
     engine::CMainRenderer* m_rendererPtr;
+
+    bool m_wantsToCaptureMouse;
 };
 
 void renderScene( engine::CICamera* cameraPtr,
@@ -67,13 +75,9 @@ void renderScene( engine::CICamera* cameraPtr,
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
-    _ui->setRenderer( _app->renderer() );
+    auto _uiLayer = new FrustumCullingGuiLayer( "Frustum-culling-utils" );
+    _app->addGuiLayer( std::unique_ptr< FrustumCullingGuiLayer >( _uiLayer ) );
+    _uiLayer->setRenderer( _app->renderer() );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -199,15 +203,11 @@ int main()
         renderScene( _camera, _shader, _renderables );
 
         // check if the renderer is culling properly
-        _app->renderer()->render( _app->scene(), g_renderOptions );
+        _app->renderer()->begin( g_renderOptions );
+        _app->renderer()->submit( _app->scene()->renderables() );
         /****************************************************/
 
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
     }
 

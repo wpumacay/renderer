@@ -40,44 +40,13 @@ int g_sceneId = 0;
 int g_renderMode = 0;
 int g_numRenderables = 0;
 
-class ApplicationUi : public engine::CImguiUi
+class RenderModesGuiLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        
-    }
-
-    ~ApplicationUi() {}
-
-    void setRenderer( engine::CMainRenderer* rendererPtr )
-    {
-        m_rendererPtr = rendererPtr;
-    }
-
-    void setMeshRenderer( engine::CMeshRenderer* meshRendererPtr )
-    {
-        m_meshRendererPtr = meshRendererPtr;
-    }
-
-    void setRenderablesScene0( const std::vector< engine::CIRenderable* >& renderables )
-    {
-        m_renderablesScene0 = renderables;
-    }
-
-    void setRenderablesScene1( const std::vector< engine::CIRenderable* >& renderables )
-    {
-        m_renderablesScene1 = renderables;
-    }
-
-    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
-
-protected :
-
-    void _initInternal() override
+    RenderModesGuiLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_rendererPtr = nullptr;
         m_meshRendererPtr = nullptr;
@@ -116,14 +85,53 @@ protected :
 
         m_lightPointPosition    = g_lightPointPosition;
         m_lightSpotPosition     = g_lightSpotPosition;
+
+        m_wantsToCaptureMouse = false;
     }
 
-    void _renderInternal() override
+    ~RenderModesGuiLayer() {}
+
+    void setRenderer( engine::CMainRenderer* rendererPtr )
     {
+        m_rendererPtr = rendererPtr;
+    }
+
+    void setMeshRenderer( engine::CMeshRenderer* meshRendererPtr )
+    {
+        m_meshRendererPtr = meshRendererPtr;
+    }
+
+    void setRenderablesScene0( const std::vector< engine::CIRenderable* >& renderables )
+    {
+        m_renderablesScene0 = renderables;
+    }
+
+    void setRenderablesScene1( const std::vector< engine::CIRenderable* >& renderables )
+    {
+        m_renderablesScene1 = renderables;
+    }
+
+    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
+
+    void render() override
+    {
+        m_wantsToCaptureMouse = false;
+
         _menuUiRendererStats();
         _menuUiLights();
         _menuUiRendererScene();
         _menuUiRendererShadowMap();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -131,8 +139,14 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.5f", engine::COpenGLApp::GetInstance()->fps() );
-        ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
+        ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
+        ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
+        ImGui::PlotLines( "fps-avg", 
+                          engine::CTime::GetFpsAvgs(), 
+                          engine::CTime::GetNumFramesForAvg(), 
+                          engine::CTime::GetFrameTimeIndex(),
+                          ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),
+                          0.0f, FLT_MAX, ImVec2( 0, 120 ) );
         ImGui::End();
     }
 
@@ -328,6 +342,8 @@ private :
 
     std::vector< engine::CIRenderable* > m_renderablesScene0;
     std::vector< engine::CIRenderable* > m_renderablesScene1;
+
+    bool m_wantsToCaptureMouse;
 };
 
 void renderDepthMap( engine::CILight* lightPtr,
@@ -341,12 +357,8 @@ std::vector< engine::CIRenderable* > _createScene1();
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _ui = new RenderModesGuiLayer( "RenderModes-utils" );
+    _app->addGuiLayer( std::unique_ptr< RenderModesGuiLayer >( _ui ) );
     _ui->setRenderer( _app->renderer() );
     _ui->setMeshRenderer( _app->renderer()->meshRenderer() );
 
@@ -396,7 +408,7 @@ int main()
     g_renderOptions.viewportHeight = _app->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = _ui->selectedLight();
-    g_renderOptions.shadowMapPtr = nullptr;
+    g_renderOptions.shadowMapPtr = _app->renderer()->shadowMap();
     g_renderOptions.renderTargetPtr = nullptr;
 
     g_renderOptions.depthViewZmin = 0.0f;
@@ -510,18 +522,14 @@ int main()
 
         /****************************************************/
         // render our scene
-        _app->renderer()->render( _app->scene(), g_renderOptions );
+        _app->renderer()->begin( g_renderOptions );
+        _app->renderer()->submit( _app->scene()->renderables() );
+        _app->render();
 
         // visualize the shadow-map
         renderDepthMap( lightPtr, _quad_varray, _shaderShadowMapViz, _app->renderer()->shadowMap() );
 
         /****************************************************/
-
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
 
         _app->end();
     }
@@ -557,7 +565,7 @@ void renderDepthMap( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }
 
 std::vector< engine::CIRenderable* > _createScene0()
@@ -604,7 +612,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -711,7 +719,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     return _renderables;

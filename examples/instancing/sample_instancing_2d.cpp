@@ -24,7 +24,6 @@ void drawGrid_Instancing( engine::CShader* shader,
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
 
     /* load the shader used for instancing-2d */
     std::string _baseNameInstancing2d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/instancing_2d";
@@ -49,6 +48,7 @@ int main()
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
 
+        _app->update();
         _app->begin();
 
         if ( g_useInstancing )

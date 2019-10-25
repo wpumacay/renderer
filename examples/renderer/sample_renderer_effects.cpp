@@ -78,68 +78,13 @@ engine::CFrameBuffer* createRenderTarget();
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
-class ApplicationUi : public engine::CImguiUi
+class RenderEffectsGuiLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) 
-    {
-        
-    }
-
-    ~ApplicationUi() {}
-
-    void setRenderer( engine::CMainRenderer* rendererPtr )
-    {
-        m_rendererPtr = rendererPtr;
-    }
-
-    void setMeshRenderer( engine::CMeshRenderer* meshRendererPtr )
-    {
-        m_meshRendererPtr = meshRendererPtr;
-    }
-
-    void setRenderablesScene0( const std::vector< engine::CIRenderable* >& renderables )
-    {
-        m_renderablesScene0 = renderables;
-    }
-
-    void setRenderablesScene1( const std::vector< engine::CIRenderable* >& renderables )
-    {
-        m_renderablesScene1 = renderables;
-    }
-
-    void setRenderablesScene2( const std::vector< engine::CIRenderable* >& renderables )
-    {
-        m_renderablesScene2 = renderables;
-    }
-
-    void setRenderTargetNormal( engine::CFrameBuffer* target )
-    {
-        m_renderTargetNormal = target;
-    }
-
-    void setRenderTargetDepth( engine::CFrameBuffer* target )
-    {
-        m_renderTargetDepth = target;
-    }
-
-    void setRenderTargetSemantic( engine::CFrameBuffer* target )
-    {
-        m_renderTargetSemantic = target;
-    }
-
-    void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
-
-    void setSkyboxReference( engine::CSkybox* skyboxPtr ) { m_skyboxPtr = skyboxPtr; }
-
-    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
-
-protected :
-
-    void _initInternal() override
+    RenderEffectsGuiLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         m_rendererPtr = nullptr;
         m_meshRendererPtr = nullptr;
@@ -188,15 +133,78 @@ protected :
 
         m_cubemapSelectedIndex = 0;
         m_cubemapSelectedName = ( m_cubemapsNames.size() > 0 ) ? m_cubemapsNames[m_cubemapSelectedIndex] : "undefined";
+
+        m_wantsToCaptureMouse = false;
     }
 
-    void _renderInternal() override
+    ~RenderEffectsGuiLayer() {}
+
+    void setRenderer( engine::CMainRenderer* rendererPtr )
     {
+        m_rendererPtr = rendererPtr;
+    }
+
+    void setMeshRenderer( engine::CMeshRenderer* meshRendererPtr )
+    {
+        m_meshRendererPtr = meshRendererPtr;
+    }
+
+    void setRenderablesScene0( const std::vector< engine::CIRenderable* >& renderables )
+    {
+        m_renderablesScene0 = renderables;
+    }
+
+    void setRenderablesScene1( const std::vector< engine::CIRenderable* >& renderables )
+    {
+        m_renderablesScene1 = renderables;
+    }
+
+    void setRenderablesScene2( const std::vector< engine::CIRenderable* >& renderables )
+    {
+        m_renderablesScene2 = renderables;
+    }
+
+    void setRenderTargetNormal( engine::CFrameBuffer* target )
+    {
+        m_renderTargetNormal = target;
+    }
+
+    void setRenderTargetDepth( engine::CFrameBuffer* target )
+    {
+        m_renderTargetDepth = target;
+    }
+
+    void setRenderTargetSemantic( engine::CFrameBuffer* target )
+    {
+        m_renderTargetSemantic = target;
+    }
+
+    void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
+
+    void setSkyboxReference( engine::CSkybox* skyboxPtr ) { m_skyboxPtr = skyboxPtr; }
+
+    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
+
+    void render() override
+    {
+        m_wantsToCaptureMouse = false;
+
         _menuUiRendererStats();
         _menuUiRendererEffects();
         _menuUiLights();
         _menuUiRendererScene();
         _menuUiRendererShadowMap();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -204,8 +212,6 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.2f", engine::COpenGLApp::GetInstance()->fps() );
-        ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
         ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
         ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
         ImGui::PlotLines( "fps-avg", 
@@ -654,17 +660,15 @@ private :
     std::vector< std::string > m_cubemapsNames;
     std::string m_cubemapSelectedName;
     int m_cubemapSelectedIndex;
+
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _ui = new RenderEffectsGuiLayer( "RenderEffects-utils" );
+    _app->addGuiLayer( std::unique_ptr< RenderEffectsGuiLayer >( _ui ) );
     _ui->setRenderer( _app->renderer() );
     _ui->setMeshRenderer( _app->renderer()->meshRenderer() );
 
@@ -740,8 +744,10 @@ int main()
     g_renderOptions.viewportHeight = _app->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = _ui->selectedLight();
-    g_renderOptions.shadowMapPtr = nullptr;
+    g_renderOptions.shadowMapPtr = _app->renderer()->shadowMap();
     g_renderOptions.renderTargetPtr = nullptr;
+    g_renderOptions.fogPtr = _fog;
+    g_renderOptions.skyboxPtr = _skybox;
 
     g_renderOptions.depthViewZmin = 0.0f;
     g_renderOptions.depthViewZmax = 20.0f;
@@ -775,7 +781,9 @@ int main()
     g_renderOptionsTargetNormal.viewportHeight = _app->window()->height() / g_target_factor;
     g_renderOptionsTargetNormal.cameraPtr = _camera;
     g_renderOptionsTargetNormal.lightPtr = _ui->selectedLight();
-    g_renderOptionsTargetNormal.shadowMapPtr = nullptr;
+    g_renderOptionsTargetNormal.shadowMapPtr = _app->renderer()->shadowMap();
+    g_renderOptionsTargetNormal.fogPtr = _fog;
+    g_renderOptionsTargetNormal.skyboxPtr = _skybox;
     g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal;
 
     // configure render-target - depth-render mode
@@ -923,30 +931,37 @@ int main()
         _app->update();
 
         /****************************************************/
-        // render our scene
-        _app->renderer()->render( _app->scene(), g_renderOptions );
 
         // render to the targets
         if ( g_showRenderTargetDepth )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetDepth );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetDepth );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetSemantic )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetSemantic );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetSemantic );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetNormal )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetNormal );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetNormal );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
+
+        // render our scene
+        _app->renderer()->begin( g_renderOptions );
+        _app->render();
 
         //// // visualize the shadow-map
         //// renderShadowMap( lightPtr, _quad_varray, _shaderShadowMapViz, _app->renderer()->shadowMap() );
 
         /****************************************************/
-
-        _app->renderScene();
-        _app->renderDebug();
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
         _app->end();
 
 ////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
@@ -985,7 +1000,7 @@ void renderShadowMap( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }
 
 std::vector< engine::CIRenderable* > _createScene0()
@@ -1035,7 +1050,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -1153,7 +1168,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     return _renderables;
@@ -1184,7 +1199,7 @@ std::vector< engine::CIRenderable* > _createScene2()
         _renderablePtr->material()->setAlbedoMap( _renderableTexture );
 
         _renderables.push_back( _renderablePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
 
         // create a cube inside the sphere
         auto _cubePtr = engine::CMeshBuilder::createBox( 0.5f, 0.5f, 0.5f );
@@ -1199,7 +1214,7 @@ std::vector< engine::CIRenderable* > _createScene2()
         _cubePtr->material()->specular = { 0.8f, 0.1f, 0.1f };
 
         _renderables.push_back( _cubePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
@@ -1207,7 +1222,7 @@ std::vector< engine::CIRenderable* > _createScene2()
     _floor->material()->setAlbedoMap( _renderableTexture );
     _floor->setObjectId( 1000 );
     _renderables.push_back( _floor );
-    engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
 
     return _renderables;
 }
@@ -1217,8 +1232,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = _app->window()->width() / g_target_factor;
-    _fbColorConfig.height               = _app->window()->height() / g_target_factor;
+    _fbColorConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbColorConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -1228,8 +1243,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = _app->window()->width() / g_target_factor;
-    _fbDepthConfig.height               = _app->window()->height() / g_target_factor;
+    _fbDepthConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbDepthConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;

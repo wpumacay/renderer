@@ -489,7 +489,7 @@ namespace engine
             m_shaderSolidLightingPtr->setInt( "u_directionalLight.enabled", 1 );
             m_shaderSolidLightingPtr->setVec3( "u_directionalLight.ambient", light->ambient );
             m_shaderSolidLightingPtr->setVec3( "u_directionalLight.diffuse", light->diffuse );
-            m_shaderSolidLightingPtr->setVec3( "u_directionalLight.specular", light->specular );
+            //// m_shaderSolidLightingPtr->setVec3( "u_directionalLight.specular", light->specular );
             m_shaderSolidLightingPtr->setFloat( "u_directionalLight.intensity", light->intensity );
             m_shaderSolidLightingPtr->setVec3( "u_directionalLight.direction", light->direction );
         }
@@ -498,7 +498,7 @@ namespace engine
             m_shaderSolidLightingPtr->setInt( "u_pointLight.enabled", 1 );
             m_shaderSolidLightingPtr->setVec3( "u_pointLight.ambient", light->ambient );
             m_shaderSolidLightingPtr->setVec3( "u_pointLight.diffuse", light->diffuse );
-            m_shaderSolidLightingPtr->setVec3( "u_pointLight.specular", light->specular );
+            //// m_shaderSolidLightingPtr->setVec3( "u_pointLight.specular", light->specular );
             m_shaderSolidLightingPtr->setFloat( "u_pointLight.intensity", light->intensity );
             m_shaderSolidLightingPtr->setVec3( "u_pointLight.position", light->position );
             m_shaderSolidLightingPtr->setFloat( "u_pointLight.attnk0", light->atnConstant );
@@ -510,7 +510,7 @@ namespace engine
             m_shaderSolidLightingPtr->setInt( "u_spotLight.enabled", 1 );
             m_shaderSolidLightingPtr->setVec3( "u_spotLight.ambient", light->ambient );
             m_shaderSolidLightingPtr->setVec3( "u_spotLight.diffuse", light->diffuse );
-            m_shaderSolidLightingPtr->setVec3( "u_spotLight.specular", light->specular );
+            //// m_shaderSolidLightingPtr->setVec3( "u_spotLight.specular", light->specular );
             m_shaderSolidLightingPtr->setFloat( "u_spotLight.intensity", light->intensity );
             m_shaderSolidLightingPtr->setVec3( "u_spotLight.position", light->position );
             m_shaderSolidLightingPtr->setFloat( "u_spotLight.attnk0", light->atnConstant );

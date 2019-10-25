@@ -100,15 +100,71 @@ engine::CFrameBuffer* createRenderTarget();
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
-class ApplicationUi : public engine::CImguiUi
+class ObjectPickingGuiLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
+    ObjectPickingGuiLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
+    {
+        m_rendererPtr = nullptr;
+        m_meshRendererPtr = nullptr;
+        m_objectPickerPtr = nullptr;
 
-    ~ApplicationUi() {}
+        auto _dirlight = new engine::CDirectionalLight( "directional",
+                                                        { 0.4f, 0.4f, 0.4f },
+                                                        { 0.4f, 0.4f, 0.4f },
+                                                        { 0.8f, 0.8f, 0.8f },
+                                                        g_lightDirDirection );
+
+        auto _pointlight = new engine::CPointLight( "point",
+                                                    { 0.2f, 0.2f, 0.2f },
+                                                    { 0.5f, 0.5f, 0.5f },
+                                                    { 0.8f, 0.8f, 0.8f },
+                                                    g_lightPointPosition,
+                                                    1.0f, 0.05f, 0.005f );
+
+        auto _spotLight = new engine::CSpotLight( "spot",
+                                                  { 0.2f, 0.2f, 0.2f },
+                                                  { 0.5f, 0.5f, 0.5f },
+                                                  { 0.8f, 0.8f, 0.8f },
+                                                  g_lightSpotPosition,
+                                                  g_lightSpotDirection,
+                                                  1.0f, 0.05f, 0.005f,
+                                                  ENGINE_PI / 4.0f,
+                                                  ENGINE_PI / 3.0f );
+
+        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _dirlight ) );
+        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
+        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _spotLight ) );
+
+        m_lights = { _dirlight, _pointlight, _spotLight };
+        m_lightsNames = { "directional", "point", "spot" };
+        m_lightSelectedIndex = 2;
+        m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
+
+        m_lightDirDirection     = g_lightDirDirection;
+        m_lightPointDirection   = g_lightPointDirection;
+        m_lightSpotDirection    = g_lightSpotDirection;
+
+        m_lightPointPosition    = g_lightPointPosition;
+        m_lightSpotPosition     = g_lightSpotPosition;
+
+        auto _cubemapsPtrs = engine::CTextureManager::GetAllCachedTexturesCube();
+        for ( auto& _cubemapPtr : _cubemapsPtrs )
+        {
+            m_cubemaps.push_back( _cubemapPtr );
+            m_cubemapsNames.push_back( _cubemapPtr->name() );
+        }
+
+        m_cubemapSelectedIndex = 0;
+        m_cubemapSelectedName = ( m_cubemapsNames.size() > 0 ) ? m_cubemapsNames[m_cubemapSelectedIndex] : "undefined";
+
+        m_wantsToCaptureMouse = false;
+    }
+
+    ~ObjectPickingGuiLayer() {}
 
     void setRenderer( engine::CMainRenderer* rendererPtr )
     {
@@ -118,6 +174,11 @@ public :
     void setMeshRenderer( engine::CMeshRenderer* meshRendererPtr )
     {
         m_meshRendererPtr = meshRendererPtr;
+    }
+
+    void setObjectPicker( engine::CObjectPicker* objectPickerPtr )
+    {
+        m_objectPickerPtr = objectPickerPtr;
     }
 
     void setRenderablesScene0( const std::vector< engine::CIRenderable* >& renderables )
@@ -156,61 +217,10 @@ public :
 
     engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
 
-protected :
-
-    void _initInternal() override
+    void render() override
     {
-        m_rendererPtr = nullptr;
-        m_meshRendererPtr = nullptr;
+        m_wantsToCaptureMouse = false;
 
-        auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                        { 0.4f, 0.4f, 0.4f },
-                                                        { 0.4f, 0.4f, 0.4f },
-                                                        { 0.8f, 0.8f, 0.8f },
-                                                        g_lightDirDirection );
-
-        auto _pointlight = new engine::CPointLight( "point",
-                                                    { 0.2f, 0.2f, 0.2f },
-                                                    { 0.5f, 0.5f, 0.5f },
-                                                    { 0.8f, 0.8f, 0.8f },
-                                                    g_lightPointPosition,
-                                                    1.0f, 0.05f, 0.005f );
-
-        auto _spotLight = new engine::CSpotLight( "spot",
-                                                  { 0.2f, 0.2f, 0.2f },
-                                                  { 0.5f, 0.5f, 0.5f },
-                                                  { 0.8f, 0.8f, 0.8f },
-                                                  g_lightSpotPosition,
-                                                  g_lightSpotDirection,
-                                                  1.0f, 0.05f, 0.005f,
-                                                  ENGINE_PI / 4.0f,
-                                                  ENGINE_PI / 3.0f );
-
-        m_lights = { _dirlight, _pointlight, _spotLight };
-        m_lightsNames = { "directional", "point", "spot" };
-        m_lightSelectedIndex = 2;
-        m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
-
-        m_lightDirDirection     = g_lightDirDirection;
-        m_lightPointDirection   = g_lightPointDirection;
-        m_lightSpotDirection    = g_lightSpotDirection;
-
-        m_lightPointPosition    = g_lightPointPosition;
-        m_lightSpotPosition     = g_lightSpotPosition;
-
-        auto _cubemapsPtrs = engine::CTextureManager::GetAllCachedTexturesCube();
-        for ( auto& _cubemapPtr : _cubemapsPtrs )
-        {
-            m_cubemaps.push_back( _cubemapPtr );
-            m_cubemapsNames.push_back( _cubemapPtr->name() );
-        }
-
-        m_cubemapSelectedIndex = 0;
-        m_cubemapSelectedName = ( m_cubemapsNames.size() > 0 ) ? m_cubemapsNames[m_cubemapSelectedIndex] : "undefined";
-    }
-
-    void _renderInternal() override
-    {
         _menuUiRendererStats();
         _menuUiDebugDrawer();
         _menuUiPicking();
@@ -218,6 +228,17 @@ protected :
         _menuUiLights();
         _menuUiRendererScene();
         _menuUiRendererShadowMap();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
+    }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
     }
 
 private :
@@ -225,8 +246,6 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.2f", engine::COpenGLApp::GetInstance()->fps() );
-        ImGui::Text( "frame-time    : %.5f", engine::COpenGLApp::GetInstance()->frametime() );
         ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
         ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
         ImGui::PlotLines( "fps-avg", 
@@ -291,18 +310,18 @@ private :
         ImGui::Checkbox( "use-picking", &g_usePicking );
         if ( g_usePicking )
         {
-            engine::CObjectPicker::SetMode( engine::ePickerMode::NORMAL );
+            m_objectPickerPtr->setMode( engine::ePickerMode::NORMAL );
 
             ImGui::TextColored( ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ), "Picking-mode:" );
             ImGui::RadioButton( "normal", &g_pickingMode, 0 ); ImGui::SameLine();
             ImGui::RadioButton( "visualize", &g_pickingMode, 1 ); ImGui::Spacing();
 
             if ( g_pickingMode == 0 ) 
-                engine::CObjectPicker::SetMode( engine::ePickerMode::NORMAL );
+                m_objectPickerPtr->setMode( engine::ePickerMode::NORMAL );
             else if ( g_pickingMode == 1 )
-                engine::CObjectPicker::SetMode( engine::ePickerMode::VISUALIZE );
+                m_objectPickerPtr->setMode( engine::ePickerMode::VISUALIZE );
 
-            auto _fboEncoding = engine::CObjectPicker::GetFbo();
+            auto _fboEncoding = m_objectPickerPtr->getFbo();
             auto _texEncoding = _fboEncoding->getTextureAttachment( "color_attachment" );
 
             ImGui::Image( (void*)(intptr_t) _texEncoding->openglId(),
@@ -325,7 +344,7 @@ private :
         }
         else
         {
-            engine::CObjectPicker::SetMode( engine::ePickerMode::STOPPED );
+            m_objectPickerPtr->setMode( engine::ePickerMode::STOPPED );
         }
 
         ImGui::End();
@@ -740,6 +759,7 @@ private :
 
     engine::CMainRenderer* m_rendererPtr;
     engine::CMeshRenderer* m_meshRendererPtr;
+    engine::CObjectPicker* m_objectPickerPtr;
 
     std::vector< engine::CILight* > m_lights;
     std::vector< std::string > m_lightsNames;
@@ -768,28 +788,27 @@ private :
     std::vector< std::string > m_cubemapsNames;
     std::string m_cubemapSelectedName;
     int m_cubemapSelectedIndex;
+
+    bool m_wantsToCaptureMouse;
 };
 
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _ui = new ObjectPickingGuiLayer( "Object-picking-utils" );
+    _app->addGuiLayer( std::unique_ptr< ObjectPickingGuiLayer >( _ui ) );
     _ui->setRenderer( _app->renderer() );
     _ui->setMeshRenderer( _app->renderer()->meshRenderer() );
 
-    engine::CObjectPicker::Init( _app->window()->width(),
-                                 _app->window()->height() );
-    engine::CObjectPicker::SetMode( engine::ePickerMode::VISUALIZE );
+    auto _objectPicker = new engine::CObjectPicker( engine::CApplication::GetInstance()->window()->width(),
+                                                    engine::CApplication::GetInstance()->window()->height() );
+    _objectPicker->setMode( engine::ePickerMode::VISUALIZE );
+    _ui->setObjectPicker( _objectPicker );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
     _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = _app->window()->aspect();
+    _cameraProjData.aspect      = engine::CApplication::GetInstance()->window()->aspect();
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
@@ -798,8 +817,8 @@ int main()
                                              { 0.0f, 0.0f, 0.0f },
                                              engine::eAxis::Y,
                                              _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+                                             engine::CApplication::GetInstance()->window()->width(),
+                                             engine::CApplication::GetInstance()->window()->height() );
 
     _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
@@ -854,11 +873,13 @@ int main()
     g_renderOptions.useSkybox = g_useSkybox;
     g_renderOptions.useShadowMapping = g_useShadowMapping;
     g_renderOptions.redrawShadowMap = true;
-    g_renderOptions.viewportWidth = _app->window()->width();
-    g_renderOptions.viewportHeight = _app->window()->height();
+    g_renderOptions.viewportWidth = engine::CApplication::GetInstance()->window()->width();
+    g_renderOptions.viewportHeight = engine::CApplication::GetInstance()->window()->height();
     g_renderOptions.cameraPtr = _camera;
     g_renderOptions.lightPtr = _ui->selectedLight();
-    g_renderOptions.shadowMapPtr = nullptr;
+    g_renderOptions.shadowMapPtr = _app->renderer()->shadowMap();
+    g_renderOptions.fogPtr = _fog;
+    g_renderOptions.skyboxPtr = _skybox;
     g_renderOptions.renderTargetPtr = nullptr;
 
     g_renderOptions.depthViewZmin = 0.0f;
@@ -889,11 +910,13 @@ int main()
     g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
     g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
     g_renderOptionsTargetNormal.redrawShadowMap = false;
-    g_renderOptionsTargetNormal.viewportWidth = _app->window()->width() / g_target_factor;
-    g_renderOptionsTargetNormal.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetNormal.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    g_renderOptionsTargetNormal.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     g_renderOptionsTargetNormal.cameraPtr = _camera;
     g_renderOptionsTargetNormal.lightPtr = _ui->selectedLight();
-    g_renderOptionsTargetNormal.shadowMapPtr = nullptr;
+    g_renderOptionsTargetNormal.shadowMapPtr = _app->renderer()->shadowMap();
+    g_renderOptionsTargetNormal.fogPtr = _fog;
+    g_renderOptionsTargetNormal.skyboxPtr = _skybox;
     g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal;
 
     // configure render-target - depth-render mode
@@ -906,8 +929,8 @@ int main()
     g_renderOptionsTargetDepth.useSkybox = false;
     g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
-    g_renderOptionsTargetDepth.viewportWidth = _app->window()->width() / g_target_factor;
-    g_renderOptionsTargetDepth.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetDepth.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    g_renderOptionsTargetDepth.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     g_renderOptionsTargetDepth.cameraPtr = _camera;
     g_renderOptionsTargetDepth.lightPtr = nullptr;
     g_renderOptionsTargetDepth.shadowMapPtr = nullptr;
@@ -927,8 +950,8 @@ int main()
     g_renderOptionsTargetSemantic.useSkybox = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
     g_renderOptionsTargetSemantic.redrawShadowMap = false;
-    g_renderOptionsTargetSemantic.viewportWidth = _app->window()->width() / g_target_factor;
-    g_renderOptionsTargetSemantic.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     g_renderOptionsTargetSemantic.cameraPtr = _camera;
     g_renderOptionsTargetSemantic.lightPtr = nullptr;
     g_renderOptionsTargetSemantic.shadowMapPtr = nullptr;
@@ -978,9 +1001,9 @@ int main()
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
         {
             if ( _camera->active() )
-                _app->window()->disableCursor();
+                engine::CApplication::GetInstance()->window()->disableCursor();
             else
-                _app->window()->enableCursor();
+                engine::CApplication::GetInstance()->window()->enableCursor();
         }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
@@ -1103,48 +1126,57 @@ int main()
         g_renderOptions.shadowMapRangeConfig = _config;
         g_renderOptionsTargetNormal.shadowMapRangeConfig = _config;
 
+        _app->renderOptions() = g_renderOptions;
+
         _app->begin();
         _app->update();
 
         /****************************************************/
-        // render our scene
-        _app->renderer()->render( _app->scene(), g_renderOptions );
 
         // render to the targets
         if ( g_showRenderTargetDepth )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetDepth );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetDepth );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetSemantic )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetSemantic );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetSemantic );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
 
         if ( g_showRenderTargetNormal )
-            _app->renderer()->render( _app->scene(), g_renderOptionsTargetNormal );
+        {
+            _app->renderer()->begin( g_renderOptionsTargetNormal );
+            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->render();
+        }
+
+        // render our scene
+        _app->renderer()->begin( g_renderOptions );
+        _app->render();
 
         //// // visualize the shadow-map
         //// renderShadowMap( lightPtr, _quad_varray, _shaderShadowMapViz, _app->renderer()->shadowMap() );
 
         /****************************************************/
 
-        engine::CObjectPicker::Submit( _app->scene()->renderables(), _camera );
+        _app->end();
+
+        _objectPicker->begin( _camera );
+        _objectPicker->submit( _app->scene()->renderables() );
+        _objectPicker->render();
+
         if ( engine::CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
         {
-            g_objectPicked = engine::CObjectPicker::GetObjectPicked( engine::CInputManager::GetCursorPosition().x,
-                                                                     engine::CInputManager::GetCursorPosition().y,
-                                                                     _app->window()->width(),
-                                                                     _app->window()->height() );
+            g_objectPicked = _objectPicker->getObjectPicked( engine::CInputManager::GetCursorPosition().x,
+                                                             engine::CInputManager::GetCursorPosition().y,
+                                                             engine::CApplication::GetInstance()->window()->width(),
+                                                             engine::CApplication::GetInstance()->window()->height() );
         }
-
-        //// _app->renderScene();
-        //// _app->renderDebug();
-        if ( g_debug_drawer_use_lighting )
-            engine::CDebugDrawer::Render( _camera, lightPtr );
-        else
-            engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
-        _app->end();
 
 ////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
 ////                      1.0f / engine::CTime::GetAvgTimeStep(), 
@@ -1182,7 +1214,7 @@ void renderShadowMap( engine::CILight* lightPtr,
     shadowMapPtr->frameBuffer()->getTextureAttachment( "shadow_depth_attachment" )->unbind();
     shaderPtr->unbind();
     glEnable( GL_DEPTH_TEST );
-    glViewport( 0, 0, _app->window()->width(), _app->window()->height() );
+    glViewport( 0, 0, engine::CApplication::GetInstance()->window()->width(), engine::CApplication::GetInstance()->window()->height() );
 }
 
 std::vector< engine::CIRenderable* > _createScene0()
@@ -1232,7 +1264,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -1350,7 +1382,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
     }
 
     return _renderables;
@@ -1381,7 +1413,7 @@ std::vector< engine::CIRenderable* > _createScene2()
         _renderablePtr->material()->setAlbedoMap( _renderableTexture );
 
         _renderables.push_back( _renderablePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
 
         // create a cube inside the sphere
         auto _cubePtr = engine::CMeshBuilder::createBox( 0.5f, 0.5f, 0.5f );
@@ -1396,7 +1428,7 @@ std::vector< engine::CIRenderable* > _createScene2()
         _cubePtr->material()->specular = { 0.8f, 0.1f, 0.1f };
 
         _renderables.push_back( _cubePtr );
-        engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
+        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
@@ -1404,7 +1436,7 @@ std::vector< engine::CIRenderable* > _createScene2()
     _floor->material()->setAlbedoMap( _renderableTexture );
     _floor->setObjectId( 1000 );
     _renderables.push_back( _floor );
-    engine::COpenGLApp::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
 
     return _renderables;
 }
@@ -1414,8 +1446,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = _app->window()->width() / g_target_factor;
-    _fbColorConfig.height               = _app->window()->height() / g_target_factor;
+    _fbColorConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbColorConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -1425,8 +1457,8 @@ engine::CFrameBuffer* createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = _app->window()->width() / g_target_factor;
-    _fbDepthConfig.height               = _app->window()->height() / g_target_factor;
+    _fbDepthConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
+    _fbDepthConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;

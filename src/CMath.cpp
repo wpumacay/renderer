@@ -930,6 +930,8 @@ namespace engine
     void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex )
     {
         CComparatorSignedDistancePlane _comparator;
+        _comparator.plane = plane;
+
         auto _corners = computeBoxCorners( bbox );
         std::sort( _corners.begin(), _corners.end(), _comparator );
 
