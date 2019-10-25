@@ -47,6 +47,8 @@ namespace engine
         void bind();
         void unbind();
 
+        void resize( int32 width, int32 height );
+
         CTexture* getTextureAttachment( const std::string& name );
         CAttachmentConfig getConfigAttachment( const std::string& name );
 

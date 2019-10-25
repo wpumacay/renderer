@@ -35,7 +35,14 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _windowProperties = engine::CWindowProps();
+    _windowProperties.width = 1024;
+    _windowProperties.height = 768;
+    _windowProperties.title = "resizable-application";
+    _windowProperties.clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+    _windowProperties.resizable = true;
+
+    auto _app = new engine::CApplication( _windowProperties );
     auto _layer = new SampleGuiLayer( "sample-layer" );
     _app->addGuiLayer( std::unique_ptr< engine::CImGuiLayer >( _layer ) );
 

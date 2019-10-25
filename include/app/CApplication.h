@@ -34,7 +34,7 @@ namespace engine
 
         static CApplication* GetInstance();
 
-        CApplication();
+        CApplication( const CWindowProps& windowProperties = CWindowProps() );
         virtual ~CApplication();
 
         void setScene( std::unique_ptr< CScene > scene );
@@ -48,6 +48,12 @@ namespace engine
         void render();
 
         void end();
+
+        void addKeyboardCallback( FnPtr_keyboard_callback callback ) { m_keyboardCallbacks.push_back( callback ); }
+        void addMouseButtonCallback( FnPtr_mouse_callback callback ) { m_mouseButtonCallbacks.push_back( callback ); }
+        void addMouseMoveCallback( FnPtr_mousemove_callback callback ) { m_mouseMoveCallbacks.push_back( callback ); }
+        void addScrollCallback( FnPtr_scroll_callback callback ) { m_scrollCallbacks.push_back( callback ); }
+        void addResizeCallback( FnPtr_resize_callback callback ) { m_resizeCallbacks.push_back( callback ); }
 
         static void CallbackKey( int key, int action );
         static void CallbackMouseButton( int button, int action, double x, double y );
@@ -78,6 +84,12 @@ namespace engine
         std::unique_ptr< CMainRenderer >                m_mainRenderer;
         std::unique_ptr< CImGuiManager >                m_imguiManager;
         std::vector< std::unique_ptr< CImGuiLayer > >   m_guiLayers;
+
+        std::vector< FnPtr_keyboard_callback > m_keyboardCallbacks;
+        std::vector< FnPtr_mouse_callback > m_mouseButtonCallbacks;
+        std::vector< FnPtr_mousemove_callback > m_mouseMoveCallbacks;
+        std::vector< FnPtr_scroll_callback > m_scrollCallbacks;
+        std::vector< FnPtr_resize_callback > m_resizeCallbacks;
     };
 
 }

@@ -163,7 +163,10 @@ namespace engine
         glTexImage2D( GL_TEXTURE_2D, 0, 
                       toOpenGLEnum( m_texDataPtr->internalFormat ), m_texDataPtr->width, m_texDataPtr->height, 0,
                       toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), m_texDataPtr->data );
-        glGenerateMipmap( GL_TEXTURE_2D );
+
+        // create mipmaps for textures loaded from disk, not for potential fbo attachments
+        if ( m_texDataPtr->data )
+            glGenerateMipmap( GL_TEXTURE_2D );
 
         glBindTexture( GL_TEXTURE_2D, 0 );
         /***********************************************************************/
@@ -199,6 +202,24 @@ namespace engine
 
     void CTexture::unbind()
     {
+        glBindTexture( GL_TEXTURE_2D, 0 );
+    }
+
+    void CTexture::resize( int32 width, int32 height )
+    {
+        if ( m_texDataPtr->data )
+        {
+            ENGINE_CORE_WARN( "Tried resizing a texture associated to non-null initial texture data. Skipping resize" );
+            return;
+        }
+
+        m_texDataPtr->width = width;
+        m_texDataPtr->height = height;
+
+        glBindTexture( GL_TEXTURE_2D, m_openglId );
+        glTexImage2D( GL_TEXTURE_2D, 0,
+                      toOpenGLEnum( m_texDataPtr->internalFormat ), width, height, 0,
+                      toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), NULL );
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
 

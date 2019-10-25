@@ -130,6 +130,12 @@ namespace engine
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     }
 
+    void CFrameBuffer::resize( int32 width, int32 height )
+    {
+        // should resize textures to handle the required available space
+        for ( auto& pair : m_textures )
+            pair.second->resize( width, height );
+    }
 
     CTexture* CFrameBuffer::getTextureAttachment( const std::string& name )
     {

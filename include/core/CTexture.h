@@ -92,6 +92,7 @@ namespace engine
 
         void bind();
         void unbind();
+        void resize( int32 width, int32 height );
 
         CTextureData* data() const { return m_texDataPtr; }
 

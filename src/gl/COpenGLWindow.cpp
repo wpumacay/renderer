@@ -17,7 +17,7 @@ namespace engine
     #ifdef __APPLE__
         glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     #endif
-        glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
+        glfwWindowHint( GLFW_RESIZABLE, ( properties.resizable ) ? GL_TRUE : GL_FALSE );
 
         m_glfwWindowPtr = glfwCreateWindow( m_properties.width,
                                             m_properties.height,

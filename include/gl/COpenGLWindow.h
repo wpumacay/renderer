@@ -18,6 +18,7 @@ namespace engine
         int height;
         std::string title;
         CVec4 clearColor;
+        bool resizable;
 
         int gl_api_version_major;
         int gl_api_version_minor;
@@ -32,8 +33,9 @@ namespace engine
         {
             width = 1024;
             height = 768;
-            title = "OpenGL-Window";
+            title = "Minino-renderer :3";
             clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+            resizable = false;
 
             gl_api_version_major = 3;
             gl_api_version_minor = 3;

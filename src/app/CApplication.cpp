@@ -12,7 +12,7 @@ namespace engine
         return CApplication::s_instance;
     }
 
-    CApplication::CApplication()
+    CApplication::CApplication( const CWindowProps& windowProperties )
     {
         // create the global reference for other systems to use
         CApplication::s_instance = this;
@@ -20,15 +20,7 @@ namespace engine
         engine::CLogger::Init();
         ENGINE_CORE_INFO( "GL-Application: starting..." );
 
-        CWindowProps _windowProperties;
-        _windowProperties.width = 800;
-        _windowProperties.height = 600;
-        _windowProperties.title = "Minino-engine :3";
-        _windowProperties.callbackKey = nullptr;
-        _windowProperties.callbackMouse = nullptr;
-        _windowProperties.callbackMouseMove = nullptr;
-
-        m_window = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( _windowProperties ) );
+        m_window = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( windowProperties ) );
 
         ENGINE_CORE_ASSERT( m_window->glfwWindow(), "There was an error while creating the opengl-window" );
 
@@ -48,6 +40,10 @@ namespace engine
         m_window->registerMouseMoveCallback( CApplication::CallbackMouseMove );
         m_window->registerScrollCallback( CApplication::CallbackScroll );
         m_window->registerResizeCallback( CApplication::CallbackResize );
+
+        // setup initial viewport
+        m_renderOptions.viewportWidth = m_window->width();
+        m_renderOptions.viewportHeight = m_window->height();
 
         // start keeping track of time
         engine::CTime::Start();
@@ -214,6 +210,10 @@ namespace engine
             }
         }
 
+        /* call extra user-installed callbacks */
+        for ( auto _callback : _app->m_keyboardCallbacks )
+            _callback( key, action );
+
         CInputManager::Callback_key( key, action );
     }
 
@@ -256,6 +256,10 @@ namespace engine
             }
         };
 
+        /* call extra user-installed callbacks */
+        for ( auto _callback : _app->m_mouseButtonCallbacks )
+            _callback( button, ( _handled ) ? ENGINE_MOUSE_BUTTON_RELEASED : action, x, y );
+
         if ( _handled ) // clear the state for this button
             CInputManager::Callback_mouse( button, ENGINE_MOUSE_BUTTON_RELEASED, x, y );
         else
@@ -280,6 +284,10 @@ namespace engine
                 return;
         }
 
+        /* call extra user-installed callbacks */
+        for ( auto _callback : _app->m_mouseMoveCallbacks )
+            _callback( x, y );
+
         CInputManager::Callback_mouseMove( x, y );
     }
 
@@ -301,6 +309,10 @@ namespace engine
                 return;
         }
 
+        /* call extra user-installed callbacks */
+        for ( auto _callback : _app->m_scrollCallbacks )
+            _callback( xOff, yOff );
+
         CInputManager::Callback_scroll( xOff, yOff );
     }
 
@@ -318,8 +330,18 @@ namespace engine
         for ( auto& _layer : _layers )
             _layer->onEvent( _ev );
 
+        /* all resources on the scene should be notified that the dimensions have changed */
         if ( _scene )
             _scene->resize( width, height );
+
+        /* the renderer viewport should also change accordingly  */
+        auto& _renderOptions = _app->m_renderOptions;
+        _renderOptions.viewportWidth = width;
+        _renderOptions.viewportHeight = height;
+
+        /* call extra user-installed callbacks */
+        for ( auto _callback : _app->m_resizeCallbacks )
+            _callback( width, height );
     }
 
     std::vector< CImGuiLayer* > CApplication::guiLayers() const
