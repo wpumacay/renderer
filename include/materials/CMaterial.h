@@ -11,7 +11,6 @@ namespace engine
 
     const int MATERIAL_ALBEDO_MAP_SLOT = 0;
     const int MATERIAL_SPECULAR_MAP_SLOT = 1;
-    const int MATERIAL_NORMAL_MAP_SLOT = 2;
 
     const CVec3 MATERIAL_DEFAULT_AMBIENT_COLOR = { 1.0f, 0.5f, 0.31f };
     const CVec3 MATERIAL_DEFAULT_DIFFUSE_COLOR = { 1.0f, 0.5f, 0.31f };
@@ -47,8 +46,7 @@ namespace engine
                    const CVec3& specularColor = MATERIAL_DEFAULT_SPECULAR_COLOR,
                    float32 specularShininess = MATERIAL_DEFAULT_SHININESS,
                    CTexture* albedoMap = nullptr,
-                   CTexture* specularMap = nullptr,
-                   CTexture* normalMap = nullptr );
+                   CTexture* specularMap = nullptr );
 
         ~CMaterial();
 
@@ -60,11 +58,9 @@ namespace engine
         void setType( const eMaterialType& type ) { m_type = type; }
         void setAlbedoMap( CTexture* albedoMap ) { m_albedoMap = albedoMap; }
         void setSpecularMap( CTexture* specularMap ) { m_specularMap = specularMap; }
-        void setNormalMap( CTexture* normalMap ) { m_normalMap = normalMap; }
 
         CTexture* albedoMap() const { return m_albedoMap; }
         CTexture* specularMap() const { return m_specularMap; }
-        CTexture* normalMap() const { return m_normalMap; }
 
         std::string name() const { return m_name; }
         eMaterialType type() const { return m_type; }
@@ -77,7 +73,6 @@ namespace engine
         eMaterialType   m_type;
         CTexture*       m_albedoMap;
         CTexture*       m_specularMap;
-        CTexture*       m_normalMap;
 
     };
 

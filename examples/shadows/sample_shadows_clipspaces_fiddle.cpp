@@ -577,6 +577,8 @@ int main()
 //                                            _cameraSpeed,
 //                                            _cameraMaxDelta );
 
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();
     _cameraProjDataTest.projection  = engine::eCameraProjection::PERSPECTIVE;

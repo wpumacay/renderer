@@ -61,6 +61,8 @@ int main()
                                              _app->window()->width(),
                                              _app->window()->height() );
 
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+
     auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
 
@@ -163,7 +165,6 @@ int main()
 
         _app->update();
         _app->begin();
-        _camera->update();
 
         /* do our thing here ************************/
 

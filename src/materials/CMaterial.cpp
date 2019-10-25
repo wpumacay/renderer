@@ -22,8 +22,7 @@ namespace engine
                           const CVec3& specularColor,
                           float32 specularShininess,
                           CTexture* albedoMap,
-                          CTexture* specularMap,
-                          CTexture* normalMap )
+                          CTexture* specularMap )
     {
         m_name  = name;
         m_type  = type;
@@ -37,14 +36,12 @@ namespace engine
 
         m_albedoMap     = albedoMap;
         m_specularMap   = specularMap;
-        m_normalMap     = normalMap;
     }
 
     CMaterial::~CMaterial()
     {
         m_albedoMap = nullptr;
         m_specularMap = nullptr;
-        m_normalMap = nullptr;
     }
 
     void CMaterial::bind( engine::CShader* shaderPtr )
@@ -97,18 +94,6 @@ namespace engine
             {
                 shaderPtr->setInt( "u_material.specularMapActive", 0 );
             }
-
-            if ( m_normalMap )
-            {
-                shaderPtr->setInt( "u_material.normalMap", MATERIAL_NORMAL_MAP_SLOT );
-                shaderPtr->setInt( "u_material.normalMapActive", 1 );
-                glActiveTexture( GL_TEXTURE0 + MATERIAL_NORMAL_MAP_SLOT );
-                m_normalMap->bind();
-            }
-            else
-            {
-                shaderPtr->setInt( "u_material.normalMapActive", 0 );
-            }
         }
     }
 
@@ -146,7 +131,6 @@ namespace engine
             _strRep += "shininess   : " + std::to_string( shininess ) + "\n\r";
             _strRep += "albedoMap  : " + ( ( m_albedoMap ) ? m_albedoMap->name() : "none" ) + "\n\r";
             _strRep += "specularMap : " + ( ( m_specularMap ) ? m_specularMap->name() : "none" ) + "\n\r";
-            _strRep += "normalMap   : " + ( ( m_normalMap ) ? m_normalMap->name() : "none" ) + "\n\r";
         }
  
         return _strRep;

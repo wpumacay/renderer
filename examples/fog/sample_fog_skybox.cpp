@@ -16,24 +16,13 @@ const engine::CVec3 g_worldUp = { 0.0f, 1.0f, 0.0f };
 float g_lowerLimit = 0.0f;
 float g_upperLimit = 0.25f;
 
-class ApplicationUi : public engine::CImguiUi
+class FogSkyboxLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ApplicationUi( engine::COpenGLContext* context ) 
-        : engine::CImguiUi( context ) {}
-
-    ~ApplicationUi() {}
-
-    void setSkyboxReference( engine::CSkybox* skyboxPtr ) { m_skyboxPtr = skyboxPtr; }
-    void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
-
-    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
-
-protected :
-
-    void _initInternal() override
+    FogSkyboxLayer( const std::string& name ) 
+        : engine::CImGuiLayer( name ) 
     {
         auto _dirlight = new engine::CDirectionalLight( "directional",
                                                         { 0.2f, 0.2f, 0.2f },
@@ -81,14 +70,38 @@ protected :
 
         m_cubemapSelectedIndex = 0;
         m_cubemapSelectedName = ( m_cubemapsNames.size() > 0 ) ? m_cubemapsNames[m_cubemapSelectedIndex] : "undefined";
+
+        m_wantsToCaptureMouse = false;
     }
 
-    void _renderInternal() override
+    ~FogSkyboxLayer() {}
+
+    void setSkyboxReference( engine::CSkybox* skyboxPtr ) { m_skyboxPtr = skyboxPtr; }
+    void setFogReference( engine::CFog* fogPtr ) { m_fogPtr = fogPtr; }
+
+    engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
+
+    void render() override
     {
+        m_wantsToCaptureMouse = false;
+
         _menuUiLights();
         _menuUiFog();
         _menuUiSkybox();
+
+        ImGuiIO& io = ImGui::GetIO();
+        m_wantsToCaptureMouse = io.WantCaptureMouse;
     }
+
+    bool onEvent( const engine::CInputEvent& event ) override
+    {
+        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
+            return m_wantsToCaptureMouse;
+
+        return false;
+    }
+
+protected :
 
     void _menuUiLights()
     {
@@ -273,6 +286,8 @@ protected :
     std::vector< std::string > m_cubemapsNames;
     std::string m_cubemapSelectedName;
     int m_cubemapSelectedIndex;
+
+    bool m_wantsToCaptureMouse;
 };
 
 void renderSceneWithFog( engine::CILight* lightPtr, 
@@ -294,12 +309,8 @@ engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis );
 int main()
 {
     auto _app = new engine::CApplication();
-    _app->init();
-
-    auto _ui = new ApplicationUi( _app->window()->context() );
-    _ui->init();
-
-    _app->addGuiLayer( std::unique_ptr< ApplicationUi >( _ui ) );
+    auto _uiLayer = new FogSkyboxLayer( "FogSkybox-utils" );
+    _app->addGuiLayer( std::unique_ptr< FogSkyboxLayer >( _uiLayer ) );
 
     /* load the shader used to render the scene with fog */
     std::string _baseNamePhongWithFog = std::string( ENGINE_EXAMPLES_PATH ) + "fog/shaders/phong_with_fog";
@@ -344,6 +355,8 @@ int main()
 //                                            _cameraSensitivity,
 //                                            _cameraSpeed,
 //                                            _cameraMaxDelta );
+
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();
@@ -407,9 +420,9 @@ int main()
 
     /**********************************************************************************************/
 
-    auto _currentLight = _ui->selectedLight();
-    _ui->setFogReference( _fog );
-    _ui->setSkyboxReference( _skybox );
+    auto _currentLight = _uiLayer->selectedLight();
+    _uiLayer->setFogReference( _fog );
+    _uiLayer->setSkyboxReference( _skybox );
 
     while( _app->active() )
     {
@@ -433,10 +446,10 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         /* use the light selected by the user */
-        _currentLight = _ui->selectedLight();
+        _currentLight = _uiLayer->selectedLight();
 
+        _app->update();
         _app->begin();
-        _camera->update();
 
         /* do our thing here ************************/
 
@@ -448,11 +461,7 @@ int main()
 
         /********************************************/
 
-        engine::CDebugDrawer::Render( _camera );
-
-        if ( !_camera->active() )
-            _app->renderUi();
-
+        _app->render();
         _app->end();
     }
 

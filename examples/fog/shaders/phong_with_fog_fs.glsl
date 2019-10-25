@@ -17,8 +17,6 @@ struct Material
     int albedoMapActive;
     sampler2D specularMap;
     int specularMapActive;
-    sampler2D normalMap;
-    int normalMapActive;
 };
 uniform Material u_material;
 

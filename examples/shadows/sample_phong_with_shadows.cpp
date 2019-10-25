@@ -66,7 +66,7 @@ int main()
     //                                          _app->window()->height() );
 
     const float _cameraSensitivity  = 0.25f;
-    const float _cameraSpeed        = 250.0f;
+    const float _cameraSpeed        = 25.0f;
     const float _cameraMaxDelta     = 10.0f;
     
     auto _camera = new engine::CFpsCamera( "fps",
@@ -77,6 +77,8 @@ int main()
                                            _cameraSensitivity,
                                            _cameraSpeed,
                                            _cameraMaxDelta );
+
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
     auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };

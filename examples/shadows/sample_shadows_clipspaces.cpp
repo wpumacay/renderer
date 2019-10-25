@@ -34,12 +34,12 @@ float g_extraWidth = 1.0f;
 float g_extraHeight = 1.0f;
 float g_extraDepth = 1.0f;
 
-class ShadowsUtilsLayers : public engine::CImGuiLayer
+class ShadowsUtilsLayer : public engine::CImGuiLayer
 {
 
 public :
 
-    ShadowsUtilsLayers( const std::string& name ) 
+    ShadowsUtilsLayer( const std::string& name ) 
         : engine::CImGuiLayer( name ) 
     {
         auto _dirlight = new engine::CDirectionalLight( "directional",
@@ -80,7 +80,7 @@ public :
         m_wantsToCaptureMouse = false;
     }
 
-    ~ShadowsUtilsLayers() {}
+    ~ShadowsUtilsLayer() {}
 
     engine::CILight* selectedLight() const { return m_lights[m_lightSelectedIndex]; }
 
@@ -264,8 +264,8 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr,
 int main()
 {
     auto _app = new engine::CApplication();
-    auto _uiLayer = new ShadowsUtilsLayers( "Shadows-utils" );
-    _app->addGuiLayer( std::unique_ptr< ShadowsUtilsLayers >( _uiLayer ) );
+    auto _uiLayer = new ShadowsUtilsLayer( "Shadows-utils" );
+    _app->addGuiLayer( std::unique_ptr< ShadowsUtilsLayer >( _uiLayer ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
@@ -317,6 +317,8 @@ int main()
 //                                            _cameraSensitivity,
 //                                            _cameraSpeed,
 //                                            _cameraMaxDelta );
+
+    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
 
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();
