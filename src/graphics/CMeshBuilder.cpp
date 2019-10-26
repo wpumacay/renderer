@@ -835,10 +835,10 @@ namespace engine
                 _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
                 _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
 
-                CVec2 _t0( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
-                CVec2 _t1( ( (float)( i + 0 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
-                CVec2 _t2( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 1 ) ) / nDepthSamples );
-                CVec2 _t3( ( (float)( i + 1 ) ) / nWidthSamples, ( (float)( j + 0 ) ) / nDepthSamples );
+                CVec2 _t0( 0.5f * ( i + 0 ) * _dw, 0.5f * ( j + 0 ) * _dd );
+                CVec2 _t1( 0.5f * ( i + 1 ) * _dw, 0.5f * ( j + 0 ) * _dd );
+                CVec2 _t2( 0.5f * ( i + 1 ) * _dw, 0.5f * ( j + 1 ) * _dd );
+                CVec2 _t3( 0.5f * ( i + 0 ) * _dw, 0.5f * ( j + 1 ) * _dd );
 
                 _texCoords.push_back( _t0 );
                 _texCoords.push_back( _t1 );
@@ -1007,7 +1007,7 @@ namespace engine
         _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
 
         auto _duration = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - _start );
-        ENGINE_CORE_INFO( "time taken (ms) to create hfield: {0}", _duration.count() );
+        ENGINE_CORE_TRACE( "time taken (ms) to create hfield: {0}", _duration.count() );
 
         return _mesh;
     }

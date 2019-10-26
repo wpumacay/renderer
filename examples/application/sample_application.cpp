@@ -111,10 +111,22 @@ int main()
                                                            _centerX, _centerY,
                                                            _heightData, 1.0f,
                                                            engine::eAxis::Y );
-    _patch->material()->ambient = { 0.3f, 0.5f, 0.8f };
-    _patch->material()->diffuse = { 0.3f, 0.5f, 0.8f };
-    _patch->material()->specular = { 0.3f, 0.5f, 0.8f };
+    _patch->material()->ambient = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->diffuse = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->specular = { 0.5f, 0.5f, 0.5f };
     _patch->material()->shininess = 32.0f;
+
+    //// auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Y );
+    //// _patch->material()->ambient = { 0.3f, 0.5f, 0.8f };
+    //// _patch->material()->diffuse = { 0.3f, 0.5f, 0.8f };
+    //// _patch->material()->specular = { 0.3f, 0.5f, 0.8f };
+    //// _patch->material()->shininess = 32.0f;
+
+    //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_grid" );
+    //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_smiley" );
+    auto _texture = engine::CTextureManager::GetCachedTexture( "built_in_chessboard" );
+    _patch->material()->setAlbedoMap( _texture );
+    //// _floor->material()->setAlbedoMap( _texture );
 
     /* create some renderables in our scene *******************************************************/
     std::string _modelpath = std::string( ENGINE_RESOURCES_PATH ) + "models/pokemons/lizardon/lizardon.obj";
@@ -124,6 +136,7 @@ int main()
 
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _model ) );
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _patch ) );
+    //// _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
     /**********************************************************************************************/
 
     _app->setScene( std::unique_ptr< engine::CScene >( _scene ) );
@@ -132,6 +145,9 @@ int main()
     _app->renderOptions().shadowMapRangeConfig.type = engine::eShadowRangeType::FIXED_USER;
     _app->renderOptions().shadowMapRangeConfig.worldUp = { 0.0f, 1.0f, 0.0f };
     _app->renderOptions().shadowMapRangeConfig.cameraPtr = _orbitCamera;
+    _app->renderOptions().shadowMapRangeConfig.clipSpaceWidth   = 40.0f;
+    _app->renderOptions().shadowMapRangeConfig.clipSpaceHeight  = 40.0f;
+    _app->renderOptions().shadowMapRangeConfig.clipSpaceDepth   = 40.0f;
     //// _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
     _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlight;
 

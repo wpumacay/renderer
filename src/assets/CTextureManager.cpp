@@ -568,7 +568,66 @@ namespace engine
 
     void CTextureManager::_createBuiltInTextures()
     {
-        // @TODO: Add functionality for built-in textures
+        _createChessboardTexture();
+    }
+
+    void CTextureManager::_createChessboardTexture()
+    {
+        const size_t _width = 256;
+        const size_t _height = 256;
+
+        struct _CPixel
+        {
+            uint8 r; uint8 g; uint8 b;
+        };
+
+        auto _data = new _CPixel[ _width * _height ];
+
+        for ( size_t i = 0; i < _height; i++ )
+        {
+            for ( size_t j = 0; j < _width; j++ )
+            {
+                if ( ( ( i & 0x40 ) == 0 ) ^ ( ( j & 0x40 ) == 0 ) )
+                {
+                    _data[ j + i * _width ].r = 255;
+                    _data[ j + i * _width ].g = 255;
+                    _data[ j + i * _width ].b = 255;
+                }
+                else
+                {
+                    _data[ j + i * _width ].r = 122;
+                    _data[ j + i * _width ].g = 122;
+                    _data[ j + i * _width ].b = 122;
+                }
+            }
+        }
+
+        auto _textureData = new CTextureData();
+        _textureData->name              = "built_in_chessboard";
+        _textureData->width             = _width;
+        _textureData->height            = _height;
+        _textureData->channels          = 3;
+        _textureData->internalFormat    = eTextureFormat::RGB;
+        _textureData->format            = eTextureFormat::RGB;
+        _textureData->data              = (uint8*) _data;
+
+        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
+        m_texturesData[ "built_in_chessboard" ] = std::move( _textureDataPtr );
+        m_texturesDataList.push_back( _textureData );
+
+        auto _texture = new CTexture( _textureData,
+                                      { eTextureFilter::NEAREST,
+                                        eTextureFilter::NEAREST,
+                                        eTextureWrap::REPEAT,
+                                        eTextureWrap::REPEAT,
+                                        { 0.0f, 0.0f, 0.0f, 1.0f },
+                                        { 0.0f, 0.0f, 0.0f, 1.0f },
+                                        ePixelDataType::UINT_8 } );
+
+        std::unique_ptr< CTexture > _texturePtr( _texture );
+        m_textures[ "built_in_chessboard" ] = std::move( _texturePtr );
+        m_texturesList.push_back( _texture );
+
     }
 
 }

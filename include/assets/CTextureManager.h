@@ -63,6 +63,7 @@ namespace engine
 
         void _loadTextures();
         void _createBuiltInTextures();
+        void _createChessboardTexture();
 
         CTextureData* _loadTextureData( const std::string& filepath, bool flipVertically );
         CTextureCubeData* _loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically );
