@@ -67,7 +67,6 @@ namespace engine
         CVec4           borderColorU;
         CVec4           borderColorV;
         ePixelDataType  dtype;
-        uint32          textureUnit;
     };
 
     class CTexture
@@ -82,8 +81,7 @@ namespace engine
                   const eTextureWrap& wrapV,
                   const CVec4& borderColorU,
                   const CVec4& borderColorV,
-                  const ePixelDataType& dtype,
-                  uint32 textureUnit );
+                  const ePixelDataType& dtype );
 
         CTexture( CTextureData* texDataPtr,
                   const CTextureOptions& texOptions );
@@ -111,7 +109,6 @@ namespace engine
         ePixelDataType dtype() const { return m_texPixelDtype; }
 
         uint32 openglId() const { return m_openglId; }
-        uint32 openglTexUnit() const { return m_openglTexUnit; }
 
     private :
 

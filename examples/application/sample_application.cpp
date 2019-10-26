@@ -48,19 +48,27 @@ int main()
 
     auto _scene = new engine::CScene();
 
-    auto _pointlight = new engine::CPointLight( "point",
-                                                { 0.2f, 0.2f, 0.2f },
-                                                { 0.5f, 0.5f, 0.5f },
-                                                { 0.8f, 0.8f, 0.8f },
-                                                { 0.0f, 3.0f, 0.0f },
-                                                1.0f, 0.05f, 0.005f );
+    /* create a simple point-light for the scene **************************************************/
+////     auto _pointlight = new engine::CPointLight( "point",
+////                                                 { 0.2f, 0.2f, 0.2f },
+////                                                 { 0.5f, 0.5f, 0.5f },
+////                                                 { 0.8f, 0.8f, 0.8f },
+////                                                 { 0.0f, 7.0f, 0.0f },
+////                                                 1.0f, 0.05f, 0.005f );
+//// 
+////     _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
 
+    auto _dirlight = new engine::CDirectionalLight( "directional",
+                                                    { 0.4f, 0.4f, 0.4f },
+                                                    { 0.8f, 0.8f, 0.8f },
+                                                    { 0.8f, 0.8f, 0.8f },
+                                                    { -1.0f, -1.0f, -1.0f } );
+
+    _scene->addLight( std::unique_ptr< engine::CILight >( _dirlight ) );
+
+    /* create a single camera *********************************************************************/
     auto _cameraProjData = engine::CCameraProjData();
-    _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
-    _cameraProjData.fov         = 45.0f;
-    _cameraProjData.aspect      = _app->window()->aspect();
-    _cameraProjData.zNear       = 0.1f;
-    _cameraProjData.zFar        = 50.0f;
+    _cameraProjData.aspect = _app->window()->aspect();
 
     auto _orbitCamera = new engine::COrbitCamera( "orbit",
                                                   { 0.0f, 0.0f, 3.0f },
@@ -70,15 +78,52 @@ int main()
                                                   _app->window()->width(),
                                                   _app->window()->height() );
 
-    auto _sphere = engine::CMeshBuilder::createSphere( 1.0f );
-    _sphere->position = { 0.0f, 1.0f, 0.0f };
-
-    auto _floor = engine::CMeshBuilder::createPlane( 6.0f, 6.0f, engine::eAxis::Y );
-
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _sphere ) );
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
-    _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
     _scene->addCamera( std::unique_ptr< engine::CICamera >( _orbitCamera ) );
+    /**********************************************************************************************/
+
+    const int _nWidthSamples = 50;
+    const int _nDepthSamples = 50;
+    const float _widthExtent = 10.0f;
+    const float _depthExtent = 10.0f;
+    const float _centerX = _widthExtent / 2.0f;
+    const float _centerY = _depthExtent / 2.0f;
+    std::vector< float > _heightData;
+    for ( size_t i = 0; i < _nWidthSamples; i++ )
+    {
+        for ( size_t j = 0; j < _nDepthSamples; j++ )
+        {
+            float _x = _widthExtent * ( ( (float) i ) / _nWidthSamples - 0.5f );
+            float _y = _depthExtent * ( ( (float) j ) / _nDepthSamples - 0.5f );
+            
+            // float _z = 10.0f * ( _x * _x + _y * _y ) / ( _widthExtent * _widthExtent + _depthExtent * _depthExtent );
+
+            float _u = _x * 2.0f;
+            float _v = _y * 2.0f;
+            float _z = std::cos( std::sqrt( ( _u * _u + _v * _v ) ) );
+
+            _heightData.push_back( _z );
+        }
+    }
+
+    auto _patch = engine::CMeshBuilder::createHeightField( _nWidthSamples, _nDepthSamples,
+                                                           _widthExtent, _depthExtent,
+                                                           _centerX, _centerY,
+                                                           _heightData, 1.0f,
+                                                           engine::eAxis::Y );
+    _patch->material()->ambient = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->diffuse = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->specular = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->shininess = 32.0f;
+
+    /* create some renderables in our scene *******************************************************/
+    std::string _modelpath = std::string( ENGINE_RESOURCES_PATH ) + "models/pokemons/lizardon/lizardon.obj";
+    auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath );
+    _model->scale = { 0.1f, 0.1f, 0.1f };
+    _model->position = { 0.0f, 2.0f, 0.0f };
+
+    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _model ) );
+    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _patch ) );
+    /**********************************************************************************************/
 
     _app->setScene( std::unique_ptr< engine::CScene >( _scene ) );
 
@@ -86,7 +131,8 @@ int main()
     _app->renderOptions().shadowMapRangeConfig.type = engine::eShadowRangeType::FIXED_USER;
     _app->renderOptions().shadowMapRangeConfig.worldUp = { 0.0f, 1.0f, 0.0f };
     _app->renderOptions().shadowMapRangeConfig.cameraPtr = _orbitCamera;
-    _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
+    // _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
+    _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlight;
 
     while ( _app->active() )
     {
@@ -96,6 +142,10 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
+
+        //// engine::CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::CMat4::translation( _pointlight->position ), { 1.0f, 1.0f, 1.0f } );
+
+        engine::CDebugDrawer::DrawNormals( _patch, { 0.0f, 0.0f, 1.0f } );
 
         _app->update();
 

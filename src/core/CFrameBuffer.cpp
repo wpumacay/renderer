@@ -96,7 +96,6 @@ namespace engine
         _textureOpts.borderColorU   = config.texBorderColorU;
         _textureOpts.borderColorV   = config.texBorderColorV;
         _textureOpts.dtype          = config.texPixelDataType;
-        _textureOpts.textureUnit    = 0;
 
         std::unique_ptr< CTexture > _texturePtr( new CTexture( _textureData, _textureOpts ) );
 

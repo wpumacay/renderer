@@ -122,8 +122,7 @@ namespace engine
                         const eTextureWrap& wrapV,
                         const CVec4& borderColorU,
                         const CVec4& borderColorV,
-                        const ePixelDataType& dtype,
-                        uint32 textureUnit )
+                        const ePixelDataType& dtype )
     {
         m_texDataPtr        = texData;
         m_texWrapModeU      = wrapU;
@@ -133,7 +132,6 @@ namespace engine
         m_texBorderColorU   = borderColorU;
         m_texBorderColorV   = borderColorV;
         m_texPixelDtype     = dtype;
-        m_openglTexUnit     = textureUnit;
         m_openglId          = 0;
 
         /* create gl-texture resource with the given information ****************/
@@ -181,8 +179,7 @@ namespace engine
                     texOptions.wrapV,
                     texOptions.borderColorU,
                     texOptions.borderColorV,
-                    texOptions.dtype,
-                    texOptions.textureUnit )
+                    texOptions.dtype )
     {
         // no additional construction steps needed
     }

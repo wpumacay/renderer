@@ -20,7 +20,7 @@ namespace engine
 
         ~CTextureManager();
 
-        static CTextureData* LoadTextureData( const std::string& filepath );
+        static CTextureData* LoadTextureData( const std::string& filepath, bool flipVertically = true );
         static CTexture* LoadTexture( const std::string& filepath,
                                       const eTextureFilter& filterMin = eTextureFilter::NEAREST,
                                       const eTextureFilter& filterMag = eTextureFilter::NEAREST,
@@ -29,12 +29,13 @@ namespace engine
                                       const CVec4& borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f },
                                       const CVec4& borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f },
                                       const ePixelDataType& dtype = ePixelDataType::UINT_8,
-                                      uint32 textureUnit = 0 );
+                                      bool flipVertically = true );
         static CTexture* LoadTexture( const std::string& filepath,
-                                      const CTextureOptions& texOptions );
+                                      const CTextureOptions& texOptions,
+                                      bool flipVertically = true );
 
-        static CTextureCubeData* LoadTextureCubeData( const std::array< std::string, 6 >& filepaths );
-        static CTextureCube* LoadTextureCube( const std::array< std::string, 6 >& filepaths );
+        static CTextureCubeData* LoadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically = false );
+        static CTextureCube* LoadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically = false );
 
         static CTextureData* GetCachedTextureData( const std::string& texDataId );
         static CTextureCubeData* GetCachedTextureCubeData( const std::string& texCubeDataId );
@@ -63,11 +64,11 @@ namespace engine
         void _loadTextures();
         void _createBuiltInTextures();
 
-        CTextureData* _loadTextureData( const std::string& filepath );
-        CTextureCubeData* _loadTextureCubeData( const std::array< std::string, 6 >& filepaths );
+        CTextureData* _loadTextureData( const std::string& filepath, bool flipVertically );
+        CTextureCubeData* _loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically );
 
-        CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions );
-        CTextureCube* _loadTextureCube( const std::array< std::string, 6 >& filepaths );
+        CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions, bool flipVertically );
+        CTextureCube* _loadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically );
 
         CTextureData* _getCachedTextureData( const std::string& texDataId );
         CTextureCubeData* _getCachedTextureCubeData( const std::string& texCubeDataId );

@@ -31,7 +31,7 @@ namespace engine
     CTextureManager::CTextureManager()
     {
         // make sure textures are loaded in the standard orientation
-        // stbi_set_flip_vertically_on_load( true );
+        stbi_set_flip_vertically_on_load( true );
 
         _loadTextures();
         _createBuiltInTextures();
@@ -46,19 +46,20 @@ namespace engine
         m_texturesDataList.clear();
     }
 
-    CTextureData* CTextureManager::LoadTextureData( const std::string& filepath )
+    CTextureData* CTextureManager::LoadTextureData( const std::string& filepath, bool flipVertically )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
-        return CTextureManager::s_instance->_loadTextureData( filepath );
+        return CTextureManager::s_instance->_loadTextureData( filepath, flipVertically );
     }
 
     CTexture* CTextureManager::LoadTexture( const std::string& filepath,
-                                            const CTextureOptions& texOptions )
+                                            const CTextureOptions& texOptions,
+                                            bool flipVertically )
     {
         ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
 
-        return CTextureManager::s_instance->_loadTexture( filepath, texOptions );
+        return CTextureManager::s_instance->_loadTexture( filepath, texOptions, flipVertically );
     }
 
     CTexture* CTextureManager::LoadTexture( const std::string& filepath,
@@ -69,9 +70,9 @@ namespace engine
                                             const CVec4& borderColorU,
                                             const CVec4& borderColorV,
                                             const ePixelDataType& dtype,
-                                            uint32 textureUnit )
+                                            bool flipVertically )
     {
-        return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype, textureUnit } );
+        return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype }, flipVertically );
     }
 
     CTextureData* CTextureManager::GetCachedTextureData( const std::string& texDataId )
@@ -186,9 +187,8 @@ namespace engine
                     _texOptions.borderColorU    = { 0.0f, 0.0f, 0.0f, 1.0f };
                     _texOptions.borderColorV    = { 0.0f, 0.0f, 0.0f, 1.0f };
                     _texOptions.dtype           = ePixelDataType::UINT_8;
-                    _texOptions.textureUnit     = 0;
 
-                    _loadTexture( _pathImagesFolder + _fname, _texOptions );
+                    _loadTexture( _pathImagesFolder + _fname, _texOptions, true );
                 }
             }
             closedir( _directoryPtr );
@@ -237,13 +237,18 @@ namespace engine
                                                             _pathSkyboxesFolder + it.first + "_bottom." + it.second,
                                                             _pathSkyboxesFolder + it.first + "_right." + it.second, 
                                                             _pathSkyboxesFolder + it.first + "_left." + it.second };
-                _loadTextureCube( _filepaths );
+                _loadTextureCube( _filepaths, false );
             }
         }
     }
 
-    CTextureData* CTextureManager::_loadTextureData( const std::string& filepath )
+    CTextureData* CTextureManager::_loadTextureData( const std::string& filepath, bool flipVertically )
     {
+        if ( flipVertically )
+            stbi_set_flip_vertically_on_load( true );
+        else
+            stbi_set_flip_vertically_on_load( false );
+
         eTextureFormat _format = eTextureFormat::NONE;
         if ( filepath.find( ".jpg" ) != std::string::npos ) { _format = eTextureFormat::RGB; }
         if ( filepath.find( ".jpeg" ) != std::string::npos ) { _format = eTextureFormat::RGB; }
@@ -287,12 +292,19 @@ namespace engine
         m_texturesData[ _filenameNoExtension ] = std::move( _textureDataPtr );
         m_texturesDataList.push_back( _textureData );
 
+        // default mode (vertically flipped)
+        stbi_set_flip_vertically_on_load( true );
+
         return _textureData;
     }
 
 
-    CTextureCubeData* CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths )
+    CTextureCubeData* CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically )
     {
+        if ( flipVertically )
+            stbi_set_flip_vertically_on_load( true );
+        else
+            stbi_set_flip_vertically_on_load( false );
 
         bool _errorFormat           = false;
         bool _errorData             = false;
@@ -426,13 +438,17 @@ namespace engine
         m_texturesCubeData[ _name ] = std::move( _textureCubeDataPtr );
         m_texturesCubeDataList.push_back( _textureCubeData );
 
+        /* default mode (vertically flipped) */
+        stbi_set_flip_vertically_on_load( true );
+
         return _textureCubeData;
     }
 
     CTexture* CTextureManager::_loadTexture( const std::string& filepath,
-                                             const CTextureOptions& texOptions )
+                                             const CTextureOptions& texOptions,
+                                             bool flipVertically )
     {
-        auto _textureData = _loadTextureData( filepath );
+        auto _textureData = _loadTextureData( filepath, flipVertically );
         if ( !_textureData )
         {
             ENGINE_CORE_ERROR( "Could not load requested texture: {0}", filepath );
@@ -459,9 +475,10 @@ namespace engine
         return _texture;
     }
 
-    CTextureCube* CTextureManager::_loadTextureCube( const std::array< std::string, 6 >& filepaths )
+    CTextureCube* CTextureManager::_loadTextureCube( const std::array< std::string, 6 >& filepaths,
+                                                     bool flipVertically )
     {
-        auto _textureCubeData = _loadTextureCubeData( filepaths );
+        auto _textureCubeData = _loadTextureCubeData( filepaths, flipVertically );
         if ( !_textureCubeData )
         {
             ENGINE_CORE_ERROR( "Could not load requested texture-cube: {0}", filepaths.front() );

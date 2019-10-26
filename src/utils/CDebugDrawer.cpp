@@ -837,7 +837,7 @@ namespace engine
             auto _wnormal = _normalMatrix * CVec4( _normals[i], 0.0f );
 
             CVec3 _position3d = { _wposition.x, _wposition.y, _wposition.z };
-            CVec3 _normal3d = { _wnormal.x, _wnormal.y, _wnormal.z };
+            CVec3 _normal3d = CVec3::normalize( { _wnormal.x, _wnormal.y, _wnormal.z } );
 
             _drawArrow( _position3d, _position3d + 0.1f * _normal3d, color );
         }

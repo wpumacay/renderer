@@ -1092,10 +1092,27 @@ namespace engine
             }
         }
 
-        // collect textures only if required
+        auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
+        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+
+        // collect material information
         if ( assimpMeshPtr->mMaterialIndex >= 0 )
         {
             aiMaterial* _assimpMaterial = assimpScenePtr->mMaterials[assimpMeshPtr->mMaterialIndex];
+
+            // check for ambient color
+            C_STRUCT aiColor4D ambient;
+            if ( AI_SUCCESS == aiGetMaterialColor( _assimpMaterial, AI_MATKEY_COLOR_AMBIENT, &ambient ) )
+                _mesh->material()->ambient = { ambient.r, ambient.g, ambient.b };
+
+            C_STRUCT aiColor4D diffuse;
+            if ( AI_SUCCESS == aiGetMaterialColor( _assimpMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse ) )
+                _mesh->material()->diffuse = { diffuse.r, diffuse.g, diffuse.b };
+
+            C_STRUCT aiColor4D specular;
+            if ( AI_SUCCESS == aiGetMaterialColor( _assimpMaterial, AI_MATKEY_COLOR_SPECULAR, &specular ) )
+                _mesh->material()->specular = { specular.r, specular.g, specular.b };
+
             // check for diffuse maps
             if ( _assimpMaterial->GetTextureCount( aiTextureType_DIFFUSE ) > 0 )
             {
@@ -1140,6 +1157,7 @@ namespace engine
                     _specularMap = CTextureManager::LoadTexture( folderPath + _str.C_Str() );
                 }
             }
+
         }
 
         // compute bounding box
@@ -1150,8 +1168,6 @@ namespace engine
         float32 _dz = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z - 
                       (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z;
 
-        auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { _dx, _dy, _dz } );
         _mesh->cullFaces = false; // don't cull this submesh (we don't know if it's closed yet), pretty please :(
         _mesh->material()->setAlbedoMap( _albedoMap );

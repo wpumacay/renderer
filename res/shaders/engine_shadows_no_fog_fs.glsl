@@ -101,6 +101,11 @@ float _computeFragmentShadowFactor( vec3 normal );
 
 void main()
 {
+    // texture color has alpha < eps, then discard it
+    if ( u_material.albedoMapActive == 1 )
+        if ( texture( u_material.albedoMap, fTexcoord ).a < 0.1f )
+            discard;
+
     vec3 _resultColor = vec3(0.0);
     // compute some required vectors
     vec3 _normal = normalize( fNormal );

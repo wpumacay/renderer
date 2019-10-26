@@ -35,6 +35,18 @@ namespace engine
         /* common to both types*/
         float zNear;
         float zFar;
+
+        CCameraProjData()
+        {
+            projection  = eCameraProjection::PERSPECTIVE;
+            fov         = 45.0f;
+            zNear       = 0.1f;
+            zFar        = 50.0f;
+
+            aspect  = -1.0f;
+            width   = -1;
+            height  = -1;
+        }
     };
 
     std::string toString( const CCameraProjData& projData );
