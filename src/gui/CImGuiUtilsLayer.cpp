@@ -57,7 +57,17 @@ namespace engine
 
     void CImGuiUtilsLayer::_menuStatistics()
     {
-
+        ImGui::Begin( "Stats" );
+        ImGui::TextColored( ImVec4( 0.8f, 0.1f, 0.1f, 1.0f ), "performance" );
+        ImGui::Text( "Fps-avg       : %.2f", CTime::GetAvgFps() );
+        ImGui::Text( "Frametime-avg : %.5f", CTime::GetAvgTimeStep() );
+        ImGui::PlotLines( "Fps-avg", 
+                          engine::CTime::GetFpsAvgs(), 
+                          engine::CTime::GetNumFramesForAvg(), 
+                          engine::CTime::GetFrameTimeIndex(),
+                          ( std::string( "average: " ) + std::to_string( engine::CTime::GetAvgFps() ) ).c_str(),
+                          0.0f, FLT_MAX, ImVec2( 0, 100 ) );
+        ImGui::End();
     }
 
     void CImGuiUtilsLayer::_menuSceneMeshes()

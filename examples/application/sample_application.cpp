@@ -117,10 +117,10 @@ int main()
     _patch->material()->shininess = 32.0f;
 
     //// auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Y );
-    //// _patch->material()->ambient = { 0.3f, 0.5f, 0.8f };
-    //// _patch->material()->diffuse = { 0.3f, 0.5f, 0.8f };
-    //// _patch->material()->specular = { 0.3f, 0.5f, 0.8f };
-    //// _patch->material()->shininess = 32.0f;
+    //// _floor->material()->ambient = { 0.3f, 0.5f, 0.8f };
+    //// _floor->material()->diffuse = { 0.3f, 0.5f, 0.8f };
+    //// _floor->material()->specular = { 0.3f, 0.5f, 0.8f };
+    //// _floor->material()->shininess = 32.0f;
 
     //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_grid" );
     //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_smiley" );

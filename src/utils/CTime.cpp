@@ -80,6 +80,13 @@ namespace engine
         return CTime::_instance->m_timeDeltaAvg;
     }
 
+    float CTime::GetAvgFps()
+    {
+        ENGINE_CORE_ASSERT( CTime::_instance, "Should have initialized time keeper before using it" );
+
+        return 1.0f / CTime::_instance->m_timeDeltaAvg;
+    }
+
     float CTime::GetWallTime()
     {
         ENGINE_CORE_ASSERT( CTime::_instance, "Should have initialized time keeper before using it" );

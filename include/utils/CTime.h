@@ -18,6 +18,7 @@ namespace engine
         static float GetTimeStep();
         static float GetRawTimeStep();
         static float GetAvgTimeStep();
+        static float GetAvgFps();
         static float GetWallTime();
         static float* GetFrameTimes();
         static float* GetFpsAvgs();

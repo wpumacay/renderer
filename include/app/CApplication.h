@@ -71,6 +71,8 @@ namespace engine
 
         CMainRenderer* renderer() const { return m_mainRenderer.get(); }
 
+        CImGuiManager* imguiManager() const { return m_imguiManager.get(); }
+
         bool active() const { return m_window->active(); }
 
     protected :

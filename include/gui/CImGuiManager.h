@@ -25,12 +25,23 @@ namespace engine
         void render();
 
         void setActive( bool active ) { m_active = active; }
+        void setDockingSpace( bool enabled ) { m_useDockingSpace = enabled; }
+        void setDockingSpacePassthrough( bool enabled );
         bool active() const { return m_active; }
+        bool usesDocking() const { return m_useDockingSpace; }
+        bool usesDockingPassthrough() const;
 
     private :
 
-        /* whether or not create ui render-frame */
+        void _configureDockingSpace();
+
+    private :
+
         bool m_active;
+        bool m_useDockingSpace;
+
+        ImGuiDockNodeFlags  m_dockSpaceFlags;       // docking configuration options
+        ImGuiWindowFlags    m_dockSpaceWindowFlags; // central-window (docking node) configuration
 
         /* handle to glfw window to copy (or create more, if viewports enabled???) contexts */
         GLFWwindow* m_glfwWindowPtr;
