@@ -14,6 +14,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <chrono>
+
+//// #define USE_HFIELD_FLAT_NORMALS
+
 namespace engine
 {
 
@@ -162,6 +166,11 @@ namespace engine
                                           aiMesh* assimpMeshPtr,
                                           const aiScene* assimpScenePtr,
                                           const std::string& folderPath );
+
+        static CVec3 _hfieldComputeSmoothNormal( int i, int j, int nWidthSamples, int nDepthSamples, 
+                                                 float dw, float dd, float centerX, float centerY, 
+                                                 const std::vector< float >& heightData, 
+                                                 const eAxis& axis );
 
         static CVec3 _rotateToMatchUpAxis( const CVec3& vec, const eAxis& axis );
         static CVec3 _rotateBackFromUpAxis( const CVec3& vec, const eAxis& axis );

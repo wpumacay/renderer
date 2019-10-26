@@ -801,30 +801,34 @@ namespace engine
 
         ENGINE_CORE_ASSERT( heightData.size() == nWidthSamples * nDepthSamples, "Mismatch in number of heightmap samples" );
 
+        auto _start = std::chrono::high_resolution_clock::now();
+
         float _maxHeight = -1000000.0f;
         float _minHeight = 1000000.0f;
         float _minNegHeight = 0.0f; // catch minimum negative heights
+        float _dw = widthExtent / nWidthSamples;
+        float _dd = depthExtent / nDepthSamples;
         for ( size_t i = 0; i < nWidthSamples - 1; i++ )
         {
             for ( size_t j = 0; j < nDepthSamples - 1; j++ )
             {
-                auto _p0 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 0 ) ) / nWidthSamples ) - centerX, 
-                                                   depthExtent * ( ( (float)( j + 0 ) ) / nDepthSamples ) - centerY, 
+                auto _p0 = _rotateToMatchUpAxis( { ( i + 0 ) * _dw - centerX, 
+                                                   ( j + 0 ) * _dd - centerY, 
                                                    heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] }, 
                                                  axis );
 
-                auto _p1 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 1 ) ) / nWidthSamples ) - centerX, 
-                                                   depthExtent * ( ( (float)( j + 0 ) ) / nDepthSamples ) - centerY, 
+                auto _p1 = _rotateToMatchUpAxis( { ( i + 1 ) * _dw - centerX, 
+                                                   ( j + 0 ) * _dd - centerY, 
                                                    heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] }, 
                                                  axis );
 
-                auto _p2 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 1 ) ) / nWidthSamples ) - centerX, 
-                                                   depthExtent * ( ( (float)( j + 1 ) ) / nDepthSamples ) - centerY, 
+                auto _p2 = _rotateToMatchUpAxis( { ( i + 1 ) * _dw - centerX, 
+                                                   ( j + 1 ) * _dd - centerY, 
                                                    heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] }, 
                                                  axis );
 
-                auto _p3 = _rotateToMatchUpAxis( { widthExtent * ( ( (float)( i + 0 ) ) / nWidthSamples ) - centerX, 
-                                                   depthExtent * ( ( (float)( j + 1 ) ) / nDepthSamples ) - centerY, 
+                auto _p3 = _rotateToMatchUpAxis( { ( i + 0 ) * _dw - centerX, 
+                                                   ( j + 1 ) * _dd - centerY, 
                                                    heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] }, 
                                                  axis );
 
@@ -850,6 +854,7 @@ namespace engine
                 _vertices.push_back( _p2 );
                 _vertices.push_back( _p3 );
 
+            #ifdef USE_HFIELD_FLAT_NORMALS
                 auto _nt1 = CVec3::cross( _p1 - _p0, _p2 - _p1 );
                 auto _nt2 = CVec3::cross( _p2 - _p0, _p3 - _p2 );
 
@@ -860,6 +865,27 @@ namespace engine
                 _normals.push_back( _nt2 );
                 _normals.push_back( _nt2 );
                 _normals.push_back( _nt2 );
+            #else
+                _normals.push_back( _hfieldComputeSmoothNormal( i, j, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+                _normals.push_back( _hfieldComputeSmoothNormal( i + 1, j, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+                _normals.push_back( _hfieldComputeSmoothNormal( i + 1, j + 1, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+
+                _normals.push_back( _hfieldComputeSmoothNormal( i, j, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+                _normals.push_back( _hfieldComputeSmoothNormal( i + 1, j + 1, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+                _normals.push_back( _hfieldComputeSmoothNormal( i, j + 1, nWidthSamples, nDepthSamples, 
+                                                                _dw, _dd, centerX, centerY, 
+                                                                heightData, axis ) );
+            #endif
 
                 // store the minimum height for later usage (computing base)
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] );
@@ -980,7 +1006,58 @@ namespace engine
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
         _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
 
+        auto _duration = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - _start );
+        ENGINE_CORE_INFO( "time taken (ms) to create hfield: {0}", _duration.count() );
+
         return _mesh;
+    }
+
+    CVec3 CMeshBuilder::_hfieldComputeSmoothNormal( int i, int j, int nWidthSamples, int nDepthSamples, 
+                                                    float dw, float dd, float centerX, float centerY,
+                                                    const std::vector< float >& heightData, const eAxis& axis )
+    {
+        // calculate the necessary neighbouring points
+        /*
+        *   1---2---3
+        *   |   |   |
+        *   4---v---6
+        *   |   |   |
+        *   7---8---9
+        */
+        CVec3 _n;
+
+        auto _pv = _rotateToMatchUpAxis( { ( i + 0 ) * dw, ( j + 0 ) * dd, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] }, axis );
+
+        auto _p1 = ( i > 0 && j < (nDepthSamples - 1) )                     ? _rotateToMatchUpAxis( { ( i - 1 ) * dw - centerX, ( j + 1 ) * dd - centerY, heightData[( i - 1 ) * nDepthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p2 = ( j < (nDepthSamples - 1) )                              ? _rotateToMatchUpAxis( { ( i + 0 ) * dw - centerX, ( j + 1 ) * dd - centerY, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p3 = ( i < (nWidthSamples - 1) && j < (nDepthSamples - 1) )   ? _rotateToMatchUpAxis( { ( i + 1 ) * dw - centerX, ( j + 1 ) * dd - centerY, heightData[( i + 1 ) * nDepthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p4 = ( i > 0 )                                                ? _rotateToMatchUpAxis( { ( i - 1 ) * dw - centerX, ( j + 0 ) * dd - centerY, heightData[( i - 1 ) * nDepthSamples + ( j + 0 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p6 = ( i < (nWidthSamples - 1) )                              ? _rotateToMatchUpAxis( { ( i + 1 ) * dw - centerX, ( j + 0 ) * dd - centerY, heightData[( i + 1 ) * nDepthSamples + ( j + 0 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p7 = ( i > 0 && j > 0 )                                       ? _rotateToMatchUpAxis( { ( i - 1 ) * dw - centerX, ( j - 1 ) * dd - centerY, heightData[( i - 1 ) * nDepthSamples + ( j - 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p8 = ( j > 0 )                                                ? _rotateToMatchUpAxis( { ( i + 0 ) * dw - centerX, ( j - 1 ) * dd - centerY, heightData[( i + 0 ) * nDepthSamples + ( j - 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+        auto _p9 = ( i < (nDepthSamples - 1) && j > 0 )                     ? _rotateToMatchUpAxis( { ( i + 1 ) * dw - centerX, ( j - 1 ) * dd - centerY, heightData[( i + 1 ) * nDepthSamples + ( j - 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
+
+        if ( i > 0 && j < (nDepthSamples - 1) )
+            _n = _n + CVec3::cross( _p2 - _pv, _p4 - _pv );
+
+        if ( i < (nWidthSamples - 1) && j < (nDepthSamples - 1) )
+        {
+            _n = _n + CVec3::cross( _p6 - _pv, _p3 - _pv );
+            _n = _n + CVec3::cross( _p3 - _pv, _p2 - _pv );
+        }
+
+        if ( i < (nWidthSamples - 1) && j > 0 )
+            _n = _n + CVec3::cross( _p8 - _pv, _p6 - _pv );
+
+        if ( i > 0 && j > 0 )
+        {
+            _n = _n + CVec3::cross( _p7 - _pv, _p8 - _pv );
+            _n = _n + CVec3::cross( _p4 - _pv, _p7 - _pv );
+        }
+
+        _n.normalize();
+
+        return _n;
     }
 
     CModel* CMeshBuilder::createModelFromFile( const std::string& filename )

@@ -50,11 +50,11 @@ int main()
 
     /* create a simple point-light for the scene **************************************************/
 ////     auto _pointlight = new engine::CPointLight( "point",
-////                                                 { 0.2f, 0.2f, 0.2f },
-////                                                 { 0.5f, 0.5f, 0.5f },
+////                                                 { 0.4f, 0.4f, 0.4f },
 ////                                                 { 0.8f, 0.8f, 0.8f },
-////                                                 { 0.0f, 7.0f, 0.0f },
-////                                                 1.0f, 0.05f, 0.005f );
+////                                                 { 0.8f, 0.8f, 0.8f },
+////                                                 { 5.0f, 5.0f, 5.0f },
+////                                                 1.0f, 0.0f, 0.0f );
 //// 
 ////     _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
 
@@ -100,6 +100,7 @@ int main()
             float _u = _x * 2.0f;
             float _v = _y * 2.0f;
             float _z = std::cos( std::sqrt( ( _u * _u + _v * _v ) ) );
+            // float _z = 1.0f;
 
             _heightData.push_back( _z );
         }
@@ -110,9 +111,9 @@ int main()
                                                            _centerX, _centerY,
                                                            _heightData, 1.0f,
                                                            engine::eAxis::Y );
-    _patch->material()->ambient = { 0.5f, 0.5f, 0.5f };
-    _patch->material()->diffuse = { 0.5f, 0.5f, 0.5f };
-    _patch->material()->specular = { 0.5f, 0.5f, 0.5f };
+    _patch->material()->ambient = { 0.3f, 0.5f, 0.8f };
+    _patch->material()->diffuse = { 0.3f, 0.5f, 0.8f };
+    _patch->material()->specular = { 0.3f, 0.5f, 0.8f };
     _patch->material()->shininess = 32.0f;
 
     /* create some renderables in our scene *******************************************************/
@@ -131,7 +132,7 @@ int main()
     _app->renderOptions().shadowMapRangeConfig.type = engine::eShadowRangeType::FIXED_USER;
     _app->renderOptions().shadowMapRangeConfig.worldUp = { 0.0f, 1.0f, 0.0f };
     _app->renderOptions().shadowMapRangeConfig.cameraPtr = _orbitCamera;
-    // _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
+    //// _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
     _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlight;
 
     while ( _app->active() )
@@ -145,7 +146,7 @@ int main()
 
         //// engine::CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::CMat4::translation( _pointlight->position ), { 1.0f, 1.0f, 1.0f } );
 
-        engine::CDebugDrawer::DrawNormals( _patch, { 0.0f, 0.0f, 1.0f } );
+        //// engine::CDebugDrawer::DrawNormals( _patch, { 1.0f, 0.0f, 1.0f } );
 
         _app->update();
 
