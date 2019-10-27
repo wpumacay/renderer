@@ -74,6 +74,8 @@ namespace engine
 
         if ( m_dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode )
             m_dockSpaceWindowFlags |= ImGuiWindowFlags_NoBackground;
+        else
+            m_dockSpaceWindowFlags &= ~ImGuiWindowFlags_NoBackground;
 
         ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0.0f, 0.0f ) );
         ImGui::Begin( "DockSpace", NULL, m_dockSpaceWindowFlags );

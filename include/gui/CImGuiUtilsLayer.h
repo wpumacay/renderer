@@ -6,6 +6,7 @@
 #include <utils/CLogger.h>
 #include <renderers/CMainRenderer.h>
 #include <graphics/CScene.h>
+#include <gui/CImGuiManager.h>
 
 namespace engine
 {
@@ -18,9 +19,12 @@ namespace engine
         CImGuiUtilsLayer( const std::string& name,
                           CScene* scene,
                           CMainRenderer* mainRenderer,
-                          CMeshRenderer* meshRenderer,
-                          CSkyboxRenderer* skyboxRenderer );
+                          CImGuiManager* imguiManager );
         ~CImGuiUtilsLayer();
+
+        void setScene( CScene* scene ) { m_scene = scene; }
+        void setMainRenderer( CMainRenderer* renderer ) { m_mainRenderer = renderer; }
+        void setImguiManager( CImGuiManager* imguiManager ) { m_imguiManager = imguiManager; }
 
         void update() override;
         void render() override;
@@ -28,11 +32,15 @@ namespace engine
 
     private :
 
+        void _menuGeneralOptions();
         void _menuStatistics();
         void _menuSceneMeshes();
         void _menuSceneModels();
         void _menuSceneLights();
         void _menuSceneCameras();
+
+        void _menuMesh( CMesh* mesh );
+        void _menuModel( CModel* model );
 
     private :
 
@@ -40,6 +48,7 @@ namespace engine
         CMainRenderer*      m_mainRenderer;
         CMeshRenderer*      m_meshRenderer;
         CSkyboxRenderer*    m_skyboxRenderer;
+        CImGuiManager*      m_imguiManager;
 
         bool m_wantsToCaptureMouse;
 

@@ -23,6 +23,8 @@
 
 #include <gui/CImGuiManager.h>
 #include <gui/CImGuiLayer.h>
+#include <gui/CImGuiUtilsLayer.h>
+#include <gui/CImGuiSceneLayer.h>
 
 namespace engine
 {
@@ -38,6 +40,14 @@ namespace engine
         virtual ~CApplication();
 
         void setScene( std::unique_ptr< CScene > scene );
+
+        void setOffscreenRendering( bool enabled );
+
+        void setGuiActive( bool enabled );
+
+        void setGuiUtilsActive( bool enabled );
+
+        void setGuiSceneViewActive( bool enabled );
 
         void addGuiLayer( std::unique_ptr< CImGuiLayer > layer );
 
@@ -65,6 +75,8 @@ namespace engine
 
         CRenderOptions& renderOptions() { return m_renderOptions; }
 
+        CFrameBuffer* renderTarget() const { return m_renderTarget.get(); }
+
         CScene* scene() const { return m_scene.get(); }
 
         COpenGLWindow* window() const { return m_window.get(); }
@@ -75,17 +87,30 @@ namespace engine
 
         bool active() const { return m_window->active(); }
 
+        bool guiActive() const { return m_imguiManager->active(); }
+
+        bool guiUtilsActive() const { return m_guiUtilsLayer->active(); }
+
+        bool guiSceneViewActive() const { return false; }
+
     protected :
+
+        CFrameBuffer* _createRenderTarget();
 
         static CApplication* s_instance;
 
         float32                                         m_timeStamp;
         CRenderOptions                                  m_renderOptions;
+        std::unique_ptr< CFrameBuffer >                 m_renderTarget;
         std::unique_ptr< CScene >                       m_scene;
         std::unique_ptr< COpenGLWindow >                m_window;
         std::unique_ptr< CMainRenderer >                m_mainRenderer;
         std::unique_ptr< CImGuiManager >                m_imguiManager;
         std::vector< std::unique_ptr< CImGuiLayer > >   m_guiLayers;
+
+        CImGuiUtilsLayer* m_guiUtilsLayer;
+
+        bool m_useRenderTarget;
 
         std::vector< FnPtr_keyboard_callback > m_keyboardCallbacks;
         std::vector< FnPtr_mouse_callback > m_mouseButtonCallbacks;

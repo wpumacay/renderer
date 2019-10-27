@@ -1,38 +1,6 @@
 
 #include <CEngine.h>
 
-class SampleGuiLayer : public engine::CImGuiLayer
-{
-
-public :
-
-    SampleGuiLayer( const std::string& name )
-        : engine::CImGuiLayer( name ) {}
-
-    void render() override
-    {
-        ImGui::Begin( "Sample-gui-layer" );
-
-        m_hasFocus = ImGui::IsWindowFocused();
-        m_isHovered = ImGui::IsWindowHovered();
-
-        ImGui::End();
-    }
-
-    bool onEvent( const engine::CInputEvent& event ) override
-    {
-        if ( event.type() == engine::eEventType::MOUSE_PRESSED )
-            return m_isHovered;
-
-        return false;
-    }
-
-private :
-
-    bool m_hasFocus;
-    bool m_isHovered;
-};
-
 int main()
 {
     auto _windowProperties = engine::CWindowProps();
@@ -43,8 +11,7 @@ int main()
     _windowProperties.resizable = true;
 
     auto _app = new engine::CApplication( _windowProperties );
-    auto _layer = new SampleGuiLayer( "sample-layer" );
-    _app->addGuiLayer( std::unique_ptr< engine::CImGuiLayer >( _layer ) );
+    _app->setGuiUtilsActive( true );
 
     auto _scene = new engine::CScene();
 
@@ -116,17 +83,17 @@ int main()
     _patch->material()->specular = { 0.5f, 0.5f, 0.5f };
     _patch->material()->shininess = 32.0f;
 
-    //// auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Y );
-    //// _floor->material()->ambient = { 0.3f, 0.5f, 0.8f };
-    //// _floor->material()->diffuse = { 0.3f, 0.5f, 0.8f };
-    //// _floor->material()->specular = { 0.3f, 0.5f, 0.8f };
-    //// _floor->material()->shininess = 32.0f;
+    auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Y );
+    _floor->material()->ambient = { 0.3f, 0.5f, 0.8f };
+    _floor->material()->diffuse = { 0.3f, 0.5f, 0.8f };
+    _floor->material()->specular = { 0.3f, 0.5f, 0.8f };
+    _floor->material()->shininess = 32.0f;
 
     //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_grid" );
     //// auto _texture = engine::CTextureManager::GetCachedTexture( "img_smiley" );
     auto _texture = engine::CTextureManager::GetCachedTexture( "built_in_chessboard" );
     _patch->material()->setAlbedoMap( _texture );
-    //// _floor->material()->setAlbedoMap( _texture );
+    _floor->material()->setAlbedoMap( _texture );
 
     /* create some renderables in our scene *******************************************************/
     std::string _modelpath = std::string( ENGINE_RESOURCES_PATH ) + "models/pokemons/lizardon/lizardon.obj";
@@ -136,7 +103,7 @@ int main()
 
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _model ) );
     _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _patch ) );
-    //// _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
     /**********************************************************************************************/
 
     _app->setScene( std::unique_ptr< engine::CScene >( _scene ) );
@@ -155,6 +122,10 @@ int main()
     {
         if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
             break;
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_G ) )
+            _app->setGuiActive( !_app->guiActive() );
+        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_U ) )
+            _app->setGuiUtilsActive( !_app->guiUtilsActive() );
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );

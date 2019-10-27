@@ -46,8 +46,24 @@ namespace engine
         CICamera* currentCamera() const { return m_currentCamera; }
         CILight* mainLight() const { return m_mainLight; }
 
-        std::vector< CIRenderable* > renderables() const;
         std::vector< CICamera* > cameras() const;
+        bool hasCamera( const std::string& name ) const;
+        CICamera* getCamera( const std::string& name );
+
+        std::vector< CIRenderable* > renderables() const;
+        bool hasRenderable( const std::string& name ) const;
+        CIRenderable* getRenderable( const std::string& name );
+
+        template< typename T >
+        std::vector< T* > collectTypedRenderables() const
+        {
+            std::vector< T* > _typedRenderables;
+            for ( auto& renderable : m_renderables )
+                if ( renderable->type() == T::GetStaticType() )
+                    _typedRenderables.push_back( dynamic_cast< T* >( renderable.get() ) );
+
+            return _typedRenderables;
+        }
 
         std::vector< CILight* > lights() const;
         std::vector< CDirectionalLight* > directionalLights() const;
@@ -59,9 +75,9 @@ namespace engine
         std::unique_ptr< CFog > m_fog;
         std::unique_ptr< CSkybox > m_skybox;
 
-        CICamera*                                   m_currentCamera;
-        std::vector< std::unique_ptr< CICamera > >  m_cameras;
-        std::map< std::string, CICamera* >          m_camerasMap;
+        CICamera*                                       m_currentCamera;
+        std::vector< std::unique_ptr< CICamera > >      m_cameras;
+        std::unordered_map< std::string, CICamera* >    m_camerasMap;
 
         CILight*                                    m_mainLight;
         std::vector< std::unique_ptr< CILight > >   m_lights;
@@ -70,7 +86,8 @@ namespace engine
         std::vector< CPointLight* >                 m_pointLights;
         std::vector< CSpotLight* >                  m_spotLights;
 
-        std::vector< std::unique_ptr< CIRenderable > >  m_renderables;
+        std::vector< std::unique_ptr< CIRenderable > >      m_renderables;
+        std::unordered_map< std::string, CIRenderable* >    m_renderablesMap;
     };
 
 }

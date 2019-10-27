@@ -28,7 +28,7 @@ namespace engine
         void setDockingSpace( bool enabled ) { m_useDockingSpace = enabled; }
         void setDockingSpacePassthrough( bool enabled );
         bool active() const { return m_active; }
-        bool usesDocking() const { return m_useDockingSpace; }
+        bool usesDockingSpace() const { return m_useDockingSpace; }
         bool usesDockingPassthrough() const;
 
     private :

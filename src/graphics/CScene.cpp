@@ -95,11 +95,13 @@ namespace engine
     void CScene::addRenderable( std::unique_ptr< CIRenderable > renderable )
     {
         m_renderables.push_back( std::move( renderable ) );
+        m_renderablesMap[ m_renderables.back()->name() ] = m_renderables.back().get();
     }
 
     void CScene::clearScene()
     {
         m_renderables.clear();
+        m_renderablesMap.clear();
     }
 
     void CScene::changeToCamera( const std::string& name )
@@ -139,6 +141,22 @@ namespace engine
         return _renderablesPtrs;
     }
 
+    bool CScene::hasRenderable( const std::string& name ) const
+    {
+        return m_renderablesMap.find( name ) != m_renderablesMap.end();
+    }
+
+    CIRenderable* CScene::getRenderable( const std::string& name )
+    {
+        if ( m_renderablesMap.find( name ) == m_renderablesMap.end() )
+        {
+            ENGINE_CORE_ERROR( "Couldn't find renderable with name {0} in scene", name );
+            return nullptr;
+        }
+
+        return m_renderablesMap[name];
+    }
+
     std::vector< CICamera* > CScene::cameras() const
     {
         std::vector< CICamera* > _camerasPtrs;
@@ -146,6 +164,22 @@ namespace engine
             _camerasPtrs.push_back( _camera.get() );
 
         return _camerasPtrs;
+    }
+
+    bool CScene::hasCamera( const std::string& name ) const
+    {
+        return m_camerasMap.find( name ) != m_camerasMap.end();
+    }
+
+    CICamera* CScene::getCamera( const std::string& name )
+    {
+        if ( m_camerasMap.find( name ) == m_camerasMap.end() )
+        {
+            ENGINE_CORE_ERROR( "Couldn't find camera with name {0} in scene", name );
+            return nullptr;
+        }
+
+        return m_camerasMap[name];
     }
 
     std::vector< CILight* > CScene::lights() const

@@ -26,6 +26,7 @@ namespace engine
         CShadowMap* shadowMap() const { return m_shadowMap.get(); }
 
         CMeshRenderer* meshRenderer() const { return m_rendererMeshes.get(); }
+        CSkyboxRenderer* skyboxRenderer() const { return m_rendererSkybox.get(); }
 
     private :
 

@@ -34,6 +34,7 @@ namespace engine
         m_scene         = std::unique_ptr< CScene >( new CScene() );
         m_mainRenderer  = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
         m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow() ) );
+        m_renderTarget  = std::unique_ptr< CFrameBuffer >( _createRenderTarget() );
 
         m_window->registerKeyCallback( CApplication::CallbackKey );
         m_window->registerMouseCallback( CApplication::CallbackMouseButton );
@@ -49,7 +50,14 @@ namespace engine
         engine::CTime::Start();
         m_timeStamp = 0.0f;
 
-        // create some default resources for our renderer to use
+        // create a utils panel by default (the user can choose to use it or not)
+        m_guiUtilsLayer = new CImGuiUtilsLayer( "Utils-layer",
+                                                m_scene.get(),
+                                                m_mainRenderer.get(),
+                                                m_imguiManager.get() );
+
+        m_guiUtilsLayer->setActive( false );
+        addGuiLayer( std::unique_ptr< CImGuiLayer >( m_guiUtilsLayer ) );
 
         ENGINE_CORE_INFO( "GL-Application started successfully!!!" );
     }
@@ -72,6 +80,29 @@ namespace engine
     void CApplication::setScene( std::unique_ptr< CScene > scene )
     {
         m_scene = std::move( scene );
+        // update resources that require the scene reference
+        m_guiUtilsLayer->setScene( m_scene.get() );
+    }
+
+    void CApplication::setOffscreenRendering( bool enabled )
+    {
+        m_useRenderTarget = enabled;
+        m_renderOptions.renderTargetPtr = ( enabled ) ? m_renderTarget.get() : nullptr;
+    }
+
+    void CApplication::setGuiActive( bool enabled )
+    {
+        m_imguiManager->setActive( enabled );
+    }
+
+    void CApplication::setGuiUtilsActive( bool enabled )
+    {
+        m_guiUtilsLayer->setActive( enabled );
+    }
+
+    void CApplication::setGuiSceneViewActive( bool enabled )
+    {
+        // @todo: activate scene-view and enable render-target to use it for later visualization
     }
 
     void CApplication::addGuiLayer( std::unique_ptr< CImGuiLayer > layer )
@@ -86,9 +117,10 @@ namespace engine
             m_scene->update();
 
         // update all gui-layers
-        for ( auto& layer : m_guiLayers )
-            if ( layer->active() )
-                layer->update();
+        if ( m_imguiManager->active() )
+            for ( auto& layer : m_guiLayers )
+                if ( layer->active() )
+                    layer->update();
     }
 
     void CApplication::begin()
@@ -115,9 +147,6 @@ namespace engine
 
         // prepare our renderer to accepts rendering commands
         m_mainRenderer->begin( m_renderOptions );
-
-        // prepare imgui prior to accepts any rendering commands
-        m_imguiManager->begin();
     }
 
     void CApplication::render()
@@ -130,10 +159,14 @@ namespace engine
         // render all commands requested to our renderer
         m_mainRenderer->render();
 
+        // prepare imgui prior to accepts any rendering commands
+        m_imguiManager->begin();
+
         // render all gui-layers
-        for ( auto& layer : m_guiLayers )
-            if ( layer->active() )
-                layer->render();
+        if ( m_imguiManager->active() )
+            for ( auto& layer : m_guiLayers )
+                if ( layer->active() )
+                    layer->render();
 
         // render all commands requested to the debug drawer
         auto _camera = m_scene->currentCamera();
@@ -351,5 +384,37 @@ namespace engine
             _layersPtrs.push_back( layer.get() );
 
         return _layersPtrs;
+    }
+
+    CFrameBuffer* CApplication::_createRenderTarget()
+    {
+        engine::CAttachmentConfig _fbColorConfig;
+        _fbColorConfig.name                 = "color_attachment";
+        _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
+        _fbColorConfig.width                = m_window->width();
+        _fbColorConfig.height               = m_window->height();
+        _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
+        _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
+        _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
+        _fbColorConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+        _fbColorConfig.texWrapV             = engine::eTextureWrap::REPEAT;
+
+        // @todo: sould use render-buffer-objects for depth attachment instead (quicker access)
+        engine::CAttachmentConfig _fbDepthConfig;
+        _fbDepthConfig.name                 = "depth_attachment";
+        _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
+        _fbDepthConfig.width                = m_window->width();
+        _fbDepthConfig.height               = m_window->height();
+        _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
+        _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
+        _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
+        _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
+        _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
+
+        auto _frameBuffer = new CFrameBuffer();
+        _frameBuffer->addAttachment( _fbColorConfig );
+        _frameBuffer->addAttachment( _fbDepthConfig );
+
+        return _frameBuffer;
     }
 }
