@@ -151,6 +151,9 @@ namespace engine
         static CMat4 rotation( float32 theta, const CVec3& axis );
         static CMat4 fromEuler( const CVec3& euler );
         static CMat4 fromEulerIntrinsicXYZ( const CVec3& euler );
+        static CMat4 fromQuaternion( const CVec4& quat );
+        static CVec3 toEuler( const CMat4& mat );
+        static CVec4 toQuaternion( const CMat4& mat );
     };
 
     std::string toString( const CMat4& mat );

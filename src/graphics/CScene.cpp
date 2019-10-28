@@ -50,6 +50,9 @@ namespace engine
             return;
         }
 
+        if ( m_camerasMap.find( camera->name() ) != m_camerasMap.end() )
+            ENGINE_CORE_WARN( "Adding a camera with the same name. Deleting the previous one" );
+
         auto _cameraPtr = camera.get();
 
         // keep ownership of this camera
@@ -69,6 +72,9 @@ namespace engine
             ENGINE_CORE_WARN( "Tried to add a null-light to the scene" );
             return;
         }
+
+        if ( m_lightsMap.find( light->name() ) != m_lightsMap.end() )
+            ENGINE_CORE_WARN( "Adding a light with the same name. Deleting the previous one" );
 
         auto _lightPtr = light.get();
 
@@ -94,6 +100,9 @@ namespace engine
 
     void CScene::addRenderable( std::unique_ptr< CIRenderable > renderable )
     {
+        if ( m_renderablesMap.find( renderable->name() ) != m_renderablesMap.end() )
+            ENGINE_CORE_WARN( "Adding a renderable with the same name. Deleting the previous one" );
+
         m_renderables.push_back( std::move( renderable ) );
         m_renderablesMap[ m_renderables.back()->name() ] = m_renderables.back().get();
     }
@@ -189,6 +198,22 @@ namespace engine
             _lightsPtrs.push_back( _light.get() );
 
         return _lightsPtrs;
+    }
+
+    bool CScene::hasLight( const std::string& name ) const
+    {
+        return m_lightsMap.find( name ) != m_lightsMap.end();
+    }
+
+    CILight* CScene::getLight( const std::string& name )
+    {
+        if ( m_lightsMap.find( name ) == m_lightsMap.end() )
+        {
+            ENGINE_CORE_ERROR( "Couldn't find light with name {0} in scene", name );
+            return nullptr;
+        }
+
+        return m_lightsMap[name];
     }
 
     std::vector< CDirectionalLight* > CScene::directionalLights() const

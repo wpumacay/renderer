@@ -687,6 +687,101 @@ namespace engine
         return _res;
     }
 
+    CMat4 CMat4::fromQuaternion( const CVec4& quat )
+    {
+        float32 _qi = quat.x;
+        float32 _qj = quat.y;
+        float32 _qk = quat.z;
+        float32 _qr = quat.w;
+
+        float32 _n = sqrt( _qr * _qr + _qi * _qi + 
+                           _qj * _qj + _qk * _qk );
+
+        float32 _s = 1.0 / ( _n * _n );
+
+        CMat4 _res;
+
+        _res.buff[0] = 1.0 - 2.0 * _s * ( _qj * _qj + _qk * _qk );
+        _res.buff[1] = 2.0 * _s * ( _qi * _qj + _qk * _qr );
+        _res.buff[2] = 2.0 * _s * ( _qi * _qk - _qj * _qr );
+
+        _res.buff[4] = 2.0 * _s * ( _qi * _qj - _qk * _qr );
+        _res.buff[5] = 1.0 - 2.0 * _s * ( _qi * _qi + _qk * _qk );
+        _res.buff[6] = 2.0 * _s * ( _qj * _qk + _qi * _qr );
+
+        _res.buff[8] = 2.0 * _s * ( _qi * _qk + _qj * _qr );
+        _res.buff[9] = 2.0 * _s * ( _qj * _qk - _qi * _qr );
+        _res.buff[10] = 1.0 - 2.0 * _s * ( _qi * _qi + _qj * _qj );
+
+        return _res;
+    }
+
+    CVec3 CMat4::toEuler( const CMat4& mat )
+    {
+        CVec3 _res;
+
+        auto _r11 = mat.buff[0];
+        auto _r21 = mat.buff[1];
+        auto _r31 = mat.buff[2];
+        auto _r32 = mat.buff[6];
+        auto _r33 = mat.buff[10];
+
+        _res.x = std::atan2( _r32, _r33 );
+        _res.y = std::atan2( -_r31, std::sqrt( _r11 * _r11 + _r21 * _r21 ) );
+        _res.z = std::atan2( _r21, _r11 );
+
+        return _res;
+    }
+
+    CVec4 CMat4::toQuaternion( const CMat4& mat )
+    {
+        CVec4 _res;
+
+        auto _m00 = mat.buff[0];
+        auto _m11 = mat.buff[5];
+        auto _m22 = mat.buff[10];
+
+        auto _trace = _m00 + _m11 + _m22;
+
+        if ( _trace > 0 )
+        {
+            _res.w = std::sqrt( _trace + 1 ) / 2.0;
+
+            _res.x = ( mat.buff[6] - mat.buff[9] ) / ( 4 * _res.w );
+            _res.y = ( mat.buff[8] - mat.buff[2] ) / ( 4 * _res.w );
+            _res.z = ( mat.buff[1] - mat.buff[4] ) / ( 4 * _res.w );
+        }
+        else if ( ( _m00 > _m11 ) && ( _m00 > _m22 ) )
+        {
+            auto _s = std::sqrt( 1 + _m00 - _m11 - _m22 ) * 2;
+
+            _res.x = 0.25 * _s;
+            _res.y = ( mat.buff[4] + mat.buff[1] ) / _s;
+            _res.z = ( mat.buff[8] + mat.buff[2] ) / _s;
+            _res.w = ( mat.buff[6] - mat.buff[9] ) / _s;
+        }
+        else if ( _m11 > _m22 )
+        {
+            auto _s = std::sqrt( 1 + _m11 - _m00 - _m22 ) * 2;
+
+            _res.x = ( mat.buff[4] + mat.buff[1] ) / _s;
+            _res.y = 0.25 * _s;
+            _res.z = ( mat.buff[9] + mat.buff[6] ) / _s;
+            _res.w = ( mat.buff[8] - mat.buff[2] ) / _s;
+        }
+        else
+        {
+            auto _s = std::sqrt( 1 + _m22 - _m00 - _m11 ) * 2;
+
+            _res.x = ( mat.buff[8] + mat.buff[2] ) / _s;
+            _res.y = ( mat.buff[9] + mat.buff[6] ) / _s;
+            _res.z = 0.25 * _s;
+            _res.w = ( mat.buff[1] - mat.buff[4] ) / _s;
+        }
+
+        return _res;
+    }
+
     std::string toString( const CMat4& mat )
     {
         std::string _res;

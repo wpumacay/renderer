@@ -54,6 +54,7 @@ namespace engine
         m_guiUtilsLayer = new CImGuiUtilsLayer( "Utils-layer",
                                                 m_scene.get(),
                                                 m_mainRenderer.get(),
+                                                &m_renderOptions,
                                                 m_imguiManager.get() );
 
         m_guiUtilsLayer->setActive( false );

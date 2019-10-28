@@ -66,6 +66,9 @@ namespace engine
         }
 
         std::vector< CILight* > lights() const;
+        bool hasLight( const std::string& name ) const;
+        CILight* getLight( const std::string& name );
+
         std::vector< CDirectionalLight* > directionalLights() const;
         std::vector< CPointLight* > pointLights() const;
         std::vector< CSpotLight* > spotLights() const;

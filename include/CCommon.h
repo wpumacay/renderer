@@ -18,8 +18,8 @@
 #include <map>
 #include <set>
 
-#define ENGINE_PI 3.141592653589793
-#define ENGINE_EPS 0.000001
+#define ENGINE_PI 3.141592653589793f
+#define ENGINE_EPS 0.000001f
 
 #ifndef ENGINE_RESOURCES_PATH
     #define ENGINE_RESOURCES_PATH "../res/"

@@ -8,6 +8,22 @@
 #include <graphics/CScene.h>
 #include <gui/CImGuiManager.h>
 
+#define IMGUI_COMBO_CONSTRUCT( combo_name, current_name_str, vect_container )       \
+        if ( ImGui::BeginCombo( combo_name, current_name_str.c_str() ) )            \
+        {                                                                           \
+            for ( auto _vect_elm : vect_container )                                 \
+            {                                                                       \
+                bool _isSelected = ( _vect_elm->name() == current_name_str );       \
+                                                                                    \
+                if ( ImGui::Selectable( _vect_elm->name().c_str(), _isSelected ) )  \
+                    current_name_str = _vect_elm->name();                           \
+                                                                                    \
+                if ( _isSelected )                                                  \
+                    ImGui::SetItemDefaultFocus();                                   \
+            }                                                                       \
+            ImGui::EndCombo();                                                      \
+        }
+
 namespace engine
 {
 
@@ -19,6 +35,7 @@ namespace engine
         CImGuiUtilsLayer( const std::string& name,
                           CScene* scene,
                           CMainRenderer* mainRenderer,
+                          CRenderOptions* renderOptions,
                           CImGuiManager* imguiManager );
         ~CImGuiUtilsLayer();
 
@@ -42,10 +59,16 @@ namespace engine
         void _menuMesh( CMesh* mesh );
         void _menuModel( CModel* model );
 
+        void _menuLightDirectional( CDirectionalLight* light );
+        void _menuLightPoint( CPointLight* light );
+        void _menuLightSpot( CSpotLight* light );
+
+
     private :
 
         CScene*             m_scene;
         CMainRenderer*      m_mainRenderer;
+        CRenderOptions*     m_renderOptions;
         CMeshRenderer*      m_meshRenderer;
         CSkyboxRenderer*    m_skyboxRenderer;
         CImGuiManager*      m_imguiManager;
