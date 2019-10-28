@@ -21,7 +21,9 @@ namespace engine
         void addMesh( std::unique_ptr< CMesh > mesh, const CMat4& localTransform );
 
         std::vector< CMesh* > meshes() const;
+
         std::vector< CMat4 > localTransforms() const { return m_localTransforms; }
+        std::vector< CMat4 >& localTransforms() { return m_localTransforms; }
 
         static eRenderableType GetStaticType() { return eRenderableType::MODEL; }
 

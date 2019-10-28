@@ -134,6 +134,8 @@ namespace engine
         CVec3 getBasisVectorX() const;
         CVec3 getBasisVectorY() const;
         CVec3 getBasisVectorZ() const;
+        void setPosition( const CVec3& position );
+        void setRotation( const CMat4& rotation );
         CVec3 getPosition() const;
         CMat4 getRotation() const;
         CMat4 inverse() const;

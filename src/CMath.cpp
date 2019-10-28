@@ -386,6 +386,20 @@ namespace engine
         return CVec3( buff[8], buff[9], buff[10] );
     }
 
+    void CMat4::setPosition( const CVec3& position )
+    {
+        buff[12] = position.x;
+        buff[13] = position.y;
+        buff[14] = position.z;
+    }
+
+    void CMat4::setRotation( const CMat4& rotation )
+    {
+        buff[0] = rotation.buff[0]; buff[4] = rotation.buff[4]; buff[8] = rotation.buff[8];
+        buff[1] = rotation.buff[1]; buff[5] = rotation.buff[5]; buff[9] = rotation.buff[9];
+        buff[2] = rotation.buff[2]; buff[6] = rotation.buff[6]; buff[10] = rotation.buff[10];
+    }
+
     CVec3 CMat4::getPosition() const
     {
         return CVec3( buff[12], buff[13], buff[14] );

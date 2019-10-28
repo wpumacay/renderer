@@ -135,16 +135,19 @@ namespace engine
             return;
         }
 
+        static std::string _lastMeshName = "";
         static std::string _currentMeshName = "";
         IMGUI_COMBO_CONSTRUCT( "meshes", _currentMeshName, _meshes );
+        bool _refresh = ( _currentMeshName != _lastMeshName );
+        _lastMeshName = _currentMeshName;
 
         if ( m_scene->hasRenderable( _currentMeshName ) )
-            _menuMesh( dynamic_cast< CMesh* >( m_scene->getRenderable( _currentMeshName ) ) );
+            _menuMesh( dynamic_cast< CMesh* >( m_scene->getRenderable( _currentMeshName ) ), _refresh );
 
         ImGui::End();
     }
 
-    void CImGuiUtilsLayer::_menuMesh( CMesh* mesh )
+    void CImGuiUtilsLayer::_menuMesh( CMesh* mesh, bool refresh )
     {
         auto _visible = mesh->visible();
         ImGui::Checkbox( "Visible", &_visible );
@@ -153,36 +156,43 @@ namespace engine
         if ( !_visible )
             return;
 
+        _submenuTransform( mesh->position, mesh->rotation, mesh->scale );
+        _submenuMaterial( mesh->material(), refresh );
+    }
+
+    void CImGuiUtilsLayer::_submenuTransform( CVec3& position, CMat4& rotation, CVec3& scale )
+    {
         // position, rotation and scale
         if ( ImGui::TreeNode( "World-transform" ) )
         {
-            float32 _vposition[3] = { mesh->position.x, mesh->position.y, mesh->position.z };
+            float32 _vposition[3] = { position.x, position.y, position.z };
             ImGui::InputFloat3( "position", _vposition );
-            mesh->position = { _vposition[0], _vposition[1], _vposition[2] };
+            position = { _vposition[0], _vposition[1], _vposition[2] };
 
-            auto _euler = CMat4::toEuler( mesh->rotation );
+            auto _euler = CMat4::toEuler( rotation );
             ImGui::SliderFloat( "euler-x", &_euler.x, -ENGINE_PI, ENGINE_PI );
             ImGui::SliderFloat( "euler-y", &_euler.y, -ENGINE_PI / 2 + 0.001f, ENGINE_PI / 2 - 0.001f );
             ImGui::SliderFloat( "euler-z", &_euler.z, -ENGINE_PI, ENGINE_PI );
-            mesh->rotation = CMat4::fromEuler( _euler );
+            rotation = CMat4::fromEuler( _euler );
 
-            float32 _vscale[3] = { mesh->scale.x, mesh->scale.y, mesh->scale.z };
+            float32 _vscale[3] = { scale.x, scale.y, scale.z };
             ImGui::SliderFloat3( "scale", _vscale, 0.1f, 10.0f );
-            mesh->scale = { _vscale[0], _vscale[1], _vscale[2] };
+            scale = { _vscale[0], _vscale[1], _vscale[2] };
 
             ImGui::TreePop();
         }
+    }
 
+    void CImGuiUtilsLayer::_submenuMaterial( CMaterial* material, bool refresh )
+    {
         // material properties
         if ( ImGui::TreeNode( "Material" ) )
         {
-            auto _material = mesh->material();
-
             /* material type */
             int32 _materialType = 0;
-            if ( _material->type() == eMaterialType::LAMBERT ) _materialType = 0;
-            else if ( _material->type() == eMaterialType::PHONG ) _materialType = 1;
-            else if ( _material->type() == eMaterialType::BLINN_PHONG ) _materialType = 2;
+            if ( material->type() == eMaterialType::LAMBERT ) _materialType = 0;
+            else if ( material->type() == eMaterialType::PHONG ) _materialType = 1;
+            else if ( material->type() == eMaterialType::BLINN_PHONG ) _materialType = 2;
 
             ImGui::RadioButton( "Lambert", &_materialType, 0 ); ImGui::SameLine();
             ImGui::RadioButton( "Phong", &_materialType, 1 ); ImGui::SameLine();
@@ -193,58 +203,62 @@ namespace engine
             else if ( _materialType == 1 ) _mtype = eMaterialType::PHONG;
             else if ( _materialType == 2 ) _mtype = eMaterialType::BLINN_PHONG;
 
-            _material->setType( _mtype );
+            material->setType( _mtype );
 
             /* material color-components */
-            float32 _ambient[3] = { _material->ambient.x, _material->ambient.y, _material->ambient.z };
-            float32 _diffuse[3] = { _material->diffuse.x, _material->diffuse.y, _material->diffuse.z };
+            float32 _ambient[3] = { material->ambient.x, material->ambient.y, material->ambient.z };
+            float32 _diffuse[3] = { material->diffuse.x, material->diffuse.y, material->diffuse.z };
             ImGui::ColorEdit3( "Ambient", _ambient );
             ImGui::ColorEdit3( "Diffuse", _diffuse );
-            _material->ambient = { _ambient[0], _ambient[1], _ambient[2] };
-            _material->diffuse = { _diffuse[0], _diffuse[1], _diffuse[2] };
+            material->ambient = { _ambient[0], _ambient[1], _ambient[2] };
+            material->diffuse = { _diffuse[0], _diffuse[1], _diffuse[2] };
 
             if ( _mtype == eMaterialType::PHONG || _mtype == eMaterialType::BLINN_PHONG )
             {
-                float32 _specular[3] = { _material->specular.x, _material->specular.y, _material->specular.z };
+                float32 _specular[3] = { material->specular.x, material->specular.y, material->specular.z };
                 ImGui::ColorEdit3( "Specular", _specular );
-                _material->specular = { _specular[0], _specular[1], _specular[2] };
+                material->specular = { _specular[0], _specular[1], _specular[2] };
 
-                ImGui::SliderFloat( "Shininess", &_material->shininess, 1.0f, 256.0f );
+                ImGui::SliderFloat( "Shininess", &material->shininess, 1.0f, 256.0f );
             }
 
             /* material textures */
             auto _allTextures = CTextureManager::GetAllCachedTextures();
 
             // albedo-map
-            static std::string _albedoMapName = _material->albedoMap() ? _material->albedoMap()->name() : "none";
+            static std::string _albedoMapName = material->albedoMap() ? material->albedoMap()->name() : "none";
+            // in case the user selected a different renderable
+            if ( refresh ) _albedoMapName = material->albedoMap() ? material->albedoMap()->name() : "none";
             IMGUI_COMBO_CONSTRUCT( "albedo-map", _albedoMapName, _allTextures );
 
             if ( CTextureManager::HasCachedTexture( _albedoMapName ) )
-                _material->setAlbedoMap( CTextureManager::GetCachedTexture( _albedoMapName ) );
+                material->setAlbedoMap( CTextureManager::GetCachedTexture( _albedoMapName ) );
 
             if ( ImGui::Button( "Clear-albedomap" ) )
             {
                 _albedoMapName = "none";
-                _material->setAlbedoMap( nullptr );
+                material->setAlbedoMap( nullptr );
             }
 
             // specular map
-            static std::string _specularMapName  = _material->specularMap() ? _material->specularMap()->name() : "none";
+            static std::string _specularMapName  = material->specularMap() ? material->specularMap()->name() : "none";
+            // in case the user selected a different renderable
+            if ( refresh ) _specularMapName = material->specularMap() ? material->specularMap()->name() : "none";
             IMGUI_COMBO_CONSTRUCT( "specular-map", _specularMapName, _allTextures );
 
             if ( CTextureManager::HasCachedTexture( _specularMapName ) )
-                _material->setSpecularMap( CTextureManager::GetCachedTexture( _specularMapName ) );
+                material->setSpecularMap( CTextureManager::GetCachedTexture( _specularMapName ) );
 
             if ( ImGui::Button( "Clear-specularmap" ) )
             {
                 _specularMapName = "none";
-                _material->setSpecularMap( nullptr );
+                material->setSpecularMap( nullptr );
             }
 
             /* transparency */
-            ImGui::Checkbox( "Use-transparency", &_material->transparent );
-            if ( _material->transparent )
-                ImGui::SliderFloat( "Alpha", &_material->alpha, 0.0f, 1.0f );
+            ImGui::Checkbox( "Use-transparency", &material->transparent );
+            if ( material->transparent )
+                ImGui::SliderFloat( "Alpha", &material->alpha, 0.0f, 1.0f );
 
             ImGui::TreePop();
         }
@@ -263,31 +277,69 @@ namespace engine
             return;
         }
 
+        static std::string _lastModelName = "";
         static std::string _currentModelName = "";
         IMGUI_COMBO_CONSTRUCT( "models", _currentModelName, _models );
+        bool _refresh = ( _currentModelName != _lastModelName );
+        _lastModelName = _currentModelName;
 
         if ( m_scene->hasRenderable( _currentModelName ) )
-            _menuModel( dynamic_cast< CModel* >( m_scene->getRenderable( _currentModelName ) ) );
+            _menuModel( dynamic_cast< CModel* >( m_scene->getRenderable( _currentModelName ) ), _refresh );
 
         ImGui::End();
     }
 
-    void CImGuiUtilsLayer::_menuModel( CModel* model )
+    void CImGuiUtilsLayer::_menuModel( CModel* model, bool refresh )
     {
+        auto _visible = model->visible();
+        ImGui::Checkbox( "Visible", &_visible );
+        model->setVisibility( _visible );
+
+        if ( !_visible )
+            return;
+
         // position, rotation and scale (root of the model)
-        float32 _vposition[3] = { model->position.x, model->position.y, model->position.z };
-        ImGui::InputFloat3( "position", _vposition );
-        model->position = { _vposition[0], _vposition[1], _vposition[2] };
+        _submenuTransform( model->position, model->rotation, model->scale );
 
-        auto _euler = CMat4::toEuler( model->rotation );
-        ImGui::SliderFloat( "euler-x", &_euler.x, -ENGINE_PI, ENGINE_PI );
-        ImGui::SliderFloat( "euler-y", &_euler.y, -ENGINE_PI / 2 + 0.001f, ENGINE_PI / 2 - 0.001f );
-        ImGui::SliderFloat( "euler-z", &_euler.z, -ENGINE_PI, ENGINE_PI );
-        model->rotation = CMat4::fromEuler( _euler );
+        // grab all submeshes and give access to their properties
+        auto _submeshes = model->meshes();
+        auto& _submeshesLocalTf = model->localTransforms();
+        if ( ImGui::TreeNode( "Submeshes" ) )
+        {
+            static std::string _lastSubmeshName = "";
+            static std::string _currentSubmeshName = "";
+            static int _currentSubmeshIndex = -1;
+            if ( refresh )
+            {
+                _lastSubmeshName = "";
+                _currentSubmeshName = "";
+                _currentSubmeshIndex = -1;
+            }
+            IMGUI_COMBO_CONSTRUCT_EXT( "submesh", _currentSubmeshName, _currentSubmeshIndex, _submeshes );
+            bool _refreshSubmesh = ( _currentSubmeshName != _lastSubmeshName );
+            _lastSubmeshName = _currentSubmeshName;
 
-        float32 _vscale[3] = { model->scale.x, model->scale.y, model->scale.z };
-        ImGui::SliderFloat3( "scale", _vscale, 0.1f, 10.0f );
-        model->scale = { _vscale[0], _vscale[1], _vscale[2] };
+            if ( _currentSubmeshIndex == -1 )
+            {
+                ImGui::TreePop();
+                return;
+            }
+
+            // local transform w.r.t. root
+            auto _position = _submeshesLocalTf[_currentSubmeshIndex].getPosition();
+            auto _rotation = _submeshesLocalTf[_currentSubmeshIndex].getRotation();
+            auto _scale = _submeshes[_currentSubmeshIndex]->scale;
+            _submenuTransform( _position, _rotation, _scale );
+            _submeshesLocalTf[_currentSubmeshIndex].setPosition( _position );
+            _submeshesLocalTf[_currentSubmeshIndex].setRotation( _rotation );
+            _submeshes[_currentSubmeshIndex]->scale = _scale;
+
+            // submesh's material
+            _submenuMaterial( _submeshes[_currentSubmeshIndex]->material(), _refreshSubmesh );
+
+            ImGui::TreePop();
+        }
+
     }
 
     void CImGuiUtilsLayer::_menuSceneLights()
