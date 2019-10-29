@@ -39,13 +39,15 @@ namespace engine
         CCameraProjData()
         {
             projection  = eCameraProjection::PERSPECTIVE;
-            fov         = 45.0f;
-            zNear       = 0.1f;
-            zFar        = 50.0f;
 
-            aspect  = -1.0f;
-            width   = -1;
-            height  = -1;
+            fov     = 45.0f;
+            aspect  = 1024.0f / 768.0f;
+
+            width   = 1024.0f / 768.0f;
+            height  = 1.0f;
+
+            zNear   = 0.1f;
+            zFar    = 50.0f;
         }
     };
 
@@ -66,6 +68,7 @@ namespace engine
         static eCameraType GetStaticType() { return eCameraType::BASE; }
 
         void setPosition( const CVec3& position );
+        void setTargetPoint( const CVec3& targetPoint );
         void setActiveMode( bool activeMode );
         void setProjectionData( const CCameraProjData& projData );
         void update();
@@ -96,7 +99,9 @@ namespace engine
         void _buildProjMatrix();
 
         virtual void _positionChangedInternal() = 0;
+        virtual void _targetPointChangedInternal() = 0;
         virtual void _updateInternal() = 0;
+        virtual void _resizeInternal( int width, int height ) = 0;
         virtual std::string _toStringInternal() = 0;
 
     protected :

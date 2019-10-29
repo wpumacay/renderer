@@ -41,12 +41,8 @@ namespace engine
         _menuGeneralOptions();
         /* show some stats (fps, num-drawables, etc.) */
         _menuStatistics();
-        /* render menus related to the scene */
-        _menuSceneMeshes();
-        _menuSceneModels();
-        _menuSceneLights();
-        _menuSceneCameras();
-        /* render menus related to renderers' information */
+        /* show configuration|information of the scene */
+        _menuScene();
 
         ImGuiIO& io = ImGui::GetIO();
         m_wantsToCaptureMouse = io.WantCaptureMouse;
@@ -122,11 +118,24 @@ namespace engine
         ImGui::End();
     }
 
-    void CImGuiUtilsLayer::_menuSceneMeshes()
+    void CImGuiUtilsLayer::_menuScene()
     {
-        auto _meshes = m_scene->collectTypedRenderables< CMesh >();
+        ImGui::Begin( "Scene" );
 
-        ImGui::Begin( "Meshes" );
+        _submenuSceneMeshes();
+        _submenuSceneModels();
+        _submenuSceneLights();
+        _submenuSceneCameras();
+
+        ImGui::End();
+    }
+
+    void CImGuiUtilsLayer::_submenuSceneMeshes()
+    {
+        if ( !ImGui::CollapsingHeader( "Meshes" ) )
+            return;
+
+        auto _meshes = m_scene->collectTypedRenderables< CMesh >();
 
         if ( _meshes.size() < 1 )
         {
@@ -142,12 +151,10 @@ namespace engine
         _lastMeshName = _currentMeshName;
 
         if ( m_scene->hasRenderable( _currentMeshName ) )
-            _menuMesh( dynamic_cast< CMesh* >( m_scene->getRenderable( _currentMeshName ) ), _refresh );
-
-        ImGui::End();
+            _submenuMesh( dynamic_cast< CMesh* >( m_scene->getRenderable( _currentMeshName ) ), _refresh );
     }
 
-    void CImGuiUtilsLayer::_menuMesh( CMesh* mesh, bool refresh )
+    void CImGuiUtilsLayer::_submenuMesh( CMesh* mesh, bool refresh )
     {
         auto _visible = mesh->visible();
         ImGui::Checkbox( "Visible", &_visible );
@@ -156,11 +163,11 @@ namespace engine
         if ( !_visible )
             return;
 
-        _submenuTransform( mesh->position, mesh->rotation, mesh->scale );
-        _submenuMaterial( mesh->material(), refresh );
+        _submenuTreeTransform( mesh->position, mesh->rotation, mesh->scale );
+        _submenuTreeMaterial( mesh->material(), refresh );
     }
 
-    void CImGuiUtilsLayer::_submenuTransform( CVec3& position, CMat4& rotation, CVec3& scale )
+    void CImGuiUtilsLayer::_submenuTreeTransform( CVec3& position, CMat4& rotation, CVec3& scale )
     {
         // position, rotation and scale
         if ( ImGui::TreeNode( "World-transform" ) )
@@ -183,7 +190,7 @@ namespace engine
         }
     }
 
-    void CImGuiUtilsLayer::_submenuMaterial( CMaterial* material, bool refresh )
+    void CImGuiUtilsLayer::_submenuTreeMaterial( CMaterial* material, bool refresh )
     {
         // material properties
         if ( ImGui::TreeNode( "Material" ) )
@@ -264,11 +271,12 @@ namespace engine
         }
     }
 
-    void CImGuiUtilsLayer::_menuSceneModels()
+    void CImGuiUtilsLayer::_submenuSceneModels()
     {
-        auto _models = m_scene->collectTypedRenderables< CModel >();
+        if ( !ImGui::CollapsingHeader( "Models" ) )
+            return;
 
-        ImGui::Begin( "Models" );
+        auto _models = m_scene->collectTypedRenderables< CModel >();
 
         if ( _models.size() < 1 )
         {
@@ -284,12 +292,10 @@ namespace engine
         _lastModelName = _currentModelName;
 
         if ( m_scene->hasRenderable( _currentModelName ) )
-            _menuModel( dynamic_cast< CModel* >( m_scene->getRenderable( _currentModelName ) ), _refresh );
-
-        ImGui::End();
+            _submenuModel( dynamic_cast< CModel* >( m_scene->getRenderable( _currentModelName ) ), _refresh );
     }
 
-    void CImGuiUtilsLayer::_menuModel( CModel* model, bool refresh )
+    void CImGuiUtilsLayer::_submenuModel( CModel* model, bool refresh )
     {
         auto _visible = model->visible();
         ImGui::Checkbox( "Visible", &_visible );
@@ -299,7 +305,7 @@ namespace engine
             return;
 
         // position, rotation and scale (root of the model)
-        _submenuTransform( model->position, model->rotation, model->scale );
+        _submenuTreeTransform( model->position, model->rotation, model->scale );
 
         // grab all submeshes and give access to their properties
         auto _submeshes = model->meshes();
@@ -329,71 +335,118 @@ namespace engine
             auto _position = _submeshesLocalTf[_currentSubmeshIndex].getPosition();
             auto _rotation = _submeshesLocalTf[_currentSubmeshIndex].getRotation();
             auto _scale = _submeshes[_currentSubmeshIndex]->scale;
-            _submenuTransform( _position, _rotation, _scale );
+            _submenuTreeTransform( _position, _rotation, _scale );
             _submeshesLocalTf[_currentSubmeshIndex].setPosition( _position );
             _submeshesLocalTf[_currentSubmeshIndex].setRotation( _rotation );
             _submeshes[_currentSubmeshIndex]->scale = _scale;
 
             // submesh's material
-            _submenuMaterial( _submeshes[_currentSubmeshIndex]->material(), _refreshSubmesh );
+            _submenuTreeMaterial( _submeshes[_currentSubmeshIndex]->material(), _refreshSubmesh );
 
             ImGui::TreePop();
         }
 
     }
 
-    void CImGuiUtilsLayer::_menuSceneLights()
+    void CImGuiUtilsLayer::_submenuSceneLights()
     {
-        auto _lights = m_scene->lights();
+        if ( !ImGui::CollapsingHeader( "Lights" ) )
+            return;
 
-        ImGui::Begin( "Lights" );
+        auto _lights = m_scene->lights();
 
         if ( _lights.size() < 1 )
         {
             ImGui::Text( "No lights in the scene for now" );
-            ImGui::End();
             return;
         }
 
+        // show the main-light in the scene
+        auto _mainLight = m_scene->mainLight();
+        if ( _mainLight )
+        {
+            ImGui::Text( "Main-light: " ); 
+            ImGui::SameLine();
+            ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), _mainLight->name().c_str() );
+        }
+
+        static std::string _lastLightName = "";
         static std::string _currentLightName = "";
         IMGUI_COMBO_CONSTRUCT( "lights", _currentLightName, _lights );
+        bool _refresh = ( _currentLightName != _lastLightName );
+        _lastLightName = _currentLightName;
 
         if ( m_scene->hasLight( _currentLightName ) )
         {
+            // give an option to set this as current light
+            if ( ImGui::Button( "Set as main light" ) )
+                m_scene->changeMainLight( _currentLightName );
+
             auto _light = m_scene->getLight( _currentLightName );
-
-            if ( _light->type() == eLightType::DIRECTIONAL )
-                _menuLightDirectional( dynamic_cast< CDirectionalLight* >( _light ) );
-
-            else if ( _light->type() == eLightType::POINT )
-                _menuLightPoint( dynamic_cast< CPointLight* >( _light ) );
-
-            else if ( _light->type() == eLightType::SPOT )
-                _menuLightSpot( dynamic_cast< CSpotLight* >( _light ) );
+            _submenuLight( _light, _refresh );
         }
     }
 
-    void CImGuiUtilsLayer::_menuLightDirectional( CDirectionalLight* light )
+    void CImGuiUtilsLayer::_submenuLight( CILight* light, bool refresh )
     {
+        float32 _cAmbient[3] = { light->ambient.x, light->ambient.y, light->ambient.z };
+        float32 _cDiffuse[3] = { light->diffuse.x, light->diffuse.y, light->diffuse.z };
+        float32 _cSpecular[3] = { light->specular.x, light->specular.y, light->specular.z };
+        ImGui::ColorEdit3( "Ambient-color", _cAmbient );
+        ImGui::ColorEdit3( "Diffuse-color", _cDiffuse );
+        ImGui::ColorEdit3( "Specular-color", _cSpecular );
+        light->ambient = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
+        light->diffuse = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
+        light->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
 
+        ImGui::SliderFloat( "Intensity", &light->intensity, 0.0f, 1.0f );
+
+        if ( light->type() == eLightType::DIRECTIONAL )
+        {
+            static CVec3 _direction = light->direction;
+            if ( refresh ) _direction = light->direction;
+            float32 _vdir[3] = { _direction.x, _direction.y, _direction.z };
+            ImGui::SliderFloat3( "Direction", _vdir, -1.0f, 1.0f );
+            _direction = { _vdir[0], _vdir[1], _vdir[2] };
+            light->direction = CVec3::normalize( _direction );
+        }
+        else if ( light->type() == eLightType::POINT )
+        {
+            float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
+            ImGui::InputFloat3( "Position", _vpos );
+            light->position = { _vpos[0], _vpos[1], _vpos[2] };
+
+            ImGui::SliderFloat( "Attn-constant", &light->atnConstant, 1.0f, 2.0f );
+            ImGui::SliderFloat( "Attn-linear", &light->atnLinear, 0.0f, 0.5f );
+            ImGui::SliderFloat( "Attn-quadratic", &light->atnQuadratic, 0.0f, 0.25f );
+        }
+        else if ( light->type() == eLightType::SPOT )
+        {
+            static CVec3 _direction = light->direction;
+            if ( refresh ) _direction = light->direction;
+            float32 _vdir[3] = { _direction.x, _direction.y, _direction.z };
+            ImGui::SliderFloat3( "Direction", _vdir, -1.0f, 1.0f );
+            _direction = { _vdir[0], _vdir[1], _vdir[2] };
+            light->direction = CVec3::normalize( _direction );
+
+            float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
+            ImGui::InputFloat3( "Position", _vpos );
+            light->position = { _vpos[0], _vpos[1], _vpos[2] };
+
+            ImGui::SliderFloat( "Attn-constant", &light->atnConstant, 1.0f, 2.0f );
+            ImGui::SliderFloat( "Attn-linear", &light->atnLinear, 0.0f, 0.5f );
+            ImGui::SliderFloat( "Attn-quadratic", &light->atnQuadratic, 0.0f, 0.25f );
+            ImGui::SliderFloat( "Inner-cutoff", &light->innerCutoff, ENGINE_PI / 10.0f, ENGINE_PI / 2 );
+            ImGui::SliderFloat( "Outer-cutoff", &light->outerCutoff, ENGINE_PI / 10.0f, ENGINE_PI / 2 );
+        }
     }
 
-    void CImGuiUtilsLayer::_menuLightPoint( CPointLight* light )
+    void CImGuiUtilsLayer::_submenuSceneCameras()
     {
+        if ( !ImGui::CollapsingHeader( "Cameras" ) )
+            return;
 
-    }
-
-    void CImGuiUtilsLayer::_menuLightSpot( CSpotLight* light )
-    {
-
-    }
-
-
-    void CImGuiUtilsLayer::_menuSceneCameras()
-    {
         auto _cameras = m_scene->cameras();
-
-        ImGui::Begin( "Cameras" );
 
         if ( _cameras.size() < 1 )
         {
@@ -402,8 +455,123 @@ namespace engine
             return;
         }
 
+        // show the current-camera in the scene
+        auto _currentCamera = m_scene->currentCamera();
+        if ( _currentCamera )
+        {
+            ImGui::Text( "Current-camera: " ); 
+            ImGui::SameLine();
+            ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), _currentCamera->name().c_str() );
+        }
+
+        static std::string _lastCameraName = "";
         static std::string _currentCameraName = "";
         IMGUI_COMBO_CONSTRUCT( "cameras", _currentCameraName, _cameras );
+        bool _refresh = ( _currentCameraName != _lastCameraName );
+        _lastCameraName = _currentCameraName;
+
+        if ( m_scene->hasCamera( _currentCameraName ) )
+        {
+            // give an option to set this as current camera
+            if ( ImGui::Button( "Set as current camera" ) )
+                m_scene->changeToCamera( _currentCameraName );
+
+            auto _camera = m_scene->getCamera( _currentCameraName );
+            _submenuCamera( _camera, _refresh );
+        }
+    }
+
+    void CImGuiUtilsLayer::_submenuCamera( CICamera* camera, bool refresh )
+    {
+        /* common properties of all camera types */
+
+        // position
+        const float32 _dragSpeed = 0.1f;
+        float32 _vposition[3] = { camera->position().x, camera->position().y, camera->position().z };
+        if ( ImGui::DragFloat3( "Position", _vposition, _dragSpeed ) )
+        {
+            camera->setActiveMode( false );
+            camera->setPosition( { _vposition[0], _vposition[1], _vposition[2] } );
+        }
+        else
+        {
+            camera->setActiveMode( true );
+        }
+
+        // projection-data (fov, ...)
+        auto _projData = camera->projData();
+        int _projType = ( _projData.projection == eCameraProjection::PERSPECTIVE ) ? 0 : 1;
+        ImGui::RadioButton( "Perspective", &_projType, 0 ); ImGui::SameLine();
+        ImGui::RadioButton( "Orthographic", &_projType, 1 ); ImGui::Spacing();
+        _projData.projection = ( _projType == 0 ) ? eCameraProjection::PERSPECTIVE : eCameraProjection::ORTHOGRAPHIC;
+        if ( _projData.projection == eCameraProjection::PERSPECTIVE )
+        {
+            ImGui::SliderFloat( "fov", &_projData.fov, 30.0f, 120.0f );
+        }
+        else
+        {
+            ImGui::SliderFloat( "width", &_projData.width, 1.0f, 10.0f );
+            ImGui::SliderFloat( "height", &_projData.height, 1.0f, 10.0f );
+        }
+        ImGui::SliderFloat( "znear", &_projData.zNear, 0.1f, 1.0f );
+        ImGui::SliderFloat( "zfar", &_projData.zFar, 10.0f, 100.0f );
+
+        camera->setProjectionData( _projData );
+
+        /* type-specific properties */
+
+        // target-point
+        if ( camera->type() == eCameraType::FIXED || camera->type() == eCameraType::ORBIT )
+        {
+            float32 _vtargetPoint[3] = { camera->targetPoint().x, camera->targetPoint().y, camera->targetPoint().z };
+            if ( ImGui::DragFloat3( "Target-point", _vtargetPoint, _dragSpeed ) )
+            {
+                camera->setActiveMode( false );
+                camera->setTargetPoint( { _vtargetPoint[0], _vtargetPoint[1], _vtargetPoint[2] } );
+            }
+            else
+            {
+                camera->setActiveMode( true );
+            }
+        }
+
+        if ( camera->type() == eCameraType::ORBIT )
+        {
+            auto _orbitCamera = dynamic_cast< COrbitCamera* >( camera );
+            float _moveSensitivity = _orbitCamera->moveSensitivity();
+            float _zoomSensitivity = _orbitCamera->zoomSensitivity();
+            if ( ImGui::SliderFloat( "Drag-sens.", &_moveSensitivity, 0.000f, 0.100f ) )
+            {
+                camera->setActiveMode( false );
+                _orbitCamera->setMoveSensitivity( _moveSensitivity );
+            }
+            else
+            {
+                camera->setActiveMode( true );
+            }
+            if ( ImGui::SliderFloat( "Zoom-sens.", &_zoomSensitivity, 0.000f, 4.000f ) )
+            {
+                camera->setActiveMode( false );
+                _orbitCamera->setZoomSensitivity( _zoomSensitivity );
+            }
+            else
+            {
+                camera->setActiveMode( true );
+            }
+        }
+        else if ( camera->type() == eCameraType::FPS )
+        {
+            auto _fpsCamera = dynamic_cast< CFpsCamera* >( camera );
+            float _mouseSensitivity = _fpsCamera->sensitivity();
+            float _camSpeed = _fpsCamera->camSpeed();
+            ImGui::SliderFloat( "Mouse-sens.", &_mouseSensitivity, 0.000f, 1.000f );
+            ImGui::SliderFloat( "Camera-speed", &_camSpeed, 0.0f, 500.0f );
+            _fpsCamera->setSensitivity( _mouseSensitivity );
+            _fpsCamera->setCamSpeed( _camSpeed );
+        }
+
+        ImGui::TextColored( ImVec4( 0.8f, 0.8f, 0.2f, 1.0f ), "Information:" );
+        ImGui::Text( camera->toString().c_str() );
     }
 
 }

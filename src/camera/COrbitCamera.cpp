@@ -21,7 +21,9 @@ namespace engine
                                 const eAxis& upAxis,
                                 const CCameraProjData& projData,
                                 float viewportWidth,
-                                float viewportHeight )
+                                float viewportHeight,
+                                float moveSensitivity,
+                                float zoomSensitivity )
         : CICamera( name, position, targetPoint, upAxis, projData )
     {
         m_type = eCameraType::ORBIT;
@@ -42,6 +44,11 @@ namespace engine
         m_cursor = { 0.0f, 0.0f };
         m_cursor0 = { 0.0f, 0.0f };
 
+        m_moveSensitivity = moveSensitivity;
+        m_zoomSensitivity = zoomSensitivity;
+
+        m_baseAccumScroll = m_zoomSensitivity * CInputManager::GetScrollAccumValueY();
+
         _computeSphericalsFromPosition();
         _updateCameraVectors();
         _buildViewMatrix();
@@ -49,6 +56,22 @@ namespace engine
 
     void COrbitCamera::_positionChangedInternal()
     {
+        _computeSphericalsFromPosition();
+        _updateCameraVectors();
+        _buildViewMatrix();
+    }
+
+    void COrbitCamera::_targetPointChangedInternal()
+    {
+        _computeSphericalsFromPosition();
+        _updateCameraVectors();
+        _buildViewMatrix();
+    }
+
+    void COrbitCamera::setZoomSensitivity( float zoomSensitivity )
+    {
+        m_zoomSensitivity = zoomSensitivity; 
+
         _computeSphericalsFromPosition();
         _updateCameraVectors();
         _buildViewMatrix();
@@ -104,19 +127,25 @@ namespace engine
             float _dx = -( m_cursor.x - m_cursor0.x );
             float _dy = m_cursor.y - m_cursor0.y;
 
-            m_targetPoint.x = m_targetPoint0.x + ( m_right.x * _dx + m_up.x * _dy ) * 0.005f;
-            m_targetPoint.y = m_targetPoint0.y + ( m_right.y * _dx + m_up.y * _dy ) * 0.005f;
+            m_targetPoint.x = m_targetPoint0.x + ( m_right.x * _dx + m_up.x * _dy ) * m_moveSensitivity;
+            m_targetPoint.y = m_targetPoint0.y + ( m_right.y * _dx + m_up.y * _dy ) * m_moveSensitivity;
             m_targetPoint.z = m_targetPoint0.z;
 
             if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
         }
 
-        m_rho = m_rho0 - CInputManager::GetScrollAccumValueY() * 0.25f;
+        m_rho = m_rho0 + ( m_baseAccumScroll - m_zoomSensitivity * CInputManager::GetScrollAccumValueY() ) * 0.25f;
 
         _computePositionFromSphericals();
         _updateCameraVectors();
         _buildViewMatrix();
+    }
+
+    void COrbitCamera::_resizeInternal( int width, int height )
+    {
+        m_viewportWidth = width;
+        m_viewportHeight = height;
     }
 
     std::string COrbitCamera::_toStringInternal()
@@ -145,8 +174,23 @@ namespace engine
         m_r = m_position - m_targetPoint;
 
         m_rho0 = m_rho = m_r.length();
-        m_phi0 = m_phi = std::acos( m_r.z / m_rho );
-        m_theta0 = m_theta = std::atan2( m_r.y, m_r.x );
+        if ( m_upAxis == eAxis::X )
+        {
+            m_phi0 = m_phi = std::acos( m_r.x / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.z, m_r.y );
+        }
+        else if ( m_upAxis == eAxis::Y )
+        {
+            m_phi0 = m_phi = std::acos( m_r.y / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.x, m_r.z );
+        }
+        else if ( m_upAxis == eAxis::Z )
+        {
+            m_phi0 = m_phi = std::acos( m_r.z / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.y, m_r.x );
+        }
+
+        m_baseAccumScroll = m_zoomSensitivity * CInputManager::GetScrollAccumValueY();
     }
 
     void COrbitCamera::_computePositionFromSphericals()

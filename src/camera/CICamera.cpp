@@ -85,6 +85,14 @@ namespace engine
         _buildViewMatrix();
     }
 
+    void CICamera::setTargetPoint( const CVec3& targetPoint )
+    {
+        m_targetPoint = targetPoint;
+
+        _targetPointChangedInternal();
+        _buildViewMatrix();
+    }
+
     void CICamera::setActiveMode( bool activeMode )
     {
         m_active = activeMode;
@@ -104,8 +112,10 @@ namespace engine
     void CICamera::resize( int width, int height )
     {
         m_projData.aspect = ( (float)width ) / height;
-        m_projData.width = width;
-        m_projData.height = height;
+        m_projData.width = 10.0f * ( (float)width ) / height;
+        m_projData.height = 10.0f;
+
+        _resizeInternal( width, height );
 
         _buildProjMatrix();
     }

@@ -14,8 +14,9 @@
 #include <graphics/CIRenderable.h>
 
 #include <camera/CICamera.h>
-#include <camera/CFpsCamera.h>
 #include <camera/CFixedCamera.h>
+#include <camera/COrbitCamera.h>
+#include <camera/CFpsCamera.h>
 
 namespace engine
 {

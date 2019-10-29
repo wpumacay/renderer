@@ -26,14 +26,24 @@ namespace engine
                       const eAxis& upAxis,
                       const CCameraProjData& projData,
                       float viewportWidth,
-                      float viewportHeight );
+                      float viewportHeight,
+                      float moveSensitivity = 0.005f,
+                      float zoomSensitivity = 1.000f );
 
         static eCameraType GetStaticType() { return eCameraType::ORBIT; }
+
+        void setMoveSensitivity( float moveSensitivity ) { m_moveSensitivity = moveSensitivity; }
+        void setZoomSensitivity( float zoomSensitivity );
+
+        float moveSensitivity() const { return m_moveSensitivity; }
+        float zoomSensitivity() const { return m_zoomSensitivity; }
 
     protected :
 
         void _positionChangedInternal() override;
+        void _targetPointChangedInternal() override;
         void _updateInternal() override;
+        void _resizeInternal( int width, int height ) override;
         std::string _toStringInternal() override;
 
     private :
@@ -58,6 +68,11 @@ namespace engine
 
         CVec3 m_r;
         CVec3 m_targetPoint0;
+
+        float m_baseAccumScroll;
+
+        float m_moveSensitivity;
+        float m_zoomSensitivity;
 
         eOrbitCameraState m_cameraState;
         CVec2 m_cursor;

@@ -43,6 +43,11 @@ namespace engine
         // nothing for now, use the same front, right and up vectors
     }
 
+    void CFpsCamera::_targetPointChangedInternal()
+    {
+        // nothing for now, as a target-point is only used during initialization
+    }
+
     void CFpsCamera::_updateInternal()
     {
         if ( !m_active )
@@ -84,6 +89,11 @@ namespace engine
 
         // some book keeping for next calculation
         m_lastCursorPos = _currentCursorPos;
+    }
+
+    void CFpsCamera::_resizeInternal( int width, int height )
+    {
+        // nothing extra to do for now
     }
 
     std::string CFpsCamera::_toStringInternal()

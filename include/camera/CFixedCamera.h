@@ -20,7 +20,9 @@ namespace engine
     protected :
 
         void _positionChangedInternal() override;
+        void _targetPointChangedInternal() override;
         void _updateInternal() override;
+        void _resizeInternal( int width, int height ) override;
         std::string _toStringInternal() override;
     };
 

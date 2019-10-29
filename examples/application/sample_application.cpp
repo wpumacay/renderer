@@ -15,16 +15,7 @@ int main()
 
     auto _scene = new engine::CScene();
 
-    /* create a simple point-light for the scene **************************************************/
-////     auto _pointlight = new engine::CPointLight( "point",
-////                                                 { 0.4f, 0.4f, 0.4f },
-////                                                 { 0.8f, 0.8f, 0.8f },
-////                                                 { 0.8f, 0.8f, 0.8f },
-////                                                 { 5.0f, 5.0f, 5.0f },
-////                                                 1.0f, 0.0f, 0.0f );
-//// 
-////     _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
-
+    /* create some lights for the scene ***********************************************************/
     auto _dirlight = new engine::CDirectionalLight( "directional",
                                                     { 0.4f, 0.4f, 0.4f },
                                                     { 0.8f, 0.8f, 0.8f },
@@ -33,12 +24,22 @@ int main()
 
     _scene->addLight( std::unique_ptr< engine::CILight >( _dirlight ) );
 
+    auto _pointlight = new engine::CPointLight( "point",
+                                                { 0.4f, 0.4f, 0.4f },
+                                                { 0.8f, 0.8f, 0.8f },
+                                                { 0.8f, 0.8f, 0.8f },
+                                                { 5.0f, 5.0f, 5.0f },
+                                                1.0f, 0.0f, 0.0f );
+
+    _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
     /* create a single camera *********************************************************************/
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.aspect = _app->window()->aspect();
+    _cameraProjData.width = 10.0f * _app->window()->aspect();
+    _cameraProjData.height = 10.0f;
 
     auto _orbitCamera = new engine::COrbitCamera( "orbit",
-                                                  { 0.0f, 0.0f, 3.0f },
+                                                  { 0.0f, 3.0f, 0.0f },
                                                   { 0.0f, 0.0f, 0.0f },
                                                   engine::eAxis::Y,
                                                   _cameraProjData,
@@ -46,6 +47,21 @@ int main()
                                                   _app->window()->height() );
 
     _scene->addCamera( std::unique_ptr< engine::CICamera >( _orbitCamera ) );
+
+    const float _cameraSensitivity  = 0.1f;
+    const float _cameraSpeed        = 50.0f;
+    const float _cameraMaxDelta     = 10.0f;
+    
+    auto _fpsCamera = new engine::CFpsCamera( "fps",
+                                              { 3.0f, 3.0f, 3.0f },
+                                              { 0.0f, 0.0f, 0.0f },
+                                              engine::eAxis::Y,
+                                              _cameraProjData,
+                                              _cameraSensitivity,
+                                              _cameraSpeed,
+                                              _cameraMaxDelta );
+
+    _scene->addCamera( std::unique_ptr< engine::CICamera >( _fpsCamera ) );
     /**********************************************************************************************/
 
     const int _nWidthSamples = 50;

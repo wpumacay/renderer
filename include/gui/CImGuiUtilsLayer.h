@@ -71,20 +71,20 @@ namespace engine
 
         void _menuGeneralOptions();
         void _menuStatistics();
-        void _menuSceneMeshes();
-        void _menuSceneModels();
-        void _menuSceneLights();
-        void _menuSceneCameras();
+        void _menuScene();
+        void _submenuSceneMeshes();
+        void _submenuSceneModels();
+        void _submenuSceneLights();
+        void _submenuSceneCameras();
 
-        void _menuMesh( CMesh* mesh, bool refresh );
-        void _menuModel( CModel* model, bool refresh );
+        void _submenuMesh( CMesh* mesh, bool refresh );
+        void _submenuModel( CModel* model, bool refresh );
 
-        void _submenuTransform( CVec3& position, CMat4& rotation, CVec3& scale );
-        void _submenuMaterial( CMaterial* material, bool refresh );
+        void _submenuTreeTransform( CVec3& position, CMat4& rotation, CVec3& scale );
+        void _submenuTreeMaterial( CMaterial* material, bool refresh );
 
-        void _menuLightDirectional( CDirectionalLight* light );
-        void _menuLightPoint( CPointLight* light );
-        void _menuLightSpot( CSpotLight* light );
+        void _submenuLight( CILight* light, bool refresh );
+        void _submenuCamera( CICamera* camera, bool refresh );
 
 
     private :

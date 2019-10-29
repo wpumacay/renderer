@@ -22,7 +22,15 @@ namespace engine
 
     void CFixedCamera::_positionChangedInternal()
     {
-        // keep looking at same target point
+        m_front = CVec3::normalize( m_targetPoint - m_position );
+        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
+        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+
+        m_targetDir = m_front;
+    }
+
+    void CFixedCamera::_targetPointChangedInternal()
+    {
         m_front = CVec3::normalize( m_targetPoint - m_position );
         m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
         m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
@@ -31,6 +39,11 @@ namespace engine
     }
 
     void CFixedCamera::_updateInternal()
+    {
+        // nothing to do for now
+    }
+
+    void CFixedCamera::_resizeInternal( int width, int height )
     {
         // nothing to do for now
     }
