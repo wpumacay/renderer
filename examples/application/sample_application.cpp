@@ -32,7 +32,7 @@ int main()
                                                 1.0f, 0.0f, 0.0f );
 
     _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
-    /* create a single camera *********************************************************************/
+    /* create some cameras for the scene **********************************************************/
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.aspect = _app->window()->aspect();
     _cameraProjData.width = 10.0f * _app->window()->aspect();
@@ -62,8 +62,14 @@ int main()
                                               _cameraMaxDelta );
 
     _scene->addCamera( std::unique_ptr< engine::CICamera >( _fpsCamera ) );
-    /**********************************************************************************************/
+    /* add some effects like fog and a skybox *****************************************************/
 
+    auto _skybox = new engine::CSkybox();
+    _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
+
+    _scene->addSkybox( std::unique_ptr< engine::CSkybox >( _skybox ) );
+
+    /**********************************************************************************************/
     const int _nWidthSamples = 50;
     const int _nDepthSamples = 50;
     const float _widthExtent = 10.0f;

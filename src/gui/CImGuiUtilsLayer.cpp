@@ -8,7 +8,8 @@ namespace engine
                                         CScene* scene,
                                         CMainRenderer* mainRenderer,
                                         CRenderOptions* renderOptions,
-                                        CImGuiManager* imguiManager )
+                                        CImGuiManager* imguiManager,
+                                        COpenGLWindow* window )
         : CImGuiLayer( name )
     {
         m_scene = scene;
@@ -17,6 +18,10 @@ namespace engine
         m_meshRenderer = mainRenderer->meshRenderer();
         m_skyboxRenderer = mainRenderer->skyboxRenderer();
         m_imguiManager = imguiManager;
+        m_window = window;
+
+        m_wantsToCaptureMouse = false;
+        m_cursorDisabledByFpsCamera = false;
     }
 
     CImGuiUtilsLayer::~CImGuiUtilsLayer()
@@ -30,7 +35,40 @@ namespace engine
 
     void CImGuiUtilsLayer::update()
     {
+        if ( !m_scene )
+            return;
 
+        auto _currentCamera = m_scene->currentCamera();
+        auto _cameraType = ( _currentCamera ) ? _currentCamera->type() : eCameraType::BASE;
+        m_cursorDisabledByFpsCamera = ( _cameraType == eCameraType::FPS ) ? _currentCamera->active() : false;
+
+        // restore cursor if disabled by fps camera
+        if ( m_cursorDisabledByFpsCamera && CInputManager::IsKeyDown( ENGINE_KEY_SPACE ) )
+        {
+            m_window->enableCursor();
+            m_cursorDisabledByFpsCamera = false;
+            _currentCamera->setActiveMode( false );
+        }
+
+        // draw some gizmos for the lights
+        auto _lights = m_scene->lights();
+        for ( auto _light : _lights )
+            if ( _light->type() != eLightType::DIRECTIONAL )
+                CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, CMat4::translation( _light->position ), { 1.0f, 1.0f, 1.0f } );
+
+        // draw some gizmos for the cameras
+        auto _cameras = m_scene->cameras();
+        for ( auto _camera : _cameras )
+        {
+            auto _projData = _camera->projData();
+            if ( _camera == m_scene->currentCamera() )
+                continue;
+
+            if ( _camera->projData().projection == eCameraProjection::PERSPECTIVE )
+                CDebugDrawer::DrawClipVolume( CMat4::perspective( _projData.fov, _projData.aspect, 0.01f, 0.2f ) * _camera->matView(), { 0.0f, 1.0f, 1.0f } );
+            else
+                CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, _camera->matView().inverse(), { 0.0f, 1.0f, 1.0f } );
+        }
     }
 
     void CImGuiUtilsLayer::render()
@@ -101,7 +139,7 @@ namespace engine
                               0.0f, FLT_MAX, ImVec2( 0, 100 ) );
         }
 
-        if ( ImGui::CollapsingHeader( "Scene-summary" ) )
+        if ( m_scene && ImGui::CollapsingHeader( "Scene-summary" ) )
         {
             ENGINE_CORE_ASSERT( m_scene, "Must provide a scene to gui-utils" );
 
@@ -120,6 +158,9 @@ namespace engine
 
     void CImGuiUtilsLayer::_menuScene()
     {
+        if ( !m_scene )
+            return;
+
         ImGui::Begin( "Scene" );
 
         _submenuSceneMeshes();
@@ -173,7 +214,7 @@ namespace engine
         if ( ImGui::TreeNode( "World-transform" ) )
         {
             float32 _vposition[3] = { position.x, position.y, position.z };
-            ImGui::InputFloat3( "position", _vposition );
+            ImGui::DragFloat3( "position", _vposition, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             position = { _vposition[0], _vposition[1], _vposition[2] };
 
             auto _euler = CMat4::toEuler( rotation );
@@ -413,7 +454,7 @@ namespace engine
         else if ( light->type() == eLightType::POINT )
         {
             float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
-            ImGui::InputFloat3( "Position", _vpos );
+            ImGui::DragFloat3( "Position", _vpos, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             light->position = { _vpos[0], _vpos[1], _vpos[2] };
 
             ImGui::SliderFloat( "Attn-constant", &light->atnConstant, 1.0f, 2.0f );
@@ -430,7 +471,7 @@ namespace engine
             light->direction = CVec3::normalize( _direction );
 
             float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
-            ImGui::InputFloat3( "Position", _vpos );
+            ImGui::DragFloat3( "Position", _vpos, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             light->position = { _vpos[0], _vpos[1], _vpos[2] };
 
             ImGui::SliderFloat( "Attn-constant", &light->atnConstant, 1.0f, 2.0f );
@@ -472,11 +513,21 @@ namespace engine
 
         if ( m_scene->hasCamera( _currentCameraName ) )
         {
-            // give an option to set this as current camera
-            if ( ImGui::Button( "Set as current camera" ) )
-                m_scene->changeToCamera( _currentCameraName );
-
             auto _camera = m_scene->getCamera( _currentCameraName );
+            auto _cameraType = _camera->type();
+
+            // give an option to set this as current camera
+            if ( ImGui::Button( ( _cameraType != eCameraType::FPS ) ? "Set current" : "Set current (press SPACE to toggle cursor)" ) )
+            {
+                m_scene->changeToCamera( _currentCameraName );
+                if ( m_scene->currentCamera()->type() == eCameraType::FPS )
+                {
+                    m_cursorDisabledByFpsCamera = true;
+                    _camera->setActiveMode( true );
+                    m_window->disableCursor();
+                }
+            }
+
             _submenuCamera( _camera, _refresh );
         }
     }
@@ -486,16 +537,18 @@ namespace engine
         /* common properties of all camera types */
 
         // position
-        const float32 _dragSpeed = 0.1f;
         float32 _vposition[3] = { camera->position().x, camera->position().y, camera->position().z };
-        if ( ImGui::DragFloat3( "Position", _vposition, _dragSpeed ) )
+        if ( ImGui::DragFloat3( "Position", _vposition, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
         {
             camera->setActiveMode( false );
             camera->setPosition( { _vposition[0], _vposition[1], _vposition[2] } );
         }
         else
         {
-            camera->setActiveMode( true );
+            if ( camera->type() == eCameraType::FPS )
+                camera->setActiveMode( m_cursorDisabledByFpsCamera );
+            else
+                camera->setActiveMode( true );
         }
 
         // projection-data (fov, ...)
@@ -524,7 +577,7 @@ namespace engine
         if ( camera->type() == eCameraType::FIXED || camera->type() == eCameraType::ORBIT )
         {
             float32 _vtargetPoint[3] = { camera->targetPoint().x, camera->targetPoint().y, camera->targetPoint().z };
-            if ( ImGui::DragFloat3( "Target-point", _vtargetPoint, _dragSpeed ) )
+            if ( ImGui::DragFloat3( "Target-point", _vtargetPoint, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
             {
                 camera->setActiveMode( false );
                 camera->setTargetPoint( { _vtargetPoint[0], _vtargetPoint[1], _vtargetPoint[2] } );

@@ -131,8 +131,8 @@ namespace engine
 
     void CScene::update()
     {
-        for ( auto& cameraPtr : m_cameras )
-            cameraPtr->update();
+        if ( m_currentCamera )
+            m_currentCamera->update();
     }
 
     void CScene::resize( int32 width, int32 height )

@@ -55,7 +55,8 @@ namespace engine
                                                 m_scene.get(),
                                                 m_mainRenderer.get(),
                                                 &m_renderOptions,
-                                                m_imguiManager.get() );
+                                                m_imguiManager.get(),
+                                                m_window.get() );
 
         m_guiUtilsLayer->setActive( false );
         addGuiLayer( std::unique_ptr< CImGuiLayer >( m_guiUtilsLayer ) );
@@ -135,7 +136,27 @@ namespace engine
             m_renderOptions.cameraPtr = m_scene->currentCamera();
 
         if ( m_scene && m_scene->mainLight() )
-            m_renderOptions.lightPtr = m_scene->mainLight();
+        {
+            auto _light = m_scene->mainLight();
+            auto _lightType = _light->type();
+
+            // use this main light for rendering purposes
+            m_renderOptions.lightPtr = _light;
+
+            // configure shadow-range options according to the type of light we have
+            if ( _lightType == eLightType::POINT || _lightType == eLightType::SPOT )
+                m_renderOptions.shadowMapRangeConfig.type = eShadowRangeType::FIXED_USER;
+            m_renderOptions.shadowMapRangeConfig.dirLightPtr = nullptr;
+            m_renderOptions.shadowMapRangeConfig.pointLightPtr = nullptr;
+            m_renderOptions.shadowMapRangeConfig.spotLightPtr = nullptr;
+
+            if ( _lightType == eLightType::DIRECTIONAL )
+                m_renderOptions.shadowMapRangeConfig.dirLightPtr = dynamic_cast< CDirectionalLight* >( _light );
+            else if ( _lightType == eLightType::POINT )
+                m_renderOptions.shadowMapRangeConfig.pointLightPtr = dynamic_cast< CPointLight* >( _light );
+            else if ( _lightType == eLightType::SPOT )
+                m_renderOptions.shadowMapRangeConfig.spotLightPtr = dynamic_cast< CSpotLight* >( _light );
+        }
 
         if ( m_scene && m_scene->skybox() )
             m_renderOptions.skyboxPtr = m_scene->skybox();
