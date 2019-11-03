@@ -1063,15 +1063,17 @@ namespace engine
     CModel* CMeshBuilder::createModelFromFile( const std::string& filename )
     {
         auto _assimpScenePtr = aiImportFile( filename.c_str(),
-                                             aiProcessPreset_TargetRealtime_MaxQuality );
+                                             aiProcessPreset_TargetRealtime_MaxQuality |
+                                             aiProcess_PreTransformVertices );
 
         if ( !_assimpScenePtr )
         {
-            return NULL;
+            ENGINE_CORE_ERROR( "Could not load model: {0}", filename );
+            return nullptr;
         }
 
         // Create a temporary holder to place the processes data from assimp
-        auto _name = std::string( "assimpModel:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ );
+        auto _name = std::string( "aim:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ ) + "//" + engine::getFilenameNoExtensionFromFilePath( filename );
         auto _model = new CModel( _name );
         // recursively copy the data from assimp to our data structure
         _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr, engine::getFolderpathFromFilePath( filename ) );
