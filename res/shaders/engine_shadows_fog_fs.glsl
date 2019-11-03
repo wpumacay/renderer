@@ -305,11 +305,11 @@ float _computeFragmentShadowFactor( vec3 normal )
     /* compute a bias term to avoid peter panning */
     float _bias = 0.005;
     if ( u_directionalLight.enabled == 1 )
-        _bias = max( 0.05 * ( 1.0f - dot( normal, -normalize( u_directionalLight.direction ) ) ), 0.005 );
+        _bias = max( 0.005 * ( 1.0f - dot( normal, -normalize( u_directionalLight.direction ) ) ), 0.0005 );
     else if ( u_pointLight.enabled == 1 ) // point lights seem to need a smaller bias
-        _bias = max( 0.005 * ( 1.0f - dot( normal, normalize( u_pointLight.position - fPosition ) ) ), 0.0005 );
+        _bias = max( 0.001 * ( 1.0f - dot( normal, normalize( u_pointLight.position - fPosition ) ) ), 0.0001 );
     else if ( u_spotLight.enabled == 1 ) // spot lights also seem to need a smaller bias
-        _bias = max( 0.005 * ( 1.0f - dot( normal, normalize( u_spotLight.position - fPosition ) ) ), 0.0005 );
+        _bias = max( 0.001 * ( 1.0f - dot( normal, normalize( u_spotLight.position - fPosition ) ) ), 0.0001 );
 
     /* grab depths required to check if we are in shadow or not */
     float _closestDepth = texture( u_shadowMap.depthMap, _projCoords.xy ).r;
