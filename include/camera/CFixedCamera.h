@@ -17,6 +17,8 @@ namespace engine
 
         static eCameraType GetStaticType() { return eCameraType::FIXED; }
 
+        void setCameraTransform( const CMat4& transform );
+
     protected :
 
         void _positionChangedInternal() override;

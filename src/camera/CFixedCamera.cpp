@@ -20,6 +20,19 @@ namespace engine
         _buildViewMatrix();
     }
 
+    void CFixedCamera::setCameraTransform( const CMat4& transform )
+    {
+        m_position = transform.getPosition();
+
+        m_front = transform.getBasisVectorX();
+        m_right = -transform.getBasisVectorY();
+        m_up = transform.getBasisVectorZ();
+
+        m_targetDir = m_front;
+
+        _buildViewMatrix();
+    }
+
     void CFixedCamera::_positionChangedInternal()
     {
         m_front = CVec3::normalize( m_targetPoint - m_position );
