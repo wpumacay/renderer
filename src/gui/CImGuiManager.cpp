@@ -8,7 +8,7 @@ namespace engine
     CImGuiManager::CImGuiManager( GLFWwindow* glfwWindowPtr )
     {
         m_active = true;
-        m_useDockingSpace = false;
+        m_useDockingSpace = true;
         m_glfwWindowPtr = glfwWindowPtr;
 
         IMGUI_CHECKVERSION();
@@ -16,6 +16,7 @@ namespace engine
         ImGuiIO& _io = ImGui::GetIO(); (void) _io;
         _io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        _io.IniFilename = "app_gui_layout.ini";
 
         ImGui_ImplGlfw_InitForOpenGL( m_glfwWindowPtr, true ); // true: installing callbacks
     #ifdef __APPLE__
@@ -30,6 +31,7 @@ namespace engine
 
         // base configuration (no passthrough)
         m_dockSpaceFlags |= ImGuiDockNodeFlags_NoDockingInCentralNode;
+        m_dockSpaceFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
