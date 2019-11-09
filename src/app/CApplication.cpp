@@ -12,7 +12,8 @@ namespace engine
         return CApplication::s_instance;
     }
 
-    CApplication::CApplication( const CWindowProps& windowProperties )
+    CApplication::CApplication( const CWindowProps& windowProperties,
+                                const CImGuiProps& imguiProperties )
     {
         // create the global reference for other systems to use
         CApplication::s_instance = this;
@@ -33,7 +34,7 @@ namespace engine
 
         m_scene         = std::unique_ptr< CScene >( new CScene() );
         m_mainRenderer  = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
-        m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow() ) );
+        m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow(), imguiProperties ) );
         m_renderTarget  = std::unique_ptr< CFrameBuffer >( _createRenderTarget() );
 
         m_window->registerKeyCallback( CApplication::CallbackKey );

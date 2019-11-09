@@ -107,7 +107,7 @@ namespace engine
             ImGui::Checkbox( "DockingSpace", &_usesDockingSpace );
             m_imguiManager->setDockingSpace( _usesDockingSpace );
 
-            bool _usesPassthrough = m_imguiManager->usesDockingPassthrough();
+            bool _usesPassthrough = m_imguiManager->usesDockingSpacePassthrough();
             ImGui::Checkbox( "DockingSpace-passthrough", &_usesPassthrough );
             m_imguiManager->setDockingSpacePassthrough( _usesPassthrough );
         }
