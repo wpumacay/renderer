@@ -36,7 +36,8 @@ namespace engine
 
         static CApplication* GetInstance();
 
-        CApplication( const CWindowProps& windowProperties = CWindowProps() );
+        CApplication( const CWindowProps& windowProperties = CWindowProps(),
+                      const CImGuiProps& imguiProperties = CImGuiProps() );
         virtual ~CApplication();
 
         void setScene( std::unique_ptr< CScene > scene );

@@ -13,23 +13,40 @@
 namespace engine
 {
 
+    struct CImGuiProps
+    {
+        bool useDockingSpace;
+        bool useDockingSpacePassthrough;
+        bool useAutosaveLayout;
+        std::string fileLayout;
+
+        CImGuiProps()
+        {
+            useDockingSpace = false;
+            useDockingSpacePassthrough = false;
+            useAutosaveLayout = true;
+            fileLayout = "";
+        }
+    };
+
     class CImGuiManager
     {
 
     public :
 
-        CImGuiManager( GLFWwindow* glfwWindowPtr );
+        CImGuiManager( GLFWwindow* glfwWindowPtr,
+                       const CImGuiProps& props = CImGuiProps() );
         ~CImGuiManager();
 
         void begin();
         void render();
 
         void setActive( bool active ) { m_active = active; }
-        void setDockingSpace( bool enabled ) { m_useDockingSpace = enabled; }
+        void setDockingSpace( bool enabled );
         void setDockingSpacePassthrough( bool enabled );
         bool active() const { return m_active; }
-        bool usesDockingSpace() const { return m_useDockingSpace; }
-        bool usesDockingPassthrough() const;
+        bool usesDockingSpace() const { return m_properties.useDockingSpace; }
+        bool usesDockingSpacePassthrough() const { return m_properties.useDockingSpacePassthrough; }
 
     private :
 
@@ -38,7 +55,7 @@ namespace engine
     private :
 
         bool m_active;
-        bool m_useDockingSpace;
+        CImGuiProps m_properties;
 
         ImGuiDockNodeFlags  m_dockSpaceFlags;       // docking configuration options
         ImGuiWindowFlags    m_dockSpaceWindowFlags; // central-window (docking node) configuration

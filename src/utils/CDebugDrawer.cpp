@@ -48,6 +48,8 @@ namespace engine
         _createInstancedBuffers( DD_PRIMITIVE_ARROW_X );
         _createInstancedBuffers( DD_PRIMITIVE_ARROW_Y );
         _createInstancedBuffers( DD_PRIMITIVE_ARROW_Z );
+
+        m_active = true;
     }
 
     void CDebugDrawer::Init()
@@ -67,6 +69,13 @@ namespace engine
 
         delete CDebugDrawer::s_instance;
         CDebugDrawer::s_instance = nullptr;
+    }
+
+    void CDebugDrawer::SetEnabled( bool enabled )
+    {
+        ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Tried to release debug-drawer more than once" );
+
+        CDebugDrawer::s_instance->_setEnabled( enabled );
     }
 
     void CDebugDrawer::Render( CICamera* camera )
@@ -230,6 +239,11 @@ namespace engine
         m_linesColorsVBO = nullptr;
     }
 
+    void CDebugDrawer::_setEnabled( bool enabled )
+    {
+        m_active = enabled;
+    }
+
     void CDebugDrawer::_createInstancedBuffers( int primitive )
     {
         // get the vertices|normals|indices required for this primitive
@@ -323,14 +337,18 @@ namespace engine
 
     void CDebugDrawer::_render( CICamera* camera )
     {
-        //// _renderSolidBoxes( camera );
+        if ( !m_active )
+            return;
+
         _renderSolidPrimitives( camera );
         _renderLines( camera );
     }
 
     void CDebugDrawer::_render( CICamera* camera, CILight* light )
     {
-        //// _renderSolidBoxes( camera, light );
+        if ( !m_active )
+            return;
+
         _renderSolidPrimitives( camera, light );
         _renderLines( camera );
     }

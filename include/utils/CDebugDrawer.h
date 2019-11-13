@@ -48,6 +48,7 @@ namespace engine
 
         static void Init();
         static void Release();
+        static void SetEnabled( bool enabled );
         static void Render( CICamera* camera );
         static void Render( CICamera* camera, CILight* light );
         static void DrawLine( const CVec3& start, const CVec3& end, const CVec3& color );
@@ -99,6 +100,7 @@ namespace engine
         void _drawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color );
         void _drawSolidAxes( float32 length, const CMat4& transform, float32 alpha );
 
+        void _setEnabled( bool enabled );
         void _createInstancedBuffers( int primitive );
 
         void _render( CICamera* camera );
@@ -121,6 +123,7 @@ namespace engine
         std::unique_ptr< CVertexBuffer >    m_linesColorsVBO;
         std::unique_ptr< CVertexArray >     m_linesVAO;
 
+        bool m_active;
         CShader* m_shaderLinesPtr;
 
         /* resources required to render solid objects *******************************/

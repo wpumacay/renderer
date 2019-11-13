@@ -5,10 +5,11 @@
 namespace engine
 {
 
-    CImGuiManager::CImGuiManager( GLFWwindow* glfwWindowPtr )
+    CImGuiManager::CImGuiManager( GLFWwindow* glfwWindowPtr,
+                                  const CImGuiProps& props )
     {
         m_active = true;
-        m_useDockingSpace = false;
+        m_properties = props;
         m_glfwWindowPtr = glfwWindowPtr;
 
         IMGUI_CHECKVERSION();
@@ -16,6 +17,14 @@ namespace engine
         ImGuiIO& _io = ImGui::GetIO(); (void) _io;
         _io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+        if ( props.useAutosaveLayout )
+            _io.IniFilename = ( props.fileLayout == "" ) ? "imgui.ini" : props.fileLayout.c_str();
+        else
+            _io.IniFilename = nullptr;
+
+        if ( !props.useAutosaveLayout && props.fileLayout != "" )
+            ImGui::LoadIniSettingsFromDisk( props.fileLayout.c_str() );
 
         ImGui_ImplGlfw_InitForOpenGL( m_glfwWindowPtr, true ); // true: installing callbacks
     #ifdef __APPLE__
@@ -30,6 +39,7 @@ namespace engine
 
         // base configuration (no passthrough)
         m_dockSpaceFlags |= ImGuiDockNodeFlags_NoDockingInCentralNode;
+        m_dockSpaceFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
         m_dockSpaceWindowFlags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
@@ -55,11 +65,11 @@ namespace engine
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //// ENGINE_CORE_TRACE( "dockspace? {0}", m_useDockingSpace );
+        //// ENGINE_CORE_TRACE( "dockspace? {0}", m_properties.useDockingSpace );
         //// ENGINE_CORE_TRACE( "transparent? {0}", ( m_dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode ) != 0 );
         //// ENGINE_CORE_TRACE( "dockable-central? {0}", ( m_dockSpaceFlags & ImGuiDockNodeFlags_NoDockingInCentralNode ) != 0 );
 
-        if ( m_useDockingSpace )
+        if ( m_properties.useDockingSpace )
             _configureDockingSpace();
     }
 
@@ -104,17 +114,19 @@ namespace engine
         ImGui::End();
     }
 
+    void CImGuiManager::setDockingSpace( bool enabled )
+    {
+        m_properties.useDockingSpace = enabled;
+    }
+
     void CImGuiManager::setDockingSpacePassthrough( bool enabled )
     {
+        m_properties.useDockingSpacePassthrough = enabled;
+
         if ( enabled )
             m_dockSpaceFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
         else
             m_dockSpaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-    }
-
-    bool CImGuiManager::usesDockingPassthrough() const
-    {
-        return ( m_dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode ) != 0;
     }
 
     void CImGuiManager::render()
