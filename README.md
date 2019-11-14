@@ -7,6 +7,6 @@ to [ThreeJs](https://github.com/mrdoob/three.js/), [BabylonJs](https://github.co
 and [Ogre3D](https://github.com/OGRECave/ogre). Some sample application that can be built with this renderer
 are shown below:
 
-![demo-1](https://media.giphy.com/media/SqrtZMytk0O0FnDtex/source.gif)
+![demo-1](https://media.giphy.com/media/SqrtZMytk0O0FnDtex/giphy.gif)
 
-![demo-2](https://media.giphy.com/media/WprV20VRPQC9WVfhO9/source.gif)
+![demo-2](https://media.giphy.com/media/WprV20VRPQC9WVfhO9/giphy.gif)
