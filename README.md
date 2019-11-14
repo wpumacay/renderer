@@ -9,4 +9,4 @@ are shown below:
 
 ![demo-1](https://media.giphy.com/media/SqrtZMytk0O0FnDtex/giphy.gif)
 
-![demo-2](https://media.giphy.com/media/gdeExM6PWEYSp9bFkW/giphy.gif)
+![demo-2](https://media.giphy.com/media/ZDEAQSUraLao0fOhHi/giphy.gif)
