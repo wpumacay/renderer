@@ -79,5 +79,10 @@ target_link_libraries( cat1
                        spdlog
                        imgui )
 
-# build some examples of the usage of our library
-add_subdirectory( examples )
+# whether or not to build examples
+option( CAT1_BUILD_EXAMPLES "Set this ON to enabled building all examples" ON )
+
+if ( CAT1_BUILD_EXAMPLES )
+    # build some examples of the usage of our library
+    add_subdirectory( examples )
+endif()
