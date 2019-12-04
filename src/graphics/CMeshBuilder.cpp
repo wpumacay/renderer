@@ -806,8 +806,8 @@ namespace engine
         float _maxHeight = -1000000.0f;
         float _minHeight = 1000000.0f;
         float _minNegHeight = 0.0f; // catch minimum negative heights
-        float _dw = widthExtent / nWidthSamples;
-        float _dd = depthExtent / nDepthSamples;
+        float _dw = widthExtent / ( nWidthSamples - 1 );
+        float _dd = depthExtent / ( nDepthSamples - 1 );
         for ( size_t i = 0; i < nWidthSamples - 1; i++ )
         {
             for ( size_t j = 0; j < nDepthSamples - 1; j++ )
@@ -949,10 +949,10 @@ namespace engine
                     int ii1 = ( _ii.size() > 1 ) ? ( _ii[iind + 1] ) : ( ii0 );
                     int jj1 = ( _jj.size() > 1 ) ? ( _jj[jind + 1] ) : ( jj0 );
 
-                    auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj0 ) / nDepthSamples, heightData[ii0 * nDepthSamples + jj0] }, axis );
-                    auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj1 ) / nDepthSamples, heightData[ii1 * nDepthSamples + jj1] }, axis );
-                    auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj1 ) / nDepthSamples, _minNegHeight - heightBase }, axis );
-                    auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / nWidthSamples, -centerY + depthExtent * ( (float)jj0 ) / nDepthSamples, _minNegHeight - heightBase }, axis );
+                    auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)jj0 ) / ( nDepthSamples - 1 ), heightData[ii0 * nDepthSamples + jj0] }, axis );
+                    auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)jj1 ) / ( nDepthSamples - 1 ), heightData[ii1 * nDepthSamples + jj1] }, axis );
+                    auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii1 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)jj1 ) / ( nDepthSamples - 1 ), _minNegHeight - heightBase }, axis );
+                    auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)ii0 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)jj0 ) / ( nDepthSamples - 1 ), _minNegHeight - heightBase }, axis );
 
                     _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
                     _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
@@ -977,10 +977,10 @@ namespace engine
 
         // bottom base plane
         {
-            auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                            , -centerY + depthExtent * 0.0f                             , _minNegHeight - heightBase }, axis );
-            auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / nWidthSamples ) , -centerY + depthExtent * 0.0f                             , _minNegHeight - heightBase }, axis );
-            auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / nWidthSamples ) , -centerY + depthExtent * ( 1.0f - 1.0f / nDepthSamples )  , _minNegHeight - heightBase }, axis );
-            auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                            , -centerY + depthExtent * ( 1.0f - 1.0f / nDepthSamples )  , _minNegHeight - heightBase }, axis );
+            auto _p0 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                                    , -centerY + depthExtent * 0.0f                                     , _minNegHeight - heightBase }, axis );
+            auto _p1 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / ( nWidthSamples - 1 ) ) , -centerY + depthExtent * 0.0f                                     , _minNegHeight - heightBase }, axis );
+            auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / ( nWidthSamples - 1 ) ) , -centerY + depthExtent * ( 1.0f - 1.0f / ( nDepthSamples - 1 ) )  , _minNegHeight - heightBase }, axis );
+            auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                                    , -centerY + depthExtent * ( 1.0f - 1.0f / ( nDepthSamples - 1 ) )  , _minNegHeight - heightBase }, axis );
 
             _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
             _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
@@ -1026,7 +1026,7 @@ namespace engine
         */
         CVec3 _n;
 
-        auto _pv = _rotateToMatchUpAxis( { ( i + 0 ) * dw, ( j + 0 ) * dd, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] }, axis );
+        auto _pv = _rotateToMatchUpAxis( { ( i + 0 ) * dw - centerX, ( j + 0 ) * dd - centerY, heightData[( i + 0 ) * nDepthSamples + ( j + 0 )] }, axis );
 
         auto _p1 = ( i > 0 && j < (nDepthSamples - 1) )                     ? _rotateToMatchUpAxis( { ( i - 1 ) * dw - centerX, ( j + 1 ) * dd - centerY, heightData[( i - 1 ) * nDepthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
         auto _p2 = ( j < (nDepthSamples - 1) )                              ? _rotateToMatchUpAxis( { ( i + 0 ) * dw - centerX, ( j + 1 ) * dd - centerY, heightData[( i + 0 ) * nDepthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
