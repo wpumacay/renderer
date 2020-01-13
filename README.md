@@ -10,3 +10,14 @@ are shown below:
 ![demo-1](https://media.giphy.com/media/SqrtZMytk0O0FnDtex/giphy.gif)
 
 ![demo-2](https://media.giphy.com/media/ZDEAQSUraLao0fOhHi/giphy.gif)
+
+## Setup
+
+### Requirements
+
+#### Ubuntu >= 16.04
+
+```bash
+sudo apt install make cmake pkg-config
+sudo apt install libassimp-dev libglfw3-dev libglew-dev
+```

@@ -75,6 +75,7 @@ target_link_libraries( cat1
                        ${GLFW_LIBRARIES} 
                        ${OPENGL_LIBRARIES} 
                        ${GLEW_LIBRARIES}
+                       tinymath_cpp_lib
                        assimp
                        spdlog
                        imgui )

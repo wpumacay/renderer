@@ -1,27 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# --------------------------------------------------------------------- #
-# script/setup: Sets up this repo by cloning all required dependencies  #
-# --------------------------------------------------------------------- #
+GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
+GIT_DEPS_USER=(wpumacay pybind wpumacay gabime)
+GIT_DEPS_BRANCH=(master master docking master)
 
-echo "======== Installing apt-dependencies ============"
-
-echo "==> Installing build tools"
-sudo apt-get install make cmake pkg-config
-
-echo "==> Installing dependencies for renderer"
-sudo apt-get install libassimp-dev libglfw3-dev libglew-dev
-
-echo "Done installing dependencies ..."
-
-echo "======== Cloning dependencies -> ext/ ==========="
-
-# using own imgui version to add some extra cmake-files
-echo "==> Cloning wpumacay/imgui @ github - master branch"
-git clone --branch=docking https://github.com/wpumacay/imgui.git ext/imgui
-
-# spdlog library (for our logging system)
-echo "==> Cloning gabime/spdlog @ github - master branch"
-git clone https://github.com/gabime/spdlog.git ext/spdlog
-
-echo "Done cloning dependencies ..."
+for i in {0..3}
+do
+    USER=${GIT_DEPS_USER[$i]}
+    REPO=${GIT_DEPS_REPO[$i]}
+    BRANCH=${GIT_DEPS_BRANCH[$i]}
+    URL=https://github.com/${USER}/${REPO}
+    if [ ! -d "ext/${GIT_DEPS_REPO[$i]}" ]
+    then
+        echo "===> Cloning ${USER}/${REPO} @ github - ${BRANCH} branch"
+        git clone --branch=${BRANCH} ${URL} ext/${REPO}
+    else
+        echo "===> Repository ${USER}/${REPO} @ github already checked out"
+    fi
+done

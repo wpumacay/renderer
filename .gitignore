@@ -17,6 +17,8 @@ tmp/
 # dependencies-exclusions
 ext/imgui*
 ext/spdlog*
+ext/pybind11*
+ext/tiny_math*
 
 # compressed files
 *.zip
