@@ -78,9 +78,9 @@ int main()
     std::uniform_real_distribution< float > _randomDistribution( 0.5f, 1.0f );
     for ( size_t i = 0; i < _renderables.size(); i++ )
     {
-        _renderables[i]->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                                _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                                _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
+        _renderables[i]->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
         float _scale = _randomDistribution( _randomGenerator );
         _renderables[i]->scale = { _scale, _scale, _scale };
     }
@@ -143,7 +143,7 @@ void renderScene( engine::CICamera* cameraPtr,
         auto _bsphere = renderablePtr->bsphere();
 
         engine::CDebugDrawer::DrawBox( _bbox.size, _bbox.worldTransform, { 0.2f, 0.2f, 0.8f } );
-        engine::CDebugDrawer::DrawSphere( _bsphere.radius, engine::CMat4::translation( _bsphere.worldPosition ), { 0.2f, 0.8f, 0.2f } );
+        engine::CDebugDrawer::DrawSphere( _bsphere.radius, engine::translation( _bsphere.worldPosition ), { 0.2f, 0.8f, 0.2f } );
     }
 
     shaderPtr->unbind();

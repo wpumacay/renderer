@@ -32,12 +32,12 @@ ComparatorSignedDistPlane g_signedComparator = { g_plane };
 auto g_box_size = engine::CVec3( 0.8f, 0.8f, 0.8f );
 auto g_box_position = engine::CVec3( 3.0f, 3.0f, 3.0f );
 auto g_box_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
-auto g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEuler( g_box_rotation );
+auto g_box_transform = engine::translation( g_box_position ) * engine::rotation( tinymath::rotation( g_box_rotation ) );
 
 auto g_sphere_size = 0.5f;
 auto g_sphere_position = engine::CVec3( -1.0f, 1.0f, -1.0f );
 auto g_sphere_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
-auto g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEuler( g_sphere_rotation );
+auto g_sphere_transform = engine::translation( g_sphere_position ) * engine::rotation( tinymath::rotation( g_sphere_rotation ) );
 
 bool g_use_signed_distance = false;
 bool g_show_comparison_with_frustum = false;
@@ -82,9 +82,9 @@ private :
         ImGui::Checkbox( "comparator-use-signed-dist", &g_use_signed_distance );
         ImGui::Checkbox( "show-comparison-with-frustum", &g_show_comparison_with_frustum );
 
-        float _bSize[3]     = { g_box_size.x, g_box_size.y, g_box_size.z };
-        float _bPosition[3] = { g_box_position.x, g_box_position.y, g_box_position.z };
-        float _bRotation[3] = { g_box_rotation.x, g_box_rotation.y, g_box_rotation.z };
+        float _bSize[3]     = { g_box_size.x(), g_box_size.y(), g_box_size.z() };
+        float _bPosition[3] = { g_box_position.x(), g_box_position.y(), g_box_position.z() };
+        float _bRotation[3] = { g_box_rotation.x(), g_box_rotation.y(), g_box_rotation.z() };
 
         ImGui::SliderFloat3( "bSize", _bSize, 0.2f, 2.0f );
         ImGui::SliderFloat3( "bPosition", _bPosition, -5.0f, 5.0f );
@@ -93,7 +93,7 @@ private :
         g_box_size      = { _bSize[0], _bSize[1], _bSize[2] };
         g_box_position  = { _bPosition[0], _bPosition[1], _bPosition[2] };
         g_box_rotation  = { _bRotation[0], _bRotation[1], _bRotation[2] };
-        g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_box_rotation );
+        g_box_transform = engine::translation( g_box_position ) * tinymath::rotation( g_box_rotation );
 
         ImGui::Spacing();
         ImGui::Text( "world-transform:" );
@@ -105,8 +105,8 @@ private :
     {
         ImGui::Begin( "Play around with the sphere" );
 
-        float _sPosition[3] = { g_sphere_position.x, g_sphere_position.y, g_sphere_position.z };
-        float _sRotation[3] = { g_sphere_rotation.x, g_sphere_rotation.y, g_sphere_rotation.z };
+        float _sPosition[3] = { g_sphere_position.x(), g_sphere_position.y(), g_sphere_position.z() };
+        float _sRotation[3] = { g_sphere_rotation.x(), g_sphere_rotation.y(), g_sphere_rotation.z() };
 
         ImGui::SliderFloat( "sSize", &g_sphere_size, 0.2f, 2.0f );
         ImGui::SliderFloat3( "sPosition", _sPosition, -5.0f, 5.0f );
@@ -114,7 +114,7 @@ private :
 
         g_sphere_position  = { _sPosition[0], _sPosition[1], _sPosition[2] };
         g_sphere_rotation  = { _sRotation[0], _sRotation[1], _sRotation[2] };
-        g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_sphere_rotation );
+        g_sphere_transform = engine::translation( g_sphere_position ) * tinymath::rotation( g_sphere_rotation );
 
         ImGui::Spacing();
         ImGui::Text( "world-transform:" );
@@ -126,9 +126,9 @@ private :
     {
         ImGui::Begin( "Play around with the plane" );
 
-        float _pSize[2]     = { g_plane_size.x, g_plane_size.y };
-        float _pNormal[3]   = { g_plane_normal.x, g_plane_normal.y, g_plane_normal.z };
-        float _pPosition[3] = { g_plane_position.x, g_plane_position.y, g_plane_position.z };
+        float _pSize[2]     = { g_plane_size.x(), g_plane_size.y() };
+        float _pNormal[3]   = { g_plane_normal.x(), g_plane_normal.y(), g_plane_normal.z() };
+        float _pPosition[3] = { g_plane_position.x(), g_plane_position.y(), g_plane_position.z() };
 
         ImGui::SliderFloat2( "pSize", _pSize, 0.2f, 2.0f );
         ImGui::SliderFloat3( "pNormal", _pNormal, -1.0f, 1.0f );

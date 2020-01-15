@@ -134,7 +134,7 @@ int main()
 
         _shader->bind();
         _shader->setMat4( "u_tProj", _camera->matProj() );
-        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _camera->matView() ), { 0.0f, 0.0f, 0.0f } ) * _correctionMat );
+        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _camera->matView() ) ) * _correctionMat );
 
         _textureCubemap->bind();
         _varray->bind();

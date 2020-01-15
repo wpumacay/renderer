@@ -43,7 +43,7 @@ namespace engine
         else if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::Z ) 
             _upAxisCorrectionMat = CMat4( tinymath::rotationX<float32>( ENGINE_PI / 2.0f ), CVec3( 0.0f, 0.0f, 0.0f ) );
 
-        m_context.viewMatrix = CMat4( CMat3( _camMatView ), CVec3( 0.0f, 0.0f, 0.0f ) ) * _upAxisCorrectionMat;
+        m_context.viewMatrix = CMat4( CMat3( _camMatView ) ) * _upAxisCorrectionMat;
         m_context.projMatrix = _camMatProj;
 
         // setup fog information

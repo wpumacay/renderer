@@ -8,8 +8,8 @@ engine::CVec3 g_lightSpotPosition   = { 0.0f, 5.0f, 0.0f };
 // engine::CVec3 g_lightPointPosition  = { -2.0f, 4.0f, -1.0f };
 // engine::CVec3 g_lightSpotPosition   = { -2.0f, 4.0f, -1.0f };
 
-engine::CVec3 g_lightDirDirection   = engine::CVec3::normalize( -g_lightDirPosition );
-engine::CVec3 g_lightSpotDirection  = engine::CVec3::normalize( -g_lightSpotPosition );
+engine::CVec3 g_lightDirDirection   = -g_lightDirPosition.normalized();
+engine::CVec3 g_lightSpotDirection  = -g_lightSpotPosition.normalized();
 
 const engine::CVec3 g_worldUp = { 0.0f, 1.0f, 0.0f };
 
@@ -142,16 +142,16 @@ protected :
         auto _lightPtr = m_lights[m_lightSelectedIndex];
         if ( _lightPtr->type() == engine::eLightType::DIRECTIONAL )
         {
-            float _direction[3] = { m_lightDirDirection.x, m_lightDirDirection.y, m_lightDirDirection.z };
+            float _direction[3] = { m_lightDirDirection.x(), m_lightDirDirection.y(), m_lightDirDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
             m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
 
-            g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
+            g_lightDirDirection = m_lightDirDirection.normalized();
             _lightPtr->direction = g_lightDirDirection;
         }
         else if ( _lightPtr->type() == engine::eLightType::POINT )
         {
-            float _position[3] = { m_lightPointPosition.x, m_lightPointPosition.y, m_lightPointPosition.z };
+            float _position[3] = { m_lightPointPosition.x(), m_lightPointPosition.y(), m_lightPointPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightPointPosition = { _position[0], _position[1], _position[2] };
 
@@ -160,15 +160,15 @@ protected :
         }
         else if ( _lightPtr->type() == engine::eLightType::SPOT )
         {
-            float _direction[3] = { m_lightSpotDirection.x, m_lightSpotDirection.y, m_lightSpotDirection.z };
+            float _direction[3] = { m_lightSpotDirection.x(), m_lightSpotDirection.y(), m_lightSpotDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
             m_lightSpotDirection = { _direction[0], _direction[1], _direction[2] };
 
-            float _position[3] = { m_lightSpotPosition.x, m_lightSpotPosition.y, m_lightSpotPosition.z };
+            float _position[3] = { m_lightSpotPosition.x(), m_lightSpotPosition.y(), m_lightSpotPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightSpotPosition = { _position[0], _position[1], _position[2] };
 
-            g_lightSpotDirection = engine::CVec3::normalize( m_lightSpotDirection );
+            g_lightSpotDirection = m_lightSpotDirection.normalized();
             g_lightSpotPosition = m_lightSpotPosition;
 
             _lightPtr->direction = g_lightSpotDirection;
@@ -225,7 +225,7 @@ protected :
             ImGui::SliderFloat( "dist-start", &m_fogPtr->distStart, 0.0f, 10.0f );
         }
 
-        float _fogColor[3] = { m_fogPtr->color.x, m_fogPtr->color.y, m_fogPtr->color.z };
+        float _fogColor[3] = { m_fogPtr->color.x(), m_fogPtr->color.y(), m_fogPtr->color.z() };
         ImGui::ColorEdit3( "color", _fogColor );
         m_fogPtr->color = { _fogColor[0], _fogColor[1], _fogColor[2] };
 
@@ -383,7 +383,7 @@ int main()
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     _cube3->position = { -1.0f, 0.5f, 2.0f };
-    _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 60.0f ), { 1.0f, 0.0f, 1.0f } );
+    _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 60.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
     auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
@@ -567,7 +567,7 @@ void renderSkyboxWithFog( engine::CICamera* cameraPtr,
     /* render the skybox (as it last rendererd, we take advantage of early depth testing) */
 
     shaderPtr->bind();
-    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * cameraPtr->matView().getRotation() * _correctionMat );
+    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * engine::CMat4( engine::CMat3( cameraPtr->matView() ) ) * _correctionMat );
     shaderPtr->setInt( "u_fog.enabled", ( fogPtr->active() ) ? 1 : 0 );
     shaderPtr->setVec3( "u_fog.color", fogPtr->color );
     shaderPtr->setFloat( "u_fog.lowerLimit", g_lowerLimit );
@@ -580,9 +580,8 @@ void renderSkyboxWithFog( engine::CICamera* cameraPtr,
 
 engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 {
-    if ( axis == engine::eAxis::X ) return engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
-    if ( axis == engine::eAxis::Y ) return engine::CMat4();
-    if ( axis == engine::eAxis::Z ) return engine::CMat4::rotationX( ENGINE_PI / 2.0f );
+    if ( axis == engine::eAxis::X ) return tinymath::rotationZ<float>( -ENGINE_PI / 2.0f );
+    else if ( axis == engine::eAxis::Z ) return tinymath::rotationX<float>( ENGINE_PI / 2.0f );
 
     return engine::CMat4();
 }
