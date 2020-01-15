@@ -212,7 +212,7 @@ void drawGrid_noInstancing( engine::CShader* shader,
                 float _y = 20.0f * ( ( (float)i ) / ( g_num_rows - 1 ) - 0.5f );    // range [-5, 5]
                 float _z = 20.0f * ( ( (float)k ) / ( g_num_floors - 1 ) - 0.5f );  // range [-5, 5]
                 
-                engine::CMat4 _modelMatrix = engine::CMat4::translation( { _x, _y, _z } );
+                engine::CMat4 _modelMatrix = engine::translation( { _x, _y, _z } );
                 shader->setMat4( "u_modelMatrix", _modelMatrix );
                 glDrawElements( GL_TRIANGLES, vao->indexBuffer()->count(), GL_UNSIGNED_INT, 0 );
             }
@@ -244,7 +244,7 @@ void drawGrid_Instancing( engine::CShader* shader,
                 float _z = 20.0f * ( ( (float)k ) / ( g_num_floors - 1 ) - 0.5f );  // range [-5, 5]
 
                 int _index = k + j * g_num_floors + i * g_num_floors * g_num_cols;
-                bufferModelMatrices[_index] =  engine::CMat4::translation( { _x, _y, _z } );
+                bufferModelMatrices[_index] =  engine::translation( { _x, _y, _z } );
             }
         }
     }

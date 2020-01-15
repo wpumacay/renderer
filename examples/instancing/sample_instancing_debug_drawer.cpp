@@ -20,9 +20,9 @@ engine::CVec3 g_lightSpotPosition   = { 0.0f, 5.0f, 0.0f };
 // engine::CVec3 g_lightPointPosition  = { -2.0f, 4.0f, -1.0f };
 // engine::CVec3 g_lightSpotPosition   = { -2.0f, 4.0f, -1.0f };
 
-engine::CVec3 g_lightDirDirection   = engine::CVec3::normalize( -g_lightDirPosition );
-engine::CVec3 g_lightPointDirection = engine::CVec3::normalize( -g_lightPointPosition );
-engine::CVec3 g_lightSpotDirection  = engine::CVec3::normalize( -g_lightSpotPosition );
+engine::CVec3 g_lightDirDirection   = ( -g_lightDirPosition ).normalized();
+engine::CVec3 g_lightPointDirection = ( -g_lightPointPosition ).normalized();
+engine::CVec3 g_lightSpotDirection  = ( -g_lightSpotPosition ).normalized();
 
 engine::CVec3 g_focusPoint = { 0.0f, 0.0f, 0.0f };
 const engine::CVec3 g_worldUp = { 0.0f, 1.0f, 0.0f };
@@ -339,7 +339,7 @@ private :
                 ImGui::SliderFloat( "dist-start", &m_fogPtr->distStart, 0.0f, 10.0f );
             }
 
-            float _fogColor[3] = { m_fogPtr->color.x, m_fogPtr->color.y, m_fogPtr->color.z };
+            float _fogColor[3] = { m_fogPtr->color.x(), m_fogPtr->color.y(), m_fogPtr->color.z() };
             ImGui::ColorEdit3( "color", _fogColor );
             m_fogPtr->color = { _fogColor[0], _fogColor[1], _fogColor[2] };
         }
@@ -631,11 +631,11 @@ private :
         if ( _lightPtr->type() == engine::eLightType::DIRECTIONAL )
         {
             /* shadow frustum transform in world-space (view) */
-            float _direction[3] = { m_lightDirDirection.x, m_lightDirDirection.y, m_lightDirDirection.z };
+            float _direction[3] = { m_lightDirDirection.x(), m_lightDirDirection.y(), m_lightDirDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
             m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
 
-            g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
+            g_lightDirDirection = m_lightDirDirection.normalized();
             _lightPtr->direction = g_lightDirDirection;
 
             // whether or not to use autofix-to-camera for directional lights shadowmapping
@@ -654,18 +654,18 @@ private :
                 ImGui::SliderFloat( "width", &g_widthDir, 20.0f, 40.0f );
                 ImGui::SliderFloat( "height", &g_heightDir, 20.0f, 40.0f );
 
-                float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+                float _focusp[3] = { g_focusPoint.x(), g_focusPoint.y(), g_focusPoint.z() };
                 ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
                 g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
             }
         }
         else if ( _lightPtr->type() == engine::eLightType::POINT )
         {
-            float _position[3] = { m_lightPointPosition.x, m_lightPointPosition.y, m_lightPointPosition.z };
+            float _position[3] = { m_lightPointPosition.x(), m_lightPointPosition.y(), m_lightPointPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightPointPosition = { _position[0], _position[1], _position[2] };
 
-            g_lightPointDirection = engine::CVec3::normalize( m_lightPointDirection );
+            g_lightPointDirection = m_lightPointDirection.normalized();
             g_lightPointPosition = m_lightPointPosition;
             _lightPtr->position = g_lightPointPosition;
 
@@ -673,21 +673,21 @@ private :
             ImGui::SliderFloat( "zfar", &g_zfarPoint, g_znearPoint, 20.0f );
             ImGui::SliderFloat( "fov", &g_fovPoint, 20.0f, 150.0f );
 
-            float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+            float _focusp[3] = { g_focusPoint.x(), g_focusPoint.y(), g_focusPoint.z() };
             ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
             g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
         }
         else if ( _lightPtr->type() == engine::eLightType::SPOT )
         {
-            float _direction[3] = { m_lightSpotDirection.x, m_lightSpotDirection.y, m_lightSpotDirection.z };
+            float _direction[3] = { m_lightSpotDirection.x(), m_lightSpotDirection.y(), m_lightSpotDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -10.0f, 10.0f );
             m_lightSpotDirection = { _direction[0], _direction[1], _direction[2] };
 
-            float _position[3] = { m_lightSpotPosition.x, m_lightSpotPosition.y, m_lightSpotPosition.z };
+            float _position[3] = { m_lightSpotPosition.x(), m_lightSpotPosition.y(), m_lightSpotPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightSpotPosition = { _position[0], _position[1], _position[2] };
 
-            g_lightSpotDirection = engine::CVec3::normalize( m_lightSpotDirection );
+            g_lightSpotDirection = m_lightSpotDirection.normalized();
             g_lightSpotPosition = m_lightSpotPosition;
 
             _lightPtr->direction = g_lightSpotDirection;
@@ -950,7 +950,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
-        //// engine::CDebugDrawer::DrawSolidBox( { 0.4f, 0.4f, 0.4f }, engine::CMat4::translation( { 0.0f, 4.0f, 0.0f } ), { 1.0f, 0.0f, 0.0f, 1.0f } );
+        //// engine::CDebugDrawer::DrawSolidBox( { 0.4f, 0.4f, 0.4f }, engine::translation( { 0.0f, 4.0f, 0.0f } ), { 1.0f, 0.0f, 0.0f, 1.0f } );
 
         for ( size_t i = 0; i < g_num_rows; i++ )
         {
@@ -962,8 +962,8 @@ int main()
                     float _y = 10.0f * ( ( (float)i ) / ( g_num_rows - 1 ) - 0.5f );    // range [-5, 5]
                     float _z = 10.0f * ( ( (float)k ) / ( g_num_floors - 1 ) - 0.5f );  // range [-5, 5]
 
-                    auto _transform = engine::CMat4::translation( { _x, _y + 10.0f, _z } ) * 
-                                      engine::CMat4::rotation( g_debug_drawer_angle, { 1.0f, 1.0f, 1.0f } );
+                    auto _transform = engine::translation( { _x, _y + 10.0f, _z } ) * 
+                                      engine::rotation( tinymath::rotation( engine::CVec3( 1.0f, 1.0f, 1.0f ), g_debug_drawer_angle ) );
                     auto _color = engine::CVec4( g_debug_drawer_primitives_color[0],
                                                  g_debug_drawer_primitives_color[1],
                                                  g_debug_drawer_primitives_color[2],
@@ -1010,7 +1010,7 @@ int main()
                     {
                         engine::CDebugDrawer::DrawSolidAxes( g_debug_drawer_axes_length,
                                                              _transform,
-                                                             _color.w );
+                                                             _color.w() );
                     }
 
                 }
@@ -1211,9 +1211,9 @@ std::vector< engine::CIRenderable* > _createScene0()
             continue;
         }
 
-        renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                              _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
+        renderablePtr->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                     _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                     _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
         float _scale = _randomDistribution( _randomGenerator );
         renderablePtr->scale = { _scale, _scale, _scale };
 
@@ -1252,7 +1252,7 @@ std::vector< engine::CIRenderable* > _createScene1()
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     _cube3->position = { -1.0f, 0.5f, 2.0f };
-    _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 30.0f ), { 1.0f, 0.0f, 1.0f } );
+    _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 30.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
     auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
@@ -1331,9 +1331,9 @@ std::vector< engine::CIRenderable* > _createScene2()
                                      _randomDistribution( _randomGenerator ) * 10.0f,
                                      _randomDistribution( _randomGenerator ) * 10.0f };
 
-        _renderablePtr->rotation = engine::CMat4::fromEuler( { _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                               _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                               _randomDistribution( _randomGenerator ) * (float) ENGINE_PI } );
+        _renderablePtr->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                      _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                      _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
 
         float _scale = 0.5f + ( 1.0f + _randomDistribution( _randomGenerator ) ) * 0.5f;
         _renderablePtr->scale = { _scale, _scale, _scale };

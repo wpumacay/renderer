@@ -153,7 +153,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        //// engine::CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::CMat4::translation( _pointlight->position ), { 1.0f, 1.0f, 1.0f } );
+        //// engine::CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::translation( _pointlight->position ), { 1.0f, 1.0f, 1.0f } );
 
         //// engine::CDebugDrawer::DrawNormals( _patch, { 1.0f, 0.0f, 1.0f } );
 

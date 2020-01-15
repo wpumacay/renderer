@@ -68,61 +68,7 @@ add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/" 
 
 file( GLOB_RECURSE SRCS "src/*.cpp" )
 
-#### set( SRCS "src/CCommon.cpp"
-####           "src/CMath.cpp"
-####           "src/app/CApplication.cpp"
-####           "src/assets/CTextureManager.cpp"
-####           "src/camera/CFixedCamera.cpp"
-####           "src/camera/CFpsCamera.cpp"
-####           "src/camera/CICamera.cpp"
-####           "src/camera/COrbitCamera.cpp"
-####           "src/core/CFrameBuffer.cpp"
-####           "src/core/CIndexBuffer.cpp"
-####           "src/core/CTexture.cpp"
-####           "src/core/CTextureCube.cpp"
-####           "src/core/CVertexArray.cpp"
-####           "src/core/CVertexBuffer.cpp"
-####           "src/core/CVertexBufferLayout.cpp"
-####           "src/gl/COpenGLContext.cpp"
-####           "src/gl/COpenGLWindow.cpp"
-####           "src/graphics/CFog.cpp"
-####           "src/graphics/CIRenderable.cpp"
-####           "src/graphics/CMesh.cpp"
-####           "src/graphics/CMeshBuilder.cpp"
-####           "src/graphics/CModel.cpp"
-####           "src/graphics/CScene.cpp"
-####           "src/graphics/CShadowMap.cpp"
-####           "src/graphics/CSkybox.cpp"
-####           "src/gui/CImGuiLayer.cpp"
-####           "src/gui/CImGuiManager.cpp"
-####           "src/gui/CImGuiUtilsLayer.cpp"
-####           "src/input/CInputEvent.cpp"
-####           "src/input/CInputManager.cpp"
-####           "src/lights/CDirectionalLight.cpp"
-####           "src/lights/CILight.cpp"
-####           "src/lights/CPointLight.cpp"
-####           "src/lights/CSpotLight.cpp"
-####           "src/materials/CMaterial.cpp"
-####           "src/renderers/CMainRenderer.cpp"
-####           "src/renderers/CMeshRenderer.cpp"
-####           "src/renderers/CRenderersCommon.cpp"
-####           "src/renderers/CSkyboxRenderer.cpp"
-####           "src/shaders/CShader.cpp"
-####           "src/shaders/CShaderManager.cpp"
-####           "src/utils/CDebugDrawer.cpp"
-####           "src/utils/CImguiUi.cpp"
-####           "src/utils/CImguiUiDemo.cpp"
-####           "src/utils/CLogger.cpp"
-####           "src/utils/CNoiseGenerator.cpp"
-####           "src/utils/CObjectPicker.cpp"
-####           "src/utils/CTime.cpp" )
-#### 
-#### foreach(file ${SRCS})
-####     message( "SRCS: ${file}" )
-#### endforeach(file)
-
-add_library( cat1 SHARED
-             ${SRCS} )
+add_library( cat1 SHARED ${SRCS} )
 
 target_link_libraries( cat1 
                        ${GLFW_LIBRARIES} 
