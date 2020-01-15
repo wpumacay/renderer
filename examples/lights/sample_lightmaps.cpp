@@ -170,8 +170,8 @@ private :
 
     void _menuUiDiffuseProps()
     {
-        float _cAmbient[3]  = { m_material->ambient.x, m_material->ambient.y, m_material->ambient.z };
-        float _cDiffuse[3]  = { m_material->diffuse.x, m_material->diffuse.y, m_material->diffuse.z };
+        float _cAmbient[3]  = { m_material->ambient.x(), m_material->ambient.y(), m_material->ambient.z() };
+        float _cDiffuse[3]  = { m_material->diffuse.x(), m_material->diffuse.y(), m_material->diffuse.z() };
         ImGui::ColorEdit3( "cAmbient", _cAmbient );
         ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
         m_material->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
@@ -180,7 +180,7 @@ private :
 
     void _menuUiSpecularProps()
     {
-        float _cSpecular[3] = { m_material->specular.x, m_material->specular.y, m_material->specular.z };
+        float _cSpecular[3] = { m_material->specular.x(), m_material->specular.y(), m_material->specular.z() };
         ImGui::ColorEdit3( "cSpecular", _cSpecular );
         ImGui::SliderFloat( "cShininess", &m_material->shininess, 32.0f, 256.0f );
         m_material->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
@@ -197,17 +197,17 @@ private :
 
         if ( m_lightsAnimated )
         {
-            m_light->ambient.x = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 2.0f );
-            m_light->ambient.y = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 0.7f );
-            m_light->ambient.z = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 1.3f );
+            m_light->ambient.x() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 2.0f );
+            m_light->ambient.y() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 0.7f );
+            m_light->ambient.z() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 1.3f );
             m_light->diffuse = 5.0f * m_light->ambient;
             m_light->specular = { 1.0f, 1.0f, 1.0f };
         }
         else
         {
-            float _cAmbient[3]  = { m_light->ambient.x, m_light->ambient.y, m_light->ambient.z };
-            float _cDiffuse[3]  = { m_light->diffuse.x, m_light->diffuse.y, m_light->diffuse.z };
-            float _cSpecular[3] = { m_light->specular.x, m_light->specular.y, m_light->specular.z };
+            float _cAmbient[3]  = { m_light->ambient.x(), m_light->ambient.y(), m_light->ambient.z() };
+            float _cDiffuse[3]  = { m_light->diffuse.x(), m_light->diffuse.y(), m_light->diffuse.z() };
+            float _cSpecular[3] = { m_light->specular.x(), m_light->specular.y(), m_light->specular.z() };
 
             ImGui::ColorEdit3( "cAmbient", _cAmbient );
             ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
@@ -252,7 +252,7 @@ private :
         if ( m_meshSelectedIndex != -1 )
         {
             ImGui::SliderFloat( "angle", &m_meshRotationAngle, 0.0f, 2.0f * ENGINE_PI );
-            m_meshes[m_meshSelectedIndex]->rotation = engine::CMat4::rotation( m_meshRotationAngle, { 0.0f, 1.0f, 0.0f } );
+            m_meshes[m_meshSelectedIndex]->rotation = tinymath::rotation( engine::CVec3( 0.0f, 1.0f, 0.0f ), m_meshRotationAngle );
         }
 
         m_anyMenuHovered |= ImGui::IsWindowHovered();
@@ -372,12 +372,12 @@ int main()
         if ( _moveLight )
         {
             _mvParam += 10.0f * engine::CTime::GetTimeStep();
-            // _gizmo->position.x = 1.0f + std::sin( _mvParam ) * 2.0f;
-            // _gizmo->position.y = std::sin( _mvParam / 2.0f ) * 1.0f;
+            // _gizmo->position.x() = 1.0f + std::sin( _mvParam ) * 2.0f;
+            // _gizmo->position.y() = std::sin( _mvParam / 2.0f ) * 1.0f;
 
-            _pointLight->position.x = 4.0f * std::sin( _mvParam );
-            _pointLight->position.y = 4.0f * std::cos( _mvParam );
-            _pointLight->position.z = 0.0f;
+            _pointLight->position.x() = 4.0f * std::sin( _mvParam );
+            _pointLight->position.y() = 4.0f * std::cos( _mvParam );
+            _pointLight->position.z() = 0.0f;
         }
 
         auto _mesh = _uiLayer->selectedMesh();
@@ -388,7 +388,7 @@ int main()
         _shaderLighting->bind();
         _shaderLighting->setMat4( "u_modelMatrix", _mesh->matModel() );
         _shaderLighting->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _shaderLighting->setMat4( "u_normalMatrix", ( ( _mesh->matModel() ).inverse() ).transpose() );
+        _shaderLighting->setMat4( "u_normalMatrix", tinymath::inverse( _mesh->matModel() ).transpose() );
         _phongMaterial->bind( _shaderLighting );
         _shaderLighting->setVec3( "u_light.ambient", _pointLight->ambient );
         _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );

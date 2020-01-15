@@ -58,7 +58,7 @@ namespace engine
     CMat4 ortho( float32 width, float32 height, float32 zNear, float32 zFar );
     CMat4 lookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp );
     CMat4 scale( const CVec3& v );
-    CMat4 rotate( const CMat3& m );
+    CMat4 rotation( const CMat3& m );
     CMat4 translation( const CVec3& v );
 
     /***********************************************************************************************

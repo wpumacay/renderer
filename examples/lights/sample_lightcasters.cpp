@@ -219,8 +219,8 @@ private :
 
     void _menuUiMaterialDiffuseProps()
     {
-        float _cAmbient[3]  = { m_material->ambient.x, m_material->ambient.y, m_material->ambient.z };
-        float _cDiffuse[3]  = { m_material->diffuse.x, m_material->diffuse.y, m_material->diffuse.z };
+        float _cAmbient[3]  = { m_material->ambient.x(), m_material->ambient.y(), m_material->ambient.z() };
+        float _cDiffuse[3]  = { m_material->diffuse.x(), m_material->diffuse.y(), m_material->diffuse.z() };
         ImGui::ColorEdit3( "cAmbient", _cAmbient );
         ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
         m_material->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
@@ -229,7 +229,7 @@ private :
 
     void _menuUiMaterialSpecularProps()
     {
-        float _cSpecular[3] = { m_material->specular.x, m_material->specular.y, m_material->specular.z };
+        float _cSpecular[3] = { m_material->specular.x(), m_material->specular.y(), m_material->specular.z() };
         ImGui::ColorEdit3( "cSpecular", _cSpecular );
         ImGui::SliderFloat( "cShininess", &m_material->shininess, 32.0f, 256.0f );
         m_material->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
@@ -278,17 +278,17 @@ private :
         {
             if ( !m_lightLockedToCamera )
             {
-                float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
+                float _vDirection[3] = { m_lightDirection.x(), m_lightDirection.y(), m_lightDirection.z() };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _lightPtr->direction = engine::CVec3::normalize( m_lightDirection );
+                _lightPtr->direction = m_lightDirection.normalized();
             }
         }
         else if ( _type == engine::eLightType::POINT )
         {
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _lightPtr->position.x, _lightPtr->position.y, _lightPtr->position.z };
+                float _vPosition[3] = { _lightPtr->position.x(), _lightPtr->position.y(), _lightPtr->position.z() };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
                 _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
             }
@@ -300,14 +300,14 @@ private :
         {
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _lightPtr->position.x, _lightPtr->position.y, _lightPtr->position.z };
+                float _vPosition[3] = { _lightPtr->position.x(), _lightPtr->position.y(), _lightPtr->position.z() };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
                 _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
 
-                float _vDirection[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
+                float _vDirection[3] = { m_lightDirection.x(), m_lightDirection.y(), m_lightDirection.z() };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _lightPtr->direction = engine::CVec3::normalize( m_lightDirection );
+                _lightPtr->direction = m_lightDirection.normalized();
             }
 
             ImGui::SliderFloat( "attn-linear", &_lightPtr->atnLinear, 0.0f, 1.0f );
@@ -556,7 +556,7 @@ int main()
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
-                _modelMat = engine::CMat4::translation( _xyz ) * engine::CMat4::rotation( _theta, { 1.0f, 0.3f, 0.5f } );
+                _modelMat = engine::translation( _xyz ) * engine::CMat4( tinymath::rotation( engine::CVec3( 1.0f, 0.3f, 0.5f ), _theta ), { 0.0f, 0.0f, 0.0f } );
             }
             else
             {
@@ -564,11 +564,11 @@ int main()
                 int _col = i % 5;
 
                 engine::CVec3 _xyz = { ( _col - 2.0f ) * 2.0f, 0.0f, -( ( _row == 0 ) ? 0.0f : 2.0f ) };
-                _modelMat = engine::CMat4::translation( _xyz );
+                _modelMat = engine::translation( _xyz );
             }
 
             _shaderLightCasters->setMat4( "u_modelMatrix", _modelMat );
-            _shaderLightCasters->setMat4( "u_normalMatrix", _modelMat.inverse().transpose() );
+            _shaderLightCasters->setMat4( "u_normalMatrix", tinymath::inverse( _modelMat ).transpose() );
             _mesh->render();
         }
 

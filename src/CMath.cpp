@@ -232,7 +232,7 @@ namespace engine
         return _resmat;
     }
 
-    CMat4 rotate( const CMat3& m )
+    CMat4 rotation( const CMat3& m )
     {
         CMat4 _resmat;
 

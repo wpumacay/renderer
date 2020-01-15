@@ -39,19 +39,19 @@ namespace engine
 
     CMat4 CIRenderable::matModel() const
     {
-        return engine::translation( position ) * engine::rotate( rotation ) * engine::scale( scale );
+        return engine::translation( position ) * engine::rotation( rotation ) * engine::scale( scale );
     }
 
     CBoundingBox CIRenderable::bbox() const
     {
         return { m_boundExtents.scaled( scale ),
-                 engine::translation( position ) * engine::rotate( rotation ) * engine::translation(  m_boundCenter.scaled( scale ) ) };
+                 engine::translation( position ) * engine::rotation( rotation ) * engine::translation(  m_boundCenter.scaled( scale ) ) };
     }
 
     CBoundingSphere CIRenderable::bsphere() const
     {
         return { 0.5f * m_boundExtents.scaled( scale ).length(), 
-                 position + CVec3( engine::rotate( rotation ) * CVec4( m_boundCenter.scaled( scale ), 1.0f ) ) };
+                 position + CVec3( engine::rotation( rotation ) * CVec4( m_boundCenter.scaled( scale ), 1.0f ) ) };
     }
 
 }

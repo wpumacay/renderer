@@ -91,19 +91,19 @@ int main()
         if ( _moveLight )
         {
             _mvParam += 100.0f * engine::CTime::GetTimeStep();
-            // _gizmo->position.x = 1.0f + std::sin( _mvParam ) * 2.0f;
-            // _gizmo->position.y = std::sin( _mvParam / 2.0f ) * 1.0f;
+            // _gizmo->position.x() = 1.0f + std::sin( _mvParam ) * 2.0f;
+            // _gizmo->position.y() = std::sin( _mvParam / 2.0f ) * 1.0f;
 
-            _gizmo->position.x = 10.0f * std::sin( _mvParam );
-            _gizmo->position.y = 10.0f * std::cos( _mvParam );
-            _gizmo->position.z = 0.0f;
+            _gizmo->position.x() = 10.0f * std::sin( _mvParam );
+            _gizmo->position.y() = 10.0f * std::cos( _mvParam );
+            _gizmo->position.z() = 0.0f;
         }
 
         /* do our thing here ************************/
         _shaderLighting->bind();
         _shaderLighting->setMat4( "u_modelMat", _mesh->matModel() );
         _shaderLighting->setMat4( "u_viewProjMat", _camera->matProj() * _camera->matView() );
-        _shaderLighting->setMat4( "u_normalMat", ( ( _mesh->matModel() ).inverse() ).transpose() );
+        _shaderLighting->setMat4( "u_normalMat", tinymath::inverse( _mesh->matModel() ).transpose() );
         _shaderLighting->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
         _shaderLighting->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
         _shaderLighting->setVec3( "u_lightPosition", _gizmo->position );

@@ -16,7 +16,7 @@ function( FcnBuildExample paramSources paramExecutableName )
 endfunction()
 
 add_subdirectory( core )
-#### add_subdirectory( lights )
+add_subdirectory( lights )
 #### add_subdirectory( shadows )
 #### add_subdirectory( fog )
 #### add_subdirectory( math )
