@@ -91,7 +91,7 @@ int main()
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     _cube3->position = { -1.0f, 0.5f, 2.0f };
-    _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 60.0f ), { 1.0f, 0.0f, 1.0f } );
+    _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 60.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
     auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
@@ -122,7 +122,7 @@ int main()
                                                     { 0.3f, 0.3f, 0.3f },
                                                     { 0.3f, 0.3f, 0.3f },
                                                     { 0.3f, 0.3f, 0.3f },
-                                                    engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ) );
+                                                    ( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ).normalized() );
 
     auto _pointlight = new engine::CPointLight( "point",
                                                 { 0.3f, 0.3f, 0.3f },
@@ -221,8 +221,8 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-    auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    auto _lightViewMat = engine::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightProjMat = engine::ortho( 20, 20, _znear, _zfar );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
 
@@ -304,8 +304,8 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     /* setup the light-clip-space transform */
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-    auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    auto _lightViewMat = engine::lookAt( g_lightPosition, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightProjMat = engine::ortho( 20, 20, _znear, _zfar );
     shaderPtr->setMat4( "u_viewProjLightSpaceMatrix", _lightProjMat * _lightViewMat );
 
     /* configure the texture unit for our shadowmap's depth texture (slot 3 in the shader) */

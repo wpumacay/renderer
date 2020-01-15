@@ -5,25 +5,6 @@
 namespace engine
 {
 
-    /**************************************************************************
-    *                          Vec and Mat helpers                            *
-    ***************************************************************************/
-
-    bool operator==( const CVec3& v1, const CVec3& v2 )
-    {
-        return ( v1 - v2 ).length() < ENGINE_EPS;
-    }
-
-    bool operator!=( const CVec3& v1, const CVec3& v2 )
-    {
-        return !(v1 == v2);
-    }
-
-    CVec3 operator- ( const CVec3& v )
-    {
-        return CVec3( -v.x(), -v.y(), -v.z() );
-    }
-
     std::string toString( const CVec2& v )
     {
         std::string _strrep;
@@ -458,4 +439,19 @@ namespace engine
     {
         return angle * 180 / ENGINE_PI;
     }
+}
+
+
+    /**************************************************************************
+    *                          Vec and Mat helpers                            *
+    ***************************************************************************/
+
+bool operator==( const engine::CVec3& v1, const engine::CVec3& v2 )
+{
+    return ( v1 - v2 ).length() < ENGINE_EPS;
+}
+
+bool operator!=( const engine::CVec3& v1, const engine::CVec3& v2 )
+{
+    return !(v1 == v2);
 }

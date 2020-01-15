@@ -19,14 +19,6 @@ namespace engine
     typedef tinymath::Matrix<float32, 3 > CMat3;
     typedef tinymath::Matrix<float32, 4 > CMat4;
 
-    /***********************************************************************************************
-    *                                   Vec and Mat helpers                                        *
-    ***********************************************************************************************/
-
-    bool operator==( const CVec3& v1, const CVec3& v2 );
-    bool operator!=( const CVec3& v1, const CVec3& v2 );
-    CVec3 operator- ( const CVec3& v );
-
     // define our own to-string methods (mostly to avoid replacing current engine::toString usage)
     std::string toString( const CVec2& v );
     std::string toString( const CVec3& v );
@@ -171,3 +163,10 @@ namespace engine
     float32 toDegrees( float32 angle );
 
 }
+
+/***************************************************************************************************
+*                                 Vec and Mat helper operators                                     *
+***************************************************************************************************/
+
+bool operator==( const engine::CVec3& v1, const engine::CVec3& v2 );
+bool operator!=( const engine::CVec3& v1, const engine::CVec3& v2 );

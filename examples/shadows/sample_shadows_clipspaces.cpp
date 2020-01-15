@@ -9,9 +9,9 @@ engine::CVec3 g_lightSpotPosition   = { 0.0f, 5.0f, 0.0f };
 // engine::CVec3 g_lightPointPosition  = { -2.0f, 4.0f, -1.0f };
 // engine::CVec3 g_lightSpotPosition   = { -2.0f, 4.0f, -1.0f };
 
-engine::CVec3 g_lightDirDirection   = engine::CVec3::normalize( -g_lightDirPosition );
-engine::CVec3 g_lightPointDirection = engine::CVec3::normalize( -g_lightPointPosition );
-engine::CVec3 g_lightSpotDirection  = engine::CVec3::normalize( -g_lightSpotPosition );
+engine::CVec3 g_lightDirDirection   = ( -g_lightDirPosition ).normalized();
+engine::CVec3 g_lightPointDirection = ( -g_lightPointPosition ).normalized();
+engine::CVec3 g_lightSpotDirection  = ( -g_lightSpotPosition ).normalized();
 
 engine::CVec3 g_focusPoint = { 0.0f, 0.0f, 0.0f };
 const engine::CVec3 g_worldUp = { 0.0f, 1.0f, 0.0f };
@@ -153,11 +153,11 @@ private :
         if ( _lightPtr->type() == engine::eLightType::DIRECTIONAL )
         {
             /* shadow frustum transform in world-space (view) */
-            float _direction[3] = { m_lightDirDirection.x, m_lightDirDirection.y, m_lightDirDirection.z };
+            float _direction[3] = { m_lightDirDirection.x(), m_lightDirDirection.y(), m_lightDirDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -1.0f, 1.0f );
             m_lightDirDirection = { _direction[0], _direction[1], _direction[2] };
 
-            g_lightDirDirection = engine::CVec3::normalize( m_lightDirDirection );
+            g_lightDirDirection = m_lightDirDirection.normalized();
             _lightPtr->direction = g_lightDirDirection;
 
             // whether or not to use autofix-to-camera for directional lights shadowmapping
@@ -176,18 +176,18 @@ private :
                 ImGui::SliderFloat( "width", &g_widthDir, 20.0f, 40.0f );
                 ImGui::SliderFloat( "height", &g_heightDir, 20.0f, 40.0f );
 
-                float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+                float _focusp[3] = { g_focusPoint.x(), g_focusPoint.y(), g_focusPoint.z() };
                 ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
                 g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
             }
         }
         else if ( _lightPtr->type() == engine::eLightType::POINT )
         {
-            float _position[3] = { m_lightPointPosition.x, m_lightPointPosition.y, m_lightPointPosition.z };
+            float _position[3] = { m_lightPointPosition.x(), m_lightPointPosition.y(), m_lightPointPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightPointPosition = { _position[0], _position[1], _position[2] };
 
-            g_lightPointDirection = engine::CVec3::normalize( m_lightPointDirection );
+            g_lightPointDirection = m_lightPointDirection.normalized();
             g_lightPointPosition = m_lightPointPosition;
             _lightPtr->position = g_lightPointPosition;
 
@@ -195,21 +195,21 @@ private :
             ImGui::SliderFloat( "zfar", &g_zfarPoint, g_znearPoint, 20.0f );
             ImGui::SliderFloat( "fov", &g_fovPoint, 20.0f, 150.0f );
 
-            float _focusp[3] = { g_focusPoint.x, g_focusPoint.y, g_focusPoint.z };
+            float _focusp[3] = { g_focusPoint.x(), g_focusPoint.y(), g_focusPoint.z() };
             ImGui::SliderFloat3( "focus", _focusp, -10.0f, 10.0f );
             g_focusPoint = { _focusp[0], _focusp[1], _focusp[2] };
         }
         else if ( _lightPtr->type() == engine::eLightType::SPOT )
         {
-            float _direction[3] = { m_lightSpotDirection.x, m_lightSpotDirection.y, m_lightSpotDirection.z };
+            float _direction[3] = { m_lightSpotDirection.x(), m_lightSpotDirection.y(), m_lightSpotDirection.z() };
             ImGui::SliderFloat3( "direction", _direction, -1.0f, 1.0f );
             m_lightSpotDirection = { _direction[0], _direction[1], _direction[2] };
 
-            float _position[3] = { m_lightSpotPosition.x, m_lightSpotPosition.y, m_lightSpotPosition.z };
+            float _position[3] = { m_lightSpotPosition.x(), m_lightSpotPosition.y(), m_lightSpotPosition.z() };
             ImGui::SliderFloat3( "position", _position, -10.0f, 10.0f );
             m_lightSpotPosition = { _position[0], _position[1], _position[2] };
 
-            g_lightSpotDirection = engine::CVec3::normalize( m_lightSpotDirection );
+            g_lightSpotDirection = m_lightSpotDirection.normalized();
             g_lightSpotPosition = m_lightSpotPosition;
 
             _lightPtr->direction = g_lightSpotDirection;
@@ -345,7 +345,7 @@ int main()
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     _cube3->position = { -1.0f, 0.5f, 2.0f };
-    _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 60.0f ), { 1.0f, 0.0f, 1.0f } );
+    _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 60.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
     auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
@@ -376,7 +376,7 @@ int main()
                                                      { 0.3f, 0.3f, 0.3f },
                                                      { 0.3f, 0.3f, 0.3f },
                                                      { 0.3f, 0.3f, 0.3f },
-                                                     engine::CVec3::normalize( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightDirPosition ) );
+                                                     ( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightDirPosition ).normalized() );
 
     /**********************************************************************************************/
 

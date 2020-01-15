@@ -74,7 +74,7 @@ int main()
 
     auto _cube3 = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     _cube3->position = { -1.0f, 0.25f, 2.0f };
-    _cube3->rotation = engine::CMat4::rotation( engine::toRadians( 60.0f ), { 1.0f, 0.0f, 1.0f } );
+    _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 60.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
     auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
@@ -197,8 +197,8 @@ void renderToShadowMap( engine::CILight* lightPtr,
 
     const float _znear = 1.0f;
     const float _zfar = 7.5f;
-    auto _lightViewMat = engine::CMat4::lookAt( { -2.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
-    auto _lightProjMat = engine::CMat4::ortho( 20, 20, _znear, _zfar );
+    auto _lightViewMat = engine::lookAt( { -2.0f, 4.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
+    auto _lightProjMat = engine::ortho( 20, 20, _znear, _zfar );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
 
