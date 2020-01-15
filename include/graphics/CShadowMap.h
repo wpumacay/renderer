@@ -73,8 +73,8 @@ namespace engine
     
         bool operator() ( CVec3 v1, CVec3 v2 )
         {
-            auto _dot1 = CVec3::dot( direction, v1 );
-            auto _dot2 = CVec3::dot( direction, v2 );
+            auto _dot1 = direction.dot( v1 );
+            auto _dot2 = direction.dot( v2 );
     
             return _dot1 < _dot2;
         }

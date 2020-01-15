@@ -224,8 +224,8 @@ namespace engine
                     // again when constructing the model-matrix for this submesh (unpacking and 
                     // packing the matrix again )
                     auto _subMeshWorldTransform = _modelWorldTransform * _localTransforms[i];
-                    _submeshes[i]->position = _subMeshWorldTransform.getPosition();
-                    _submeshes[i]->rotation = _subMeshWorldTransform.getRotation();
+                    _submeshes[i]->position = CVec3( _subMeshWorldTransform.col( 3 ) );
+                    _submeshes[i]->rotation = CMat3( _subMeshWorldTransform );
                     _submeshes[i]->setMaskId( renderablePtr->maskId() );
 
                     meshes.push_back( _submeshes[i] );

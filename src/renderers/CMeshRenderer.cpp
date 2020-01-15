@@ -60,7 +60,7 @@ namespace engine
             m_context.lightSpecular             = _lightPtr->specular;
             m_context.lightIntensity            = _lightPtr->intensity;
             m_context.lightPosition             = _lightPtr->position;
-            m_context.lightDirection            = CVec3::normalize( _lightPtr->direction );
+            m_context.lightDirection            = _lightPtr->direction.normalized();
             m_context.lightInnerCutoffCos       = std::cos( _lightPtr->innerCutoff );
             m_context.lightOuterCutoffCos       = std::cos( _lightPtr->outerCutoff );
             m_context.lightAttnK0               = _lightPtr->atnConstant;
@@ -431,7 +431,7 @@ namespace engine
         // setup mesh transforms-uniforms
         auto _matModel = meshPtr->matModel();
         shaderPtr->setMat4( "u_modelMatrix", _matModel );
-        shaderPtr->setMat4( "u_normalMatrix", ( _matModel.inverse() ).transpose() );
+        shaderPtr->setMat4( "u_normalMatrix", tinymath::inverse( _matModel ).transpose() );
 
         // render the mesh ************************************************
         auto _vao = meshPtr->vertexArray();

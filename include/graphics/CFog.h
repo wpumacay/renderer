@@ -4,10 +4,6 @@
 #include <CMath.h>
 #include <shaders/CShader.h>
 
-#define FOG_TYPE_LINEAR     0
-#define FOG_TYPE_EXP        1
-#define FOG_TYPE_EXP_SQUARE 2
-
 namespace engine
 {
 

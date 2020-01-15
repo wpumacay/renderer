@@ -95,10 +95,10 @@ namespace engine
         glViewport( 0, 0, m_properties.width, m_properties.height );
 
         glEnable( GL_DEPTH_TEST );
-        glClearColor( m_properties.clearColor.x, 
-                      m_properties.clearColor.y,
-                      m_properties.clearColor.z,
-                      m_properties.clearColor.w );
+        glClearColor( m_properties.clearColor.x(), 
+                      m_properties.clearColor.y(),
+                      m_properties.clearColor.z(),
+                      m_properties.clearColor.w() );
     }
 
     COpenGLWindow::~COpenGLWindow()
@@ -124,10 +124,10 @@ namespace engine
 
     void COpenGLWindow::begin()
     {
-        glClearColor( m_properties.clearColor.x, 
-                      m_properties.clearColor.y,
-                      m_properties.clearColor.z,
-                      m_properties.clearColor.w );
+        glClearColor( m_properties.clearColor.x(), 
+                      m_properties.clearColor.y(),
+                      m_properties.clearColor.z(),
+                      m_properties.clearColor.w() );
 
         glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
         glfwPollEvents();

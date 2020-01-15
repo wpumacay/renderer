@@ -107,8 +107,8 @@ namespace engine
 
         for ( int i = 0; i < m_octaves; i++ )
         {
-            float _sampleX = _freq * ( x / m_noiseScale ) + m_octaveOffsets[i].x;
-            float _sampleY = _freq * ( y / m_noiseScale ) + m_octaveOffsets[i].y;
+            float _sampleX = _freq * ( x / m_noiseScale ) + m_octaveOffsets[i].x();
+            float _sampleY = _freq * ( y / m_noiseScale ) + m_octaveOffsets[i].y();
 
             _noiseValue += _perlin2d( _sampleX, _sampleY ) * _ampl;
 

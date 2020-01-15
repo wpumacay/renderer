@@ -1,7 +1,5 @@
 #pragma once
 
-#include <CCommon.h>
-#include <CMath.h>
 #include <lights/CILight.h>
 
 namespace engine

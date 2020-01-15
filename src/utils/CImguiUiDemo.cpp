@@ -91,8 +91,8 @@ namespace engine
 
         ImGui::Image( (void*)(intptr_t) m_textureToShow->openglId(),
                       ImVec2( m_textureToShow->width() / 2.0, m_textureToShow->height() / 2.0 ),
-                      ImVec2( m_textureToShowUv0.x, m_textureToShowUv0.y ),
-                      ImVec2( m_textureToShowUv1.x, m_textureToShowUv1.y ) );
+                      ImVec2( m_textureToShowUv0.x(), m_textureToShowUv0.y() ),
+                      ImVec2( m_textureToShowUv1.x(), m_textureToShowUv1.y() ) );
         
         ImGui::End();
     }

@@ -86,7 +86,7 @@ namespace engine
         void _submenuMesh( CMesh* mesh, bool refresh );
         void _submenuModel( CModel* model, bool refresh );
 
-        void _submenuTreeTransform( CVec3& position, CMat4& rotation, CVec3& scale );
+        void _submenuTreeTransform( CVec3& position, CMat3& rotation, CVec3& scale );
         void _submenuTreeMaterial( CMaterial* material, bool refresh );
 
         void _submenuLight( CILight* light, bool refresh );

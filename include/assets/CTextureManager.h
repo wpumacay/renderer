@@ -26,8 +26,8 @@ namespace engine
                                       const eTextureFilter& filterMag = eTextureFilter::NEAREST,
                                       const eTextureWrap& wrapU = eTextureWrap::REPEAT,
                                       const eTextureWrap& wrapV = eTextureWrap::REPEAT,
-                                      const CVec4& borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f },
-                                      const CVec4& borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f },
+                                      const CVec4& borderColorU = CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
+                                      const CVec4& borderColorV = CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
                                       const ePixelDataType& dtype = ePixelDataType::UINT_8,
                                       bool flipVertically = true );
         static CTexture* LoadTexture( const std::string& filepath,

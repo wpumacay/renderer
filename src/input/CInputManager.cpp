@@ -60,8 +60,8 @@ namespace engine
             return;
 
         CInputManager::s_instance->m_buttons[button] = action;
-        CInputManager::s_instance->m_cursor.x = x;
-        CInputManager::s_instance->m_cursor.y = y;
+        CInputManager::s_instance->m_cursor.x() = x;
+        CInputManager::s_instance->m_cursor.y() = y;
     }
 
     void CInputManager::Callback_mouseMove( double x, double y )
@@ -69,8 +69,8 @@ namespace engine
         if ( !CInputManager::s_instance )
             return;
 
-        CInputManager::s_instance->m_cursor.x = x;
-        CInputManager::s_instance->m_cursor.y = y;
+        CInputManager::s_instance->m_cursor.x() = x;
+        CInputManager::s_instance->m_cursor.y() = y;
     }
 
     void CInputManager::Callback_scroll( double xOff, double yOff )
@@ -78,11 +78,11 @@ namespace engine
         if ( !CInputManager::s_instance )
             return;
 
-        CInputManager::s_instance->m_scrollOff.x = xOff;
-        CInputManager::s_instance->m_scrollOff.y = yOff;
+        CInputManager::s_instance->m_scrollOff.x() = xOff;
+        CInputManager::s_instance->m_scrollOff.y() = yOff;
 
-        CInputManager::s_instance->m_scrollAccumValue.x += xOff;
-        CInputManager::s_instance->m_scrollAccumValue.y += yOff;
+        CInputManager::s_instance->m_scrollAccumValue.x() += xOff;
+        CInputManager::s_instance->m_scrollAccumValue.y() += yOff;
     }
 
     bool CInputManager::IsKeyDown( int key )

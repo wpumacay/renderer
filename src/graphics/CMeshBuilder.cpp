@@ -56,14 +56,14 @@ namespace engine
 
             // Form a perpendicular right hand system based on the current normal
             CVec3 _n = _normalsSource[q];
-            CVec3 _s1 = { _n.y, _n.z, _n.x };
-            CVec3 _s2 = CVec3::cross( _n, _s1 );
+            CVec3 _s1 = { _n.y(), _n.z(), _n.x() };
+            CVec3 _s2 = tinymath::cross( _n, _s1 );
 
             // Generate each vertex of each face according to these vectors
-            auto _v0 = CVec3::scale( _n - _s1 - _s2, _scale );
-            auto _v1 = CVec3::scale( _n + _s1 - _s2, _scale );
-            auto _v2 = CVec3::scale( _n + _s1 + _s2, _scale );
-            auto _v3 = CVec3::scale( _n - _s1 + _s2, _scale );
+            auto _v0 = ( _n - _s1 - _s2 ).scaled( _scale );
+            auto _v1 = ( _n + _s1 - _s2 ).scaled( _scale );
+            auto _v2 = ( _n + _s1 + _s2 ).scaled( _scale );
+            auto _v3 = ( _n - _s1 + _s2 ).scaled( _scale );
 
             _vertices.push_back( _v0 );
             _vertices.push_back( _v1 );
@@ -107,7 +107,7 @@ namespace engine
                 auto _vertex = CVec3( radius * cos( _theta ) * cos( _phi ),
                                       radius * sin( _theta ) * cos( _phi ),
                                       radius * sin( _phi ) );
-                auto _normal = CVec3::normalize( _vertex );
+                auto _normal = _vertex.normalized();
 
                 _vertices.push_back( _vertex );
                 _normals.push_back( _normal );
@@ -168,7 +168,7 @@ namespace engine
                 auto _vertex = CVec3( radX * cos( _theta ) * cos( _phi ),
                                       radY * sin( _theta ) * cos( _phi ),
                                       radZ * sin( _phi ) );
-                auto _normal = CVec3::normalize( _vertex );
+                auto _normal = _vertex.normalized();
 
                 _vertices.push_back( _vertex );
                 _normals.push_back( _normal );
@@ -235,8 +235,8 @@ namespace engine
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, 1.0f }, axis ) );
 
             // @TODO: Check this part, there might be something wrong with the texture coordinates
-            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * radius ) ),
-                                    0.5f + ( _sectionXY[q].y / ( 2.0f * radius ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x() / ( 2.0f * radius ) ),
+                                    0.5f + ( _sectionXY[q].y() / ( 2.0f * radius ) ) } );
         }
 
         for ( int q = 1; q <= nDiv1 - 2; q++ )
@@ -263,8 +263,8 @@ namespace engine
             _texCoords.push_back( { ( (float) ( q + 1 ) ) / nDiv1, 1.0f } );
             _texCoords.push_back( { ( (float) ( q + 0 ) ) / nDiv1, 1.0f } );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 0] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 1] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( _sectionXY[q + 0].normalized(), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( _sectionXY[q + 1].normalized(), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -283,9 +283,9 @@ namespace engine
             _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q] + CVec3( 0.0f, 0.0f, -0.5f * height ), axis ) );
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
 
-            // @TODO: Check this part, there might be something wrong with the texture coordinates
-            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * radius ) ),
-                                    0.5f + ( _sectionXY[q].y / ( 2.0f * radius ) ) } );
+            // @todo: Check this part, there might be something wrong with the texture coordinates
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x() / ( 2.0f * radius ) ),
+                                    0.5f + ( _sectionXY[q].y() / ( 2.0f * radius ) ) } );
         }
 
         for ( int q = 1; q <= nDiv1 - 2; q++ )
@@ -327,7 +327,7 @@ namespace engine
                                                             radius * sin( _theta ) * cos( _phi ),
                                                             radius * sin( _phi ) ),
                                                      axis );
-                auto _normal = CVec3::normalize( _vertex );
+                auto _normal = _vertex.normalized();
                 // apply offset to up position
                 _vertex = _vertex + _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * height }, axis );
 
@@ -386,8 +386,8 @@ namespace engine
             _vertices.push_back( _rotateToMatchUpAxis( _p2, axis ) );
             _vertices.push_back( _rotateToMatchUpAxis( _p3, axis ) );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[( q + 0 ) % _sectionXY.size()] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[( q + 1 ) % _sectionXY.size()] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( ( _sectionXY[( q + 0 ) % _sectionXY.size()] ).normalized(), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( ( _sectionXY[( q + 1 ) % _sectionXY.size()] ).normalized(), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -418,7 +418,7 @@ namespace engine
                                                             radius * sin( _theta ) * cos( _phi ),
                                                             radius * sin( _phi ) ),
                                                      axis );
-                auto _normal = CVec3::normalize( _vertex );
+                auto _normal = _vertex.normalized();
                 // apply offset to up position
                 _vertex = _vertex - _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * height }, axis );
 
@@ -493,8 +493,8 @@ namespace engine
             _vertices.push_back( _rotateToMatchUpAxis( _sectionXY[q], axis ) );
             _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
 
-            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x / ( 2.0f * _radiusCyl ) ),
-                                    0.5f + ( _sectionXY[q].y / ( 2.0f * _radiusCyl ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXY[q].x() / ( 2.0f * _radiusCyl ) ),
+                                    0.5f + ( _sectionXY[q].y() / ( 2.0f * _radiusCyl ) ) } );
         }
 
         for ( size_t q = 1; q <= _nDiv1 - 2; q++ )
@@ -525,8 +525,8 @@ namespace engine
             _texCoords.push_back( { ( (float) ( q + 1 ) ) / _nDiv1, 1.0f } );
             _texCoords.push_back( { ( (float) ( q + 0 ) ) / _nDiv1, 1.0f } );
 
-            auto _nQuad1 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 0] ), axis );
-            auto _nQuad2 = _rotateToMatchUpAxis( CVec3::normalize( _sectionXY[q + 1] ), axis );
+            auto _nQuad1 = _rotateToMatchUpAxis( _sectionXY[q + 0].normalized(), axis );
+            auto _nQuad2 = _rotateToMatchUpAxis( _sectionXY[q + 1].normalized(), axis );
 
             _normals.push_back( _nQuad1 );
             _normals.push_back( _nQuad2 );
@@ -604,17 +604,17 @@ namespace engine
             _normals.push_back( _normal );
             _normals.push_back( _normal );
 
-            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[q].x / ( 2.0f * _radiusCone ) ),
-                                    0.5f + ( _sectionXYConeOut[q].y / ( 2.0f * _radiusCone ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[q].x() / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeOut[q].y() / ( 2.0f * _radiusCone ) ) } );
 
-            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[q].x / ( 2.0f * _radiusCone ) ),
-                                    0.5f + ( _sectionXYConeIn[q].y / ( 2.0f * _radiusCone ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[q].x() / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeIn[q].y() / ( 2.0f * _radiusCone ) ) } );
 
-            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].x / ( 2.0f * _radiusCone ) ),
-                                    0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].y / ( 2.0f * _radiusCone ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].x() / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeIn[( q + 1 ) % _sectionXYConeIn.size()].y() / ( 2.0f * _radiusCone ) ) } );
 
-            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].x / ( 2.0f * _radiusCone ) ),
-                                    0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].y / ( 2.0f * _radiusCone ) ) } );
+            _texCoords.push_back( { 0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].x() / ( 2.0f * _radiusCone ) ),
+                                    0.5f + ( _sectionXYConeOut[( q + 1 ) % _sectionXYConeOut.size()].y() / ( 2.0f * _radiusCone ) ) } );
 
             _indices.push_back( { _baseIndx, _baseIndx + 2, _baseIndx + 1 } );
             _indices.push_back( { _baseIndx, _baseIndx + 3, _baseIndx + 2 } );
@@ -626,7 +626,7 @@ namespace engine
         auto _mesh = new CMesh( _name, _vertices, _normals,_texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 0.2f * length, 0.2f * length, 1.0f * length }, axis ) );
         _mesh->setBoundCenter( _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * length }, axis ) );
-        _mesh->cullFaces = false; // don't cull this type of meshes, pretty please :(
+        _mesh->cullFaces = false; // don't cull these type of meshes, pretty please :(
 
         return _mesh;
     }
@@ -663,7 +663,7 @@ namespace engine
         _axesModel->addMesh( std::move( _axisCenter ), CMat4() );
         _axesModel->setBoundExtents( { 1.2f * length, 1.2f * length, 1.2f * length } );
         _axesModel->setBoundCenter( { 0.4f * length, 0.4f * length, 0.4f * length } );
-        _axesModel->cullFaces = false; // don't cull planes, pretty please :(
+        _axesModel->cullFaces = false; // don't cull faces, pretty please :(
 
         return _axesModel;
     }
@@ -728,8 +728,8 @@ namespace engine
                 _vertices.push_back( _p2 );
                 _vertices.push_back( _p3 );
 
-                auto _nt1 = CVec3::cross( _p1 - _p0, _p2 - _p1 );
-                auto _nt2 = CVec3::cross( _p2 - _p0, _p3 - _p2 );
+                auto _nt1 = tinymath::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = tinymath::cross( _p2 - _p0, _p3 - _p2 );
 
                 _normals.push_back( _nt1 );
                 _normals.push_back( _nt1 );
@@ -755,25 +755,25 @@ namespace engine
 
             auto _pv = _rotateBackFromUpAxis( _vertices[q], axis );
 
-            auto _p1 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y + _dd ) }, axis );
-            auto _p2 = _rotateToMatchUpAxis( { _pv.x      , _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x      , _pv.y + _dd ) }, axis );
-            auto _p3 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y + _dd ) }, axis );
-            auto _p4 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y       ) }, axis );
-            auto _p6 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y       ) }, axis );
-            auto _p7 = _rotateToMatchUpAxis( { _pv.x - _dw, _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x - _dw, _pv.y - _dd ) }, axis );
-            auto _p8 = _rotateToMatchUpAxis( { _pv.x      , _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x      , _pv.y - _dd ) }, axis );
-            auto _p9 = _rotateToMatchUpAxis( { _pv.x + _dw, _pv.y - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x + _dw, _pv.y - _dd ) }, axis );
+            auto _p1 = _rotateToMatchUpAxis( { _pv.x() - _dw, _pv.y() + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() - _dw, _pv.y() + _dd ) }, axis );
+            auto _p2 = _rotateToMatchUpAxis( { _pv.x()      , _pv.y() + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x()      , _pv.y() + _dd ) }, axis );
+            auto _p3 = _rotateToMatchUpAxis( { _pv.x() + _dw, _pv.y() + _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() + _dw, _pv.y() + _dd ) }, axis );
+            auto _p4 = _rotateToMatchUpAxis( { _pv.x() - _dw, _pv.y()      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() - _dw, _pv.y()       ) }, axis );
+            auto _p6 = _rotateToMatchUpAxis( { _pv.x() + _dw, _pv.y()      , 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() + _dw, _pv.y()       ) }, axis );
+            auto _p7 = _rotateToMatchUpAxis( { _pv.x() - _dw, _pv.y() - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() - _dw, _pv.y() - _dd ) }, axis );
+            auto _p8 = _rotateToMatchUpAxis( { _pv.x()      , _pv.y() - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x()      , _pv.y() - _dd ) }, axis );
+            auto _p9 = _rotateToMatchUpAxis( { _pv.x() + _dw, _pv.y() - _dd, 2.0f + 2.0f * CNoiseGenerator::GetNoise2d( _pv.x() + _dw, _pv.y() - _dd ) }, axis );
 
             CVec3 _n;
 
-            _n = _n + CVec3::cross( _p4 - _p1, _pv - _p4 );
-            _n = _n + CVec3::cross( _pv - _p1, _p2 - _pv );
+            _n = _n + tinymath::cross( _p4 - _p1, _pv - _p4 );
+            _n = _n + tinymath::cross( _pv - _p1, _p2 - _pv );
 
-            _n = _n + CVec3::cross( _pv - _p2, _p6 - _pv );
-            _n = _n + CVec3::cross( _p8 - _p4, _pv - _p8 );
+            _n = _n + tinymath::cross( _pv - _p2, _p6 - _pv );
+            _n = _n + tinymath::cross( _p8 - _p4, _pv - _p8 );
 
-            _n = _n + CVec3::cross( _p8 - _pv, _p9 - _p8 );
-            _n = _n + CVec3::cross( _p9 - _pv, _p6 - _p9 );
+            _n = _n + tinymath::cross( _p8 - _pv, _p9 - _p8 );
+            _n = _n + tinymath::cross( _p9 - _pv, _p6 - _p9 );
 
             _n.normalize();
 
@@ -856,8 +856,8 @@ namespace engine
                 _vertices.push_back( _p3 );
 
             #ifdef USE_HFIELD_FLAT_NORMALS
-                auto _nt1 = CVec3::cross( _p1 - _p0, _p2 - _p1 );
-                auto _nt2 = CVec3::cross( _p2 - _p0, _p3 - _p2 );
+                auto _nt1 = tinymath::cross( _p1 - _p0, _p2 - _p1 );
+                auto _nt2 = tinymath::cross( _p2 - _p0, _p3 - _p2 );
 
                 _normals.push_back( _nt1 );
                 _normals.push_back( _nt1 );
@@ -1040,21 +1040,21 @@ namespace engine
         auto _p9 = ( j < (nWidthSamples - 1) && i > 0 )                     ? _rotateToMatchUpAxis( { ( j + 1 ) * dw - centerX, ( i - 1 ) * dd - centerY, heightData[( i - 1 ) * nWidthSamples + ( j + 1 )] }, axis ) : CVec3( 0.0f, 0.0f, 0.0f );
 
         if ( j > 0 && i < (nDepthSamples - 1) )
-            _n = _n + CVec3::cross( _p2 - _pv, _p4 - _pv );
+            _n = _n + tinymath::cross( _p2 - _pv, _p4 - _pv );
 
         if ( j < (nWidthSamples - 1) && i < (nDepthSamples - 1) )
         {
-            _n = _n + CVec3::cross( _p6 - _pv, _p3 - _pv );
-            _n = _n + CVec3::cross( _p3 - _pv, _p2 - _pv );
+            _n = _n + tinymath::cross( _p6 - _pv, _p3 - _pv );
+            _n = _n + tinymath::cross( _p3 - _pv, _p2 - _pv );
         }
 
         if ( j < (nWidthSamples - 1) && i > 0 )
-            _n = _n + CVec3::cross( _p8 - _pv, _p6 - _pv );
+            _n = _n + tinymath::cross( _p8 - _pv, _p6 - _pv );
 
         if ( j > 0 && i > 0 )
         {
-            _n = _n + CVec3::cross( _p7 - _pv, _p8 - _pv );
-            _n = _n + CVec3::cross( _p4 - _pv, _p7 - _pv );
+            _n = _n + tinymath::cross( _p7 - _pv, _p8 - _pv );
+            _n = _n + tinymath::cross( _p4 - _pv, _p7 - _pv );
         }
 
         _n.normalize();
@@ -1096,12 +1096,12 @@ namespace engine
         for ( auto _submesh : _submeshes )
         {
             auto _vertices = _submesh->vertices();
-            _min_x = std::min( _min_x, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x );
-            _max_x = std::max( _max_x, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x );
-            _min_y = std::min( _min_y, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y );
-            _max_y = std::max( _max_y, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y );
-            _min_z = std::min( _min_z, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z );
-            _max_z = std::max( _max_z, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z );
+            _min_x = std::min( _min_x, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x() );
+            _max_x = std::max( _max_x, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() ) ).x() );
+            _min_y = std::min( _min_y, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y() );
+            _max_y = std::max( _max_y, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() ) ).y() );
+            _min_z = std::min( _min_z, ( *std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z() );
+            _max_z = std::max( _max_z, ( *std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() ) ).z() );
         }
 
         _model->setBoundExtents( { _max_x - _min_x, _max_y - _min_y, _max_z - _min_z } );
@@ -1242,12 +1242,12 @@ namespace engine
         }
 
         // compute bounding box
-        float32 _dx = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x - 
-                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x;
-        float32 _dy = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y - 
-                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y;
-        float32 _dz = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z - 
-                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z;
+        float32 _dx = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x() - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorX() )).x();
+        float32 _dy = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y() - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorY() )).y();
+        float32 _dz = (*std::max_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z() - 
+                      (*std::min_element( _vertices.begin(), _vertices.end(), CComparatorZ() )).z();
 
         _mesh->setBoundExtents( { _dx, _dy, _dz } );
         _mesh->cullFaces = false; // don't cull this submesh (we don't know if it's closed yet), pretty please :(
@@ -1264,27 +1264,27 @@ namespace engine
     CVec3 CMeshBuilder::_rotateToMatchUpAxis( const CVec3& vec, const eAxis& axis )
     {
         if ( axis == eAxis::X )
-            return { vec.z, vec.x, vec.y };
+            return { vec.z(), vec.x(), vec.y() };
         else if ( axis == eAxis::Y )
-            return { vec.y, vec.z, vec.x };
+            return { vec.y(), vec.z(), vec.x() };
         else if ( axis == eAxis::Z )
-            return { vec.x, vec.y, vec.z };
+            return { vec.x(), vec.y(), vec.z() };
 
         ENGINE_CORE_ASSERT( false, "Invalid axis given for conversion, should be either x, y or z" );
-        return { vec.x, vec.y, vec.z };
+        return { vec.x(), vec.y(), vec.z() };
     }
 
     CVec3 CMeshBuilder::_rotateBackFromUpAxis( const CVec3& vec, const eAxis& axis )
     {
         if ( axis == eAxis::X )
-            return { vec.y, vec.z, vec.x };
+            return { vec.y(), vec.z(), vec.x() };
         else if ( axis == eAxis::Y )
-            return { vec.z, vec.x, vec.y };
+            return { vec.z(), vec.x(), vec.y() };
         else if ( axis == eAxis::Z )
-            return { vec.x, vec.y, vec.z };
+            return { vec.x(), vec.y(), vec.z() };
 
         ENGINE_CORE_ASSERT( false, "Invalid axis given for conversion, should be either x, y or z" );
-        return { vec.x, vec.y, vec.z };
+        return { vec.x(), vec.y(), vec.z() };
     }
 
     /* some counters to keep track of the number of meshes created, and some simple name assignemnt */

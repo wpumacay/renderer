@@ -35,24 +35,24 @@ namespace engine
         glUniform1f( _getUniformLocation( uName ), value );
     }
 
-    void CShader::setVec2( const std::string& uName, const CVec2& vec )
+    void CShader::setVec2( const std::string& uName, CVec2 vec )
     {
-        glUniform2fv( _getUniformLocation( uName ), 1, ( float32* ) &vec );
+        glUniform2fv( _getUniformLocation( uName ), 1, ( float32* ) vec.data() );
     }
 
-    void CShader::setVec3( const std::string& uName, const CVec3& vec )
+    void CShader::setVec3( const std::string& uName, CVec3 vec )
     {
-        glUniform3fv( _getUniformLocation( uName ), 1, ( float32* ) &vec );
+        glUniform3fv( _getUniformLocation( uName ), 1, ( float32* ) vec.data() );
     }
 
-    void CShader::setVec4( const std::string& uName, const CVec4& vec )
+    void CShader::setVec4( const std::string& uName, CVec4 vec )
     {
-        glUniform4fv( _getUniformLocation( uName ), 1, ( float32* ) &vec );
+        glUniform4fv( _getUniformLocation( uName ), 1, ( float32* ) vec.data() );
     }
 
-    void CShader::setMat4( const std::string& uName, const CMat4& mat )
+    void CShader::setMat4( const std::string& uName, CMat4 mat )
     {
-        glUniformMatrix4fv( _getUniformLocation( uName ), 1, GL_FALSE, mat.buff );
+        glUniformMatrix4fv( _getUniformLocation( uName ), 1, GL_FALSE, ( float32* ) mat.data() );
     }
 
     void CShader::_setInt( uint32 uniform, int32 value )
@@ -62,27 +62,27 @@ namespace engine
 
     void CShader::_setFloat( uint32 uniform, float32 value )
     {
-        glUniform1f( uniform, value );        
+        glUniform1f( uniform, value );
     }
 
-    void CShader::_setVec2( uint32 uniform, const CVec2& vec )
+    void CShader::_setVec2( uint32 uniform, CVec2 vec )
     {
-        glUniform2fv( uniform, 1, ( float32* ) &vec );
+        glUniform2fv( uniform, 1, ( float32* ) vec.data() );
     }
 
-    void CShader::_setVec3( uint32 uniform, const CVec3& vec )
+    void CShader::_setVec3( uint32 uniform, CVec3 vec )
     {
-        glUniform3fv( uniform, 1, ( float32* ) &vec );
+        glUniform3fv( uniform, 1, ( float32* ) vec.data() );
     }
 
-    void CShader::_setVec4( uint32 uniform, const CVec4& vec )
+    void CShader::_setVec4( uint32 uniform, CVec4 vec )
     {
-        glUniform4fv( uniform, 1, ( float32* ) &vec );
+        glUniform4fv( uniform, 1, ( float32* ) vec.data() );
     }
 
-    void CShader::_setMat4( uint32 uniform, const CMat4& mat )
+    void CShader::_setMat4( uint32 uniform, CMat4 mat )
     {
-        glUniformMatrix4fv( uniform, 1, GL_FALSE, mat.buff );
+        glUniformMatrix4fv( uniform, 1, GL_FALSE, ( float32* ) mat.data() );
     }
 
     uint32 CShader::_getUniformLocation( const std::string& uniformName )

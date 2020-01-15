@@ -117,7 +117,7 @@ namespace engine
     {
         ENGINE_CORE_ASSERT( CDebugDrawer::s_instance, "Must initialize debug-drawer before using it" );
 
-        CDebugDrawer::s_instance->_drawSphere( radius, transform, CVec3::Blue(), CVec3::Red(), CVec3::Green() );
+        CDebugDrawer::s_instance->_drawSphere( radius, transform, CVec3( 0.0f, 0.0f, 1.0f ), CVec3( 1.0f, 0.0f, 0.0f ), CVec3( 0.0f, 1.0f, 0.0f ) );
     }
 
     void CDebugDrawer::DrawSphere( float32 radius, const CMat4& transform, const CVec3& color )
@@ -645,15 +645,15 @@ namespace engine
         CVec3 _arrowVec = end - start;
         float _length = _arrowVec.length();
 
-        CVec3 _uf = CVec3::normalize( _arrowVec );
-        CVec3 _ur = CVec3::cross( _uf, CVec3( 0, 1, 0 ) );
-        CVec3 _uu = CVec3::cross( _ur, _uf );
+        CVec3 _uf = _arrowVec.normalized();
+        CVec3 _ur = tinymath::cross( _uf, CVec3( 0, 1, 0 ) );
+        CVec3 _uu = tinymath::cross( _ur, _uf );
 
         float _sidesLength = _length / 10.0f;
 
-        _uf.scale( _sidesLength, _sidesLength, _sidesLength );
-        _ur.scale( _sidesLength, _sidesLength, _sidesLength );
-        _uu.scale( _sidesLength, _sidesLength, _sidesLength );
+        _uf.scale( CVec3( _sidesLength, _sidesLength, _sidesLength ) );
+        _ur.scale( CVec3( _sidesLength, _sidesLength, _sidesLength ) );
+        _uu.scale( CVec3( _sidesLength, _sidesLength, _sidesLength ) );
 
         CVec3 _p0 = end + _ur + _uu - _uf;
         CVec3 _p1 = end + _ur - _uu - _uf;
@@ -695,14 +695,14 @@ namespace engine
         {
             float32 _dtheta = ( 2.0f * ENGINE_PI / DEBUG_DRAWER_SPHERE_DIVISIONS );
             // x-y plane
-            CVec3 _pxy0 = { radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ), 0.0f };
-            CVec3 _pxy1 = { radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f };
+            CVec3 _pxy0 = CVec3( radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ), 0.0f );
+            CVec3 _pxy1 = CVec3( radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f );
             // y-z plane
-            CVec3 _pyz0 = { 0.0f, radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ) };
-            CVec3 _pyz1 = { 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ) };
+            CVec3 _pyz0 = CVec3( 0.0f, radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ) );
+            CVec3 _pyz1 = CVec3( 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ) );
             // x-z plane
-            CVec3 _pxz0 = { radius * std::sin( i * _dtheta ), 0.0f, radius * std::cos( i * _dtheta ) };
-            CVec3 _pxz1 = { radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ) };
+            CVec3 _pxz0 = CVec3( radius * std::sin( i * _dtheta ), 0.0f, radius * std::cos( i * _dtheta ) );
+            CVec3 _pxz1 = CVec3( radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f, radius * std::cos( ( i + 1 ) * _dtheta ) );
 
             // draw the steps using the points after applying world-space transformation
             _drawLine( CVec3( transform * CVec4( _pxy0, 1.0f ) ), 
@@ -716,28 +716,28 @@ namespace engine
 
     void CDebugDrawer::_drawClipVolume( const CMat4& clipMatrix, const CVec3& color )
     {
-        CMat4 _invClipMatrix = clipMatrix.inverse();
+        CMat4 _invClipMatrix = tinymath::inverse( clipMatrix );
 
         CVec3 _frustumPointsClipSpace[8] = {
             /*      near plane      */
-            { -1.0f, -1.0f, -1.0f }, 
-            { 1.0f, -1.0f, -1.0f },
-            { 1.0f,  1.0f, -1.0f },
-            { -1.0f,  1.0f, -1.0f },
+            CVec3( -1.0f, -1.0f, -1.0f ), 
+            CVec3( 1.0f, -1.0f, -1.0f ),
+            CVec3( 1.0f,  1.0f, -1.0f ),
+            CVec3( -1.0f,  1.0f, -1.0f ),
             /*      far plane       */
-            { -1.0f, -1.0f, 1.0f }, 
-            { 1.0f, -1.0f, 1.0f },
-            { 1.0f,  1.0f, 1.0f },
-            { -1.0f,  1.0f, 1.0f }
+            CVec3( -1.0f, -1.0f, 1.0f ), 
+            CVec3( 1.0f, -1.0f, 1.0f ),
+            CVec3( 1.0f,  1.0f, 1.0f ),
+            CVec3( -1.0f,  1.0f, 1.0f )
         };
 
         std::vector< engine::CVec3 > _points3d;
         for ( size_t q = 0; q < 8; q++ )
         {
             CVec4 _pointFrustum = _invClipMatrix * CVec4( _frustumPointsClipSpace[q], 1.0f );
-            CVec3 _pointFrustumNormalized = CVec3( _pointFrustum.x / _pointFrustum.w,
-                                                   _pointFrustum.y / _pointFrustum.w,
-                                                   _pointFrustum.z / _pointFrustum.w );
+            CVec3 _pointFrustumNormalized = CVec3( _pointFrustum.x() / _pointFrustum.w(),
+                                                   _pointFrustum.y() / _pointFrustum.w(),
+                                                   _pointFrustum.z() / _pointFrustum.w() );
 
             _points3d.push_back( _pointFrustumNormalized );
         }
@@ -785,17 +785,17 @@ namespace engine
                                   const CVec3& color )
     {
         auto _vmin2max = aabbMax - aabbMin;
-        auto _dx = CVec3::dot( _vmin2max, worldTransform.getBasisVectorX() );
-        auto _dy = CVec3::dot( _vmin2max, worldTransform.getBasisVectorY() );
-        auto _dz = CVec3::dot( _vmin2max, worldTransform.getBasisVectorZ() );
-        auto _origin = worldTransform.getPosition();
-        auto _sidex = worldTransform.getBasisVectorX();
-        auto _sidey = worldTransform.getBasisVectorY();
-        auto _sidez = worldTransform.getBasisVectorZ();
+        auto _dx = _vmin2max.dot( CVec3( worldTransform.col( 0 ) ) );
+        auto _dy = _vmin2max.dot( CVec3( worldTransform.col( 1 ) ) );
+        auto _dz = _vmin2max.dot( CVec3( worldTransform.col( 2 ) ) );
+        auto _origin = CVec3( worldTransform.col( 3 ) );
+        auto _sidex = CVec3( worldTransform.col( 0 ) );
+        auto _sidey = CVec3( worldTransform.col( 1 ) );
+        auto _sidez = CVec3( worldTransform.col( 2 ) );
 
-        _sidex.scale( 0.5 * _dx, 0.5 * _dx, 0.5 * _dx );
-        _sidey.scale( 0.5 * _dy, 0.5 * _dy, 0.5 * _dy );
-        _sidez.scale( 0.5 * _dz, 0.5 * _dz, 0.5 * _dz );
+        _sidex.scale( CVec3( 0.5 * _dx, 0.5 * _dx, 0.5 * _dx ) );
+        _sidey.scale( CVec3( 0.5 * _dy, 0.5 * _dy, 0.5 * _dy ) );
+        _sidez.scale( CVec3( 0.5 * _dz, 0.5 * _dz, 0.5 * _dz ) );
 
         /*
         *      p8 ___________ p7 -> max
@@ -847,15 +847,15 @@ namespace engine
         auto _normals = meshPtr->normals();
 
         auto _modelMatrix = meshPtr->matModel();
-        auto _normalMatrix = ( _modelMatrix.inverse() ).transpose();
+        auto _normalMatrix = tinymath::inverse( _modelMatrix ).transpose();
 
         for ( size_t i = 0; i < _vertices.size(); i++ )
         {
             auto _wposition = _modelMatrix * CVec4( _vertices[i], 1.0f );
             auto _wnormal = _normalMatrix * CVec4( _normals[i], 0.0f );
 
-            CVec3 _position3d = { _wposition.x, _wposition.y, _wposition.z };
-            CVec3 _normal3d = CVec3::normalize( { _wnormal.x, _wnormal.y, _wnormal.z } );
+            CVec3 _position3d = CVec3( _wposition.x(), _wposition.y(), _wposition.z() );
+            CVec3 _normal3d = CVec3( _wnormal.x(), _wnormal.y(), _wnormal.z() ).normalized();
 
             _drawArrow( _position3d, _position3d + 0.1f * _normal3d, color );
         }
@@ -870,10 +870,10 @@ namespace engine
 
     void CDebugDrawer::_drawFrame( const CMat4& frame, float32 size )
     {
-        auto _xAxis = frame.getBasisVectorX();
-        auto _yAxis = frame.getBasisVectorY();
-        auto _zAxis = frame.getBasisVectorZ();
-        auto _position = frame.getPosition();
+        auto _xAxis = CVec3( frame.col( 0 ) );
+        auto _yAxis = CVec3( frame.col( 1 ) );
+        auto _zAxis = CVec3( frame.col( 2 ) );
+        auto _position = CVec3( frame.col( 3 ) );
 
         _drawAxes( _xAxis, _yAxis, _zAxis, _position, size );
     }
@@ -884,10 +884,10 @@ namespace engine
         _axis1 = plane.normal;
         computeFrameAxes( _axis1, _axis2, _axis3, { 0.0f, 1.0f, 0.0f } );
 
-        auto _p0 = plane.position - 0.5f * size.x * _axis2 - 0.5f * size.y * _axis3;
-        auto _p1 = plane.position - 0.5f * size.x * _axis2 + 0.5f * size.y * _axis3;
-        auto _p2 = plane.position + 0.5f * size.x * _axis2 + 0.5f * size.y * _axis3;
-        auto _p3 = plane.position + 0.5f * size.x * _axis2 - 0.5f * size.y * _axis3;
+        auto _p0 = plane.position - 0.5f * size.x() * _axis2 - 0.5f * size.y() * _axis3;
+        auto _p1 = plane.position - 0.5f * size.x() * _axis2 + 0.5f * size.y() * _axis3;
+        auto _p2 = plane.position + 0.5f * size.x() * _axis2 + 0.5f * size.y() * _axis3;
+        auto _p3 = plane.position + 0.5f * size.x() * _axis2 - 0.5f * size.y() * _axis3;
 
         _drawLine( _p0, _p1, color );
         _drawLine( _p1, _p2, color );
@@ -898,56 +898,56 @@ namespace engine
     void CDebugDrawer::_drawSolidBox( const CVec3& size, const CMat4& transform, const CVec4& color )
     {
         // keep the cube-information for later rendering
-        if ( color.w < 1.0f ) // transparent are stored separately
+        if ( color.w() < 1.0f ) // transparent are stored separately
         {
-            m_primitivesTransparentModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
-            m_primitivesTransparentNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesTransparentModelMats[DD_PRIMITIVE_BOX].push_back( transform * engine::scale( size ) );
+            m_primitivesTransparentNormalMats[DD_PRIMITIVE_BOX].push_back( tinymath::inverse( transform ).transpose() );
             m_primitivesTransparentColors[DD_PRIMITIVE_BOX].push_back( color );
         }
         else
         {
-            m_primitivesOpaqueModelMats[DD_PRIMITIVE_BOX].push_back( transform * CMat4::scale( size ) );
-            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_BOX].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesOpaqueModelMats[DD_PRIMITIVE_BOX].push_back( transform * engine::scale( size ) );
+            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_BOX].push_back( tinymath::inverse( transform ).transpose() );
             m_primitivesOpaqueColors[DD_PRIMITIVE_BOX].push_back( color );
         }
     }
 
     void CDebugDrawer::_drawSolidSphere( float32 radius, const CMat4& transform, const CVec4& color )
     {
-        if ( color.w < 1.0f )
+        if ( color.w() < 1.0f )
         {
-            m_primitivesTransparentModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
-            m_primitivesTransparentNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesTransparentModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * engine::scale( { radius, radius, radius } ) );
+            m_primitivesTransparentNormalMats[DD_PRIMITIVE_SPHERE].push_back( tinymath::inverse( transform ).transpose() );
             m_primitivesTransparentColors[DD_PRIMITIVE_SPHERE].push_back( color );
         }
         else
         {
-            m_primitivesOpaqueModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * CMat4::scale( { radius, radius, radius } ) );
-            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_SPHERE].push_back( ( transform.inverse() ).transpose() );
+            m_primitivesOpaqueModelMats[DD_PRIMITIVE_SPHERE].push_back( transform * engine::scale( { radius, radius, radius } ) );
+            m_primitivesOpaqueNormalMats[DD_PRIMITIVE_SPHERE].push_back( tinymath::inverse( transform ).transpose() );
             m_primitivesOpaqueColors[DD_PRIMITIVE_SPHERE].push_back( color );
         }
     }
 
     void CDebugDrawer::_drawSolidCylinder( float32 radius, float32 height, const eAxis& axis, const CMat4& transform, const CVec4& color )
     {
-        if ( color.w < 1.0f )
+        if ( color.w() < 1.0f )
         {
             if ( axis == eAxis::X )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * engine::scale( { height, radius, radius } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
             }
             else if ( axis == eAxis::Y )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * engine::scale( { radius, height, radius } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
             }
             else if ( axis == eAxis::Z )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * engine::scale( { radius, radius, height } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
             }
         }
@@ -955,20 +955,20 @@ namespace engine
         {
             if ( axis == eAxis::X )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * CMat4::scale( { height, radius, radius } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_X].push_back( transform * engine::scale( { height, radius, radius } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_X].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_X].push_back( color );
             }
             else if ( axis == eAxis::Y )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * CMat4::scale( { radius, height, radius } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Y].push_back( transform * engine::scale( { radius, height, radius } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Y].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_Y].push_back( color );
             }
             else if ( axis == eAxis::Z )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * CMat4::scale( { radius, radius, height } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_CYLINDER_Z].push_back( transform * engine::scale( { radius, radius, height } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_CYLINDER_Z].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_CYLINDER_Z].push_back( color );
             }
         }
@@ -979,34 +979,34 @@ namespace engine
         _drawSolidCylinder( radius, height, axis, transform, color );
 
         CVec3 _trans;
-        if ( axis == eAxis::X ) _trans = { 0.5f * height, 0.0f, 0.0f };
-        if ( axis == eAxis::Y ) _trans = { 0.0f, 0.5f * height, 0.0f };
-        if ( axis == eAxis::Z ) _trans = { 0.0f, 0.0f, 0.5f * height };
+        if ( axis == eAxis::X ) _trans = CVec3( 0.5f * height, 0.0f, 0.0f );
+        if ( axis == eAxis::Y ) _trans = CVec3( 0.0f, 0.5f * height, 0.0f );
+        if ( axis == eAxis::Z ) _trans = CVec3( 0.0f, 0.0f, 0.5f * height );
 
-        _drawSolidSphere( radius, transform * engine::CMat4::translation( _trans ), color );
-        _drawSolidSphere( radius, transform * engine::CMat4::translation( -_trans ), color );
+        _drawSolidSphere( radius, transform * engine::translation( _trans ), color );
+        _drawSolidSphere( radius, transform * engine::translation( -_trans ), color );
     }
 
     void CDebugDrawer::_drawSolidArrow( float32 length, const eAxis& axis, const CMat4& transform, const CVec4& color )
     {
-        if ( color.w < 1.0f )
+        if ( color.w() < 1.0f )
         {
             if ( axis == eAxis::X )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_X].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_X].push_back( color );
             }
             else if ( axis == eAxis::Y )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
             }
             else if ( axis == eAxis::Z )
             {
-                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesTransparentModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesTransparentNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesTransparentColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
             }
         }
@@ -1014,20 +1014,20 @@ namespace engine
         {
             if ( axis == eAxis::X )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_X].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_X].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_X].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_X].push_back( color );
             }
             else if ( axis == eAxis::Y )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Y].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Y].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_Y].push_back( color );
             }
             else if ( axis == eAxis::Z )
             {
-                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * CMat4::scale( { length, length, length } ) );
-                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( ( transform.inverse() ).transpose() );
+                m_primitivesOpaqueModelMats[DD_PRIMITIVE_ARROW_Z].push_back( transform * engine::scale( { length, length, length } ) );
+                m_primitivesOpaqueNormalMats[DD_PRIMITIVE_ARROW_Z].push_back( tinymath::inverse( transform ).transpose() );
                 m_primitivesOpaqueColors[DD_PRIMITIVE_ARROW_Z].push_back( color );
             }
         }
@@ -1035,9 +1035,9 @@ namespace engine
 
     void CDebugDrawer::_drawSolidAxes( float32 length, const CMat4& transform, float32 alpha )
     {
-        _drawSolidArrow( length, eAxis::X, transform, CVec4( CVec3::Red(), alpha ) );
-        _drawSolidArrow( length, eAxis::Y, transform, CVec4( CVec3::Green(), alpha ) );
-        _drawSolidArrow( length, eAxis::Z, transform, CVec4( CVec3::Blue(), alpha ) );
+        _drawSolidArrow( length, eAxis::X, transform, CVec4( CVec3( 1.0f, 0.0f, 0.0f ), alpha ) );
+        _drawSolidArrow( length, eAxis::Y, transform, CVec4( CVec3( 0.0f, 1.0f, 0.0f ), alpha ) );
+        _drawSolidArrow( length, eAxis::Z, transform, CVec4( CVec3( 0.0f, 0.0f, 1.0f ), alpha ) );
         _drawSolidSphere( 0.2 * length, transform, { 0.3f, 0.3f, 0.3f, alpha } );
     }
 

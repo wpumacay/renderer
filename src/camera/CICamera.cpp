@@ -58,7 +58,7 @@ namespace engine
         m_name          = name;
         m_position      = position;
         m_targetPoint   = targetPoint;
-        m_targetDir     = CVec3::normalize( m_targetPoint - m_position );
+        m_targetDir     = ( m_targetPoint - m_position ).normalized();
         m_upAxis        = upAxis;
         m_projData      = projData;
         m_active        = true;
@@ -145,42 +145,42 @@ namespace engine
         */
         // Also, it's column major, so must keep layout ...
         // [ c1x c1y c1z c1w, c2x c2y c2z c2w, ... ]
-        m_matView.buff[0] = m_right.x;
-        m_matView.buff[1] = m_up.x;
-        m_matView.buff[2] = -m_front.x;
-        m_matView.buff[3] = 0;
+        m_matView( 0, 0 ) = m_right.x();
+        m_matView( 1, 0 ) = m_up.x();
+        m_matView( 2, 0 ) = -m_front.x();
+        m_matView( 3, 0 ) = 0;
 
-        m_matView.buff[4] = m_right.y;
-        m_matView.buff[5] = m_up.y;
-        m_matView.buff[6] = -m_front.y;
-        m_matView.buff[7] = 0;
+        m_matView( 0, 1 ) = m_right.y();
+        m_matView( 1, 1 ) = m_up.y();
+        m_matView( 2, 1 ) = -m_front.y();
+        m_matView( 3, 1 ) = 0;
 
-        m_matView.buff[8]  = m_right.z;
-        m_matView.buff[9]  = m_up.z;
-        m_matView.buff[10] = -m_front.z;
-        m_matView.buff[11] = 0;
+        m_matView( 0, 2 ) = m_right.z();
+        m_matView( 1, 2 ) = m_up.z();
+        m_matView( 2, 2 ) = -m_front.z();
+        m_matView( 3, 2 ) = 0;
 
-        m_matView.buff[12] = -CVec3::dot( m_right, m_position );
-        m_matView.buff[13] = -CVec3::dot( m_up, m_position );
-        m_matView.buff[14] = CVec3::dot( m_front, m_position );
-        m_matView.buff[15] = 1;
+        m_matView( 0, 3 ) = -m_right.dot( m_position );
+        m_matView( 1, 3 ) = -m_up.dot( m_position );
+        m_matView( 2, 3 ) = m_front.dot( m_position );
+        m_matView( 3, 3 ) = 1;
     }
 
     void CICamera::_buildProjMatrix()
     {
         if ( m_projData.projection == eCameraProjection::PERSPECTIVE )
         {
-            m_matProj = CMat4::perspective( m_projData.fov, 
-                                            m_projData.aspect,
-                                            m_projData.zNear, 
-                                            m_projData.zFar );
+            m_matProj = engine::perspective( m_projData.fov, 
+                                             m_projData.aspect,
+                                             m_projData.zNear, 
+                                             m_projData.zFar );
         }
         else if ( m_projData.projection == eCameraProjection::ORTHOGRAPHIC )
         {
-            m_matProj = CMat4::ortho( m_projData.width,
-                                      m_projData.height,
-                                      m_projData.zNear,
-                                      m_projData.zFar );
+            m_matProj = engine::ortho( m_projData.width,
+                                       m_projData.height,
+                                       m_projData.zNear,
+                                       m_projData.zFar );
         }
     }
 

@@ -16,7 +16,7 @@ namespace engine
 
         bool operator() ( CMesh* mesh1, CMesh* mesh2 )
         {
-            return CVec3::length( mesh1->position - point ) > CVec3::length( mesh2->position - point );
+            return ( mesh1->position - point ).length() > ( mesh2->position - point ).length();
         }
     };
 
@@ -26,7 +26,7 @@ namespace engine
 
         bool operator() ( CMesh* mesh1, CMesh* mesh2 )
         {
-            return CVec3::length( mesh1->position - point ) < CVec3::length( mesh2->position - point );
+            return ( mesh1->position - point ).length() < ( mesh2->position - point ).length();
         }
     };
 

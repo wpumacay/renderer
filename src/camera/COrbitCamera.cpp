@@ -108,8 +108,8 @@ namespace engine
         {
             m_cursor = CInputManager::GetCursorPosition();
 
-            float _dx = m_cursor.x - m_cursor0.x;
-            float _dy = m_cursor.y - m_cursor0.y;
+            float _dx = m_cursor.x() - m_cursor0.x();
+            float _dy = m_cursor.y() - m_cursor0.y();
 
             float _dtheta = ( -_dx / m_viewportWidth ) * 2.0f * ENGINE_PI;
             float _dphi = ( -_dy / m_viewportHeight ) * ENGINE_PI;
@@ -124,12 +124,12 @@ namespace engine
         {
             m_cursor = CInputManager::GetCursorPosition();
 
-            float _dx = -( m_cursor.x - m_cursor0.x );
-            float _dy = m_cursor.y - m_cursor0.y;
+            float _dx = -( m_cursor.x() - m_cursor0.x() );
+            float _dy = m_cursor.y() - m_cursor0.y();
 
-            m_targetPoint.x = m_targetPoint0.x + ( m_right.x * _dx + m_up.x * _dy ) * m_moveSensitivity;
-            m_targetPoint.y = m_targetPoint0.y + ( m_right.y * _dx + m_up.y * _dy ) * m_moveSensitivity;
-            m_targetPoint.z = m_targetPoint0.z;
+            m_targetPoint.x() = m_targetPoint0.x() + ( m_right.x() * _dx + m_up.x() * _dy ) * m_moveSensitivity;
+            m_targetPoint.y() = m_targetPoint0.y() + ( m_right.y() * _dx + m_up.y() * _dy ) * m_moveSensitivity;
+            m_targetPoint.z() = m_targetPoint0.z();
 
             if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
@@ -176,18 +176,18 @@ namespace engine
         m_rho0 = m_rho = m_r.length();
         if ( m_upAxis == eAxis::X )
         {
-            m_phi0 = m_phi = std::acos( m_r.x / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.z, m_r.y );
+            m_phi0 = m_phi = std::acos( m_r.x() / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.z(), m_r.y() );
         }
         else if ( m_upAxis == eAxis::Y )
         {
-            m_phi0 = m_phi = std::acos( m_r.y / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.x, m_r.z );
+            m_phi0 = m_phi = std::acos( m_r.y() / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.x(), m_r.z() );
         }
         else if ( m_upAxis == eAxis::Z )
         {
-            m_phi0 = m_phi = std::acos( m_r.z / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.y, m_r.x );
+            m_phi0 = m_phi = std::acos( m_r.z() / m_rho0 );
+            m_theta0 = m_theta = std::atan2( m_r.y(), m_r.x() );
         }
 
         m_baseAccumScroll = m_zoomSensitivity * CInputManager::GetScrollAccumValueY();
@@ -202,21 +202,21 @@ namespace engine
 
         if ( m_upAxis == eAxis::X )
         {
-            m_r.x = m_rho * _cphi;
-            m_r.y = m_rho * _sphi * _ctheta;
-            m_r.z = m_rho * _sphi * _stheta;
+            m_r.x() = m_rho * _cphi;
+            m_r.y() = m_rho * _sphi * _ctheta;
+            m_r.z() = m_rho * _sphi * _stheta;
         }
         else if ( m_upAxis == eAxis::Y )
         {
-            m_r.x = m_rho * _sphi * _stheta;
-            m_r.y = m_rho * _cphi;
-            m_r.z = m_rho * _sphi * _ctheta;
+            m_r.x() = m_rho * _sphi * _stheta;
+            m_r.y() = m_rho * _cphi;
+            m_r.z() = m_rho * _sphi * _ctheta;
         }
         else if ( m_upAxis == eAxis::Z )
         {
-            m_r.x = m_rho * _sphi * _ctheta;
-            m_r.y = m_rho * _sphi * _stheta;
-            m_r.z = m_rho * _cphi;
+            m_r.x() = m_rho * _sphi * _ctheta;
+            m_r.y() = m_rho * _sphi * _stheta;
+            m_r.z() = m_rho * _cphi;
         }
 
         m_position = m_targetPoint + m_r;
@@ -224,9 +224,9 @@ namespace engine
 
     void COrbitCamera::_updateCameraVectors()
     {
-        m_front = CVec3::normalize( m_targetPoint - m_position );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = ( m_targetPoint - m_position ).normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
     }
 
 }

@@ -32,12 +32,12 @@ ComparatorSignedDistPlane g_signedComparator = { g_plane };
 auto g_box_size = engine::CVec3( 0.8f, 0.8f, 0.8f );
 auto g_box_position = engine::CVec3( 3.0f, 3.0f, 3.0f );
 auto g_box_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
-auto g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_box_rotation );
+auto g_box_transform = engine::CMat4::translation( g_box_position ) * engine::CMat4::fromEuler( g_box_rotation );
 
 auto g_sphere_size = 0.5f;
 auto g_sphere_position = engine::CVec3( -1.0f, 1.0f, -1.0f );
 auto g_sphere_rotation = engine::CVec3( ENGINE_PI / 6.0f, ENGINE_PI / 6.0f, ENGINE_PI / 6.0f );
-auto g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEulerIntrinsicXYZ( g_sphere_rotation );
+auto g_sphere_transform = engine::CMat4::translation( g_sphere_position ) * engine::CMat4::fromEuler( g_sphere_rotation );
 
 bool g_use_signed_distance = false;
 bool g_show_comparison_with_frustum = false;

@@ -13,20 +13,20 @@ namespace engine
     {
         m_type = eCameraType::FIXED;
 
-        m_front = CVec3::normalize( m_targetPoint - m_position );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = ( m_targetPoint - m_position ).normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
 
         _buildViewMatrix();
     }
 
     void CFixedCamera::setCameraTransform( const CMat4& transform )
     {
-        m_position = transform.getPosition();
+        m_position = CVec3( transform.col( 3 ) );
 
-        m_front = transform.getBasisVectorX();
-        m_right = -transform.getBasisVectorY();
-        m_up = transform.getBasisVectorZ();
+        m_front = CVec3( transform.col( 0 ) );
+        m_right = -CVec3( transform.col( 1 ) );
+        m_up = CVec3( transform.col( 2 ) );
 
         m_targetDir = m_front;
 
@@ -35,18 +35,18 @@ namespace engine
 
     void CFixedCamera::_positionChangedInternal()
     {
-        m_front = CVec3::normalize( m_targetPoint - m_position );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = ( m_targetPoint - m_position ).normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
 
         m_targetDir = m_front;
     }
 
     void CFixedCamera::_targetPointChangedInternal()
     {
-        m_front = CVec3::normalize( m_targetPoint - m_position );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = ( m_targetPoint - m_position ).normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
 
         m_targetDir = m_front;
     }

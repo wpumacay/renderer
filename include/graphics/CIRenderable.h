@@ -23,7 +23,7 @@ namespace engine
     public :
 
         CVec3 position;
-        CMat4 rotation;
+        CMat3 rotation;
         CVec3 scale;
 
         bool castsShadows;
@@ -68,9 +68,9 @@ namespace engine
         eRenderableType                 m_type;
         CVec3                           m_boundExtents;
         CVec3                           m_boundCenter;
-        std::unique_ptr< CMaterial >   m_material;
+        std::unique_ptr< CMaterial >    m_material;
         int32                           m_maskId; // used for semantic_only rendering
-        int32                           m_objectId; // used for picking
+        int32                           m_objectId; // used for object-picking
 
     };
 

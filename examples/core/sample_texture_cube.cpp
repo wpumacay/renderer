@@ -6,9 +6,8 @@
 
 engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 {
-    if ( axis == engine::eAxis::X ) return engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
-    if ( axis == engine::eAxis::Y ) return engine::CMat4();
-    if ( axis == engine::eAxis::Z ) return engine::CMat4::rotationX( ENGINE_PI / 2.0f );
+    if ( axis == engine::eAxis::X ) return engine::CMat4( tinymath::rotationZ<float>( -ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
+    else if ( axis == engine::eAxis::Z ) return engine::CMat4( tinymath::rotationX<float>( ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
 
     return engine::CMat4();
 }
@@ -135,7 +134,7 @@ int main()
 
         _shader->bind();
         _shader->setMat4( "u_tProj", _camera->matProj() );
-        _shader->setMat4( "u_tView", _camera->matView().getRotation() * _correctionMat );
+        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _camera->matView() ), { 0.0f, 0.0f, 0.0f } ) * _correctionMat );
 
         _textureCubemap->bind();
         _varray->bind();

@@ -142,14 +142,14 @@ namespace engine
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, toOpenGLEnum( m_texWrapModeU ) );
         if ( m_texWrapModeU == eTextureWrap::CLAMP_TO_BORDER )
         {
-            float32 _color[] = { m_texBorderColorU.x, m_texBorderColorU.y, m_texBorderColorU.z, m_texBorderColorU.w };
+            float32 _color[] = { m_texBorderColorU.x(), m_texBorderColorU.y(), m_texBorderColorU.z(), m_texBorderColorU.w() };
             glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, _color );
         }
 
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, toOpenGLEnum( m_texWrapModeV ) );
         if ( m_texWrapModeV == eTextureWrap::CLAMP_TO_BORDER )
         {
-            float32 _color[] = { m_texBorderColorV.x, m_texBorderColorV.y, m_texBorderColorV.z, m_texBorderColorV.w };
+            float32 _color[] = { m_texBorderColorV.x(), m_texBorderColorV.y(), m_texBorderColorV.z(), m_texBorderColorV.w() };
             glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, _color );
         }
 

@@ -44,10 +44,10 @@ namespace engine
         bool _isMouseDown( int button );
 
         CVec2 _getCursorPosition() const { return m_cursor; }
-        float _getScrollOffX() const { return m_scrollOff.x; }
-        float _getScrollOffY() const { return m_scrollOff.y; }
-        float _getScrollAccumValueX() const { return m_scrollAccumValue.x; }
-        float _getScrollAccumValueY() const { return m_scrollAccumValue.y; }
+        float _getScrollOffX() const { return m_scrollOff.x(); }
+        float _getScrollOffY() const { return m_scrollOff.y(); }
+        float _getScrollAccumValueX() const { return m_scrollAccumValue.x(); }
+        float _getScrollAccumValueY() const { return m_scrollAccumValue.y(); }
 
         int m_keys[ENGINE_MAX_KEYS];
         int m_singleKeys[ENGINE_MAX_KEYS];

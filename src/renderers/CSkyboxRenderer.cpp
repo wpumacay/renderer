@@ -1,6 +1,8 @@
 
 #include <renderers/CSkyboxRenderer.h>
 
+// @todo: implement helpers for 4x4 manipulation (GetRotation, GetTranslation, RotationX, ...)
+
 namespace engine
 {
 
@@ -37,13 +39,11 @@ namespace engine
         _camMatProj = renderOptions.cameraPtr->matProj();
 
         if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::X ) 
-            _upAxisCorrectionMat = engine::CMat4::rotationZ( -ENGINE_PI / 2.0f );
-        if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::Y ) 
-            _upAxisCorrectionMat = engine::CMat4();
-        if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::Z ) 
-            _upAxisCorrectionMat = engine::CMat4::rotationX( ENGINE_PI / 2.0f );
+            _upAxisCorrectionMat = CMat4( tinymath::rotationZ<float32>( -ENGINE_PI / 2.0f ), CVec3( 0.0f, 0.0f, 0.0f ) );
+        else if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::Z ) 
+            _upAxisCorrectionMat = CMat4( tinymath::rotationX<float32>( ENGINE_PI / 2.0f ), CVec3( 0.0f, 0.0f, 0.0f ) );
 
-        m_context.viewMatrix = _camMatView.getRotation() * _upAxisCorrectionMat;
+        m_context.viewMatrix = CMat4( CMat3( _camMatView ), CVec3( 0.0f, 0.0f, 0.0f ) ) * _upAxisCorrectionMat;
         m_context.projMatrix = _camMatProj;
 
         // setup fog information

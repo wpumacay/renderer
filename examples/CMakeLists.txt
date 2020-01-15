@@ -10,16 +10,17 @@ function( FcnBuildExample paramSources paramExecutableName )
                     ${paramSources} )
 
     target_link_libraries( ${paramExecutableName}
-                           cat1 )
+                           cat1
+                           tinymath_cpp_lib )
 
 endfunction()
 
 add_subdirectory( core )
-add_subdirectory( lights )
-add_subdirectory( shadows )
-add_subdirectory( fog )
-add_subdirectory( math )
-add_subdirectory( instancing )
-add_subdirectory( renderer )
-add_subdirectory( picking )
-add_subdirectory( application )
+#### add_subdirectory( lights )
+#### add_subdirectory( shadows )
+#### add_subdirectory( fog )
+#### add_subdirectory( math )
+#### add_subdirectory( instancing )
+#### add_subdirectory( renderer )
+#### add_subdirectory( picking )
+#### add_subdirectory( application )

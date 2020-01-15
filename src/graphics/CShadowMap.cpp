@@ -93,15 +93,15 @@ namespace engine
             // is an OOBB to the view camera's view frustum
 
             /* compute the vertices of the view frustum */
-            auto _invViewProjMatrix = ( config.cameraPtr->matProj() * config.cameraPtr->matView() ).inverse();
+            auto _invViewProjMatrix = tinymath::inverse( config.cameraPtr->matProj() * config.cameraPtr->matView() );
 
             std::vector< CVec3 > _frustumPointsInWorld;
             for ( size_t q = 0; q < m_frustumPointsClipSpace.size(); q++ )
             {
                 CVec4 _frustumPointNormalized = _invViewProjMatrix * CVec4( m_frustumPointsClipSpace[q], 1.0f );
-                CVec3 _frustumPoint = { _frustumPointNormalized.x / _frustumPointNormalized.w,
-                                        _frustumPointNormalized.y / _frustumPointNormalized.w,
-                                        _frustumPointNormalized.z / _frustumPointNormalized.w };
+                CVec3 _frustumPoint = CVec3( _frustumPointNormalized.x() / _frustumPointNormalized.w(),
+                                             _frustumPointNormalized.y() / _frustumPointNormalized.w(),
+                                             _frustumPointNormalized.z() / _frustumPointNormalized.w() );
 
                 _frustumPointsInWorld.push_back( _frustumPoint );
             }
@@ -109,23 +109,23 @@ namespace engine
             /* construct a frame using the direction vector as front */
             CVec3 _fvec, _rvec, _uvec;
 
-            if ( CVec3::equal( dirLightPtr->direction, config.worldUp ) )
+            if ( dirLightPtr->direction == config.worldUp )
             {
                 _fvec = config.worldUp;
-                _rvec = { config.worldUp.z, config.worldUp.x, config.worldUp.y };
-                _uvec = { config.worldUp.y, config.worldUp.z, config.worldUp.x };
+                _rvec = CVec3( config.worldUp.z(), config.worldUp.x(), config.worldUp.y() );
+                _uvec = CVec3( config.worldUp.y(), config.worldUp.z(), config.worldUp.x() );
             }
-            else if ( CVec3::equal( dirLightPtr->direction + config.worldUp, { 0.0f, 0.0f, 0.0f } ) )
+            else if ( ( dirLightPtr->direction + config.worldUp ) == CVec3( 0.0f, 0.0f, 0.0f ) )
             {
                 _fvec = -config.worldUp;
-                _rvec = { config.worldUp.z, config.worldUp.x, config.worldUp.y };
-                _uvec = { config.worldUp.y, config.worldUp.z, config.worldUp.x };
+                _rvec = CVec3( config.worldUp.z(), config.worldUp.x(), config.worldUp.y() );
+                _uvec = CVec3( config.worldUp.y(), config.worldUp.z(), config.worldUp.x() );
             }
             else
             {
                 _fvec = dirLightPtr->direction;
-                _rvec = CVec3::cross( config.worldUp, _fvec );
-                _uvec = CVec3::cross( _fvec, _rvec );
+                _rvec = tinymath::cross( config.worldUp, _fvec );
+                _uvec = tinymath::cross( _fvec, _rvec );
             }
 
             _fvec.normalize();
@@ -152,23 +152,23 @@ namespace engine
             }
 
             /* compute the dimensions of the clipping volume */
-            float32 _df = std::abs( CVec3::dot( _fPoints3d.back() - _fPoints3d.front(), _fvec ) );
-            float32 _dr = std::abs( CVec3::dot( _rPoints3d.back() - _rPoints3d.front(), _rvec ) );
-            float32 _du = std::abs( CVec3::dot( _uPoints3d.back() - _uPoints3d.front(), _uvec ) );
+            float32 _df = std::abs( ( _fPoints3d.back() - _fPoints3d.front() ).dot( _fvec ) );
+            float32 _dr = std::abs( ( _rPoints3d.back() - _rPoints3d.front() ).dot( _rvec ) );
+            float32 _du = std::abs( ( _uPoints3d.back() - _uPoints3d.front() ).dot( _uvec ) );
 
             /* compute the center of the clipping volume */
-            auto _center = CVec3::dot( 0.5f * ( _fPoints3d.front() + _fPoints3d.back() ), _fvec ) * _fvec +
-                           CVec3::dot( 0.5f * ( _rPoints3d.front() + _rPoints3d.back() ), _rvec ) * _rvec +
-                           CVec3::dot( 0.5f * ( _uPoints3d.front() + _uPoints3d.back() ), _uvec ) * _uvec;
+            auto _center = ( 0.5f * ( _fPoints3d.front() + _fPoints3d.back() ) ).dot( _fvec ) * _fvec +
+                           ( 0.5f * ( _rPoints3d.front() + _rPoints3d.back() ) ).dot( _rvec ) * _rvec +
+                           ( 0.5f * ( _uPoints3d.front() + _uPoints3d.back() ) ).dot( _uvec ) * _uvec;
 
             /* construct view and proj matrices in light space */
             auto _position = _center - ( 0.5f * _df ) * _fvec;
             auto _target = _position + dirLightPtr->direction;
-            m_lightSpaceMatView = CMat4::lookAt( _position, _target, config.worldUp );
-            m_lightSpaceMatProj = CMat4::ortho( _dr + config.extraWidth, 
-                                                _du + config.extraHeight, 
-                                                -0.5f * config.extraDepth, 
-                                                _df + 0.5f * config.extraDepth );
+            m_lightSpaceMatView = engine::lookAt( _position, _target, config.worldUp );
+            m_lightSpaceMatProj = engine::ortho( _dr + config.extraWidth, 
+                                                 _du + config.extraHeight, 
+                                                 -0.5f * config.extraDepth, 
+                                                 _df + 0.5f * config.extraDepth );
         }
         else if ( config.type == eShadowRangeType::FIXED_USER )
         {
@@ -194,10 +194,10 @@ namespace engine
 
             /* compute the position of the clipping volume from the point we want to focus */
             auto _position = config.focusPoint - 0.5f * config.clipSpaceDepth * dirLightPtr->direction;
-            m_lightSpaceMatView = CMat4::lookAt( _position, config.focusPoint, config.worldUp );
-            m_lightSpaceMatProj = CMat4::ortho( config.clipSpaceWidth, 
-                                                config.clipSpaceHeight, 
-                                                0.0f, config.clipSpaceDepth );
+            m_lightSpaceMatView = engine::lookAt( _position, config.focusPoint, config.worldUp );
+            m_lightSpaceMatProj = engine::ortho( config.clipSpaceWidth, 
+                                                 config.clipSpaceHeight, 
+                                                 0.0f, config.clipSpaceDepth );
         }
         else
             ENGINE_CORE_ERROR( "Invalid range-type parameter given while setting up shadowmap" );
@@ -211,11 +211,11 @@ namespace engine
         }
         else if ( config.type == eShadowRangeType::FIXED_USER )
         {
-            m_lightSpaceMatView = CMat4::lookAt( pointLightPtr->position, config.focusPoint, config.worldUp );
-            m_lightSpaceMatProj = CMat4::perspective( config.clipSpaceFov, 
-                                                      ((float)m_shadowMapWidth) / m_shadowMapHeight, 
-                                                      config.clipSpaceZNear, 
-                                                      config.clipSpaceZFar );
+            m_lightSpaceMatView = engine::lookAt( pointLightPtr->position, config.focusPoint, config.worldUp );
+            m_lightSpaceMatProj = engine::perspective( config.clipSpaceFov, 
+                                                       ((float)m_shadowMapWidth) / m_shadowMapHeight, 
+                                                       config.clipSpaceZNear, 
+                                                       config.clipSpaceZFar );
         }
     }
 
@@ -227,13 +227,13 @@ namespace engine
         }
         else if ( config.type == eShadowRangeType::FIXED_USER )
         {
-            m_lightSpaceMatView = CMat4::lookAt( spotLightPtr->position, 
-                                                 spotLightPtr->position + spotLightPtr->direction, 
-                                                 config.worldUp );
-            m_lightSpaceMatProj = CMat4::perspective( config.clipSpaceFov, 
-                                                      ((float)m_shadowMapWidth) / m_shadowMapHeight, 
-                                                      config.clipSpaceZNear, 
-                                                      config.clipSpaceZFar );
+            m_lightSpaceMatView = engine::lookAt( spotLightPtr->position, 
+                                                  spotLightPtr->position + spotLightPtr->direction, 
+                                                  config.worldUp );
+            m_lightSpaceMatProj = engine::perspective( config.clipSpaceFov, 
+                                                       ((float)m_shadowMapWidth) / m_shadowMapHeight, 
+                                                       config.clipSpaceZNear, 
+                                                       config.clipSpaceZFar );
         }
     }
 

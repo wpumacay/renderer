@@ -29,9 +29,9 @@ namespace engine
         m_lastCursorPos = { 0.0f, 0.0f };
 
         // initialize looking at the target
-        m_front = CVec3::normalize( m_targetPoint - m_position );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = ( m_targetPoint - m_position ).normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
         _updateCameraAngles();
 
         // initialize view matrix to this orientation
@@ -70,8 +70,8 @@ namespace engine
 
         /* compute camera angles from user cursor */
         CVec2 _currentCursorPos = CInputManager::GetCursorPosition();
-        float _xOff = _currentCursorPos.x - m_lastCursorPos.x;
-        float _yOff = m_lastCursorPos.y - _currentCursorPos.y;
+        float _xOff = _currentCursorPos.x() - m_lastCursorPos.x();
+        float _yOff = m_lastCursorPos.y() - _currentCursorPos.y();
 
         _xOff = m_sensitivity * std::min( m_camMaxDelta, std::max( -m_camMaxDelta, _xOff ) );
         _yOff = m_sensitivity * std::min( m_camMaxDelta, std::max( -m_camMaxDelta, _yOff ) );
@@ -118,26 +118,26 @@ namespace engine
     {
         if ( m_upAxis == eAxis::X )
         {
-            m_front.x = std::sin( toRadians( m_pitch ) );
-            m_front.y = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
-            m_front.z = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_front.x() = std::sin( toRadians( m_pitch ) );
+            m_front.y() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_front.z() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
         }
         else if ( m_upAxis == eAxis::Y )
         {
-            m_front.x = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
-            m_front.y = std::sin( toRadians( m_pitch ) );
-            m_front.z = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_front.x() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_front.y() = std::sin( toRadians( m_pitch ) );
+            m_front.z() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
         }
         else if ( m_upAxis == eAxis::Z )
         {
-            m_front.x = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
-            m_front.y = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
-            m_front.z = std::sin( toRadians( m_pitch ) );
+            m_front.x() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_front.y() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_front.z() = std::sin( toRadians( m_pitch ) );
         }
 
-        m_front = CVec3::normalize( m_front );
-        m_right = CVec3::normalize( CVec3::cross( m_front, m_worldUp ) );
-        m_up    = CVec3::normalize( CVec3::cross( m_right, m_front ) );
+        m_front = m_front.normalized();
+        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
+        m_up    = tinymath::cross( m_right, m_front ).normalized();
 
         _buildViewMatrix();
     }
@@ -145,8 +145,8 @@ namespace engine
     void CFpsCamera::_updateCameraAngles()
     {
         m_roll  = 0.0f;
-        m_pitch = toDegrees( std::asin( m_front.z ) );
-        m_yaw   = toDegrees( std::atan2( m_front.y, m_front.x ) );
+        m_pitch = toDegrees( std::asin( m_front.z() ) );
+        m_yaw   = toDegrees( std::atan2( m_front.y(), m_front.x() ) );
     }
 
 }

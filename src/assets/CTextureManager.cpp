@@ -184,8 +184,8 @@ namespace engine
                     _texOptions.filterMag       = eTextureFilter::LINEAR;
                     _texOptions.wrapU           = eTextureWrap::REPEAT;
                     _texOptions.wrapV           = eTextureWrap::REPEAT;
-                    _texOptions.borderColorU    = { 0.0f, 0.0f, 0.0f, 1.0f };
-                    _texOptions.borderColorV    = { 0.0f, 0.0f, 0.0f, 1.0f };
+                    _texOptions.borderColorU    = CVec4( 0.0f, 0.0f, 0.0f, 1.0f );
+                    _texOptions.borderColorV    = CVec4( 0.0f, 0.0f, 0.0f, 1.0f );
                     _texOptions.dtype           = ePixelDataType::UINT_8;
 
                     _loadTexture( _pathImagesFolder + _fname, _texOptions, true );
@@ -620,8 +620,8 @@ namespace engine
                                         eTextureFilter::NEAREST,
                                         eTextureWrap::REPEAT,
                                         eTextureWrap::REPEAT,
-                                        { 0.0f, 0.0f, 0.0f, 1.0f },
-                                        { 0.0f, 0.0f, 0.0f, 1.0f },
+                                        CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
+                                        CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
                                         ePixelDataType::UINT_8 } );
 
         std::unique_ptr< CTexture > _texturePtr( _texture );

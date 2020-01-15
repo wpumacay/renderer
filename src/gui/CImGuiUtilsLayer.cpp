@@ -54,7 +54,7 @@ namespace engine
         auto _lights = m_scene->lights();
         for ( auto _light : _lights )
             if ( _light->type() != eLightType::DIRECTIONAL )
-                CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, CMat4::translation( _light->position ), { 1.0f, 1.0f, 1.0f } );
+                CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::translation( _light->position ), { 1.0f, 1.0f, 1.0f } );
 
         // draw some gizmos for the cameras
         auto _cameras = m_scene->cameras();
@@ -65,9 +65,9 @@ namespace engine
                 continue;
 
             if ( _camera->projData().projection == eCameraProjection::PERSPECTIVE )
-                CDebugDrawer::DrawClipVolume( CMat4::perspective( _projData.fov, _projData.aspect, 0.01f, 0.2f ) * _camera->matView(), { 0.0f, 1.0f, 1.0f } );
+                CDebugDrawer::DrawClipVolume( engine::perspective( _projData.fov, _projData.aspect, 0.01f, 0.2f ) * _camera->matView(), CVec3( 0.0f, 1.0f, 1.0f ) );
             else
-                CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, _camera->matView().inverse(), { 0.0f, 1.0f, 1.0f } );
+                CDebugDrawer::DrawBox( CVec3( 0.1f, 0.1f, 0.1f ), tinymath::inverse( _camera->matView() ), CVec3( 0.0f, 1.0f, 1.0f ) );
         }
     }
 
@@ -208,22 +208,22 @@ namespace engine
         _submenuTreeMaterial( mesh->material(), refresh );
     }
 
-    void CImGuiUtilsLayer::_submenuTreeTransform( CVec3& position, CMat4& rotation, CVec3& scale )
+    void CImGuiUtilsLayer::_submenuTreeTransform( CVec3& position, CMat3& rotation, CVec3& scale )
     {
         // position, rotation and scale
         if ( ImGui::TreeNode( "World-transform" ) )
         {
-            float32 _vposition[3] = { position.x, position.y, position.z };
+            float32 _vposition[3] = { position.x(), position.y(), position.z() };
             ImGui::DragFloat3( "position", _vposition, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             position = { _vposition[0], _vposition[1], _vposition[2] };
 
-            auto _euler = CMat4::toEuler( rotation );
-            ImGui::SliderFloat( "euler-x", &_euler.x, -ENGINE_PI, ENGINE_PI );
-            ImGui::SliderFloat( "euler-y", &_euler.y, -ENGINE_PI / 2 + 0.001f, ENGINE_PI / 2 - 0.001f );
-            ImGui::SliderFloat( "euler-z", &_euler.z, -ENGINE_PI, ENGINE_PI );
-            rotation = CMat4::fromEuler( _euler );
+            auto _euler = tinymath::euler( rotation );
+            ImGui::SliderFloat( "euler-x", &_euler.x(), -ENGINE_PI, ENGINE_PI );
+            ImGui::SliderFloat( "euler-y", &_euler.y(), -ENGINE_PI / 2 + 0.001f, ENGINE_PI / 2 - 0.001f );
+            ImGui::SliderFloat( "euler-z", &_euler.z(), -ENGINE_PI, ENGINE_PI );
+            rotation = tinymath::rotation( _euler );
 
-            float32 _vscale[3] = { scale.x, scale.y, scale.z };
+            float32 _vscale[3] = { scale.x(), scale.y(), scale.z() };
             ImGui::SliderFloat3( "scale", _vscale, 0.1f, 10.0f );
             scale = { _vscale[0], _vscale[1], _vscale[2] };
 
@@ -254,8 +254,8 @@ namespace engine
             material->setType( _mtype );
 
             /* material color-components */
-            float32 _ambient[3] = { material->ambient.x, material->ambient.y, material->ambient.z };
-            float32 _diffuse[3] = { material->diffuse.x, material->diffuse.y, material->diffuse.z };
+            float32 _ambient[3] = { material->ambient.x(), material->ambient.y(), material->ambient.z() };
+            float32 _diffuse[3] = { material->diffuse.x(), material->diffuse.y(), material->diffuse.z() };
             ImGui::ColorEdit3( "Ambient", _ambient );
             ImGui::ColorEdit3( "Diffuse", _diffuse );
             material->ambient = { _ambient[0], _ambient[1], _ambient[2] };
@@ -263,7 +263,7 @@ namespace engine
 
             if ( _mtype == eMaterialType::PHONG || _mtype == eMaterialType::BLINN_PHONG )
             {
-                float32 _specular[3] = { material->specular.x, material->specular.y, material->specular.z };
+                float32 _specular[3] = { material->specular.x(), material->specular.y(), material->specular.z() };
                 ImGui::ColorEdit3( "Specular", _specular );
                 material->specular = { _specular[0], _specular[1], _specular[2] };
 
@@ -373,12 +373,12 @@ namespace engine
             }
 
             // local transform w.r.t. root
-            auto _position = _submeshesLocalTf[_currentSubmeshIndex].getPosition();
-            auto _rotation = _submeshesLocalTf[_currentSubmeshIndex].getRotation();
+            auto _position = CVec3( _submeshesLocalTf[_currentSubmeshIndex].col( 3 ) );
+            auto _rotation = CMat3( _submeshesLocalTf[_currentSubmeshIndex] );
             auto _scale = _submeshes[_currentSubmeshIndex]->scale;
             _submenuTreeTransform( _position, _rotation, _scale );
-            _submeshesLocalTf[_currentSubmeshIndex].setPosition( _position );
-            _submeshesLocalTf[_currentSubmeshIndex].setRotation( _rotation );
+            _submeshesLocalTf[_currentSubmeshIndex].set( _position, 3 );
+            _submeshesLocalTf[_currentSubmeshIndex].set( _rotation );
             _submeshes[_currentSubmeshIndex]->scale = _scale;
 
             // submesh's material
@@ -430,9 +430,9 @@ namespace engine
 
     void CImGuiUtilsLayer::_submenuLight( CILight* light, bool refresh )
     {
-        float32 _cAmbient[3] = { light->ambient.x, light->ambient.y, light->ambient.z };
-        float32 _cDiffuse[3] = { light->diffuse.x, light->diffuse.y, light->diffuse.z };
-        float32 _cSpecular[3] = { light->specular.x, light->specular.y, light->specular.z };
+        float32 _cAmbient[3] = { light->ambient.x(), light->ambient.y(), light->ambient.z() };
+        float32 _cDiffuse[3] = { light->diffuse.x(), light->diffuse.y(), light->diffuse.z() };
+        float32 _cSpecular[3] = { light->specular.x(), light->specular.y(), light->specular.z() };
         ImGui::ColorEdit3( "Ambient-color", _cAmbient );
         ImGui::ColorEdit3( "Diffuse-color", _cDiffuse );
         ImGui::ColorEdit3( "Specular-color", _cSpecular );
@@ -446,14 +446,14 @@ namespace engine
         {
             static CVec3 _direction = light->direction;
             if ( refresh ) _direction = light->direction;
-            float32 _vdir[3] = { _direction.x, _direction.y, _direction.z };
+            float32 _vdir[3] = { _direction.x(), _direction.y(), _direction.z() };
             ImGui::SliderFloat3( "Direction", _vdir, -1.0f, 1.0f );
             _direction = { _vdir[0], _vdir[1], _vdir[2] };
-            light->direction = CVec3::normalize( _direction );
+            light->direction = _direction.normalized();
         }
         else if ( light->type() == eLightType::POINT )
         {
-            float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
+            float32 _vpos[3] = { light->position.x(), light->position.y(), light->position.z() };
             ImGui::DragFloat3( "Position", _vpos, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             light->position = { _vpos[0], _vpos[1], _vpos[2] };
 
@@ -465,12 +465,12 @@ namespace engine
         {
             static CVec3 _direction = light->direction;
             if ( refresh ) _direction = light->direction;
-            float32 _vdir[3] = { _direction.x, _direction.y, _direction.z };
+            float32 _vdir[3] = { _direction.x(), _direction.y(), _direction.z() };
             ImGui::SliderFloat3( "Direction", _vdir, -1.0f, 1.0f );
             _direction = { _vdir[0], _vdir[1], _vdir[2] };
-            light->direction = CVec3::normalize( _direction );
+            light->direction = _direction.normalized();
 
-            float32 _vpos[3] = { light->position.x, light->position.y, light->position.z };
+            float32 _vpos[3] = { light->position.x(), light->position.y(), light->position.z() };
             ImGui::DragFloat3( "Position", _vpos, GUI_UTILS_DRAGFLOAT_POSITION_SPEED );
             light->position = { _vpos[0], _vpos[1], _vpos[2] };
 
@@ -537,11 +537,11 @@ namespace engine
         /* common properties of all camera types */
 
         // position
-        float32 _vposition[3] = { camera->position().x, camera->position().y, camera->position().z };
+        float32 _vposition[3] = { camera->position().x(), camera->position().y(), camera->position().z() };
         if ( ImGui::DragFloat3( "Position", _vposition, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
         {
             camera->setActiveMode( false );
-            camera->setPosition( { _vposition[0], _vposition[1], _vposition[2] } );
+            camera->setPosition( CVec3( _vposition[0], _vposition[1], _vposition[2] ) );
         }
         else
         {
@@ -576,7 +576,7 @@ namespace engine
         // target-point
         if ( camera->type() == eCameraType::FIXED || camera->type() == eCameraType::ORBIT )
         {
-            float32 _vtargetPoint[3] = { camera->targetPoint().x, camera->targetPoint().y, camera->targetPoint().z };
+            float32 _vtargetPoint[3] = { camera->targetPoint().x(), camera->targetPoint().y(), camera->targetPoint().z() };
             if ( ImGui::DragFloat3( "Target-point", _vtargetPoint, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
             {
                 camera->setActiveMode( false );
