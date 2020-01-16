@@ -2,7 +2,7 @@
 
 GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
 GIT_DEPS_USER=(wpumacay pybind wpumacay gabime)
-GIT_DEPS_BRANCH=(master master docking master)
+GIT_DEPS_BRANCH=(master master docking v1.x)
 
 for i in {0..3}
 do
