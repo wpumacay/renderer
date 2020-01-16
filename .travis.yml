@@ -34,7 +34,7 @@ before_install:
   - ./scripts/setup_dependencies.sh
 script:
   - if [ -n "${BUILD_TYPE}" ]; then
-      mkdir -p build && cd build
-      cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-      make -j4
+      mkdir -p build && cd build;
+      cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..;
+      make -j4;
     fi
