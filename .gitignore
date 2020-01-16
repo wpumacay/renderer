@@ -13,6 +13,10 @@
 build/
 tmp/
 .vscode/
+build/
+dist/
+*.egg-info/
+*.ipynb_checkpoints/
 
 # dependencies-exclusions
 ext/imgui*

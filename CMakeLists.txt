@@ -26,6 +26,10 @@ else()
     message( "TINYRENDERER> Configuring as CHILD project" )
 endif()
 
+option( TINYRENDERER_BUILD_DOCS "Build documentation (requires Doxygen)" ON )
+option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
+option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
+
 # Add external dependencies only if master project. If child project, root adds the dependencies
 if ( TINYRENDERER_IS_MASTER_PROJECT )
     add_subdirectory( ext )
@@ -77,9 +81,6 @@ target_link_libraries( tinyrenderer_cpp_lib
                        assimp
                        spdlog
                        imgui )
-
-# whether or not to build examples
-option( TINYRENDERER_BUILD_EXAMPLES "Set this ON to enabled building all examples" ON )
 
 if ( TINYRENDERER_BUILD_EXAMPLES )
     # build some examples of the usage of our library
