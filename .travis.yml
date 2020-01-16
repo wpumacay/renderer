@@ -28,7 +28,7 @@ matrix:
         - BUILD_TYPE=Release
 
 before_install:
-  - sudo apt install build-essential cmake pkg-config
+  - sudo apt install pkg-config
   - sudo apt install libassimp-dev libglfw3-dev libglew-dev
   - ./scripts/setup_dependencies.sh
 script:
