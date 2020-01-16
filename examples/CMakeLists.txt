@@ -1,5 +1,5 @@
 
-message( "Configuring cat1::examples" )
+message( "Configuring tinyrenderer::examples" )
 
 include_directories( "../include" )
 
@@ -10,7 +10,7 @@ function( FcnBuildExample paramSources paramExecutableName )
                     ${paramSources} )
 
     target_link_libraries( ${paramExecutableName}
-                           cat1
+                           tinyrenderer_cpp_lib
                            tinymath_cpp_lib )
 
 endfunction()

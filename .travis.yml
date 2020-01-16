@@ -1,0 +1,39 @@
+language: cpp
+sudo: required
+git:
+    submodules: false
+matrix: 
+  include:
+    # build-configuration for ubuntu 16.04 - gcc
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      env:
+        - BUILD_TYPE=Debug
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      env:
+        - BUILD_TYPE=Release
+    # build-configuration for ubuntu 18.04 - gcc
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env:
+        - BUILD_TYPE=Debug
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env:
+        - BUILD_TYPE=Release
+
+before_install:
+  - sudo apt install build-essentials cmake pkg-config
+  - sudo apt install libassimp-dev libglfw3-dev libglew-dev
+  - ./scripts/setup_dependencies.sh
+script:
+  - if [ -n "${BUILD_TYPE}" ]; then
+    mkdir -p build && cd build
+    cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+    make -j4
+    fi

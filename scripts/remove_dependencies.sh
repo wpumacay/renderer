@@ -1,15 +1,22 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# ---------------------------------------------------------------------------------- #
-# script/remove_dependencies: Removes the dependencies (be careful of your changes)  #
-# ---------------------------------------------------------------------------------- #
+GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
+GIT_DEPS_USER=(wpumacay pybind wpumacay gabime)
+GIT_DEPS_BRANCH=(master master docking v1.x)
 
-echo "======================= Removing dependencies ================================="
+for i in {0..3}
+do
+    USER=${GIT_DEPS_USER[$i]}
+    REPO=${GIT_DEPS_REPO[$i]}
+    BRANCH=${GIT_DEPS_BRANCH[$i]}
+    URL=https://github.com/${USER}/${REPO}
+    if [ -d "ext/${GIT_DEPS_REPO[$i]}" ]
+    then
+        echo "===> Deleting ${USER}/${REPO} ..."
+        rm -rf ext/${REPO}
+    else
+        echo "===> Dependency ${USER}/${REPO} already deleted"
+    fi
+done
 
-echo "==> Removing ext/spdlog dependency (gabime/spdlog @ github)"
-rm -rf ext/spdlog
-
-echo "==> Removing ext/imgui dependency (wpumacay/imgui @ github)"
-rm -rf ext/imgui
-
-echo "Done cloning dependencies"
+echo "Done!"

@@ -1,5 +1,5 @@
 
-# Cat1: A small renderer for prototyping 3D applications
+# TinyRenderer: A minimal renderer for prototyping 3D applications
 
 This repo contains the implementation of a basic 3D OpenGL-based renderer. It contains basic abstractions
 of resources like VBOs, FBOs, etc., as well as a small OOP-based API to create a scene, in a similar way
@@ -15,9 +15,31 @@ are shown below:
 
 ### Requirements
 
+There are two types of requirements this package uses:
+
+* **Libraries from distribution**: We require `build-essential` or equivalent (make, gcc, g++), `cmake`
+  and `pkg-config`. These can be grabbed using your distribution's package manager.
+
 #### Ubuntu >= 16.04
 
 ```bash
-sudo apt install make cmake pkg-config
+sudo apt install build-essential cmake pkg-config
 sudo apt install libassimp-dev libglfw3-dev libglew-dev
+```
+
+#### MacOS
+
+```bash
+# toolchain (g++, make) is very likely installed along Xcode, just install cmake and pkg-config using homebrew
+brew install cmake pkg-config
+# install remaining dependencies
+brew install glew glfw assimp 
+```
+
+* **Third party repositories**: These are dependencies available through github, which can be grabbed 
+  using the provided [setup_dependencies.sh](https://github.com/wpumacay/tiny_renderer/blob/master/scripts/setup_dependencies.sh) 
+  script.
+
+```bash
+./scripts/setup_dependencies.sh
 ```
