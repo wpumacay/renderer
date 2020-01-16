@@ -580,8 +580,8 @@ void renderSkyboxWithFog( engine::CICamera* cameraPtr,
 
 engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 {
-    if ( axis == engine::eAxis::X ) return tinymath::rotationZ<float>( -ENGINE_PI / 2.0f );
-    else if ( axis == engine::eAxis::Z ) return tinymath::rotationX<float>( ENGINE_PI / 2.0f );
+    if ( axis == engine::eAxis::X ) return engine::rotationZ( -ENGINE_PI / 2.0f );
+    else if ( axis == engine::eAxis::Z ) return engine::rotationX( ENGINE_PI / 2.0f );
 
     return engine::CMat4();
 }

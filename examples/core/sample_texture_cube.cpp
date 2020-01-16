@@ -6,8 +6,8 @@
 
 engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 {
-    if ( axis == engine::eAxis::X ) return engine::CMat4( tinymath::rotationZ<float>( -ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
-    else if ( axis == engine::eAxis::Z ) return engine::CMat4( tinymath::rotationX<float>( ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
+    if ( axis == engine::eAxis::X ) return engine::CMat4( engine::rotationZ( -ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
+    else if ( axis == engine::eAxis::Z ) return engine::CMat4( engine::rotationX( ENGINE_PI / 2.0f ), { 0.0f, 0.0f, 0.0f } );
 
     return engine::CMat4();
 }

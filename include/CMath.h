@@ -53,6 +53,10 @@ namespace engine
     CMat4 rotation( const CMat3& m );
     CMat4 translation( const CVec3& v );
 
+    CMat4 rotationX( float32 angle );
+    CMat4 rotationY( float32 angle );
+    CMat4 rotationZ( float32 angle );
+
     /***********************************************************************************************
     *                                             CInd3                                            *
     ***********************************************************************************************/
@@ -163,10 +167,3 @@ namespace engine
     float32 toDegrees( float32 angle );
 
 }
-
-/***************************************************************************************************
-*                                 Vec and Mat helper operators                                     *
-***************************************************************************************************/
-
-bool operator==( const engine::CVec3& v1, const engine::CVec3& v2 );
-bool operator!=( const engine::CVec3& v1, const engine::CVec3& v2 );

@@ -235,6 +235,45 @@ namespace engine
         return _resmat;
     }
 
+    CMat4 rotationX( float32 angle )
+    {
+        CMat4 _resRotMatrix;
+
+        auto cs = std::cos( angle );
+        auto sn = std::sin( angle );
+
+        _resRotMatrix( 1, 1 ) = cs; _resRotMatrix( 1, 2 ) = -sn;
+        _resRotMatrix( 2, 1 ) = sn; _resRotMatrix( 2, 2 ) = cs;
+
+        return _resRotMatrix;
+    }
+
+    CMat4 rotationY( float32 angle )
+    {
+        CMat4 _resRotMatrix;
+
+        auto cs = std::cos( angle );
+        auto sn = std::sin( angle );
+
+        _resRotMatrix( 0, 0 ) = cs; _resRotMatrix( 0, 2 ) = sn;
+        _resRotMatrix( 2, 0 ) = -sn; _resRotMatrix( 2, 2 ) = cs;
+
+        return _resRotMatrix;
+    }
+
+    CMat4 rotationZ( float32 angle )
+    {
+        CMat4 _resRotMatrix;
+
+        auto cs = std::cos( angle );
+        auto sn = std::sin( angle );
+
+        _resRotMatrix( 0, 0 ) = cs; _resRotMatrix( 0, 1 ) = -sn;
+        _resRotMatrix( 1, 0 ) = sn; _resRotMatrix( 1, 1 ) = cs;
+
+        return _resRotMatrix;
+    }
+
     /**************************************************************************
     *                           CInd3 implementation                          *
     ***************************************************************************/
@@ -439,19 +478,4 @@ namespace engine
     {
         return angle * 180 / ENGINE_PI;
     }
-}
-
-
-    /**************************************************************************
-    *                          Vec and Mat helpers                            *
-    ***************************************************************************/
-
-bool operator==( const engine::CVec3& v1, const engine::CVec3& v2 )
-{
-    return ( v1 - v2 ).length() < ENGINE_EPS;
-}
-
-bool operator!=( const engine::CVec3& v1, const engine::CVec3& v2 )
-{
-    return !(v1 == v2);
 }
