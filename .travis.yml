@@ -28,8 +28,9 @@ matrix:
         - BUILD_TYPE=Release
 
 before_install:
-  - sudo apt install pkg-config
-  - sudo apt install libassimp-dev libglfw3-dev libglew-dev
+  - sudo apt-get -q update
+  - sudo apt-get -y install pkg-config
+  - sudo apt-get -y install libassimp-dev libglfw3-dev libglew-dev
   - ./scripts/setup_dependencies.sh
 script:
   - if [ -n "${BUILD_TYPE}" ]; then
