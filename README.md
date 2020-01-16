@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/wpumacay/tiny_renderer.svg?branch=master)](https://travis-ci.com/wpumacay/tiny_renderer)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/wpumacay/tiny_renderer/blob/master/LICENSE)
 
 # TinyRenderer: A minimal renderer for prototyping 3D applications
 
@@ -42,4 +44,20 @@ brew install glew glfw assimp
 
 ```bash
 ./scripts/setup_dependencies.sh
+```
+
+### Building
+
+Use the provided _CMake_ rules:
+
+```bash
+mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j4
+```
+
+And that's it. Try some of the examples that were built along the library:
+
+```bash
+# make sure you're in the build directory to run the examples
+./examples/application/sample_application
 ```
