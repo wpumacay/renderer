@@ -32,9 +32,18 @@ before_install:
   - sudo apt-get -y install pkg-config
   - sudo apt-get -y install libassimp-dev libglfw3-dev libglew-dev
   - ./scripts/setup_dependencies.sh
+  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - source "$HOME/miniconda/etc/profile.d/conda.sh"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda create -q -n travis_env python=3.6 setuptools numpy scipy
+  - conda activate travis_env
 script:
   - if [ -n "${BUILD_TYPE}" ]; then
       mkdir -p build && cd build;
-      cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..;
+      cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPYTHON_EXECUTABLE=$HOME/miniconda/envs/travis_env/bin/python3.6 -DPYTHON_LIBRARY=$HOME/miniconda/envs/travis_env/lib/libpython3.6m.so -DPYTHON_INCLUDE_DIR=$HOME/miniconda/envs/travis_env/include/python3.6m ..;
       make -j4;
     fi
