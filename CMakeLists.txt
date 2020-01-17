@@ -4,7 +4,12 @@ cmake_minimum_required( VERSION 3.0.0 )
 project( TinyRenderer )
 
 set( CMAKE_CXX_STANDARD 11 )
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-sign-compare -Wno-unused-variable -g -fPIC " )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-format-security -Wno-endif-labels -fPIC" )
+
+# in case nobody set the project type, set it (parent project might have set it for all)
+if ( NOT CMAKE_BUILD_TYPE )
+    set( CMAKE_BUILD_TYPE Debug )
+endif()
 
 # compile everything as shared libraries
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build libraries as shared" )
@@ -29,6 +34,11 @@ endif()
 option( TINYRENDERER_BUILD_DOCS "Build documentation (requires Doxygen)" ON )
 option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
 option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
+
+# Add cmake find-modules helpers (for sphinx)
+if( TINYRENDERER_IS_MASTER_PROJECT )
+    set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
+endif()
 
 # Add external dependencies only if master project. If child project, root adds the dependencies
 if ( TINYRENDERER_IS_MASTER_PROJECT )
@@ -63,7 +73,6 @@ set( GLENGINE_INCLUDE_DIRS
      "${CMAKE_SOURCE_DIR}/ext/imgui"
      "${CMAKE_SOURCE_DIR}/ext/imgui/examples"
      "${CMAKE_SOURCE_DIR}/ext/spdlog/include" )
-
 include_directories( ${GLENGINE_INCLUDE_DIRS} )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
@@ -72,7 +81,6 @@ add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/" 
 file( GLOB_RECURSE SRCS "src/*.cpp" )
 
 add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
-
 target_link_libraries( tinyrenderer_cpp_lib
                        ${GLFW_LIBRARIES}
                        ${OPENGL_LIBRARIES}
@@ -82,7 +90,20 @@ target_link_libraries( tinyrenderer_cpp_lib
                        spdlog
                        imgui )
 
-if ( TINYRENDERER_BUILD_EXAMPLES )
-    # build some examples of the usage of our library
+set_property( TARGET tinyrenderer_cpp_lib PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+
+if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_DOCS )
+    add_subdirectory( docs )
+endif()
+
+if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_EXAMPLES )
     add_subdirectory( examples )
 endif()
+
+message( "***************************************************************************************" )
+message( "BUILD-OPTIONS SUMMARY:" )
+message( "CMAKE_BUILD_TYPE                      : ${CMAKE_BUILD_TYPE}" )
+message( "TINYRENDERER_BUILD_DOCS               : ${TINYRENDERER_BUILD_DOCS}" )
+message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}" )
+message( "TNIYRENDERER_BUILD_PYTHON_BINDINGS    : ${TINYRENDERER_BUILD_PYTHON_BINDINGS}" )
+message( "***************************************************************************************" )
