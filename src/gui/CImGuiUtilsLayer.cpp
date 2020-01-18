@@ -139,6 +139,30 @@ namespace engine
                               0.0f, FLT_MAX, ImVec2( 0, 100 ) );
         }
 
+        if ( ImGui::CollapsingHeader( "Profiling" ) )
+        {
+            auto _sessions = CProfilingManager::GetSessions();
+            for ( auto session : _sessions )
+            {
+                if ( session->type() != eProfilerType::INTERNAL )
+                    continue;
+
+                auto _intSession = dynamic_cast< CProfilerSessionInternal* >( session );
+                if ( !_intSession )
+                    continue;
+
+                auto _results = _intSession->results();
+                //// if ( _results.size() < 1 )
+                ////     continue;
+
+                ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), "session: %s", session->name() );
+                for ( auto _result : _results )
+                    ImGui::Text( "%.3f ms %s", _result.duration, _result.name.c_str() );
+
+                ImGui::Spacing();
+            }
+        }
+
         if ( m_scene && ImGui::CollapsingHeader( "Scene-summary" ) )
         {
             ENGINE_CORE_ASSERT( m_scene, "Must provide a scene to gui-utils" );

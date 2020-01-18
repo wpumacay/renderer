@@ -3,6 +3,7 @@
 #include <renderers/CRenderersCommon.h>
 #include <renderers/CMeshRenderer.h>
 #include <renderers/CSkyboxRenderer.h>
+#include <utils/CProfiling.h>
 
 namespace engine
 {

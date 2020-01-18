@@ -20,6 +20,7 @@
 #include <utils/CTime.h>
 #include <utils/CDebugDrawer.h>
 #include <utils/CNoiseGenerator.h>
+#include <utils/CProfiling.h>
 
 #include <gui/CImGuiManager.h>
 #include <gui/CImGuiLayer.h>

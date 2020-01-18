@@ -25,6 +25,12 @@ namespace engine
 
         ENGINE_CORE_ASSERT( m_window->glfwWindow(), "There was an error while creating the opengl-window" );
 
+        //// engine::CProfilingManager::Init( eProfilerType::INTERNAL );
+        engine::CProfilingManager::Init( eProfilerType::EXTERNAL_CHROME );
+        ENGINE_CORE_INFO( "GL-Application: profiling enabled" );
+        engine::CProfilingManager::BeginSession( "sess_core_init" );
+        PROFILE_FUNCTION_IN_SESSION( "sess_core_init" );
+
         engine::CTime::Init();
         engine::CTextureManager::Init();
         engine::CShaderManager::Init();
@@ -32,6 +38,7 @@ namespace engine
         engine::CDebugDrawer::Init();
         engine::CNoiseGenerator::Init();
 
+        //// PROFILE_SCOPE_IN_SESSION( "app_initialization", "sess_core_init" );
         m_scene         = std::unique_ptr< CScene >( new CScene() );
         m_mainRenderer  = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
         m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow(), imguiProperties ) );
@@ -72,7 +79,11 @@ namespace engine
         m_imguiManager  = nullptr;
         m_window        = nullptr;
 
+        //// // flush results from initialization
+        //// engine::CProfilingManager::EndSession( "sess_core_init" );
+
         engine::CTime::Release();
+        engine::CProfilingManager::Release();
         engine::CDebugDrawer::Release();
         engine::CInputManager::Release();
         engine::CShaderManager::Release();
@@ -128,6 +139,8 @@ namespace engine
 
     void CApplication::begin()
     {
+        engine::CProfilingManager::BeginSession( "sess_core_render" );
+
         m_timeStamp = glfwGetTime();
         // prepare window for rendering, and poll events
         m_window->begin();
@@ -175,6 +188,7 @@ namespace engine
     void CApplication::render()
     {
         ENGINE_CORE_ASSERT( m_scene, "There must be a valid scene for this application" );
+        PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
 
         // submit the renderables of this scene to the renderer
         m_mainRenderer->submit( m_scene->renderables() );
@@ -215,6 +229,8 @@ namespace engine
 
         // update time keeper for our other systems to use
         engine::CTime::Update( _timeDelta );
+
+        engine::CProfilingManager::EndSession( "sess_core_render" );
     }
 
     void CApplication::CallbackKey( int key, int action )

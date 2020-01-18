@@ -22,6 +22,7 @@ namespace engine
 
     void CMainRenderer::begin( const CRenderOptions& renderOptions )
     {
+        PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
         // keep a copy for later usage
         m_renderOptions = renderOptions;
         // assume we have valid info, and check if options given are correct
@@ -68,6 +69,8 @@ namespace engine
 
     void CMainRenderer::submit( const std::vector< CIRenderable* >& renderables )
     {
+        PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
+
         if ( !m_hasValidInfo )
             return;
 
@@ -101,6 +104,8 @@ namespace engine
 
     void CMainRenderer::render()
     {
+        PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
+
         if ( !m_hasValidInfo )
             return;
 

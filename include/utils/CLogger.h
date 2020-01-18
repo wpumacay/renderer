@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CCommon.h>
+#include <cstdlib>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
