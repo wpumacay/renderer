@@ -21,13 +21,16 @@ namespace engine
             .def_readwrite( "width", &CWindowProps::width );
 
         // Expose COpenGLWindow Class
-        py::class_< COpenGLWindow >( m, "OpenGlWindow" )
+        py::class_< COpenGLWindow >( m, "OpenGLWindow" )
             .def( py::init< const CWindowProps& >() )
             .def( "begin", &COpenGLWindow::begin )
             .def( "end", &COpenGLWindow::end )
             .def( "active", &COpenGLWindow::active )
             .def( "requestClose", &COpenGLWindow::requestClose )
-            .def( "registerCallbackKey", &COpenGLWindow::registerKeyCallback )
+            .def( "registerKeyCallback", &COpenGLWindow::registerKeyCallback )
+            .def( "registerMouseCallback", &COpenGLWindow::registerMouseCallback )
+            .def( "registerMouseMoveCallback", &COpenGLWindow::registerMouseMoveCallback )
+            .def( "registerScrollCallback", &COpenGLWindow::registerScrollCallback )
             .def_property_readonly( "width", &COpenGLWindow::width )
             .def_property_readonly( "height", &COpenGLWindow::height )
             .def_property_readonly( "aspect", &COpenGLWindow::aspect )
