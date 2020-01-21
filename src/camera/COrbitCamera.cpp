@@ -84,7 +84,7 @@ namespace engine
 
         if ( m_cameraState == eOrbitCameraState::IDLE )
         {
-            if ( CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
+            if ( CInputManager::IsMouseDown( Mouse::BUTTON_LEFT ) )
             {
                 m_cameraState = eOrbitCameraState::DRAGGING;
 
@@ -94,7 +94,7 @@ namespace engine
                 m_phi0 = m_phi;
                 m_theta0 = m_theta;
             }
-            else if ( CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+            else if ( CInputManager::IsMouseDown( Mouse::BUTTON_RIGHT ) )
             {
                 m_cameraState = eOrbitCameraState::MOVING_TARGET;
 
@@ -117,7 +117,7 @@ namespace engine
             m_theta = m_theta0 + _dtheta;
             m_phi = m_phi0 + _dphi;
 
-            if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_LEFT ) )
+            if ( !CInputManager::IsMouseDown( Mouse::BUTTON_LEFT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
         }
         else if ( m_cameraState == eOrbitCameraState::MOVING_TARGET )
@@ -131,7 +131,7 @@ namespace engine
             m_targetPoint.y() = m_targetPoint0.y() + ( m_right.y() * _dx + m_up.y() * _dy ) * m_moveSensitivity;
             m_targetPoint.z() = m_targetPoint0.z();
 
-            if ( !CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+            if ( !CInputManager::IsMouseDown( Mouse::BUTTON_RIGHT ) )
                 m_cameraState = eOrbitCameraState::IDLE;
         }
 

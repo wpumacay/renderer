@@ -991,11 +991,11 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
             _camera->setActiveMode( false );
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
             _camera->setActiveMode( true );
 
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
@@ -1170,7 +1170,7 @@ int main()
         _objectPicker->submit( _app->scene()->renderables() );
         _objectPicker->render();
 
-        if ( engine::CInputManager::IsMouseDown( ENGINE_MOUSE_BUTTON_RIGHT ) )
+        if ( engine::CInputManager::IsMouseDown( engine::Mouse::BUTTON_RIGHT ) )
         {
             g_objectPicked = _objectPicker->getObjectPicked( engine::CInputManager::GetCursorPosition().x(),
                                                              engine::CInputManager::GetCursorPosition().y(),

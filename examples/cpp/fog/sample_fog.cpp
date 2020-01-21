@@ -347,11 +347,11 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
             _camera->setActiveMode( false );
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
             _camera->setActiveMode( true );
 
         if ( _camera->type() == engine::CFpsCamera::GetStaticType() )

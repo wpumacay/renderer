@@ -56,16 +56,16 @@ namespace engine
         m_camSpeedFront = 0.0f;
         m_camSpeedRight = 0.0f;
 
-        if ( CInputManager::IsKeyDown( ENGINE_KEY_W ) )
+        if ( CInputManager::IsKeyDown( engine::Keys::KEY_W ) )
             m_camSpeedFront = m_camSpeed;
 
-        else if ( CInputManager::IsKeyDown( ENGINE_KEY_S ) )
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_S ) )
             m_camSpeedFront = -m_camSpeed;
 
-        else if ( CInputManager::IsKeyDown( ENGINE_KEY_D ) )
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_D ) )
             m_camSpeedRight = m_camSpeed;
 
-        else if ( CInputManager::IsKeyDown( ENGINE_KEY_A ) )
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_A ) )
             m_camSpeedRight = -m_camSpeed;
 
         /* compute camera angles from user cursor */

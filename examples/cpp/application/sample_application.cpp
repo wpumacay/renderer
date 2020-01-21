@@ -142,11 +142,11 @@ int main()
 
     while ( _app->active() )
     {
-        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_G ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_G ) )
             _app->setGuiActive( !_app->guiActive() );
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_U ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_U ) )
             _app->setGuiUtilsActive( !_app->guiUtilsActive() );
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );

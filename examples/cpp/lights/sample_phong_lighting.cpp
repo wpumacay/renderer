@@ -66,16 +66,16 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
         {
             break;
         }
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_S ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_S ) )
         {
             _shaderLighting = ( _shaderLighting->name() == "phong_shader" ) ? _shaderGouraud : _shaderPhong;
             ENGINE_INFO( "Using shader: {0}", _shaderLighting->name() );
         }
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
         {
             _moveLight = !_moveLight;
             ENGINE_INFO( "Light state: {0}", ( _moveLight ) ? "moving" : "fixed" );

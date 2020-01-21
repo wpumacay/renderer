@@ -49,9 +49,9 @@ namespace engine
         float _getScrollAccumValueX() const { return m_scrollAccumValue.x(); }
         float _getScrollAccumValueY() const { return m_scrollAccumValue.y(); }
 
-        int m_keys[ENGINE_MAX_KEYS];
-        int m_singleKeys[ENGINE_MAX_KEYS];
-        int m_buttons[ENGINE_MAX_BUTTONS];
+        int m_keys[MAX_KEYS];
+        int m_singleKeys[MAX_KEYS];
+        int m_buttons[MAX_BUTTONS];
 
         CVec2 m_cursor;
         CVec2 m_scrollOff;

@@ -239,7 +239,7 @@ namespace engine
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "key_event: " ) + std::to_string( key ) + " - " + std::to_string( action );
 
-        if ( action == ENGINE_KEY_PRESSED ) 
+        if ( action == KeyAction::KEY_PRESSED ) 
         {
             auto _ev = CKeyPressedEvent( _name, key );
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
@@ -253,7 +253,7 @@ namespace engine
                     return;
             }
         }
-        else if ( action == ENGINE_KEY_RELEASED ) 
+        else if ( action == KeyAction::KEY_RELEASED ) 
         {
             auto _ev = CKeyReleasedEvent( _name, key );
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
@@ -267,7 +267,7 @@ namespace engine
                     return;
             }
         }
-        else if ( action == ENGINE_KEY_REPEAT ) 
+        else if ( action == KeyAction::KEY_REPEAT ) 
         {
             auto _ev = CKeyPressedEvent( _name, key );
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
@@ -297,7 +297,7 @@ namespace engine
                             std::to_string( action ) + " - " + std::to_string( x ) + " - " + std::to_string( y );
 
         bool _handled = false;
-        if ( action == ENGINE_MOUSE_BUTTON_PRESSED ) 
+        if ( action == MouseAction::BUTTON_PRESSED ) 
         {
             auto _ev = CMousePressedEvent( _name, button, { (float)x, (float)y } );
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
@@ -312,7 +312,7 @@ namespace engine
                     break;
             }
         }
-        else if ( action == ENGINE_MOUSE_BUTTON_RELEASED ) 
+        else if ( action == MouseAction::BUTTON_RELEASED ) 
         {
             auto _ev = CMouseReleasedEvent( _name, button, { (float)x, (float)y } );
             //// ENGINE_CORE_TRACE( "event information:\n\r{0}", engine::toString( _ev ) );
@@ -330,10 +330,10 @@ namespace engine
 
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_mouseButtonCallbacks )
-            _callback( button, ( _handled ) ? ENGINE_MOUSE_BUTTON_RELEASED : action, x, y );
+            _callback( button, ( _handled ) ? MouseAction::BUTTON_RELEASED : action, x, y );
 
         if ( _handled ) // clear the state for this button
-            CInputManager::Callback_mouse( button, ENGINE_MOUSE_BUTTON_RELEASED, x, y );
+            CInputManager::Callback_mouse( button, MouseAction::BUTTON_RELEASED, x, y );
         else
             CInputManager::Callback_mouse( button, action, x, y );
     }

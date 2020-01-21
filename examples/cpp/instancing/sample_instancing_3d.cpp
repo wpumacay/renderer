@@ -63,9 +63,9 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputManager::IsKeyDown( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_I ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_I ) )
         {
             g_useInstancing = !g_useInstancing;
             std::cout << std::string( g_useInstancing ? "using instancing" : "not using instancing" ) << std::endl;

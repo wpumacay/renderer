@@ -8,13 +8,13 @@ namespace engine
 
     CInputManager::CInputManager()
     {
-        for ( int q = 0; q < ENGINE_MAX_KEYS; q++ )
-            m_keys[q] = ENGINE_KEY_RELEASED;
+        for ( int q = 0; q < MAX_KEYS; q++ )
+            m_keys[q] = KeyAction::KEY_RELEASED;
 
-        for ( int q = 0; q < ENGINE_MAX_KEYS; q++ )
-            m_singleKeys[q] = ENGINE_KEY_RELEASED;
+        for ( int q = 0; q < MAX_KEYS; q++ )
+            m_singleKeys[q] = KeyAction::KEY_RELEASED;
 
-        for ( int q = 0; q < ENGINE_MAX_BUTTONS; q++ )
+        for ( int q = 0; q < MAX_BUTTONS; q++ )
             m_buttons[q] = 0;
 
         m_cursor            = { 0.0f, 0.0f };
@@ -143,32 +143,32 @@ namespace engine
 
     bool CInputManager::_isKeyDown( int key )
     {
-        if ( key < 0 || key >= ENGINE_MAX_KEYS )
+        if ( key < 0 || key >= MAX_KEYS )
         {
             ENGINE_CORE_ERROR( "Wrong key requested for input checking: {0}", key );
             return false;
         }
 
-        return m_keys[key] == ENGINE_KEY_PRESSED ||
-               m_keys[key] == ENGINE_KEY_REPEAT;
+        return m_keys[key] == KeyAction::KEY_PRESSED ||
+               m_keys[key] == KeyAction::KEY_REPEAT;
     }
 
     bool CInputManager::_checkSingleKeyPress( int key )
     {
         if ( !_isKeyDown( key ) )
         {
-            m_singleKeys[key] = ENGINE_KEY_RELEASED;
+            m_singleKeys[key] = KeyAction::KEY_RELEASED;
             return false;
         }
 
         // Xor between the saved single state and the handler state
-        bool _singleState = ( m_singleKeys[key] == ENGINE_KEY_PRESSED );
+        bool _singleState = ( m_singleKeys[key] == KeyAction::KEY_PRESSED );
         bool _handlerState = _isKeyDown( key );
         bool _res = ( _singleState && !_handlerState ) ||
                     ( !_singleState && _handlerState );
 
         // update the state of the singlekey
-        m_singleKeys[key] = ( _handlerState ) ? ENGINE_KEY_PRESSED : ENGINE_KEY_RELEASED;
+        m_singleKeys[key] = ( _handlerState ) ? KeyAction::KEY_PRESSED : KeyAction::KEY_RELEASED;
 
         // finally, return the previous result
         return _res;
@@ -176,13 +176,13 @@ namespace engine
 
     bool CInputManager::_isMouseDown( int button )
     {
-        if ( button < 0 || button >= ENGINE_MAX_BUTTONS )
+        if ( button < 0 || button >= MAX_BUTTONS )
         {
             ENGINE_CORE_ERROR( "Wrong button requested for input checking: {0}", button );
             return false;
         }
 
-        return m_buttons[button] == ENGINE_MOUSE_BUTTON_PRESSED;
+        return m_buttons[button] == MouseAction::BUTTON_PRESSED;
     }
 
 }

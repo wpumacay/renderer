@@ -2,11 +2,20 @@
 
 import tinyrenderer as tr
 
+g_terminate = False
+g_numClicks = 0
+
 def keyCallback( key : int, action : int ) :
+    global g_terminate
     print( 'key: {}, action: {}'.format( key, action ) )
+    g_terminate = ( ( key == tr.Keys.KEY_ESCAPE ) and ( action == tr.KeyAction.KEY_PRESSED ) )
 
 def mouseCallback( button : int, action : int, x : float, y : float ) :
+    global g_numClicks
     print( 'button: {}, action: {}, x: {}, y: {}'.format( button, action, x, y ) )
+    if ( ( button == tr.Mouse.BUTTON_LEFT ) and ( action == tr.MouseAction.BUTTON_PRESSED ) ) :
+        g_numClicks += 1
+    print( 'num-clicks: {}'.format( g_numClicks ) )
 
 def mouseMoveCallback( x : float, y : float ) :
     print( 'x: {}, y: {}'.format( x, y ) )
@@ -25,7 +34,7 @@ if __name__ == '__main__' :
     while windowGL.active() :
         windowGL.begin()
 
-        # render some stuff here
-        # ...
+        if g_terminate :
+            windowGL.requestClose()
 
         windowGL.end()

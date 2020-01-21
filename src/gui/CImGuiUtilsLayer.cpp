@@ -43,7 +43,7 @@ namespace engine
         m_cursorDisabledByFpsCamera = ( _cameraType == eCameraType::FPS ) ? _currentCamera->active() : false;
 
         // restore cursor if disabled by fps camera
-        if ( m_cursorDisabledByFpsCamera && CInputManager::IsKeyDown( ENGINE_KEY_SPACE ) )
+        if ( m_cursorDisabledByFpsCamera && CInputManager::IsKeyDown( engine::Keys::KEY_SPACE ) )
         {
             m_window->enableCursor();
             m_cursorDisabledByFpsCamera = false;

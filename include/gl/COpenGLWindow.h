@@ -33,7 +33,7 @@ namespace engine
         {
             width = 1024;
             height = 768;
-            title = "Minino-renderer :3";
+            title = "OpenGL-window";
             clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
             resizable = false;
 

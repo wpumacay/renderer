@@ -251,21 +251,21 @@ int main()
 
     while( _app->active() )
     {
-        if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ESCAPE ) )
+        if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
         {
             break;
         }
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_SPACE ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
             _uiLayer->setActive( true );
         }
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_ENTER ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
             _uiLayer->setActive( false );
         }
-        else if ( engine::CInputManager::CheckSingleKeyPress( ENGINE_KEY_P ) )
+        else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
         {
             _moveLight = !_moveLight;
             ENGINE_INFO( "Light state: {0}", ( _moveLight ) ? "moving" : "fixed" );

@@ -10,6 +10,9 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_common( m );
     // window bindings
     engine::bindings_window( m );
+    // input bindings
+    engine::bindings_inputKey( m );
+    engine::bindings_inputMouse( m );
 
     // execute some required initialization steps
     engine::CLogger::Init();
