@@ -39,43 +39,35 @@ namespace engine
             {
                 auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops->callbackKey )
-                    return;
-
-                _wprops->callbackKey( key, action );
+                if ( _wprops->callbackKey )
+                    _wprops->callbackKey( key, action );
             } );
 
         glfwSetMouseButtonCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, int button, int action, int mode )
             {
                 auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops->callbackMouse )
-                    return;
-
                 double _x,_y;
                 glfwGetCursorPos( pWindow, &_x, &_y );
 
-                _wprops->callbackMouse( button, action, _x, _y );
+                if ( _wprops->callbackMouse )
+                    _wprops->callbackMouse( button, action, _x, _y );
             } );
 
         glfwSetCursorPosCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, double x, double y )
             {
                 auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops->callbackMouse )
-                    return;
-
-                _wprops->callbackMouseMove( x, y );
+                if ( _wprops->callbackMouseMove )
+                    _wprops->callbackMouseMove( x, y );
             } );
 
         glfwSetScrollCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, double xOff, double yOff )
             {
                 auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
 
-                if ( !_wprops->callbackScroll )
-                    return;
-
-                _wprops->callbackScroll( xOff, yOff );
+                if ( _wprops->callbackScroll )
+                    _wprops->callbackScroll( xOff, yOff );
             } );
 
         glfwSetWindowSizeCallback( m_glfwWindowPtr, []( GLFWwindow* pWindow, int width, int height )
@@ -84,10 +76,8 @@ namespace engine
                 _wprops->width = width;
                 _wprops->height = height;
 
-                if ( !_wprops->callbackResize )
-                    return;
-
-                _wprops->callbackResize( width, height );
+                if ( _wprops->callbackResize )
+                    _wprops->callbackResize( width, height );
             } );
 
         glfwSetInputMode( m_glfwWindowPtr, GLFW_STICKY_KEYS, 1 );

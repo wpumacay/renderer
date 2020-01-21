@@ -1,7 +1,14 @@
 #pragma once
 
-typedef void ( *FnPtr_keyboard_callback )( int key, int action );
-typedef void ( *FnPtr_mouse_callback )( int button, int action, double x, double y );
-typedef void ( *FnPtr_mousemove_callback )( double x, double y );
-typedef void ( *FnPtr_scroll_callback )( double xOff, double yOff );
-typedef void ( *FnPtr_resize_callback )( int width, int height );
+#include <functional>
+
+// args: key, action
+typedef std::function<void(int,int)> FnPtr_keyboard_callback;
+// args: button, action, x, y
+typedef std::function<void(int,int,double,double)> FnPtr_mouse_callback;
+// args: x, y
+typedef std::function<void(double,double)> FnPtr_mousemove_callback;
+// args: x, y
+typedef std::function<void(double,double)> FnPtr_scroll_callback;
+// args: width, height
+typedef std::function<void(int,int)> FnPtr_resize_callback;

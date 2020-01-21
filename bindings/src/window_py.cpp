@@ -27,11 +27,6 @@ namespace engine
             .def( "end", &COpenGLWindow::end )
             .def( "active", &COpenGLWindow::active )
             .def( "requestClose", &COpenGLWindow::requestClose )
-            .def( "test_callback", []( COpenGLWindow& self, std::function<void(int,int)> f )
-            {
-                std::cout << "callback - test" << std::endl;
-                f(10,20);
-            } )
             .def( "registerCallbackKey", &COpenGLWindow::registerKeyCallback )
             .def_property_readonly( "width", &COpenGLWindow::width )
             .def_property_readonly( "height", &COpenGLWindow::height )

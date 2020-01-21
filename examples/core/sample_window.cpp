@@ -150,6 +150,11 @@ engine::CVertexArray* createGeometryVer2Indices()
     return _varray;
 }
 
+void on_keyboard( int key, int action )
+{
+    ENGINE_TRACE( "key: {0}, action: {1}", key, action );
+}
+
 int main()
 {
     engine::CLogger::Init();

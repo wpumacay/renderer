@@ -39,12 +39,6 @@ namespace engine
 
             gl_api_version_major = 3;
             gl_api_version_minor = 3;
-
-            callbackKey = nullptr;
-            callbackMouse = nullptr;
-            callbackMouseMove = nullptr;
-            callbackScroll = nullptr;
-            callbackResize = nullptr;
         }
     };
 

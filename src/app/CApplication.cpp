@@ -44,11 +44,11 @@ namespace engine
         m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow(), imguiProperties ) );
         m_renderTarget  = std::unique_ptr< CFrameBuffer >( _createRenderTarget() );
 
-        m_window->registerKeyCallback( CApplication::CallbackKey );
-        m_window->registerMouseCallback( CApplication::CallbackMouseButton );
-        m_window->registerMouseMoveCallback( CApplication::CallbackMouseMove );
-        m_window->registerScrollCallback( CApplication::CallbackScroll );
-        m_window->registerResizeCallback( CApplication::CallbackResize );
+        m_window->registerKeyCallback( &CApplication::CallbackKey );
+        m_window->registerMouseCallback( &CApplication::CallbackMouseButton );
+        m_window->registerMouseMoveCallback( &CApplication::CallbackMouseMove );
+        m_window->registerScrollCallback( &CApplication::CallbackScroll );
+        m_window->registerResizeCallback( &CApplication::CallbackResize );
 
         // setup initial viewport
         m_renderOptions.viewportWidth = m_window->width();
