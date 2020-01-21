@@ -109,6 +109,7 @@ namespace engine
         m_glfwWindowPtr = NULL;
         m_glContext = NULL;
 
+        glfwDestroyWindow( m_glfwWindowPtr );
         glfwTerminate();
     }
 

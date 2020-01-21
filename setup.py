@@ -42,9 +42,6 @@ class BuildCommand( build_ext ) :
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
-                      '-DTINYMATH_BUILD_DOCS=OFF',
-                      '-DTINYMATH_BUILD_EXAMPLES=OFF',
-                      '-DTINYMATH_BUILD_PYTHON_BINDINGS=ON',
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
                       '-DTINYRENDERER_BUILD_PYTHON_BINDINGS=ON']

@@ -64,7 +64,7 @@ message( "GLEW_INCLUDE_DIRS     : ${GLEW_INCLUDE_DIRS}" )
 message( "GLEW_LIBRARIES        : ${GLEW_LIBRARIES}" )
 message( "OPENGL_LIBRARIES      : ${OPENGL_LIBRARIES}" )
 
-set( GLENGINE_INCLUDE_DIRS
+set( TINYRENDERER_INCLUDES_DIRS
      "${GLFW_INCLUDE_DIRS}"
      "${GLEW_INCLUDE_DIRS}"
      "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -73,7 +73,7 @@ set( GLENGINE_INCLUDE_DIRS
      "${CMAKE_SOURCE_DIR}/ext/imgui"
      "${CMAKE_SOURCE_DIR}/ext/imgui/examples"
      "${CMAKE_SOURCE_DIR}/ext/spdlog/include" )
-include_directories( ${GLENGINE_INCLUDE_DIRS} )
+include_directories( ${TINYRENDERER_INCLUDES_DIRS} )
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
 add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/" )
@@ -91,6 +91,10 @@ target_link_libraries( tinyrenderer_cpp_lib
                        imgui )
 
 set_property( TARGET tinyrenderer_cpp_lib PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+
+if ( TINYRENDERER_BUILD_PYTHON_BINDINGS )
+    add_subdirectory( bindings )
+endif()
 
 if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_DOCS )
     add_subdirectory( docs )
