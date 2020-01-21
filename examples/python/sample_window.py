@@ -25,6 +25,11 @@ def scrollCallback( xOff : float, yOff : float ) :
 
 if __name__ == '__main__' :
     windowProps = tr.WindowProps()
+    windowProps.width = 800
+    windowProps.height = 600
+    windowProps.title = 'sample-window-python'
+    windowProps.clearColor = [ 0.2, 0.4, 0.8, 1.0 ]
+
     windowGL = tr.OpenGLWindow( windowProps )
     windowGL.registerKeyCallback( keyCallback )
     windowGL.registerMouseCallback( mouseCallback )

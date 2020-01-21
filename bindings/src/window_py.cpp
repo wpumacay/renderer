@@ -15,6 +15,16 @@ namespace engine
             .def_readwrite( "width", &CWindowProps::width )
             .def_readwrite( "height", &CWindowProps::height )
             .def_readwrite( "title", &CWindowProps::title )
+            //// .def_readwrite( "clearColor", &CWindowProps::clearColor ) // this works, but we implement the part below for further compatibility
+            .def_property( "clearColor",
+                []( CWindowProps& self ) -> py::array_t<tinymath::tfloat>
+                    {
+                        return tinymath::vector_to_nparray<tinymath::tfloat,4>( self.clearColor );
+                    },
+                []( CWindowProps& self, py::array_t<tinymath::tfloat>& color ) -> void
+                    {
+                        self.clearColor = tinymath::nparray_to_vector<tinymath::tfloat,4>( color );
+                    } )
             .def_readwrite( "resizable", &CWindowProps::resizable )
             .def_readwrite( "gl_api_major", &CWindowProps::gl_api_version_major )
             .def_readwrite( "gl_api_minor", &CWindowProps::gl_api_version_minor )

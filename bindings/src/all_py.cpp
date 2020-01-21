@@ -6,6 +6,8 @@
 
 PYBIND11_MODULE( tinyrenderer, m )
 {
+    py::module::import( "tinymath" );
+
     // common bindings
     engine::bindings_common( m );
     // window bindings

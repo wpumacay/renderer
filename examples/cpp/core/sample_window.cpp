@@ -32,7 +32,13 @@ int main()
 {
     engine::CLogger::Init();
 
-    auto _window = std::unique_ptr< engine::COpenGLWindow >( new engine::COpenGLWindow( engine::CWindowProps() ) );
+    auto _windowProps = engine::CWindowProps();
+    _windowProps.width = 800;
+    _windowProps.height = 600;
+    _windowProps.title = "sample-window-c++";
+    _windowProps.clearColor = { 0.2f, 0.4f, 0.8f, 1.0f };
+
+    auto _window = std::unique_ptr< engine::COpenGLWindow >( new engine::COpenGLWindow( _windowProps ) );
     _window->registerKeyCallback( keyCallback );
     _window->registerMouseCallback( mouseCallback );
     _window->registerMouseMoveCallback( mouseMoveCallback );
