@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <shaders/CShader.h>
-#include <shaders/CShaderUniforms.h>
 #include <utils/CLogger.h>
 
 #if defined( __linux__ )

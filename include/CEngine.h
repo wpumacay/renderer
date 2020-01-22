@@ -41,7 +41,6 @@
 
 #include <materials/CMaterial.h>
 
-#include <shaders/CShaderUniforms.h>
 #include <shaders/CShader.h>
 #include <shaders/CShaderManager.h>
 
