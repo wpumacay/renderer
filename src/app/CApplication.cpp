@@ -72,6 +72,12 @@ namespace engine
         ENGINE_CORE_INFO( "GL-Application started successfully!!!" );
     }
 
+    CApplication::CApplication( const CWindowProps& windowProperties )
+        : CApplication( windowProperties, CImGuiProps() ) {}
+
+    CApplication::CApplication()
+        : CApplication( CWindowProps(), CImGuiProps() ) {}
+
     CApplication::~CApplication()
     {
         m_scene         = nullptr;
@@ -89,6 +95,7 @@ namespace engine
         engine::CShaderManager::Release();
         engine::CTextureManager::Release();
         engine::CNoiseGenerator::Release();
+        engine::CLogger::Release();
     }
 
     void CApplication::setScene( std::unique_ptr< CScene > scene )
