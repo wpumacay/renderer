@@ -146,4 +146,22 @@ namespace engine
             .value( "BUTTON_RELEASED", engine::MouseAction::BUTTON_RELEASED )
             .value( "BUTTON_PRESSED", engine::MouseAction::BUTTON_PRESSED );
     }
+
+    void bindings_inputManager( py::module& m )
+    {
+        py::class_< CInputManager >( m, "InputManager" )
+            .def_static( "Init", &CInputManager::Init )
+            .def_static( "Release", &CInputManager::Release )
+            .def_static( "IsKeyDown", &CInputManager::IsKeyDown )
+            .def_static( "CheckSingleKeyPress", &CInputManager::CheckSingleKeyPress )
+            .def_static( "IsMouseDown", &CInputManager::IsMouseDown )
+            .def_static( "GetScrollOffX", &CInputManager::GetScrollOffX )
+            .def_static( "GetScrollOffY", &CInputManager::GetScrollOffY )
+            .def_static( "GetScrollAccumValueX", &CInputManager::GetScrollAccumValueX )
+            .def_static( "GetScrollAccumValueY", &CInputManager::GetScrollAccumValueY )
+            .def_static( "GetCursorPosition", []() -> py::array_t<engine::float32>
+                {
+                    return tinymath::vector_to_nparray<engine::float32,2>( CInputManager::GetCursorPosition() );
+                } );
+    }
 }
