@@ -14,6 +14,7 @@ namespace engine
         if ( CLogger::s_Initialized )
             return;
 
+#if defined( ENGINE_USE_LOGS )
         spdlog::set_pattern( "%^[%T] %n: %v%$" );
 
         s_CoreLogger = spdlog::stdout_color_mt( "ENGINE" );
@@ -21,6 +22,7 @@ namespace engine
 
         s_ClientLogger = spdlog::stdout_color_mt( "APP" );
         s_ClientLogger->set_level( spdlog::level::trace );
+#endif
 
         CLogger::s_Initialized = true;
     }
