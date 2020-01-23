@@ -111,6 +111,14 @@ namespace engine
         _initialize();
     }
 
+    CVertexBufferLayout::CVertexBufferLayout( const std::vector< CVertexBufferElement >& elements )
+    {
+        m_stride = 0;
+        m_elements = elements;
+
+        _initialize();
+    }
+
     void CVertexBufferLayout::_initialize()
     {
         m_stride = 0;

@@ -25,7 +25,8 @@ namespace engine
         CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
                        const eBufferUsage& bufferUsage, 
                        uint32 bufferSize, 
-                       float32* bufferData );
+                       float32* bufferData,
+                       bool track = false );
 
         ~CVertexBuffer();
 
@@ -44,6 +45,7 @@ namespace engine
         eBufferUsage        m_bufferUsage;
         uint32              m_bufferSize;
         uint32              m_openglId;
+        bool                m_track;
 
     };
 

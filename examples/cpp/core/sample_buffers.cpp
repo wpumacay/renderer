@@ -20,7 +20,7 @@ engine::CVertexArray* createGeometryVer1()
     auto _vbuffer = new engine::CVertexBuffer( _layout, 
                                                engine::eBufferUsage::STATIC, 
                                                sizeof( _bufferData ), 
-                                               _bufferData );
+                                               _bufferData, true );
 
     auto _varray = new engine::CVertexArray();
     _varray->addVertexBuffer( _vbuffer );
@@ -56,12 +56,12 @@ engine::CVertexArray* createGeometryVer2()
     auto _vbufferPos = new engine::CVertexBuffer( _layoutPos,
                                                   engine::eBufferUsage::STATIC,
                                                   sizeof( _bufferPosData ),
-                                                  _bufferPosData );
+                                                  _bufferPosData, true );
 
     auto _vbufferCol = new engine::CVertexBuffer( _layoutCol,
                                                   engine::eBufferUsage::STATIC,
                                                   sizeof( _bufferColData ),
-                                                  _bufferColData );
+                                                  _bufferColData, true );
 
     auto _varray = new engine::CVertexArray();
     _varray->addVertexBuffer( _vbufferPos );
@@ -91,7 +91,7 @@ engine::CVertexArray* createGeometryVer1Indices()
     auto _vbuffer = new engine::CVertexBuffer( _layout, 
                                                engine::eBufferUsage::STATIC, 
                                                sizeof( _bufferData ), 
-                                               _bufferData );
+                                               _bufferData, true );
 
     auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
                                               6, _indices );
@@ -132,12 +132,12 @@ engine::CVertexArray* createGeometryVer2Indices()
     auto _vbufferPos = new engine::CVertexBuffer( _layoutPos,
                                                   engine::eBufferUsage::STATIC,
                                                   sizeof( _bufferPosData ),
-                                                  _bufferPosData );
+                                                  _bufferPosData, true );
 
     auto _vbufferCol = new engine::CVertexBuffer( _layoutCol,
                                                   engine::eBufferUsage::STATIC,
                                                   sizeof( _bufferColData ),
-                                                  _bufferColData );
+                                                  _bufferColData, true );
 
     auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
                                               6, _indices );
@@ -152,18 +152,14 @@ engine::CVertexArray* createGeometryVer2Indices()
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique< engine::CApplication >();
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
 
-    std::cout << "sizeof( CVec2 ): " << sizeof( engine::CVec2 ) << std::endl;
-    std::cout << "sizeof( CVec3 ): " << sizeof( engine::CVec3 ) << std::endl;
-    std::cout << "sizeof( CInd3 ): " << sizeof( engine::CInd3 ) << std::endl;
-
-    // auto _geometryVAO = createGeometryVer1();
+    auto _geometryVAO = createGeometryVer1();
     // auto _geometryVAO = createGeometryVer2();
     // auto _geometryVAO = createGeometryVer1Indices();
-    auto _geometryVAO = createGeometryVer2Indices();
+    // auto _geometryVAO = createGeometryVer2Indices();
 
     while( _app->active() )
     {
@@ -173,7 +169,6 @@ int main()
             break;
 
         _shader->bind();
-
         _geometryVAO->bind();
 
         if ( _geometryVAO->indexBuffer() )
@@ -182,9 +177,7 @@ int main()
             glDrawArrays( GL_TRIANGLES, 0, 6 );
 
         _geometryVAO->unbind();
-
         _shader->unbind();
-
         _app->end();
     }
 

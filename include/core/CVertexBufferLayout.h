@@ -47,9 +47,11 @@ namespace engine
     public :
         CVertexBufferLayout();
         CVertexBufferLayout( const std::initializer_list< CVertexBufferElement >& elements );
+        CVertexBufferLayout( const std::vector< CVertexBufferElement >& elements );
 
         uint32 stride() { return m_stride; }
-        std::vector< CVertexBufferElement > elements() { return m_elements; }
+        std::vector< CVertexBufferElement >& elements() { return m_elements; }
+        const std::vector< CVertexBufferElement >& elements() const { return m_elements; }
 
     private :
 

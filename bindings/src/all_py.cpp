@@ -16,6 +16,11 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_inputKey( m );
     engine::bindings_inputMouse( m );
     engine::bindings_inputManager( m );
+    // buffers bindings
+    engine::bindings_bufferLayout( m );
+    engine::bindings_vertexBuffer( m );
+    engine::bindings_indexBuffer( m );
+    engine::bindings_vertexArray( m );
     // shader bindings
     engine::bindings_shader( m );
     engine::bindings_shaderManager( m );

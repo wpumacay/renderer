@@ -1,14 +1,16 @@
 
 #include <core/CIndexBuffer.h>
+#include <utils/CLogger.h>
 
 namespace engine
 {
     CIndexBuffer::CIndexBuffer( const eBufferUsage& bufferUsage,
                                 uint32 bufferCount,
-                                uint32* bufferData )
+                                uint32* bufferData,
+                                bool track )
+        : m_bufferUsage( bufferUsage ), m_bufferCount( bufferCount )
     {
-        m_bufferUsage = bufferUsage;
-        m_bufferCount = bufferCount;
+        m_track = track;
 
         // create gl-ibo resource and send the initial data to it
         glGenBuffers( 1, &m_openglId );
@@ -18,6 +20,17 @@ namespace engine
                       bufferData,
                       toOpenGLEnum( m_bufferUsage) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+        if ( m_track )
+            ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
+    }
+
+    CIndexBuffer::~CIndexBuffer()
+    {
+        glDeleteBuffers( 1, &m_openglId );
+
+        if ( m_track )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
     }
 
     void CIndexBuffer::updateData( uint32 bufferCount, uint32* bufferData )

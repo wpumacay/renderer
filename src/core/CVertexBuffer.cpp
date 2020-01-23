@@ -1,5 +1,6 @@
 
 #include <core/CVertexBuffer.h>
+#include <utils/CLogger.h>
 
 namespace engine
 {
@@ -26,22 +27,28 @@ namespace engine
     CVertexBuffer::CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
                                   const eBufferUsage& bufferUsage, 
                                   uint32 bufferSize, 
-                                  float32* bufferData )
+                                  float32* bufferData,
+                                  bool track )
+        : m_bufferLayout( bufferLayout ), m_bufferUsage( bufferUsage ), m_bufferSize( bufferSize )
     {
-        m_bufferLayout          = bufferLayout;
-        m_bufferUsage           = bufferUsage;
-        m_bufferSize            = bufferSize;
+        m_track = track;
 
         // create gl-vbo resource and send the initial data to it
         glGenBuffers( 1, &m_openglId );
         glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
         glBufferData( GL_ARRAY_BUFFER, m_bufferSize, bufferData, toOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        if ( m_track )
+            ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
     }
 
     CVertexBuffer::~CVertexBuffer()
     {
         glDeleteBuffers( 1, &m_openglId );
+
+        if ( m_track )
+            ENGINE_CORE_TRACE( "Allocs: Released Vertex Buffer" );
     }
 
     void CVertexBuffer::updateData( uint32 dataSize, float32* dataPtr )
