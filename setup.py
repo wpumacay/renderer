@@ -7,6 +7,8 @@ import subprocess
 from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
 
+DEBUG = True
+
 def buildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
     if not os.path.exists( buildDir ) :
         os.makedirs( buildDir )
@@ -33,17 +35,20 @@ class BuildCommand( build_ext ) :
             self.build_extension( _extension )
 
     def build_extension( self, extension ) :
+        global DEBUG
         _extensionFullPath = self.get_ext_fullpath( extension.name )
         _extensionDirName = os.path.dirname( _extensionFullPath )
         _extensionDirPath = os.path.abspath( _extensionDirName )
 
+        self.debug = True if DEBUG else False
         _cfg = 'Debug' if self.debug else 'Release'
-        _buildArgs = ['--config', _cfg, '--', '-j4']
+        _buildArgs = ['--config', _cfg, '--', '-j8']
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
+                      '-DTINYRENDERER_BUILD_WITH_LOGS=OFF',
                       '-DTINYRENDERER_BUILD_PYTHON_BINDINGS=ON']
 
         _env = os.environ.copy()
