@@ -37,8 +37,8 @@ namespace engine
         py::class_< CShaderManager >( m, "ShaderManager" )
             .def_static( "Init", &CShaderManager::Init )
             .def_static( "Release", &CShaderManager::Release )
-            .def_static( "CreateShaderFromFiles", &CShaderManager::CreateShaderFromFiles )
-            .def_static( "CreateShaderFromSources", &CShaderManager::CreateShaderFromSources )
-            .def_static( "GetCachedShader", &CShaderManager::GetCachedShader );
+            .def_static( "CreateShaderFromFiles", &CShaderManager::CreateShaderFromFiles, py::return_value_policy::reference )
+            .def_static( "CreateShaderFromSources", &CShaderManager::CreateShaderFromSources, py::return_value_policy::reference )
+            .def_static( "GetCachedShader", &CShaderManager::GetCachedShader, py::return_value_policy::reference );
     }
 }
