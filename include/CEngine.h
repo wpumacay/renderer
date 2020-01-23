@@ -2,6 +2,8 @@
 
 #include <CCommon.h>
 #include <CMath.h>
+#include <CMacros.h>
+#include <CExtensions.h>
 
 #include <utils/CTime.h>
 #include <utils/CLogger.h>

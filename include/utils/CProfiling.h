@@ -44,7 +44,7 @@ namespace engine
     /**
     *   @brief Scoped profiling timer
     *
-    *   @details Profiling timer (using <chrono>) that keeps track of the amount of time a given
+    *   @details Profiling timer (using chrono) that keeps track of the amount of time a given
     *            scope took to execute. Use it along profiling sessions and the profiling manager,
     *            as this timer sends its results through the manager to the sessions to handle.
     *

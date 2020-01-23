@@ -27,3 +27,6 @@ ext/tiny_math*
 # compressed files
 *.zip
 *.rar
+
+# logging files
+*.json
