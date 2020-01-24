@@ -10,7 +10,27 @@ Welcome to TinyRenderer's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+=====================
+C++ API Documentation
+=====================
 
+.. doxygenstruct:: engine::CVertexBufferElement
+    :members:
+
+.. doxygenclass:: engine::CVertexBufferLayout
+    :members:
+
+.. doxygenenum:: engine::eElementType
+    :project: TinyRenderer
+
+.. doxygenclass:: engine::CVertexBuffer
+    :members:
+
+.. doxygenclass:: engine::CIndexBuffer
+    :members:
+
+.. doxygenclass:: engine::CVertexArray
+    :members:
 
 Indices and tables
 ==================

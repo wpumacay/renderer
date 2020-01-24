@@ -29,7 +29,7 @@ namespace engine
         CVertexArray( bool track = false );
 
         /**
-        *   @brief Destroyes this VAO and releases the owned OpenGL resources, as well as owned VBOs and EBOs
+        *   @brief Destroys this VAO and releases the owned OpenGL resources, as well as owned VBOs and EBOs
         */
         ~CVertexArray();
 

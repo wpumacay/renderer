@@ -4,7 +4,7 @@ INPUT                   = "@DOXYGEN_INPUT_DIR@"
 GENERATE_HTML           = NO
 GENERATE_LATEX          = NO
 GENERATE_XML            = YES
-
+ENUM_VALUES_PER_LINE    = 1
 QUIET                   = YES
 WARNINGS                = YES
 WARN_IF_UNDOCUMENTED    = NO
