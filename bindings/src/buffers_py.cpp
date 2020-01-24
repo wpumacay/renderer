@@ -148,16 +148,10 @@ namespace engine
                     return std::make_unique<CVertexArray>( true );
                 } 
             ) )
-            .def( "addVertexBuffer", &CVertexArray::addVertexBuffer, py::arg( "vertexBuffer" ), py::arg( "isInstanced" ) = false, py::keep_alive<1, 2>() )
-            // @firsttodo : use pybind from drake's fork
-            //// @todo: enable once drake's fork of pybind is used (pass ownership)
             .def( "addVertexBuffer", []( CVertexArray& self, std::unique_ptr< CVertexBuffer > vbuffer )
                 {
                     self.addVertexBuffer( std::move( vbuffer ) );
                 } )
-            .def( "setIndexBuffer", &CVertexArray::setIndexBuffer, py::keep_alive<1, 2>() )
-            // @firsttodo : use pybind from drake's fork
-            //// @todo: enable once drake's fork of pybind is used (pass ownership)
             .def( "setIndexBuffer", []( CVertexArray& self, std::unique_ptr< CIndexBuffer > ibuffer )
                 {
                     self.setIndexBuffer( std::move( ibuffer ) );

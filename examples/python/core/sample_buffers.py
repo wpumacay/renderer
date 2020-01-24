@@ -24,7 +24,7 @@ def createGeometryVer1NoIndices() :
                                bufferData )
 
     varray = tr.VertexArray()
-    varray.addVertexBuffer( vbuffer, False )
+    varray.addVertexBuffer( vbuffer )
     return varray
 
 def createGeometryVer2NoIndices() :
@@ -146,10 +146,10 @@ if __name__ == '__main__' :
 
     shader = tr.ShaderManager.GetCachedShader( 'basic2d_no_textures' )
 
-    ## geometryVAO = createGeometryVer1NoIndices()
+    geometryVAO = createGeometryVer1NoIndices()
     ## geometryVAO = createGeometryVer2NoIndices()
     ## geometryVAO = createGeometryVer1WithIndices()
-    geometryVAO = createGeometryVer2WithIndices()
+    ## geometryVAO = createGeometryVer2WithIndices()
 
     while app.active() :
         app.begin()
@@ -169,8 +169,8 @@ if __name__ == '__main__' :
         shader.unbind()
         app.end()
 
-    # check the addresses and str-representation of the objects
-    print( 'vao-py-address: {} \n\robj: {}'.format( hex( id( geometryVAO ) ), geometryVAO ) )
-    for vbo in geometryVAO.vertexBuffers() :
-        print( 'vbo-py-address: {}\n\robj: {}'.format( hex( id( vbo ) ), vbo ) )
-    print( 'ebo-py-address: {} \n\robj: {}'.format( hex( id( geometryVAO.indexBuffer() ) ), geometryVAO.indexBuffer() ) )
+####     # check the addresses and str-representation of the objects
+####     print( 'vao-py-address: {} \n\robj: {}'.format( hex( id( geometryVAO ) ), geometryVAO ) )
+####     for vbo in geometryVAO.vertexBuffers() :
+####         print( 'vbo-py-address: {}\n\robj: {}'.format( hex( id( vbo ) ), vbo ) )
+####     print( 'ebo-py-address: {} \n\robj: {}'.format( hex( id( geometryVAO.indexBuffer() ) ), geometryVAO.indexBuffer() ) )
