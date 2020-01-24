@@ -1,11 +1,9 @@
 
 #include <CEngine.h>
 
-#include <core/CFrameBuffer.h>
-
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
@@ -29,7 +27,7 @@ int main()
     _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
     _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-    auto _framebuffer = new engine::CFrameBuffer();
+    auto _framebuffer = std::make_unique<engine::CFrameBuffer>();
     _framebuffer->addAttachment( _fbColorConfig );
     _framebuffer->addAttachment( _fbDepthConfig );
 
@@ -50,17 +48,14 @@ int main()
                                             { "color", engine::eElementType::Float3, false },
                                             { "uv", engine::eElementType::Float2, false } };
 
-    auto _quad_vbuffer = new engine::CVertexBuffer( _layout,
-                                                    engine::eBufferUsage::STATIC,
-                                                    sizeof( _quad_buffData ),
-                                                    _quad_buffData );;
+    auto _quad_vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC,
+                                                                  sizeof( _quad_buffData ), _quad_buffData );;
 
-    auto _quad_ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                                   6, _quad_indices );
+    auto _quad_ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _quad_indices );
 
-    auto _quad_varray = new engine::CVertexArray();
-    _quad_varray->addVertexBuffer( _quad_vbuffer );
-    _quad_varray->setIndexBuffer( _quad_ibuffer );
+    auto _quad_varray = std::make_unique<engine::CVertexArray>();
+    _quad_varray->addVertexBuffer( std::move( _quad_vbuffer ) );
+    _quad_varray->setIndexBuffer( std::move( _quad_ibuffer ) );
 
     /* setup a simple scene to render to our target *********************************/
 
@@ -73,21 +68,21 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 4.0f, 4.0f, 4.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Z,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
-    _scene->addCamera( std::unique_ptr< engine::COrbitCamera >( _camera ) );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 4.0f, 4.0f, 4.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Z,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
+    _scene->addCamera( std::move( _camera ) );
 
-    auto _light = new engine::CDirectionalLight( "directional_1",
-                                                 { 0.8f, 0.8f, 0.8f }, 
-                                                 { 0.8f, 0.8f, 0.8f },
-                                                 { 0.3f, 0.3f, 0.3f }, 
-                                                 { 0.0f, 0.0f, -1.0f } );
-    _scene->addLight( std::unique_ptr< engine::CDirectionalLight >( _light ) );
+    auto _light = std::make_unique<engine::CDirectionalLight>( "directional_1",
+                                                               engine::CVec3( 0.8f, 0.8f, 0.8f ), 
+                                                               engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                               engine::CVec3( 0.3f, 0.3f, 0.3f ), 
+                                                               engine::CVec3( 0.0f, 0.0f, -1.0f ) );
+    _scene->addLight( std::move( _light ) );
 
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
     _plane->material()->ambient  = { 0.2f, 0.3f, 0.4f };

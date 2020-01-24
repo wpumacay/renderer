@@ -249,8 +249,8 @@ namespace engine
         {
             m_shaderDepthView->setMat4( "u_modelMatrix", meshPtr->matModel() );
 
-            auto _vao = meshPtr->vertexArray();
-            auto _ibo = _vao->indexBuffer();
+            auto& _vao = meshPtr->vertexArray();
+            auto& _ibo = _vao->indexBuffer();
 
             _vao->bind();
             glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
@@ -288,8 +288,8 @@ namespace engine
 
             m_shaderSemanticView->setMat4( "u_modelMatrix", meshPtr->matModel() );
 
-            auto _vao = meshPtr->vertexArray();
-            auto _ibo = _vao->indexBuffer();
+            auto& _vao = meshPtr->vertexArray();
+            auto& _ibo = _vao->indexBuffer();
 
             _vao->bind();
             glDrawElements( GL_TRIANGLES, _ibo->count(), GL_UNSIGNED_INT, 0 );
@@ -434,8 +434,8 @@ namespace engine
         shaderPtr->setMat4( "u_normalMatrix", tinymath::inverse( _matModel ).transpose() );
 
         // render the mesh ************************************************
-        auto _vao = meshPtr->vertexArray();
-        auto _ibo = _vao->indexBuffer();
+        auto& _vao = meshPtr->vertexArray();
+        auto& _ibo = _vao->indexBuffer();
 
         if ( meshPtr->wireframe() )
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );

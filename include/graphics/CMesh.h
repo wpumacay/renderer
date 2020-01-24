@@ -24,11 +24,8 @@ namespace engine
 
         ~CMesh();
 
-        CVertexArray* vertexArray() const { return m_varray.get(); }
-        CVertexBuffer* verticesBuffer() const { return m_vbufferVertices.get(); }
-        CVertexBuffer* normalsBuffer() const { return m_vbufferNormals.get(); }
-        CVertexBuffer* uvsBuffer() const { return m_vbufferUVs.get(); }
-        CIndexBuffer* indexBuffer() const { return m_ibuffer.get(); }
+        std::unique_ptr<CVertexArray>& vertexArray() { return m_varray; }
+        const std::unique_ptr<CVertexArray>& vertexArray() const { return m_varray; }
 
         std::vector< CVec3 >& vertices() { return m_vertices; }
         std::vector< CVec3 >& normals() { return m_normals; }
@@ -41,11 +38,7 @@ namespace engine
 
     private :
 
-        std::unique_ptr< CVertexBuffer >    m_vbufferVertices; // owned by mesh's vao
-        std::unique_ptr< CVertexBuffer >    m_vbufferNormals; // owned by mesh's vao
-        std::unique_ptr< CVertexBuffer >    m_vbufferUVs; // owned by mesh's vao
-        std::unique_ptr< CIndexBuffer >     m_ibuffer; // owned by mesh's vao
-        std::unique_ptr< CVertexArray>      m_varray; // owned by this mesh
+        std::unique_ptr<CVertexArray> m_varray;
 
         std::vector<CVec3> m_vertices;
         std::vector<CVec3> m_normals;

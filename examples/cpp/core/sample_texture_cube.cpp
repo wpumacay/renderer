@@ -14,7 +14,7 @@ engine::CMat4 computeSkyboxCorrectionMat( const engine::eAxis& axis )
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     auto _textureCubeDataCloudtop   = engine::CTextureManager::GetCachedTextureCubeData( "cloudtop" );
     auto _textureCubeDataStarfield  = engine::CTextureManager::GetCachedTextureCubeData( "starfield" );
@@ -82,13 +82,12 @@ int main()
              1.0f, -1.0f,  1.0f
     };
 
-    auto _vbuffer = new engine::CVertexBuffer( { { "position", engine::eElementType::Float3, false } },
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _cubemapVertices ),
-                                               _cubemapVertices );
+    auto _vbufferLayout = engine::CVertexBufferLayout( { { "position", engine::eElementType::Float3, false } } );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _vbufferLayout, engine::eBufferUsage::STATIC,
+                                                             sizeof( _cubemapVertices ), _cubemapVertices );
 
-    auto _varray = new engine::CVertexArray();
-    _varray->addVertexBuffer( _vbuffer );
+    auto _varray = std::make_unique<engine::CVertexArray>();
+    _varray->addVertexBuffer( std::move( _vbuffer ) );
 
     auto _scene = _app->scene();
 
@@ -108,7 +107,7 @@ int main()
                                              _app->window()->width(),
                                              _app->window()->height() );
 
-    _scene->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    _scene->addCamera( std::unique_ptr<engine::CICamera>( _camera ) );
 
     auto _textureCubemap = _textureCubeCloudtop;
     // auto _textureCubemap = _textureCubeStarfield;

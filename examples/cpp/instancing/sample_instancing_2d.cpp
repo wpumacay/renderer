@@ -8,12 +8,12 @@ int g_num_cols = 10;
 
 bool g_useInstancing = true;
 
-engine::CVertexArray* g_quadVAO_NoInstancing = nullptr;
-engine::CVertexArray* g_quadVAO_Instancing = nullptr;
-engine::CVertexBuffer* g_quadVAO_positionsBuffer = nullptr;
+std::unique_ptr<engine::CVertexArray> g_quadVAO_NoInstancing = nullptr;
+std::unique_ptr<engine::CVertexArray> g_quadVAO_Instancing = nullptr;
+engine::CVertexBuffer* g_quadVAO_positionsBufferRef = nullptr;
 
-engine::CVertexArray* createQuad_noInstancing();
-engine::CVertexArray* createQuad_Instancing();
+std::unique_ptr<engine::CVertexArray> createQuad_noInstancing();
+std::unique_ptr<engine::CVertexArray> createQuad_Instancing();
 
 void drawGrid_noInstancing( engine::CShader* shader,
                             engine::CVertexArray* vao );
@@ -52,31 +52,17 @@ int main()
         _app->begin();
 
         if ( g_useInstancing )
-            drawGrid_Instancing( _shaderInstancing2d, g_quadVAO_Instancing, _bufferPositions );
+            drawGrid_Instancing( _shaderInstancing2d, g_quadVAO_Instancing.get(), _bufferPositions );
         else
-            drawGrid_noInstancing( _shaderNoInstancing2d, g_quadVAO_NoInstancing );
+            drawGrid_noInstancing( _shaderNoInstancing2d, g_quadVAO_NoInstancing.get() );
 
         _app->end();
     }
 
-    auto _vbos_noInstancing = g_quadVAO_NoInstancing->vertexBuffers();
-    auto _ibo_noInstancing = g_quadVAO_NoInstancing->indexBuffer();
-    for ( auto _vbo : _vbos_noInstancing )
-        delete _vbo;
-    delete _ibo_noInstancing;
-    delete g_quadVAO_NoInstancing;
-
-    auto _vbos_Instancing = g_quadVAO_Instancing->vertexBuffers();
-    auto _ibo_Instancing = g_quadVAO_Instancing->indexBuffer();
-    for ( auto _vbo : _vbos_Instancing )
-        delete _vbo;
-    delete _ibo_Instancing;
-    delete g_quadVAO_Instancing;
-
     return 0;
 }
 
-engine::CVertexArray* createQuad_noInstancing()
+std::unique_ptr<engine::CVertexArray> createQuad_noInstancing()
 {
     float _bufferData[] = {
     /*|      pos     |     color      |*/
@@ -94,22 +80,19 @@ engine::CVertexArray* createQuad_noInstancing()
     engine::CVertexBufferLayout _layoutPerVertex = { { "pos", engine::eElementType::Float2, false },
                                                      { "color", engine::eElementType::Float3, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layoutPerVertex,
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _bufferData ),
-                                               _bufferData );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layoutPerVertex, engine::eBufferUsage::STATIC,
+                                                             sizeof( _bufferData ), _bufferData );
 
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6, _indices );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _quadVAO = new engine::CVertexArray();
-    _quadVAO->addVertexBuffer( _vbuffer );
-    _quadVAO->setIndexBuffer( _ibuffer );
+    auto _quadVAO = std::make_unique<engine::CVertexArray>();
+    _quadVAO->addVertexBuffer( std::move( _vbuffer ) );
+    _quadVAO->setIndexBuffer( std::move( _ibuffer ) );
 
-    return _quadVAO;
+    return std::move( _quadVAO );
 }
 
-engine::CVertexArray* createQuad_Instancing()
+std::unique_ptr<engine::CVertexArray> createQuad_Instancing()
 {
     float _bufferData[] = {
     /*|      pos     |     color      |*/
@@ -127,27 +110,24 @@ engine::CVertexArray* createQuad_Instancing()
     engine::CVertexBufferLayout _layoutPerVertex = { { "pos", engine::eElementType::Float2, false },
                                                      { "color", engine::eElementType::Float3, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layoutPerVertex,
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _bufferData ),
-                                               _bufferData );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layoutPerVertex, engine::eBufferUsage::STATIC,
+                                                             sizeof( _bufferData ), _bufferData );
 
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6, _indices );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _vpositionsBuffer = new engine::CVertexBuffer( { { "screenPosition", engine::eElementType::Float2, false } },
-                                                        engine::eBufferUsage::DYNAMIC,
-                                                        g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ),
-                                                        NULL );
+    auto _vpositionsBufferLayout = engine::CVertexBufferLayout( { { "screenPosition", engine::eElementType::Float2, false } } );
+    auto _vpositionsBuffer = std::make_unique<engine::CVertexBuffer>( _vpositionsBufferLayout, engine::eBufferUsage::DYNAMIC,
+                                                                      g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ), 
+                                                                      (engine::float32*) NULL );
 
-    auto _quadVAO = new engine::CVertexArray();
-    _quadVAO->addVertexBuffer( _vbuffer );
-    _quadVAO->addVertexBuffer( _vpositionsBuffer, true ); // tell the vao that this has to be instanced
-    _quadVAO->setIndexBuffer( _ibuffer );
+    g_quadVAO_positionsBufferRef = _vpositionsBuffer.get(); // keep a reference to update the positions
 
-    g_quadVAO_positionsBuffer = _vpositionsBuffer; // keep a reference to update the positions
+    auto _quadVAO = std::make_unique<engine::CVertexArray>();
+    _quadVAO->addVertexBuffer( std::move( _vbuffer ) );
+    _quadVAO->addVertexBuffer( std::move( _vpositionsBuffer ), true ); // tell the vao that this has to be instanced
+    _quadVAO->setIndexBuffer( std::move( _ibuffer ) );
 
-    return _quadVAO;
+    return std::move( _quadVAO );
 }
 
 void drawGrid_noInstancing( engine::CShader* shader,
@@ -193,7 +173,7 @@ void drawGrid_Instancing( engine::CShader* shader,
     }
 
     // update our buffer data
-    g_quadVAO_positionsBuffer->updateData( g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ),
+    g_quadVAO_positionsBufferRef->updateData( g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ),
                                            (engine::float32*) bufferPositions );
 
     // do the render call (instanced)

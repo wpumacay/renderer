@@ -7,11 +7,11 @@ namespace engine
     std::shared_ptr<spdlog::logger> CLogger::s_CoreLogger;
     std::shared_ptr<spdlog::logger> CLogger::s_ClientLogger;
 
-    bool CLogger::s_Initialized = false;
+    bool CLogger::s_IsActive = false;
 
     void CLogger::Init()
     {
-        if ( CLogger::s_Initialized )
+        if ( CLogger::s_IsActive )
             return;
 
 #if defined( ENGINE_USE_LOGS )
@@ -24,7 +24,7 @@ namespace engine
         s_ClientLogger->set_level( spdlog::level::trace );
 #endif
 
-        CLogger::s_Initialized = true;
+        CLogger::s_IsActive = true;
     }
 
     void CLogger::Release()
@@ -33,7 +33,12 @@ namespace engine
         // have been deleted once the macro finishes.
         s_CoreLogger = nullptr;
         s_ClientLogger = nullptr;
-        s_Initialized = false;
+        s_IsActive = false;
+    }
+
+    bool CLogger::IsActive()
+    {
+        return CLogger::s_IsActive;
     }
 
 }

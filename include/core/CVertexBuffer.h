@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
 #include <core/CVertexBufferLayout.h>
 
 namespace engine

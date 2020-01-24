@@ -54,19 +54,16 @@ namespace engine
              1.0f, -1.0f,  1.0f
         };
 
-        m_vertexBuffer = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                                              eBufferUsage::STATIC,
-                                                                              sizeof( _vertices ),
-                                                                              _vertices ) );
+        auto _vboLayout = CVertexBufferLayout( { { "position", eElementType::Float3, false } } );
+        auto _vbo = std::make_unique< CVertexBuffer >( _vboLayout, eBufferUsage::STATIC, sizeof( _vertices ), _vertices );
 
-        m_vertexArray = std::unique_ptr< CVertexArray >( new CVertexArray() );
-        m_vertexArray->addVertexBuffer( m_vertexBuffer.get() );
+        m_vertexArray = std::make_unique< CVertexArray >();
+        m_vertexArray->addVertexBuffer( std::move( _vbo ) );
     }
 
     CSkybox::~CSkybox()
     {
         m_cubemap = nullptr;
-        m_vertexBuffer = nullptr;
         m_vertexArray = nullptr;
     }
 

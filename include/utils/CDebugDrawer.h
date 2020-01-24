@@ -119,9 +119,10 @@ namespace engine
         std::vector< CLinePositions > m_linesPositions;
         std::vector< CLineColors > m_linesColors;
 
-        std::unique_ptr< CVertexBuffer >    m_linesPositionsVBO;
-        std::unique_ptr< CVertexBuffer >    m_linesColorsVBO;
-        std::unique_ptr< CVertexArray >     m_linesVAO;
+        CVertexBuffer* m_linesPositionsVBOref;
+        CVertexBuffer* m_linesColorsVBOref;
+
+        std::unique_ptr< CVertexArray > m_linesVAO;
 
         bool m_active;
         CShader* m_shaderLinesPtr;
@@ -145,12 +146,13 @@ namespace engine
         std::array< std::vector< CVec4 >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesTransparentColors;
 
         std::array< std::unique_ptr< CVertexArray >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVAO;
-        std::array< std::unique_ptr< CIndexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesIBO;
-        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOpositions;
-        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOnormals;
-        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesColors;
-        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesModelMats;
-        std::array< std::unique_ptr< CVertexBuffer >, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesNormalMats;
+
+        std::array< CIndexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesIBOrefs;
+        std::array< CVertexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOpositionsRefs;
+        std::array< CVertexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOnormalsRefs;
+        std::array< CVertexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesColorsRefs;
+        std::array< CVertexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesModelMatsRefs;
+        std::array< CVertexBuffer*, DEBUG_DRAWER_PRIMITIVE_TYPES > m_primitivesVBOinstancesNormalMatsRefs;
         /****************************************************************************/
     };
 

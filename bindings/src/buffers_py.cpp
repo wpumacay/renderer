@@ -78,7 +78,7 @@ namespace engine
                         throw std::runtime_error( "VertexBuffer >>> given size argument must match size of the np-array buffer. \
                                                    Given size was " + std::to_string( size ) + " but np-array size is " + std::to_string( data.size() * sizeof( float32 ) ) );
 
-                    return new CVertexBuffer( layout, usage, size, (float32*) data.request().ptr, true );
+                    return std::make_unique<CVertexBuffer>( layout, usage, size, (float32*) data.request().ptr, true );
                 }
             ) )
             .def( "bind", &CVertexBuffer::bind )
@@ -94,7 +94,16 @@ namespace engine
             .def( "layout", &CVertexBuffer::layout )
             .def( "size", &CVertexBuffer::size )
             .def( "usage", &CVertexBuffer::usage )
-            .def( "openglId", &CVertexBuffer::openglId );
+            .def( "openglId", &CVertexBuffer::openglId )
+            .def( "__repr__", []( const CVertexBuffer& self )
+                {
+                    auto _strrep = std::string( "VertexBuffer(\n" );
+                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
+                    _strrep += "size: " + std::to_string( self.size() ) + "\n";
+                    _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
+                    return _strrep;
+                } );
     }
 
     void bindings_indexBuffer( py::module& m )
@@ -106,7 +115,7 @@ namespace engine
                         throw std::runtime_error( "IndexBuffer >>> given count argument must match number of elements in np-array. \
                                                    Given count was " + std::to_string( count ) + " but np-array size is " + std::to_string( data.size() ) );
 
-                    return new CIndexBuffer( usage, count, (uint32*) data.request().ptr, true );
+                    return std::make_unique<CIndexBuffer>( usage, count, (uint32*) data.request().ptr, true );
                 }
             ) )
             .def( "bind", &CIndexBuffer::bind )
@@ -119,29 +128,64 @@ namespace engine
 
                     self.updateData( count, (uint32*) data.request().ptr );
                 } )
-            .def( "count", &CIndexBuffer::count );
+            .def( "count", &CIndexBuffer::count )
+            .def( "__repr__", []( const CIndexBuffer& self )
+                {
+                    auto _strrep = std::string( "IndexBuffer(\n" );
+                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
+                    _strrep += "indices-count: " + std::to_string( self.count() ) + "\n";
+                    _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
+                    return _strrep;
+                } );
     }
 
     void bindings_vertexArray( py::module& m )
     {
         py::class_< CVertexArray >( m, "VertexArray" )
-            .def( py::init<>() )
+            .def( py::init( []()
+                {
+                    return std::make_unique<CVertexArray>( true );
+                } 
+            ) )
             .def( "addVertexBuffer", &CVertexArray::addVertexBuffer, py::arg( "vertexBuffer" ), py::arg( "isInstanced" ) = false, py::keep_alive<1, 2>() )
+            // @firsttodo : use pybind from drake's fork
             //// @todo: enable once drake's fork of pybind is used (pass ownership)
-            //// .def( "addVertexBuffer", []( CVertexArray& self, std::unique_ptr< CVertexBuffer > vbuffer )
-            ////     {
-            ////         self.addVertexBuffer( std::move( vbuffer ) );
-            ////     } )
+            .def( "addVertexBuffer", []( CVertexArray& self, std::unique_ptr< CVertexBuffer > vbuffer )
+                {
+                    self.addVertexBuffer( std::move( vbuffer ) );
+                } )
             .def( "setIndexBuffer", &CVertexArray::setIndexBuffer, py::keep_alive<1, 2>() )
+            // @firsttodo : use pybind from drake's fork
             //// @todo: enable once drake's fork of pybind is used (pass ownership)
-            //// .def( "setIndexBuffer", []( CVertexArray& self, std::unique_ptr< CIndexBuffer > ibuffer )
-            ////     {
-            ////         self.setIndexBuffer( std::move( ibuffer ) );
-            ////     } )
+            .def( "setIndexBuffer", []( CVertexArray& self, std::unique_ptr< CIndexBuffer > ibuffer )
+                {
+                    self.setIndexBuffer( std::move( ibuffer ) );
+                } )
             .def( "bind", &CVertexArray::bind )
             .def( "unbind", &CVertexArray::unbind )
-            .def( "vertexBuffers", &CVertexArray::vertexBuffers )
-            .def( "indexBuffer", &CVertexArray::indexBuffer )
-            .def( "openglId", &CVertexArray::openglId );
+            .def( "vertexBuffers", []( CVertexArray& self ) -> std::vector<CVertexBuffer*>
+                {
+                    auto _vboRefs = std::vector<CVertexBuffer*>();
+                    auto& _vbos = self.vertexBuffers();
+                    for ( auto& _vbo : _vbos )
+                        _vboRefs.push_back( _vbo.get() );
+                    return _vboRefs;
+                }, py::return_value_policy::reference )
+            .def( "indexBuffer", []( CVertexArray& self ) -> CIndexBuffer*
+                {
+                    return self.indexBuffer().get();
+                }, py::return_value_policy::reference )
+            .def( "openglId", &CVertexArray::openglId )
+            .def( "__repr__", []( const CVertexArray& self )
+                {
+                    auto _strrep = std::string( "VertexArray(\n" );
+                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "num-attribs: " + std::to_string( self.numAttribs() ) + "\n";
+                    _strrep += "num-vbos: " + std::to_string( self.vertexBuffers().size() ) + "\n";
+                    _strrep += "num-ebos: " + std::to_string( self.indexBuffer() ? 1 : 0 ) + "\n";
+                    _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
+                    return _strrep;
+                } );
     }
 }

@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+# using pybind11 from upstream (pybind)
+#### GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
+#### GIT_DEPS_USER=(wpumacay pybind wpumacay gabime)
+#### GIT_DEPS_BRANCH=(master master docking v1.x)
+
+# using pybind11 from RobotLocomotion fork
 GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
-GIT_DEPS_USER=(wpumacay pybind wpumacay gabime)
-GIT_DEPS_BRANCH=(master master docking v1.x)
+GIT_DEPS_USER=(wpumacay RobotLocomotion wpumacay gabime)
+GIT_DEPS_BRANCH=(master drake docking v1.x)
 
 for i in {0..3}
 do

@@ -14,18 +14,27 @@ namespace engine
         m_linesRenderBufferPositions = std::vector< CLinePositions >( DEBUG_DRAWER_BATCH_SIZE );
         m_linesRenderBufferColors = std::vector< CLineColors >( DEBUG_DRAWER_BATCH_SIZE );
 
-        m_linesPositionsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                                                   eBufferUsage::DYNAMIC,
-                                                                                   sizeof( CLinePositions ) * m_linesRenderBufferPositions.size(),
-                                                                                   (float32*) m_linesRenderBufferPositions.data() ) );
-        m_linesColorsVBO = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "color", eElementType::Float3, false } },
-                                                                                eBufferUsage::DYNAMIC,
-                                                                                sizeof( CLineColors ) * m_linesRenderBufferColors.size(),
-                                                                                (float32*) m_linesRenderBufferColors.data() ) );
+        auto _linesPositionsVBOlayout = CVertexBufferLayout( { { "position", eElementType::Float3, false } } );
+        auto _linesColorsVBOlayout = CVertexBufferLayout( { { "color", eElementType::Float3, false } } );
 
-        m_linesVAO = std::unique_ptr< CVertexArray >( new CVertexArray() );
-        m_linesVAO->addVertexBuffer( m_linesPositionsVBO.get() );
-        m_linesVAO->addVertexBuffer( m_linesColorsVBO.get() );
+        const uint32 _linesPositionsVBOsize = sizeof( CLinePositions ) * m_linesRenderBufferPositions.size();
+        const uint32 _linesColorsVBOsize = sizeof( CLineColors ) * m_linesRenderBufferColors.size();
+
+        float32* _linesPositionsVBOdata = (float32*) m_linesRenderBufferPositions.data();
+        float32* _linesColorsVBOdata = (float32*) m_linesRenderBufferColors.data();
+
+        auto _linesPositionsVBO = std::make_unique< CVertexBuffer >( _linesPositionsVBOlayout, eBufferUsage::DYNAMIC,
+                                                                     _linesPositionsVBOsize, _linesPositionsVBOdata );
+        auto _linesColorsVBO = std::make_unique< CVertexBuffer >( _linesPositionsVBOlayout, eBufferUsage::DYNAMIC,
+                                                                  _linesPositionsVBOsize, _linesColorsVBOdata  );
+
+        // keep some references for local manipulation
+        m_linesPositionsVBOref = _linesPositionsVBO.get();
+        m_linesColorsVBOref = _linesColorsVBO.get();
+
+        m_linesVAO = std::make_unique< CVertexArray >();
+        m_linesVAO->addVertexBuffer( std::move( _linesPositionsVBO ) );
+        m_linesVAO->addVertexBuffer( std::move( _linesColorsVBO ) );
 
         /* setup resources for rendering solid objects */
         m_shaderSolidLightingPtr = CShaderManager::GetCachedShader( "engine_debug_drawing_3d_solid_lighting" );
@@ -235,8 +244,8 @@ namespace engine
         m_linesRenderBufferColors.clear();
 
         m_linesVAO = nullptr;
-        m_linesPositionsVBO = nullptr;
-        m_linesColorsVBO = nullptr;
+        m_linesPositionsVBOref = nullptr;
+        m_linesColorsVBOref = nullptr;
     }
 
     void CDebugDrawer::_setEnabled( bool enabled )
@@ -283,56 +292,80 @@ namespace engine
         _indices = _dummyMesh->indices();
         delete _dummyMesh;
 
-        auto _vboPositions = new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                eBufferUsage::STATIC,
-                                                sizeof( CVec3 ) * _vertices.size(),
-                                                (float32*) _vertices.data() );
+        // Create the VBOs that hold fixed data of the shape and normals of the primitives (these 
+        // don't change during updates, unlike their instanced counterparts)
 
-        auto _vboNormals = new CVertexBuffer( { { "normal", eElementType::Float3, true } },
-                                              eBufferUsage::STATIC,
-                                              sizeof( CVec3 ) * _normals.size(),
-                                              (float32*) _normals.data() );
+        auto _vboPositionsLayout = CVertexBufferLayout( { { "position", eElementType::Float3, false } } );
+        auto _vboNormalsLayout = CVertexBufferLayout( { { "normal", eElementType::Float3, true } } );
 
-        auto _ibo = new CIndexBuffer( eBufferUsage::STATIC,
-                                      3 * _indices.size(),
-                                      (uint32*) _indices.data() );
+        uint32 _vboPositionsSize = sizeof( CVec3 ) * _vertices.size();
+        uint32 _vboNormalsSize = sizeof( CVec3 ) * _normals.size();
 
-        auto _vboInstancesColors = new CVertexBuffer( { { "color", eElementType::Float4, false } },
-                                                      eBufferUsage::DYNAMIC,
-                                                      DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 ),
-                                                      NULL );
+        float32* _vboPositionsData = (float32*) _vertices.data();
+        float32* _vboNormalsData = (float32*) _normals.data();
 
-        auto _vboInstancesModelMats = new CVertexBuffer( { { "modelMatrix-col0", eElementType::Float4, false },
-                                                           { "modelMatrix-col1", eElementType::Float4, false },
-                                                           { "modelMatrix-col2", eElementType::Float4, false },
-                                                           { "modelMatrix-col3", eElementType::Float4, false } },
-                                                         eBufferUsage::DYNAMIC,
-                                                         DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
-                                                         NULL );
+        auto _vboPositions = std::make_unique< CVertexBuffer>( _vboPositionsLayout, eBufferUsage::STATIC,
+                                                               _vboPositionsSize, _vboPositionsData );
 
-        auto _vboInstancesNormalMats = new CVertexBuffer( { { "normalMatrix-col0", eElementType::Float4, false },
-                                                            { "normalMatrix-col1", eElementType::Float4, false },
-                                                            { "normalMatrix-col2", eElementType::Float4, false },
-                                                            { "normalMatrix-col3", eElementType::Float4, false } },
-                                                          eBufferUsage::DYNAMIC,
-                                                          DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 ),
-                                                          NULL );
+        auto _vboNormals = std::make_unique<CVertexBuffer>( _vboNormalsLayout, eBufferUsage::STATIC,
+                                                            _vboNormalsSize, _vboNormalsData );
+        //******************************************************************************************
 
-        auto _vao = new CVertexArray();
-        _vao->addVertexBuffer( _vboPositions );
-        _vao->addVertexBuffer( _vboNormals );
-        _vao->addVertexBuffer( _vboInstancesColors, true );
-        _vao->addVertexBuffer( _vboInstancesModelMats, true );
-        _vao->addVertexBuffer( _vboInstancesNormalMats, true );
-        _vao->setIndexBuffer( _ibo );
+        // Create the EBO that holds fixed data of the shape (faces) of the primitives
+        auto _ibo = std::make_unique<CIndexBuffer>( eBufferUsage::STATIC, 3 * _indices.size(), (uint32*) _indices.data() );
+        //******************************************************************************************
 
-        m_primitivesVBOpositions[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboPositions ) );
-        m_primitivesVBOnormals[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboNormals ) );
-        m_primitivesVBOinstancesColors[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesColors ) );
-        m_primitivesVBOinstancesModelMats[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesModelMats ) );
-        m_primitivesVBOinstancesNormalMats[primitive] = std::move( std::unique_ptr< CVertexBuffer >( _vboInstancesNormalMats ) );
-        m_primitivesIBO[primitive] = std::move( std::unique_ptr< CIndexBuffer >( _ibo ) );
-        m_primitivesVAO[primitive] = std::move( std::unique_ptr< CVertexArray >( _vao ) );
+        // Create the VBOs that hold dynamic data of the colors, world-transforms and normals-
+        // transforms (these change during updates by placing new data into the buffers)
+
+        auto _vboInstancesColorsLayout = CVertexBufferLayout( { { "color", eElementType::Float4, false } } );
+        auto _vboInstancesModelMatsLayout = CVertexBufferLayout( { { "modelMatrix-col0", eElementType::Float4, false },
+                                                                   { "modelMatrix-col1", eElementType::Float4, false },
+                                                                   { "modelMatrix-col2", eElementType::Float4, false },
+                                                                   { "modelMatrix-col3", eElementType::Float4, false } } );
+        auto _vboInstancesNormalMatsLayout = CVertexBufferLayout( { { "normalMatrix-col0", eElementType::Float4, false },
+                                                                    { "normalMatrix-col1", eElementType::Float4, false },
+                                                                    { "normalMatrix-col2", eElementType::Float4, false },
+                                                                    { "normalMatrix-col3", eElementType::Float4, false } } );
+
+        uint32 _vboInstancesColorsSize = DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 );
+        uint32 _vboInstancesModelMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 );
+        uint32 _vboInstancesNormalMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 );
+
+        auto _vboInstancesColors = std::make_unique<CVertexBuffer>( _vboInstancesColorsLayout, eBufferUsage::DYNAMIC,
+                                                                    _vboInstancesColorsSize, (float32*) NULL );
+
+        auto _vboInstancesModelMats = std::make_unique<CVertexBuffer>( _vboInstancesModelMatsLayout, eBufferUsage::DYNAMIC,
+                                                                       _vboInstancesModelMatsSize, (float32*) NULL );
+
+        auto _vboInstancesNormalMats = std::make_unique<CVertexBuffer>( _vboInstancesNormalMatsLayout, eBufferUsage::DYNAMIC,
+                                                                        _vboInstancesNormalMatsSize, (float32*) NULL );
+        //******************************************************************************************
+
+        // keep some pointer references to use locally
+        auto _vboPositionsRef = _vboPositions.get();
+        auto _vboNormalsRef = _vboNormals.get();
+        auto _vboInstancesColorsRef = _vboInstancesColors.get();
+        auto _vboInstancesModelMatsRef = _vboInstancesModelMats.get();
+        auto _vboInstancesNormalMatsRef = _vboInstancesNormalMats.get();
+        auto _iboRef = _ibo.get();
+
+        auto _vao = std::make_unique<CVertexArray>();
+        _vao->addVertexBuffer( std::move( _vboPositions ) );
+        _vao->addVertexBuffer( std::move( _vboNormals ) );
+        _vao->addVertexBuffer( std::move( _vboInstancesColors ), true );
+        _vao->addVertexBuffer( std::move( _vboInstancesModelMats ), true );
+        _vao->addVertexBuffer( std::move( _vboInstancesNormalMats ), true );
+        _vao->setIndexBuffer( std::move( _ibo ) );
+
+        m_primitivesVAO[primitive] = std::move( _vao );
+
+        m_primitivesIBOrefs[primitive] = _iboRef;
+        m_primitivesVBOpositionsRefs[primitive] = _vboPositionsRef;
+        m_primitivesVBOnormalsRefs[primitive] = _vboNormalsRef;
+        m_primitivesVBOinstancesColorsRefs[primitive] = _vboInstancesColorsRef;
+        m_primitivesVBOinstancesModelMatsRefs[primitive] = _vboInstancesModelMatsRef;
+        m_primitivesVBOinstancesNormalMatsRefs[primitive] = _vboInstancesNormalMatsRef;
     }
 
     void CDebugDrawer::_render( CICamera* camera )
@@ -393,8 +426,8 @@ namespace engine
     {
         m_linesVAO->bind();
 
-        m_linesPositionsVBO->updateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
-        m_linesColorsVBO->updateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
+        m_linesPositionsVBOref->updateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
+        m_linesColorsVBOref->updateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
         glDrawArrays( GL_LINES, 0, numLines * 2 );
 
@@ -612,11 +645,11 @@ namespace engine
 
         m_primitivesVAO[primitive]->bind();
 
-        m_primitivesVBOinstancesColors[primitive]->updateData( numPrimitives * sizeof ( CVec4 ), (float32*) m_renderBufferPrimitivesColors[primitive].data() );
-        m_primitivesVBOinstancesModelMats[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesModelMats[primitive].data() );
-        m_primitivesVBOinstancesNormalMats[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesNormalMats[primitive].data() );
+        m_primitivesVBOinstancesColorsRefs[primitive]->updateData( numPrimitives * sizeof ( CVec4 ), (float32*) m_renderBufferPrimitivesColors[primitive].data() );
+        m_primitivesVBOinstancesModelMatsRefs[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesModelMats[primitive].data() );
+        m_primitivesVBOinstancesNormalMatsRefs[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesNormalMats[primitive].data() );
 
-        glDrawElementsInstanced( GL_TRIANGLES, m_primitivesIBO[primitive]->count(), GL_UNSIGNED_INT, 0, numPrimitives );
+        glDrawElementsInstanced( GL_TRIANGLES, m_primitivesIBOrefs[primitive]->count(), GL_UNSIGNED_INT, 0, numPrimitives );
 
         m_primitivesVAO[primitive]->unbind();
     }

@@ -80,6 +80,8 @@ namespace engine
 
     CApplication::~CApplication()
     {
+        ENGINE_CORE_INFO( "GL-Application: destroying..." );
+
         m_scene         = nullptr;
         m_mainRenderer  = nullptr;
         m_imguiManager  = nullptr;

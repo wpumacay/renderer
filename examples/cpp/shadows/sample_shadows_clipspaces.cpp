@@ -263,9 +263,9 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr,
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new ShadowsUtilsLayer( "Shadows-utils" );
-    _app->addGuiLayer( std::unique_ptr< ShadowsUtilsLayer >( _uiLayer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<ShadowsUtilsLayer>( "Shadows-utils" );
+    _app->addGuiLayer( std::move( _uiLayer ) );
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
@@ -297,28 +297,28 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
 //     const float _cameraSensitivity  = 0.25f;
 //     const float _cameraSpeed        = 250.0f;
 //     const float _cameraMaxDelta     = 10.0f;
 //     
-//     auto _camera = new engine::CFpsCamera( "fps",
-//                                            { 2.0f, 2.0f, 2.0f },
-//                                            { 0.0f, 0.0f, 0.0f },
-//                                            engine::eAxis::Y,
-//                                            _cameraProjData,
-//                                            _cameraSensitivity,
-//                                            _cameraSpeed,
-//                                            _cameraMaxDelta );
+//     auto _camera = std::make_unique<engine::CFpsCamera>( "fps",
+//                                                          engine::CVec3( 2.0f, 2.0f, 2.0f ),
+//                                                          engine::CVec3( 0.0f, 0.0f, 0.0f ),
+//                                                          engine::eAxis::Y,
+//                                                          _cameraProjData,
+//                                                          _cameraSensitivity,
+//                                                          _cameraSpeed,
+//                                                          _cameraMaxDelta );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    _app->scene()->addCamera( std::move( _camera ) );
 
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();
@@ -399,17 +399,14 @@ int main()
     engine::CVertexBufferLayout _layout = { { "pos", engine::eElementType::Float2, false },
                                             { "uv", engine::eElementType::Float2, false } };
 
-    auto _quad_vbuffer = new engine::CVertexBuffer( _layout,
-                                                    engine::eBufferUsage::STATIC,
-                                                    sizeof( _quad_buffData ),
-                                                    _quad_buffData );;
+    auto _quad_vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC,
+                                                                  sizeof( _quad_buffData ), _quad_buffData );;
 
-    auto _quad_ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                                   6, _quad_indices );
+    auto _quad_ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _quad_indices );
 
-    auto _quad_varray = new engine::CVertexArray();
-    _quad_varray->addVertexBuffer( _quad_vbuffer );
-    _quad_varray->setIndexBuffer( _quad_ibuffer );
+    auto _quad_varray = std::make_unique<engine::CVertexArray>();
+    _quad_varray->addVertexBuffer( std::move( _quad_vbuffer ) );
+    _quad_varray->setIndexBuffer( std::move( _quad_ibuffer ) );
 
     while( _app->active() )
     {
@@ -457,13 +454,13 @@ int main()
         /* do our thing here ************************/
 
         // render to shadow map first
-        renderToShadowMap( _currentLight, _camera, _shadowmap, _shaderShadowMapProj, _floor, { _cube1, _cube2, _cube3 } );
+        renderToShadowMap( _currentLight, _camera.get(), _shadowmap, _shaderShadowMapProj, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the scene normally
-        renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows, _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
+        renderSceneWithShadows( _currentLight, _camera.get(), _shadowmap, _shaderPhongWithShadows, _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
 
         // render the shadowmap to a quad
-        renderShadowMapVisualization( _currentLight, _quad_varray, _shaderShadowMapViz, _shadowmap );
+        renderShadowMapVisualization( _currentLight, _quad_varray.get(), _shaderShadowMapViz, _shadowmap );
 
         /********************************************/
 

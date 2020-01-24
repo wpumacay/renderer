@@ -14,10 +14,13 @@
 #include <memory>
 #include <algorithm>
 #include <functional>
+#include <iomanip>
 #include <vector>
 #include <unordered_map>
 #include <map>
 #include <set>
+
+#include <CExtensions.h>
 
 #define ENGINE_PI 3.141592653589793f
 #define ENGINE_EPS 0.000001f
@@ -39,6 +42,8 @@ namespace engine
     std::string getFoldernameFromFilePath( const std::string& filepath );
     std::string getFolderpathFromFilePath( const std::string& filepath );
     std::string getFilenameNoExtensionFromFilePath( const std::string& filepath );
+
+    std::string pointerToHexAddress( const void* ptr );
 
     typedef unsigned char uint8;
     typedef unsigned int uint32;

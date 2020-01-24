@@ -437,17 +437,14 @@ int main()
     engine::CVertexBufferLayout _layout = { { "pos", engine::eElementType::Float2, false },
                                             { "uv", engine::eElementType::Float2, false } };
 
-    auto _quad_vbuffer = new engine::CVertexBuffer( _layout,
-                                                    engine::eBufferUsage::STATIC,
-                                                    sizeof( _quad_buffData ),
-                                                    _quad_buffData );;
+    auto _quad_vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC,
+                                                                  sizeof( _quad_buffData ), _quad_buffData );
 
-    auto _quad_ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                                   6, _quad_indices );
+    auto _quad_ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _quad_indices );
 
-    auto _quad_varray = new engine::CVertexArray();
-    _quad_varray->addVertexBuffer( _quad_vbuffer );
-    _quad_varray->setIndexBuffer( _quad_ibuffer );
+    auto _quad_varray = std::make_unique<engine::CVertexArray>();
+    _quad_varray->addVertexBuffer( std::move( _quad_vbuffer ) );
+    _quad_varray->setIndexBuffer( std::move( _quad_ibuffer ) );
 
     while( _app->active() )
     {
@@ -527,7 +524,7 @@ int main()
         _app->render();
 
         // visualize the shadow-map
-        renderDepthMap( lightPtr, _quad_varray, _shaderShadowMapViz, _app->renderer()->shadowMap() );
+        renderDepthMap( lightPtr, _quad_varray.get(), _shaderShadowMapViz, _app->renderer()->shadowMap() );
 
         /****************************************************/
 

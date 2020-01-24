@@ -13,13 +13,14 @@ namespace engine
     public :
         static void Init();
         static void Release();
+        static bool IsActive();
         static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
         static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 
         template< typename... Args >
         static void CoreTrace( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_CoreLogger->trace( fmt, args... );
@@ -28,7 +29,7 @@ namespace engine
         template< typename... Args >
         static void CoreInfo( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_CoreLogger->info( fmt, args... );
@@ -37,7 +38,7 @@ namespace engine
         template< typename... Args >
         static void CoreWarn( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_CoreLogger->warn( fmt, args... );
@@ -46,7 +47,7 @@ namespace engine
         template< typename... Args >
         static void CoreError( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_CoreLogger->error( fmt, args... );
@@ -55,7 +56,7 @@ namespace engine
         template< typename... Args >
         static void CoreCritical( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_CoreLogger->critical( fmt, args... );
@@ -64,7 +65,7 @@ namespace engine
         template< typename... Args >
         static void ClientTrace( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_ClientLogger->trace( fmt, args... );
@@ -73,7 +74,7 @@ namespace engine
         template< typename... Args >
         static void ClientInfo( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_ClientLogger->info( fmt, args... );
@@ -82,7 +83,7 @@ namespace engine
         template< typename... Args >
         static void ClientWarn( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_ClientLogger->warn( fmt, args... );
@@ -91,7 +92,7 @@ namespace engine
         template< typename... Args >
         static void ClientError( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_ClientLogger->error( fmt, args... );
@@ -100,7 +101,7 @@ namespace engine
         template< typename... Args >
         static void ClientCritical( string_view_t fmt, const Args &... args )
         {
-            if ( !CLogger::s_Initialized )
+            if ( !CLogger::s_IsActive )
                 return;
 
             CLogger::s_ClientLogger->critical( fmt, args... );
@@ -110,7 +111,7 @@ namespace engine
         static std::shared_ptr<spdlog::logger> s_CoreLogger;
         static std::shared_ptr<spdlog::logger> s_ClientLogger;
 
-        static bool s_Initialized;
+        static bool s_IsActive;
     };
 
     inline void empty_func() {}

@@ -37,7 +37,7 @@ private :
     bool m_isHovered;
 };
 
-engine::CVertexArray* createGeometry()
+std::unique_ptr<engine::CVertexArray> createGeometry()
 {
     float _bufferData[] = {
     /*|      pos     |     color      |*/
@@ -55,19 +55,18 @@ engine::CVertexArray* createGeometry()
     engine::CVertexBufferLayout _layout = { { "pos", engine::eElementType::Float2, false },
                                             { "color", engine::eElementType::Float3, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layout, 
-                                               engine::eBufferUsage::STATIC, 
-                                               sizeof( _bufferData ), 
-                                               _bufferData );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, 
+                                                             engine::eBufferUsage::STATIC, 
+                                                             sizeof( _bufferData ), 
+                                                             _bufferData );
 
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6, _indices );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _varray = new engine::CVertexArray();
-    _varray->addVertexBuffer( _vbuffer );
-    _varray->setIndexBuffer( _ibuffer );
+    auto _varray = std::make_unique<engine::CVertexArray>();
+    _varray->addVertexBuffer( std::move( _vbuffer ) );
+    _varray->setIndexBuffer( std::move( _ibuffer ) );
 
-    return _varray;
+    return std::move( _varray );
 }
 
 int main()
@@ -79,9 +78,9 @@ int main()
     _windowProperties.clearColor = { 0.8f, 0.1f, 0.1f, 1.0f };
     _windowProperties.resizable = true;
 
-    auto _app = new engine::CApplication( _windowProperties );
-    auto _sample_layer = new SampleGuiLayer( "sample-layer" );
-    _app->addGuiLayer( std::unique_ptr< engine::CImGuiLayer >( _sample_layer ) );
+    auto _app = std::make_unique<engine::CApplication>( _windowProperties );
+    auto _sample_layer = std::make_unique<SampleGuiLayer>( "sample-layer" );
+    _app->addGuiLayer( std::move( _sample_layer ) );
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_no_textures" );
     auto _geometryVAO = createGeometry();

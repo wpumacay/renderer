@@ -19,39 +19,34 @@ namespace engine
         m_texCoords = texCoords;
         m_indices   = indices;
 
-        m_vbufferVertices = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "position", eElementType::Float3, false } },
-                                                                                 buffersUsage,
-                                                                                 sizeof( CVec3 ) * m_vertices.size(),
-                                                                                 (float32*) m_vertices.data() ) );
+        CVertexBufferLayout _vbufferVerticesLayout = { { "position", eElementType::Float3, false } };
+        CVertexBufferLayout _vbufferNormalsLayout = { { "normal", eElementType::Float3, true } };
+        CVertexBufferLayout _vbufferUVsLayout = { { "texCoord", eElementType::Float2, false } };
 
-        m_vbufferNormals = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "normal", eElementType::Float3, true } },
-                                                                                buffersUsage,
-                                                                                sizeof( CVec3 ) * m_normals.size(),
-                                                                                (float32*) m_normals.data() ) );
+        const uint32 _vbufferVerticesSize = sizeof( CVec3 ) * m_vertices.size();
+        const uint32 _vbufferNormalsSize = sizeof( CVec3 ) * m_normals.size();
+        const uint32 _vbufferUVsSize = sizeof( CVec2 ) * m_texCoords.size();
 
-        m_vbufferUVs = std::unique_ptr< CVertexBuffer >( new CVertexBuffer( { { "texCoord", eElementType::Float2, false } },
-                                                                            buffersUsage,
-                                                                            sizeof( CVec2 ) * m_texCoords.size(),
-                                                                            (float32*) m_texCoords.data() ) );
+        float32* _vbufferVerticesData = (float32*) m_vertices.data();
+        float32* _vbufferNormalsData = (float32*) m_normals.data();
+        float32* _vbufferUVsData = (float32*) m_texCoords.data();
 
-        m_ibuffer = std::unique_ptr< CIndexBuffer >( new CIndexBuffer( buffersUsage,
-                                                                       3 * m_indices.size(),
-                                                                       (uint32*) m_indices.data() ) );
+        auto _vbufferVertices = std::make_unique< CVertexBuffer >( _vbufferVerticesLayout, buffersUsage, _vbufferVerticesSize, _vbufferVerticesData );
+        auto _vbufferNormals = std::make_unique< CVertexBuffer >( _vbufferNormalsLayout, buffersUsage, _vbufferNormalsSize, _vbufferNormalsData );
+        auto _vbufferUVs = std::make_unique< CVertexBuffer >( _vbufferUVsLayout, buffersUsage, _vbufferUVsSize, _vbufferUVsData );
 
-        m_varray = std::unique_ptr< CVertexArray >( new CVertexArray() );
-        m_varray->addVertexBuffer( m_vbufferVertices.get() );
-        m_varray->addVertexBuffer( m_vbufferNormals.get() );
-        m_varray->addVertexBuffer( m_vbufferUVs.get() );
-        m_varray->setIndexBuffer( m_ibuffer.get() );
+        auto _ibuffer = std::make_unique< CIndexBuffer >( buffersUsage, 3 * m_indices.size(), (uint32*) m_indices.data() );
+
+        m_varray = std::make_unique< CVertexArray >();
+        m_varray->addVertexBuffer( std::move( _vbufferVertices ) );
+        m_varray->addVertexBuffer( std::move( _vbufferNormals ) );
+        m_varray->addVertexBuffer( std::move( _vbufferUVs ) );
+        m_varray->setIndexBuffer( std::move( _ibuffer ) );
     }
 
     CMesh::~CMesh()
     {
-        m_varray            = nullptr;
-        m_vbufferVertices   = nullptr;
-        m_vbufferNormals    = nullptr;
-        m_vbufferUVs        = nullptr;
-        m_ibuffer           = nullptr;
+        m_varray = nullptr;
     }
 
     void CMesh::render()

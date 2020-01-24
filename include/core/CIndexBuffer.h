@@ -22,7 +22,9 @@ namespace engine
         void bind();
         void unbind();
 
+        eBufferUsage usage() const { return m_bufferUsage; }
         uint32 count() const { return m_bufferCount; }
+        uint32 openglId() const { return m_openglId; }
 
     private :
 

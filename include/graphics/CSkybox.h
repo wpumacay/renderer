@@ -22,14 +22,15 @@ namespace engine
         void render();
         void setCubemap( CTextureCube* cubemap ) { m_cubemap = cubemap; }
 
-        CVertexArray* vao() const { return m_vertexArray.get(); }
+        std::unique_ptr<CVertexArray>& vao() { return m_vertexArray; }
+        const std::unique_ptr<CVertexArray>& vao() const { return m_vertexArray; }
+
         CTextureCube* cubemap() const { return m_cubemap; }
 
     private :
 
-        CTextureCube*                       m_cubemap;
-        std::unique_ptr< CVertexBuffer >    m_vertexBuffer;
-        std::unique_ptr< CVertexArray >     m_vertexArray;
+        CTextureCube* m_cubemap;
+        std::unique_ptr< CVertexArray > m_vertexArray;
 
     };
 

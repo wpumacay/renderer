@@ -1,28 +1,42 @@
 
 #include <core/CVertexArray.h>
-
+#include <utils/CLogger.h>
 
 namespace engine
 {
 
-    CVertexArray::CVertexArray()
+    CVertexArray::CVertexArray( bool track )
     {
         m_numAttribIndx = 0;
         m_openglId      = 0;
         m_indexBuffer   = nullptr;
+        m_track = track;
 
         glGenVertexArrays( 1, &m_openglId );
+
+        if ( m_track )
+            ENGINE_CORE_TRACE( "Allocs: Created Vertex Array Object" );
     }
 
     CVertexArray::~CVertexArray()
     {
+        // released owned VBOs
+        m_vertexBuffers.clear();
+        // release owned EBO
+        m_indexBuffer = nullptr;
+
         glDeleteVertexArrays( 1, &m_openglId );
 
-        m_indexBuffer = nullptr;
-        m_vertexBuffers.clear();
+        if ( m_track )
+        {
+            if ( CLogger::IsActive() )
+                ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
+            else // in python-land (when exiting script) we might have destroyed logger first
+                std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;
+        }
     }
 
-    void CVertexArray::addVertexBuffer( CVertexBuffer* vertexBuffer, bool isInstanced )
+    void CVertexArray::addVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced )
     {
         // setup the VBO within our VAO according to its layout
         auto _buffLayout = vertexBuffer->layout();
@@ -50,10 +64,11 @@ namespace engine
         unbind();
 
         // keep a reference only
-        m_vertexBuffers.push_back( vertexBuffer );
+        // keep a reference only
+        m_vertexBuffers.push_back( std::move( vertexBuffer ) );
     }
 
-    void CVertexArray::setIndexBuffer( CIndexBuffer* indexBuffer )
+    void CVertexArray::setIndexBuffer( std::unique_ptr<CIndexBuffer> indexBuffer )
     {
         // setup the IBO within our VAO
         glBindVertexArray( m_openglId );
@@ -62,7 +77,7 @@ namespace engine
         indexBuffer->unbind();
 
         // keep a reference only
-        m_indexBuffer = indexBuffer;
+        m_indexBuffer = std::move( indexBuffer );
     }
 
     void CVertexArray::bind()

@@ -7,12 +7,12 @@ int g_num_floors = 30;
 
 bool g_useInstancing = true;
 
-engine::CVertexArray* g_cubeVAO_NoInstancing = nullptr;
-engine::CVertexArray* g_cubeVAO_Instancing = nullptr;
-engine::CVertexBuffer* g_cubeVAO_modelMatricesBuffer = nullptr;
+std::unique_ptr<engine::CVertexArray> g_cubeVAO_NoInstancing = nullptr;
+std::unique_ptr<engine::CVertexArray> g_cubeVAO_Instancing = nullptr;
+engine::CVertexBuffer* g_cubeVAO_modelMatricesBufferRef = nullptr;
 
-engine::CVertexArray* createCube_noInstancing();
-engine::CVertexArray* createCube_Instancing();
+std::unique_ptr<engine::CVertexArray> createCube_noInstancing();
+std::unique_ptr<engine::CVertexArray> createCube_Instancing();
 
 void drawGrid_noInstancing( engine::CShader* shader,
                             engine::CICamera* camera,
@@ -75,32 +75,18 @@ int main()
         _app->begin();
 
         if ( g_useInstancing )
-            drawGrid_Instancing( _shaderInstancing3d, _camera, g_cubeVAO_Instancing, _bufferModelMatrices );
+            drawGrid_Instancing( _shaderInstancing3d, _camera, g_cubeVAO_Instancing.get(), _bufferModelMatrices );
         else
-            drawGrid_noInstancing( _shaderNoInstancing3d, _camera, g_cubeVAO_NoInstancing );
+            drawGrid_noInstancing( _shaderNoInstancing3d, _camera, g_cubeVAO_NoInstancing.get() );
 
         _app->render();
         _app->end();
     }
 
-    auto _vbos_noInstancing = g_cubeVAO_NoInstancing->vertexBuffers();
-    auto _ibo_noInstancing = g_cubeVAO_NoInstancing->indexBuffer();
-    for ( auto _vbo : _vbos_noInstancing )
-        delete _vbo;
-    delete _ibo_noInstancing;
-    delete g_cubeVAO_NoInstancing;
-
-    auto _vbos_Instancing = g_cubeVAO_Instancing->vertexBuffers();
-    auto _ibo_Instancing = g_cubeVAO_Instancing->indexBuffer();
-    for ( auto _vbo : _vbos_Instancing )
-        delete _vbo;
-    delete _ibo_Instancing;
-    delete g_cubeVAO_Instancing;
-
     return 0;
 }
 
-engine::CVertexArray* createCube_noInstancing()
+std::unique_ptr<engine::CVertexArray> createCube_noInstancing()
 {
     float _bufferData[] = {
     /*|      pos              |      color      |*/
@@ -126,22 +112,19 @@ engine::CVertexArray* createCube_noInstancing()
     engine::CVertexBufferLayout _layoutPerVertex = { { "pos", engine::eElementType::Float3, false },
                                                      { "color", engine::eElementType::Float3, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layoutPerVertex,
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _bufferData ),
-                                               _bufferData );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layoutPerVertex, engine::eBufferUsage::STATIC,
+                                                             sizeof( _bufferData ), _bufferData );
 
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6 * 6, _indices );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6 * 6, _indices );
 
-    auto _cubeVAO = new engine::CVertexArray();
-    _cubeVAO->addVertexBuffer( _vbuffer );
-    _cubeVAO->setIndexBuffer( _ibuffer );
+    auto _cubeVAO = std::make_unique<engine::CVertexArray>();
+    _cubeVAO->addVertexBuffer( std::move( _vbuffer ) );
+    _cubeVAO->setIndexBuffer( std::move( _ibuffer ) );
 
-    return _cubeVAO;
+    return std::move( _cubeVAO );
 }
 
-engine::CVertexArray* createCube_Instancing()
+std::unique_ptr<engine::CVertexArray> createCube_Instancing()
 {
     float _bufferData[] = {
     /*|      pos              |      color      |*/
@@ -167,30 +150,27 @@ engine::CVertexArray* createCube_Instancing()
     engine::CVertexBufferLayout _layoutPerVertex = { { "pos", engine::eElementType::Float3, false },
                                                      { "color", engine::eElementType::Float3, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layoutPerVertex,
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _bufferData ),
-                                               _bufferData );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layoutPerVertex, engine::eBufferUsage::STATIC,
+                                                             sizeof( _bufferData ), _bufferData );
 
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6 * 6, _indices );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6 * 6, _indices );
 
-    auto _modelMatricesBuffer = new engine::CVertexBuffer( { { "modelMatrix-col0", engine::eElementType::Float4, false },
-                                                             { "modelMatrix-col1", engine::eElementType::Float4, false },
-                                                             { "modelMatrix-col2", engine::eElementType::Float4, false },
-                                                             { "modelMatrix-col3", engine::eElementType::Float4, false } },
-                                                           engine::eBufferUsage::DYNAMIC,
-                                                           g_num_rows * g_num_cols * g_num_floors * 4 * engine::sizeOfElement( engine::eElementType::Float4 ),
-                                                           NULL );
+    auto _modelMatricesBufferLayout = engine::CVertexBufferLayout( { { "modelMatrix-col0", engine::eElementType::Float4, false },
+                                                                     { "modelMatrix-col1", engine::eElementType::Float4, false },
+                                                                     { "modelMatrix-col2", engine::eElementType::Float4, false },
+                                                                     { "modelMatrix-col3", engine::eElementType::Float4, false } } );
+    auto _modelMatricesBuffer = std::make_unique<engine::CVertexBuffer>( _modelMatricesBufferLayout, engine::eBufferUsage::DYNAMIC,
+                                                                         g_num_rows * g_num_cols * g_num_floors * 4 * engine::sizeOfElement( engine::eElementType::Float4 ),
+                                                                         (engine::float32*) NULL );
 
-    auto _cubeVAO = new engine::CVertexArray();
-    _cubeVAO->addVertexBuffer( _vbuffer );
-    _cubeVAO->addVertexBuffer( _modelMatricesBuffer, true ); // tell the vao that this has to be instanced
-    _cubeVAO->setIndexBuffer( _ibuffer );
+    g_cubeVAO_modelMatricesBufferRef = _modelMatricesBuffer.get(); // keep a reference to update the positions
 
-    g_cubeVAO_modelMatricesBuffer = _modelMatricesBuffer; // keep a reference to update the positions
+    auto _cubeVAO = std::make_unique<engine::CVertexArray>();
+    _cubeVAO->addVertexBuffer( std::move( _vbuffer ) );
+    _cubeVAO->addVertexBuffer( std::move( _modelMatricesBuffer ), true ); // tell the vao that this has to be instanced
+    _cubeVAO->setIndexBuffer( std::move( _ibuffer ) );
 
-    return _cubeVAO;
+    return std::move( _cubeVAO );
 }
 
 void drawGrid_noInstancing( engine::CShader* shader,
@@ -252,7 +232,7 @@ void drawGrid_Instancing( engine::CShader* shader,
     // update our buffer data
     int _num_instances = g_num_rows * g_num_cols * g_num_floors;
     int _size_of_mat4 = 4 * engine::sizeOfElement( engine::eElementType::Float4 );
-    g_cubeVAO_modelMatricesBuffer->updateData( _num_instances * _size_of_mat4,
+    g_cubeVAO_modelMatricesBufferRef->updateData( _num_instances * _size_of_mat4,
                                                (engine::float32*) bufferModelMatrices.data() );
 
     // do the render call (instanced)

@@ -1,12 +1,9 @@
 
 #include <CEngine.h>
 
-#include <core/CTexture.h>
-#include <assets/CTextureManager.h>
-
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     auto _textureDataJpg = engine::CTextureManager::GetCachedTextureData( "img_container" );
     auto _textureDataPng = engine::CTextureManager::GetCachedTextureData( "img_smiley" );
@@ -46,16 +43,13 @@ int main()
                                             { "col", engine::eElementType::Float3, false },
                                             { "uv",  engine::eElementType::Float2, false } };
 
-    auto _vbuffer = new engine::CVertexBuffer( _layout,
-                                               engine::eBufferUsage::STATIC,
-                                               sizeof( _bufferData ),
-                                               _bufferData );
-    auto _ibuffer = new engine::CIndexBuffer( engine::eBufferUsage::STATIC,
-                                              6, _indices );
+    auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC,
+                                                             sizeof( _bufferData ), _bufferData );
+    auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _varray = new engine::CVertexArray();
-    _varray->addVertexBuffer( _vbuffer );
-    _varray->setIndexBuffer( _ibuffer );
+    auto _varray = std::make_unique<engine::CVertexArray>();
+    _varray->addVertexBuffer( std::move( _vbuffer ) );
+    _varray->setIndexBuffer( std::move( _ibuffer ) );
 
     auto _shader = engine::CShaderManager::GetCachedShader( "basic2d_textures" );
 

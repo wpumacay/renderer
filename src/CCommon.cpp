@@ -67,6 +67,14 @@ namespace engine
         return engine::split( engine::split( filepath, '/' ).back(), '.' ).front();
     }
 
+    std::string pointerToHexAddress( const void* ptr )
+    {
+        auto ptr_casted = reinterpret_cast<std::intptr_t>( ptr );
+        std::stringstream _ss;
+        _ss << "0x" << std::hex << ptr_casted;
+        return _ss.str();
+    }
+
     std::string toString( const eAxis& axis )
     {
         if ( axis == eAxis::X ) return "x";

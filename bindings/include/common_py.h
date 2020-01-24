@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <CCommon.h>
 #include <CMath.h>
 // binding declarations from tinymath
