@@ -39,18 +39,15 @@ namespace engine
 
     CTextureManager::~CTextureManager()
     {
-        m_textures.clear();
-        m_texturesList.clear();
+        m_texturesMap.clear();
+        m_texturesListRefs.clear();
+        m_texturesDataMapRefs.clear();
+        m_texturesDataListRefs.clear();
 
-        m_texturesData.clear();
-        m_texturesDataList.clear();
-    }
-
-    CTextureData* CTextureManager::LoadTextureData( const std::string& filepath, bool flipVertically )
-    {
-        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
-
-        return CTextureManager::s_instance->_loadTextureData( filepath, flipVertically );
+        m_texturesCubeMap.clear();
+        m_texturesCubeListRefs.clear();
+        m_texturesCubeDataMapRefs.clear();
+        m_texturesCubeDataListRefs.clear();
     }
 
     CTexture* CTextureManager::LoadTexture( const std::string& filepath,
@@ -73,6 +70,13 @@ namespace engine
                                             bool flipVertically )
     {
         return CTextureManager::LoadTexture( filepath, { filterMin, filterMag, wrapU, wrapV, borderColorU, borderColorV, dtype }, flipVertically );
+    }
+
+    CTextureCube* CTextureManager::LoadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically )
+    {
+        ENGINE_CORE_ASSERT( CTextureManager::s_instance, "Must initialize texture manager before using it" );
+
+        return CTextureManager::s_instance->_loadTextureCube( filepaths, flipVertically );
     }
 
     CTextureData* CTextureManager::GetCachedTextureData( const std::string& texDataId )
@@ -242,7 +246,7 @@ namespace engine
         }
     }
 
-    CTextureData* CTextureManager::_loadTextureData( const std::string& filepath, bool flipVertically )
+    std::unique_ptr<CTextureData> CTextureManager::_loadTextureData( const std::string& filepath, bool flipVertically )
     {
         if ( flipVertically )
             stbi_set_flip_vertically_on_load( true );
@@ -263,14 +267,14 @@ namespace engine
         std::string _filename = engine::split( filepath, '/' ).back();
         std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
 
-        if ( m_texturesData.find( _filenameNoExtension ) != m_texturesData.end() )
+        if ( m_texturesDataMapRefs.find( _filenameNoExtension ) != m_texturesDataMapRefs.end() )
         {
-            ENGINE_CORE_WARN( "Tried loading texture-data with name {0} twice. Returning cached one", 
+            ENGINE_CORE_WARN( "Tried loading texture-data with name {0} twice. Returning nullptr", 
                               _filenameNoExtension );
-            return m_texturesData[ _filenameNoExtension ].get();
+            return nullptr;
         }
 
-        auto _textureData = new CTextureData();
+        auto _textureData = std::make_unique<CTextureData>();
 
         int _width, _height, _channels;
         _textureData->data = stbi_load( filepath.c_str(), &_width, &_height, &_channels, 0 );
@@ -288,18 +292,17 @@ namespace engine
         _textureData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
         // keep ownership of the created texture data
-        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
-        m_texturesData[ _filenameNoExtension ] = std::move( _textureDataPtr );
-        m_texturesDataList.push_back( _textureData );
+        m_texturesDataMapRefs[ _filenameNoExtension ] = _textureData.get();
+        m_texturesDataListRefs.push_back( _textureData.get() );
 
         // default mode (vertically flipped)
         stbi_set_flip_vertically_on_load( true );
 
-        return _textureData;
+        return std::move( _textureData );
     }
 
 
-    CTextureCubeData* CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically )
+    std::unique_ptr<CTextureCubeData> CTextureManager::_loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically )
     {
         if ( flipVertically )
             stbi_set_flip_vertically_on_load( true );
@@ -370,7 +373,7 @@ namespace engine
 
             _name = _filenameBasename;
 
-            if ( m_texturesCubeData.find( _filenameBasename ) != m_texturesCubeData.end() )
+            if ( m_texturesCubeDataMapRefs.find( _filenameBasename ) != m_texturesCubeDataMapRefs.end() )
             {
                 _warnAlreadyCached = true;
                 _issueMessage = std::string( "It seems that there's already a cached cube-texture " ) +
@@ -387,7 +390,7 @@ namespace engine
             {
                 _errorData = true;
                 _issueMessage = std::string( "Couldn't load data from file: " ) + filepaths[i];
-                break;;
+                break;
             }
 
             if ( ( i > 0 ) && ( _sideWidth != _width || _sideHeight != _height || _sideChannels != _channels ) )
@@ -422,26 +425,25 @@ namespace engine
         if ( _warnAlreadyCached )
         {
             ENGINE_CORE_WARN( _issueMessage );
-            return m_texturesCubeData[_name].get();
+            return nullptr;
         }
 
-        auto _textureCubeData = new CTextureCubeData();
-        _textureCubeData->name              = _name;
-        _textureCubeData->sidesData         = _sidesData;
-        _textureCubeData->width             = _width;
-        _textureCubeData->height            = _height;
-        _textureCubeData->channels          = _channels;
-        _textureCubeData->format            = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
+        auto _textureCubeData = std::make_unique<CTextureCubeData>();
+        _textureCubeData->name      = _name;
+        _textureCubeData->sidesData = _sidesData;
+        _textureCubeData->width     = _width;
+        _textureCubeData->height    = _height;
+        _textureCubeData->channels  = _channels;
+        _textureCubeData->format    = ( _channels == 3 ) ? eTextureFormat::RGB : eTextureFormat::RGBA;
 
         // keep ownership of the created texture-cube data
-        std::unique_ptr< CTextureCubeData > _textureCubeDataPtr( _textureCubeData );
-        m_texturesCubeData[ _name ] = std::move( _textureCubeDataPtr );
-        m_texturesCubeDataList.push_back( _textureCubeData );
+        m_texturesCubeDataMapRefs[ _name ] = _textureCubeData.get();
+        m_texturesCubeDataListRefs.push_back( _textureCubeData.get() );
 
         /* default mode (vertically flipped) */
         stbi_set_flip_vertically_on_load( true );
 
-        return _textureCubeData;
+        return std::move( _textureCubeData );
     }
 
     CTexture* CTextureManager::_loadTexture( const std::string& filepath,
@@ -458,21 +460,21 @@ namespace engine
         std::string _filename = engine::split( filepath, '/' ).back();
         std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
 
-        if ( m_textures.find( _filenameNoExtension ) != m_textures.end() )
+        if ( m_texturesMap.find( _filenameNoExtension ) != m_texturesMap.end() )
         {
             ENGINE_CORE_WARN( "Tried loading texture with name {0} twice. Returning cached one", 
                               _filenameNoExtension );
-            return m_textures[ _filenameNoExtension ].get();
+            return m_texturesMap[ _filenameNoExtension ].get();
         }
 
-        auto _texture = new CTexture( _textureData, texOptions );
+        auto _texture = std::make_unique<CTexture>( std::move( _textureData ), texOptions );
+        auto _textureRef = _texture.get();
 
         // keep ownership of the created texture
-        std::unique_ptr< CTexture > _texturePtr( _texture );
-        m_textures[ _filenameNoExtension ] = std::move( _texturePtr );
-        m_texturesList.push_back( _texture );
+        m_texturesMap[ _filenameNoExtension ] = std::move( _texture );
+        m_texturesListRefs.push_back( _textureRef );
 
-        return _texture;
+        return _textureRef;
     }
 
     CTextureCube* CTextureManager::_loadTextureCube( const std::array< std::string, 6 >& filepaths,
@@ -485,85 +487,86 @@ namespace engine
             return nullptr;
         }
 
-        if ( m_textures.find( _textureCubeData->name ) != m_textures.end() )
+        if ( m_texturesMap.find( _textureCubeData->name ) != m_texturesMap.end() )
         {
             ENGINE_CORE_WARN( "Tried loading texture-cube with name {0} twice. Returning cached one",
                               _textureCubeData->name );
-            return m_texturesCube[ _textureCubeData->name ].get();
+            return m_texturesCubeMap[ _textureCubeData->name ].get();
         }
 
-        auto _textureCube = new CTextureCube( _textureCubeData );
+        auto _textureCubeName = _textureCubeData->name;
+        auto _textureCube = std::make_unique<CTextureCube>( std::move( _textureCubeData ) );
+        auto _textureCubeRef = _textureCube.get();
 
         // keep ownership of the texture-cube
-        std::unique_ptr< CTextureCube > _textureCubePtr( _textureCube );
-        m_texturesCube[ _textureCubeData->name ] = std::move( _textureCubePtr );
-        m_texturesCubeList.push_back( _textureCube );
+        m_texturesCubeMap[ _textureCubeName ] = std::move( _textureCube );
+        m_texturesCubeListRefs.push_back( _textureCubeRef );
 
-        return _textureCube;
+        return _textureCubeRef;
     }
 
     CTextureData* CTextureManager::_getCachedTextureData( const std::string& texDataId )
     {
-        if ( m_texturesData.find( texDataId ) == m_texturesData.end() )
+        if ( m_texturesDataMapRefs.find( texDataId ) == m_texturesDataMapRefs.end() )
         {
             ENGINE_CORE_WARN( "Texture-data with id {0} hasn't been loaded yet.", texDataId );
             return nullptr;
         }
 
-        return m_texturesData[ texDataId ].get();
+        return m_texturesDataMapRefs[ texDataId ];
     }
 
     CTextureCubeData* CTextureManager::_getCachedTextureCubeData( const std::string& texCubeDataId )
     {
-        if ( m_texturesCubeData.find( texCubeDataId ) == m_texturesCubeData.end() )
+        if ( m_texturesCubeDataMapRefs.find( texCubeDataId ) == m_texturesCubeDataMapRefs.end() )
         {
             ENGINE_CORE_WARN( "Texture-Cube-data with id {0} hasn't been loaded yet.", texCubeDataId );
             return nullptr;
         }
 
-        return m_texturesCubeData[ texCubeDataId ].get();
+        return m_texturesCubeDataMapRefs[ texCubeDataId ];
     }
 
     CTexture* CTextureManager::_getCachedTexture( const std::string& texId )
     {
-        if ( m_textures.find( texId ) == m_textures.end() )
+        if ( m_texturesMap.find( texId ) == m_texturesMap.end() )
         {
             ENGINE_CORE_WARN( "Texture with id {0} hasn't been loaded yet.", texId );
             return nullptr;
         }
 
-        return m_textures[ texId ].get();
+        return m_texturesMap[ texId ].get();
     }
 
     CTextureCube* CTextureManager::_getCachedTextureCube( const std::string& texCubeId )
     {
-        if ( m_texturesCube.find( texCubeId ) == m_texturesCube.end() )
+        if ( m_texturesCubeMap.find( texCubeId ) == m_texturesCubeMap.end() )
         {
             ENGINE_CORE_WARN( "Texture-Cube with id {0} hasn't been loaded yet", texCubeId );
             return nullptr;
         }
 
-        return m_texturesCube[ texCubeId ].get();
+        return m_texturesCubeMap[ texCubeId ].get();
     }
 
     bool CTextureManager::_hasCachedTextureData( const std::string& texDataId )
     {
-        return m_texturesData.find( texDataId ) != m_texturesData.end();
+        return m_texturesDataMapRefs.find( texDataId ) != m_texturesDataMapRefs.end();
     }
 
     bool CTextureManager::_hasCachedTextureCubeData( const std::string& texCubeDataId )
     {
-        return m_texturesCubeData.find( texCubeDataId ) != m_texturesCubeData.end();
+        return m_texturesCubeDataMapRefs.find( texCubeDataId ) != m_texturesCubeDataMapRefs.end();
     }
 
     bool CTextureManager::_hasCachedTexture( const std::string& texId )
     {
-        return m_textures.find( texId ) != m_textures.end();
+        return m_texturesMap.find( texId ) != m_texturesMap.end();
     }
 
     bool CTextureManager::_hasCachedTextureCube( const std::string& texCubeId )
     {
-        return m_texturesCube.find( texCubeId ) != m_texturesCube.end();
+        return m_texturesCubeMap.find( texCubeId ) != m_texturesCubeMap.end();
     }
 
     void CTextureManager::_createBuiltInTextures()
@@ -602,7 +605,7 @@ namespace engine
             }
         }
 
-        auto _textureData = new CTextureData();
+        auto _textureData = std::make_unique<CTextureData>();
         _textureData->name              = "built_in_chessboard";
         _textureData->width             = _width;
         _textureData->height            = _height;
@@ -611,23 +614,21 @@ namespace engine
         _textureData->format            = eTextureFormat::RGB;
         _textureData->data              = (uint8*) _data;
 
-        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
-        m_texturesData[ "built_in_chessboard" ] = std::move( _textureDataPtr );
-        m_texturesDataList.push_back( _textureData );
+        m_texturesDataMapRefs[ "built_in_chessboard" ] = _textureData.get();
+        m_texturesDataListRefs.push_back( _textureData.get() );
 
-        auto _texture = new CTexture( _textureData,
-                                      { eTextureFilter::NEAREST,
-                                        eTextureFilter::NEAREST,
-                                        eTextureWrap::REPEAT,
-                                        eTextureWrap::REPEAT,
-                                        CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
-                                        CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
-                                        ePixelDataType::UINT_8 } );
+        auto _textureOptions = CTextureOptions();
+        _textureOptions.filterMin = eTextureFilter::NEAREST;
+        _textureOptions.filterMag = eTextureFilter::NEAREST;
+        _textureOptions.wrapU = eTextureWrap::REPEAT;
+        _textureOptions.wrapV = eTextureWrap::REPEAT;
+        _textureOptions.borderColorU = { 0.0f, 0.0f, 0.0f, 1.0f };
+        _textureOptions.borderColorV = { 0.0f, 0.0f, 0.0f, 1.0f };
+        _textureOptions.dtype = ePixelDataType::UINT_8;
+        auto _texture = std::make_unique<CTexture>( std::move( _textureData ), _textureOptions );
 
-        std::unique_ptr< CTexture > _texturePtr( _texture );
-        m_textures[ "built_in_chessboard" ] = std::move( _texturePtr );
-        m_texturesList.push_back( _texture );
-
+        m_texturesMap[ "built_in_chessboard" ] = std::move( _texture );
+        m_texturesListRefs.push_back( _texture.get() );
     }
 
 }

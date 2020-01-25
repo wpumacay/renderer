@@ -20,7 +20,6 @@ namespace engine
 
         ~CTextureManager();
 
-        static CTextureData* LoadTextureData( const std::string& filepath, bool flipVertically = true );
         static CTexture* LoadTexture( const std::string& filepath,
                                       const eTextureFilter& filterMin = eTextureFilter::NEAREST,
                                       const eTextureFilter& filterMag = eTextureFilter::NEAREST,
@@ -30,11 +29,11 @@ namespace engine
                                       const CVec4& borderColorV = CVec4( 0.0f, 0.0f, 0.0f, 1.0f ),
                                       const ePixelDataType& dtype = ePixelDataType::UINT_8,
                                       bool flipVertically = true );
+
         static CTexture* LoadTexture( const std::string& filepath,
                                       const CTextureOptions& texOptions,
                                       bool flipVertically = true );
 
-        static CTextureCubeData* LoadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically = false );
         static CTextureCube* LoadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically = false );
 
         static CTextureData* GetCachedTextureData( const std::string& texDataId );
@@ -65,8 +64,8 @@ namespace engine
         void _createBuiltInTextures();
         void _createChessboardTexture();
 
-        CTextureData* _loadTextureData( const std::string& filepath, bool flipVertically );
-        CTextureCubeData* _loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically );
+        std::unique_ptr<CTextureData> _loadTextureData( const std::string& filepath, bool flipVertically );
+        std::unique_ptr<CTextureCubeData> _loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically );
 
         CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions, bool flipVertically );
         CTextureCube* _loadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically );
@@ -83,21 +82,21 @@ namespace engine
         bool _hasCachedTexture( const std::string& texId );
         bool _hasCachedTextureCube( const std::string& texCubeId );
 
-        std::vector< CTextureData* > const _getAllCachedTexturesData() { return m_texturesDataList; }
-        std::vector< CTextureCubeData* > const _getAllCachedTexturesCubeData() { return m_texturesCubeDataList; }
+        std::vector< CTextureData* > const _getAllCachedTexturesData() { return m_texturesDataListRefs; }
+        std::vector< CTextureCubeData* > const _getAllCachedTexturesCubeData() { return m_texturesCubeDataListRefs; }
 
-        std::vector< CTexture* > const _getAllCachedTextures() { return m_texturesList; }
-        std::vector< CTextureCube* > const _getAllCachedTexturesCube() { return m_texturesCubeList; }
+        std::vector< CTexture* > const _getAllCachedTextures() { return m_texturesListRefs; }
+        std::vector< CTextureCube* > const _getAllCachedTexturesCube() { return m_texturesCubeListRefs; }
 
-        std::vector< CTextureData* >     m_texturesDataList;
-        std::vector< CTextureCubeData* > m_texturesCubeDataList;
-        std::vector< CTexture* >         m_texturesList;
-        std::vector< CTextureCube* >     m_texturesCubeList;
+        std::vector< CTextureData* >     m_texturesDataListRefs;
+        std::vector< CTextureCubeData* > m_texturesCubeDataListRefs;
+        std::vector< CTexture* >         m_texturesListRefs;
+        std::vector< CTextureCube* >     m_texturesCubeListRefs;
 
-        std::map< std::string, std::unique_ptr< CTextureData > >        m_texturesData;
-        std::map< std::string, std::unique_ptr< CTextureCubeData > >    m_texturesCubeData;
-        std::map< std::string, std::unique_ptr< CTexture > >            m_textures;
-        std::map< std::string, std::unique_ptr< CTextureCube > >        m_texturesCube;
+        std::map< std::string, CTextureData* >                      m_texturesDataMapRefs;
+        std::map< std::string, CTextureCubeData* >                  m_texturesCubeDataMapRefs;
+        std::map< std::string, std::unique_ptr< CTexture > >        m_texturesMap;
+        std::map< std::string, std::unique_ptr< CTextureCube > >    m_texturesCubeMap;
 
     };
 

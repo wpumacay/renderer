@@ -27,14 +27,15 @@ namespace engine
 
     public :
 
-        CTextureCube( CTextureCubeData* texCubeData );
+        CTextureCube( std::unique_ptr<CTextureCubeData> texCubeData );
 
         ~CTextureCube();
 
         void bind();
         void unbind();
 
-        CTextureCubeData* data() const { return m_data; }
+        std::unique_ptr<CTextureCubeData>& data() { return m_data; }
+        const std::unique_ptr<CTextureCubeData>& data() const { return m_data; }
 
         std::string name() const { return m_data->name; }
         uint32 width() const { return m_data->width; }
@@ -46,7 +47,8 @@ namespace engine
 
     private :
 
-        CTextureCubeData* m_data;
+        std::unique_ptr<CTextureCubeData> m_data;
+
         uint32 m_openglId;
 
     };

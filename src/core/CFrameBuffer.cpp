@@ -75,7 +75,7 @@ namespace engine
         glBindFramebuffer( GL_FRAMEBUFFER, m_openglId );
 
         /* create dummy texture-data for texture attachment **********************/
-        auto _textureData = new CTextureData();
+        auto _textureData = std::make_unique<CTextureData>();
         _textureData->name              = config.name;
         _textureData->data              = NULL;
         _textureData->width             = config.width;
@@ -83,10 +83,6 @@ namespace engine
         _textureData->channels          = 0; // not used for our case
         _textureData->internalFormat    = config.texInternalFormat;
         _textureData->format            = config.texFormat;
-
-        // keep ownership of the texture data of this attachment
-        std::unique_ptr< CTextureData > _textureDataPtr( _textureData );
-        m_texturesData[config.name] = std::move( _textureDataPtr );
 
         CTextureOptions _textureOpts;
         _textureOpts.filterMin      = eTextureFilter::NEAREST;
@@ -97,7 +93,7 @@ namespace engine
         _textureOpts.borderColorV   = config.texBorderColorV;
         _textureOpts.dtype          = config.texPixelDataType;
 
-        std::unique_ptr< CTexture > _texturePtr( new CTexture( _textureData, _textureOpts ) );
+        auto _texture = std::make_unique<CTexture>( std::move( _textureData ), _textureOpts );
 
         /************************************************************************/
 
@@ -105,18 +101,18 @@ namespace engine
         glFramebufferTexture2D( GL_FRAMEBUFFER, 
                                 toOpenGLEnum( config.attachment ), 
                                 GL_TEXTURE_2D,
-                                _texturePtr->openglId(),
+                                _texture->openglId(),
                                 0 );
 
         // sanity check: make sure framebuffer is correctly configured (@TODO: might be an issue with only depth-attach)
         if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
-            ENGINE_CORE_ERROR( "There seems to be an issue with a frame buffer" );
+            ENGINE_CORE_ERROR( "CFrameBuffer::addAttachment >>> There seems to be an issue with a frame buffer" );
 
         // release our current framebuffer object
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
         // keep ownership of the texture of this attachment
-        m_textures[config.name] = std::move( _texturePtr );
+        m_textures[config.name] = std::move( _texture );
     }
 
     void CFrameBuffer::bind()
@@ -140,7 +136,7 @@ namespace engine
     {
         if ( m_textures.find( name ) == m_textures.end() )
         {
-            ENGINE_CORE_ERROR( "Tried to grab non-existent tex-attachment for id: {0}", name );
+            ENGINE_CORE_ERROR( "CFrameBuffer::getTextureAttachment >>> Tried to grab non-existent tex-attachment for id: {0}", name );
             return nullptr;
         }
 
@@ -151,7 +147,7 @@ namespace engine
     {
         if ( m_configs.find( name ) == m_configs.end() )
         {
-            ENGINE_CORE_ERROR( "Tried to grab non-existent config-attachment for id: {0}", name );
+            ENGINE_CORE_ERROR( "CFrameBuffer::getConfigAttachment >>> Tried to grab non-existent config-attachment for id: {0}", name );
             return CAttachmentConfig();
         }
 

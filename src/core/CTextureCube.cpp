@@ -1,7 +1,6 @@
 
 #include <core/CTextureCube.h>
 
-
 namespace engine
 {
 
@@ -17,12 +16,26 @@ namespace engine
         height      = 0;
         channels    = 0;
         format      = eTextureFormat::NONE;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     CTextureCubeData::~CTextureCubeData()
     {
         for ( size_t i = 0; i < sidesData.size(); i++ )
             delete sidesData[i];
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     std::string toString( const CTextureCubeData& texCubeData )
@@ -42,10 +55,10 @@ namespace engine
     *                              CCubeTexture impl.                         *
     ***************************************************************************/
 
-    CTextureCube::CTextureCube( CTextureCubeData* texCubeData )
+    CTextureCube::CTextureCube( std::unique_ptr<CTextureCubeData> texCubeData )
     {
-        m_data      = texCubeData;
-        m_openglId  = 0;
+        m_data = std::move( texCubeData );
+        m_openglId = 0;
 
         /* create gl-texture resource with the given information ****************/
         glGenTextures( 1, &m_openglId );
@@ -69,11 +82,26 @@ namespace engine
 
         glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
         /***********************************************************************/
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created TextureCube @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     CTextureCube::~CTextureCube()
     {
         glDeleteTextures( 1, &m_openglId );
+        m_data = nullptr;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCube @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     void CTextureCube::bind()

@@ -74,7 +74,7 @@ namespace engine
 
     public :
 
-        CTexture( CTextureData* texDataPtr,
+        CTexture( std::unique_ptr<CTextureData> texData,
                   const eTextureFilter& filterMin,
                   const eTextureFilter& filterMag,
                   const eTextureWrap& wrapU,
@@ -83,7 +83,7 @@ namespace engine
                   const CVec4& borderColorV,
                   const ePixelDataType& dtype );
 
-        CTexture( CTextureData* texDataPtr,
+        CTexture( std::unique_ptr<CTextureData> texData,
                   const CTextureOptions& texOptions );
 
         ~CTexture();
@@ -92,7 +92,8 @@ namespace engine
         void unbind();
         void resize( int32 width, int32 height );
 
-        CTextureData* data() const { return m_texDataPtr; }
+        std::unique_ptr<CTextureData>& data() { return m_texDataPtr; }
+        const std::unique_ptr<CTextureData>& data() const { return m_texDataPtr; }
 
         std::string name() const { return m_texDataPtr->name; }
         uint32 width() const { return m_texDataPtr->width; }
@@ -112,7 +113,8 @@ namespace engine
 
     private :
 
-        CTextureData*   m_texDataPtr;
+        std::unique_ptr<CTextureData> m_texDataPtr;
+
         eTextureWrap    m_texWrapModeU;
         eTextureWrap    m_texWrapModeV;
         eTextureFilter  m_texFilterModeMin;

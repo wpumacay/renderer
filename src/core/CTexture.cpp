@@ -81,12 +81,19 @@ namespace engine
     CTextureData::CTextureData()
     {
         name            = "undefined";
-        data            = NULL;
+        data            = nullptr;
         width           = 0;
         height          = 0;
         channels        = 0;
         internalFormat  = eTextureFormat::NONE;
         format          = eTextureFormat::NONE;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created TextureData @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created TextureData @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     CTextureData::~CTextureData()
@@ -94,7 +101,14 @@ namespace engine
         if ( data )
             delete data;
 
-        data = NULL;
+        data = nullptr;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureData @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed TextureData @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     std::string toString( const CTextureData& texData )
@@ -115,7 +129,7 @@ namespace engine
     *                             CTexture impl.                              *
     ***************************************************************************/
 
-    CTexture::CTexture( CTextureData* texData,
+    CTexture::CTexture( std::unique_ptr<CTextureData> texData,
                         const eTextureFilter& filterMin,
                         const eTextureFilter& filterMag,
                         const eTextureWrap& wrapU,
@@ -124,7 +138,7 @@ namespace engine
                         const CVec4& borderColorV,
                         const ePixelDataType& dtype )
     {
-        m_texDataPtr        = texData;
+        m_texDataPtr        = std::move( texData );
         m_texWrapModeU      = wrapU;
         m_texWrapModeV      = wrapV;
         m_texFilterModeMin  = filterMin;
@@ -168,11 +182,18 @@ namespace engine
 
         glBindTexture( GL_TEXTURE_2D, 0 );
         /***********************************************************************/
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created Texture @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created Texture @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
-    CTexture::CTexture( CTextureData* texData,
+    CTexture::CTexture( std::unique_ptr<CTextureData> texData,
                         const CTextureOptions& texOptions )
-        : CTexture( texData,
+        : CTexture( std::move( texData ),
                     texOptions.filterMin,
                     texOptions.filterMag,
                     texOptions.wrapU,
@@ -186,10 +207,20 @@ namespace engine
 
     CTexture::~CTexture()
     {
+        // release cpu-data
+        m_texDataPtr = nullptr;
+
+        // release opengl-resource
         if ( m_openglId != 0 )
             glDeleteTextures( 1, &m_openglId );
-
         m_openglId = 0;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Texture @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed Texture @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     void CTexture::bind()
@@ -206,7 +237,7 @@ namespace engine
     {
         if ( m_texDataPtr->data )
         {
-            ENGINE_CORE_WARN( "Tried resizing a texture associated to non-null initial texture data. Skipping resize" );
+            ENGINE_CORE_WARN( "CTexture::resize >>> Tried resizing a texture associated to non-null initial texture data. Skipping resize" );
             return;
         }
 

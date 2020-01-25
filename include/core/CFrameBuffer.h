@@ -59,9 +59,8 @@ namespace engine
 
     private :
 
-        std::map< std::string, CAttachmentConfig >                  m_configs;
-        std::map< std::string, std::unique_ptr< CTexture > >        m_textures;
-        std::map< std::string, std::unique_ptr< CTextureData > >    m_texturesData;
+        std::map< std::string, CAttachmentConfig > m_configs;
+        std::map< std::string, std::unique_ptr< CTexture > > m_textures;
 
         uint32 m_width;
         uint32 m_height;

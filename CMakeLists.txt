@@ -35,6 +35,7 @@ option( TINYRENDERER_BUILD_DOCS "Build documentation (requires Doxygen)" ON )
 option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
 option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
 option( TINYRENDERER_BUILD_WITH_LOGS "Build using logging functionality" ON )
+option( TINYRENDERER_BUILD_WITH_TRACK_ALLOCS "Build with obj-allocation tracking" ON )
 
 # Add cmake find-modules helpers (for sphinx)
 if( TINYRENDERER_IS_MASTER_PROJECT )
@@ -86,6 +87,13 @@ else()
     set( ENGINE_USE_LOGS "NO" )
 endif()
 
+if ( TINYRENDERER_BUILD_WITH_TRACK_ALLOCS OR ( CMAKE_BUILD_TYPE STREQUAL Debug ) )
+    set( ENGINE_TRACK_ALLOCS "YES" )
+    add_definitions( -DENGINE_TRACK_ALLOCS )
+else()
+    set( ENGINE_TRACK_ALLOCS "NO" )
+endif()
+
 file( GLOB_RECURSE SRCS "src/*.cpp" )
 
 add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
@@ -120,4 +128,5 @@ message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}
 message( "TNIYRENDERER_BUILD_PYTHON_BINDINGS    : ${TINYRENDERER_BUILD_PYTHON_BINDINGS}" )
 message( "TINYRENDERER_BUILD_WITH_LOGS          : ${TINYRENDERER_BUILD_WITH_LOGS}" )
 message( "ENGINE_USE_LOGS                       : ${ENGINE_USE_LOGS}" )
+message( "ENGINE_TRACK_ALLOCS                   : ${ENGINE_TRACK_ALLOCS}" )
 message( "***************************************************************************************" )
