@@ -5,4 +5,5 @@
 #include <input_py.h>
 #include <shader_py.h>
 #include <buffers_py.h>
+#include <texture_py.h>
 #include <application_py.h>

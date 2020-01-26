@@ -24,6 +24,9 @@ PYBIND11_MODULE( tinyrenderer, m )
     // shader bindings
     engine::bindings_shader( m );
     engine::bindings_shaderManager( m );
+    // texture bindings
+    engine::bindings_texture( m );
+    engine::bindings_textureManager( m );
     // application bindings
     engine::bindings_application( m );
 
