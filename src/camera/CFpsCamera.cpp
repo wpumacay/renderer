@@ -96,7 +96,7 @@ namespace engine
         // nothing extra to do for now
     }
 
-    std::string CFpsCamera::_toStringInternal()
+    std::string CFpsCamera::_toStringInternal() const
     {
         std::string _strRep;
 

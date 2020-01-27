@@ -148,7 +148,7 @@ namespace engine
         m_viewportHeight = height;
     }
 
-    std::string COrbitCamera::_toStringInternal()
+    std::string COrbitCamera::_toStringInternal() const
     {
         std::string _strRep;
 

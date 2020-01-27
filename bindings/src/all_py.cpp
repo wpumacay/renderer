@@ -27,6 +27,9 @@ PYBIND11_MODULE( tinyrenderer, m )
     // texture bindings
     engine::bindings_texture( m );
     engine::bindings_textureManager( m );
+    // camera bindings
+    engine::bindings_cameraBase( m );
+    engine::bindings_cameraTypes( m );
     // application bindings
     engine::bindings_application( m );
 

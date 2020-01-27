@@ -61,7 +61,7 @@ namespace engine
         // nothing to do for now
     }
 
-    std::string CFixedCamera::_toStringInternal()
+    std::string CFixedCamera::_toStringInternal() const
     {
         std::string _strRep;
 

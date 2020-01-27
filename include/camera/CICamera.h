@@ -73,7 +73,7 @@ namespace engine
         void setProjectionData( const CCameraProjData& projData );
         void update();
         void resize( int width, int height );
-        std::string toString();
+        std::string toString() const;
 
         std::string name() const { return m_name; }
         eCameraType type() const { return m_type; }
@@ -102,7 +102,7 @@ namespace engine
         virtual void _targetPointChangedInternal() = 0;
         virtual void _updateInternal() = 0;
         virtual void _resizeInternal( int width, int height ) = 0;
-        virtual std::string _toStringInternal() = 0;
+        virtual std::string _toStringInternal() const = 0;
 
     protected :
 

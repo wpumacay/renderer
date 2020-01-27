@@ -6,4 +6,5 @@
 #include <shader_py.h>
 #include <buffers_py.h>
 #include <texture_py.h>
+#include <camera_py.h>
 #include <application_py.h>

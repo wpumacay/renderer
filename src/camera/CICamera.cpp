@@ -120,7 +120,7 @@ namespace engine
         _buildProjMatrix();
     }
 
-    std::string CICamera::toString()
+    std::string CICamera::toString() const
     {
         std::string _strRep;
         _strRep += "name        : " + m_name + "\n\r";

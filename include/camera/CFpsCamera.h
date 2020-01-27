@@ -43,7 +43,7 @@ namespace engine
         void _targetPointChangedInternal() override;
         void _updateInternal() override;
         void _resizeInternal( int width, int height ) override;
-        std::string _toStringInternal() override;
+        std::string _toStringInternal() const override;
 
     private :
 
