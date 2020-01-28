@@ -63,6 +63,9 @@ class BuildCommand( build_ext ) :
 with open( 'README.md', 'r' ) as fh :
     longDescriptionData = fh.read()
 
+with open( 'requirements.txt', 'r' ) as fh :
+    requiredPackages = [ line.replace( '\n', '' ) for line in fh.readlines() ]
+
 setup(
     name                            = 'wp-tinyrenderer',
     version                         = '0.0.1',
@@ -78,7 +81,7 @@ setup(
                                         "Operating System :: POSIX :: Linux" ],
     packages                        = find_packages(),
     zip_safe                        = False,
-    install_requires                = [ 'numpy', 'setuptools' ],
+    install_requires                = requiredPackages,
     package_data                    = {},
     ext_modules                     = [ CMakeExtension( 'tinyrenderer', '.' ) ],
     cmdclass                        = dict( build_ext = BuildCommand ) 

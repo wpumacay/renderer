@@ -1,7 +1,5 @@
 
 #include <window_py.h>
-// pytbind11 - functional (for callbacks support)
-#include <pybind11/functional.h>
 
 namespace py = pybind11;
 

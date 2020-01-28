@@ -12,6 +12,9 @@ namespace engine
         py::class_< CApplication >( m, "Application" )
             .def( py::init<>() )
             .def( py::init< const CWindowProps& >() )
+            .def( "setScene", &CApplication::setScene, py::arg( "scene" ),
+                  py::return_value_policy::reference,
+                  py::keep_alive<1, 2>() )
             .def( "begin", &CApplication::begin )
             .def( "render", &CApplication::render )
             .def( "update", &CApplication::update )
@@ -22,7 +25,8 @@ namespace engine
             .def( "addMouseMoveCallback", &CApplication::addMouseMoveCallback )
             .def( "addScrollCallback", &CApplication::addScrollCallback )
             .def( "addResizeCallback", &CApplication::addResizeCallback )
-            .def( "window", &CApplication::window );
+            .def( "scene", &CApplication::scene, py::return_value_policy::reference ) // @firsttodo: try <1,0>
+            .def( "window", &CApplication::window, py::return_value_policy::reference );
     }
 
 }

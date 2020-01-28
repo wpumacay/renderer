@@ -107,13 +107,14 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    _scene->addCamera( std::move( _camera ) );
+    auto _cameraRef = _scene->addCamera( std::move( _camera ) );
+    ENGINE_TRACE( "cam-info: \n\r{0}", _cameraRef->toString() );
 
     auto _textureCubemap = _textureCubeCloudtop;
     // auto _textureCubemap = _textureCubeStarfield;
     // auto _textureCubemap = _textureCubeSiege;
 
-    auto _correctionMat = computeSkyboxCorrectionMat( _camera->upAxis() );
+    auto _correctionMat = computeSkyboxCorrectionMat( _cameraRef->upAxis() );
 
     while( _app->active() )
     {
@@ -132,8 +133,8 @@ int main()
         glDepthFunc( GL_LEQUAL );
 
         _shader->bind();
-        _shader->setMat4( "u_tProj", _camera->matProj() );
-        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _camera->matView() ) ) * _correctionMat );
+        _shader->setMat4( "u_tProj", _cameraRef->matProj() );
+        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _cameraRef->matView() ) ) * _correctionMat );
 
         _textureCubemap->bind();
         _varray->bind();

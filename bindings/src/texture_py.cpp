@@ -135,6 +135,34 @@ namespace engine
                 } );
     }
 
+    void bindings_textureCube( py::module& m )
+    {
+        // Expose CTextureCubeData struct (contains description of the texture-cube and its data in CPU)
+        py::class_< CTextureCubeData >( m, "TextureCubeData" )
+            .def( py::init<>() )
+            .def_readwrite( "name", &CTextureCubeData::name )
+            .def_readwrite( "width", &CTextureCubeData::width )
+            .def_readwrite( "height", &CTextureCubeData::height )
+            .def_readwrite( "channels", &CTextureCubeData::channels )
+            .def_readwrite( "format", &CTextureCubeData::format );
+
+        // Expose CTextureCube class (abstraction on a GPU cubemap)
+        py::class_< CTextureCube >( m, "TextureCube" )
+            .def( py::init<std::unique_ptr<CTextureCubeData>>() )
+            .def( "bind", &CTextureCube::bind )
+            .def( "unbind", &CTextureCube::unbind )
+            .def( "data", []( CTextureCube& self ) -> CTextureCubeData*
+                {
+                    return self.data().get();
+                }, py::return_value_policy::reference )
+            .def_property_readonly( "name", &CTextureCube::name )
+            .def_property_readonly( "width", &CTextureCube::width )
+            .def_property_readonly( "height", &CTextureCube::height )
+            .def_property_readonly( "channels", &CTextureCube::channels )
+            .def_property_readonly( "format", &CTextureCube::format )
+            .def_property_readonly( "openglId", &CTextureCube::openglId );
+    }
+
     void bindings_textureManager( py::module& m )
     {
         py::class_< CTextureManager >( m, "TextureManager" )
