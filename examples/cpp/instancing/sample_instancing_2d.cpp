@@ -23,25 +23,25 @@ void drawGrid_Instancing( engine::CShader* shader,
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     /* load the shader used for instancing-2d */
     std::string _baseNameInstancing2d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/instancing_2d";
-    auto _shaderInstancing2d = engine::CShaderManager::CreateShaderFromFiles( "instancing_2d",
-                                                                  _baseNameInstancing2d + "_vs.glsl",
-                                                                  _baseNameInstancing2d + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderInstancing2d, "Couldn't load instancing-2d shader for our demo T_T" );
+    auto _shaderInstancing2dRef = engine::CShaderManager::CreateShaderFromFiles( "instancing_2d",
+                                                                                 _baseNameInstancing2d + "_vs.glsl",
+                                                                                 _baseNameInstancing2d + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderInstancing2dRef, "Couldn't load instancing-2d shader for our demo T_T" );
 
     std::string _baseNameNoInstancing2d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/no_instancing_2d";
-    auto _shaderNoInstancing2d = engine::CShaderManager::CreateShaderFromFiles( "no_instancing_2d",
-                                                                                _baseNameNoInstancing2d + "_vs.glsl",
-                                                                                _baseNameNoInstancing2d + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderNoInstancing2d, "Couldn't load no-instancing-2d shader for our demo T_T" );
+    auto _shaderNoInstancing2dRef = engine::CShaderManager::CreateShaderFromFiles( "no_instancing_2d",
+                                                                                   _baseNameNoInstancing2d + "_vs.glsl",
+                                                                                   _baseNameNoInstancing2d + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderNoInstancing2dRef, "Couldn't load no-instancing-2d shader for our demo T_T" );
 
     g_quadVAO_NoInstancing = createQuad_noInstancing();
     g_quadVAO_Instancing = createQuad_Instancing();
 
-    auto _bufferPositions = new engine::CVec2[g_num_rows * g_num_cols];
+    auto _bufferPositions = std::unique_ptr<engine::CVec2[]>( new engine::CVec2[g_num_rows * g_num_cols] );
 
     while( _app->active() )
     {
@@ -52,9 +52,9 @@ int main()
         _app->begin();
 
         if ( g_useInstancing )
-            drawGrid_Instancing( _shaderInstancing2d, g_quadVAO_Instancing.get(), _bufferPositions );
+            drawGrid_Instancing( _shaderInstancing2dRef, g_quadVAO_Instancing.get(), _bufferPositions.get() );
         else
-            drawGrid_noInstancing( _shaderNoInstancing2d, g_quadVAO_NoInstancing.get() );
+            drawGrid_noInstancing( _shaderNoInstancing2dRef, g_quadVAO_NoInstancing.get() );
 
         _app->end();
     }
@@ -174,7 +174,7 @@ void drawGrid_Instancing( engine::CShader* shader,
 
     // update our buffer data
     g_quadVAO_positionsBufferRef->updateData( g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ),
-                                           (engine::float32*) bufferPositions );
+                                              (engine::float32*) bufferPositions );
 
     // do the render call (instanced)
     glDrawElementsInstanced( GL_TRIANGLES, vao->indexBuffer()->count(), GL_UNSIGNED_INT, 0, g_num_rows * g_num_cols );

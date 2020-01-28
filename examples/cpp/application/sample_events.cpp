@@ -37,9 +37,9 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _layer = new SampleGuiLayer( "sample-layer" );
-    _app->addGuiLayer( std::unique_ptr< engine::CImGuiLayer >( _layer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _layer = std::make_unique<SampleGuiLayer>( "sample-layer" );
+    auto _layerRef = _app->addGuiLayer( std::move( _layer ) );
 
     while ( _app->active() )
     {

@@ -4,7 +4,7 @@
 namespace engine
 {
 
-    CMesh* CMeshBuilder::createPlane( float sizeX, float sizeY, const eAxis& axis )
+    std::unique_ptr<CMesh> CMeshBuilder::createPlane( float sizeX, float sizeY, const eAxis& axis )
     {
         std::vector< CVec3 > _vertices = { _rotateToMatchUpAxis( {  0.5f * sizeX, -0.5f * sizeY, 0.0f }, axis ),
                                            _rotateToMatchUpAxis( {  0.5f * sizeX,  0.5f * sizeY, 0.0f }, axis ),
@@ -24,14 +24,14 @@ namespace engine
         std::vector< CInd3 > _indices = { { 0, 1, 2 }, { 0, 2, 3 } };
 
         auto _name = std::string( "plane:" ) + std::to_string( CMeshBuilder::s_numPlanes++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { sizeX, sizeY, 0.2f }, axis ) );
         _mesh->cullFaces = false; // don't cull planes, pretty please :(
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
+    std::unique_ptr<CMesh> CMeshBuilder::createBox( float sizeX, float sizeY, float sizeZ )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -82,14 +82,14 @@ namespace engine
         }
 
         auto _name = std::string( "box:" ) + std::to_string( CMeshBuilder::s_numBoxes++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { sizeX, sizeY, sizeZ } );
         _mesh->cullFaces = true;
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
+    std::unique_ptr<CMesh> CMeshBuilder::createSphere( float radius, int nDiv1, int nDiv2 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -143,14 +143,14 @@ namespace engine
         }
 
         auto _name = std::string( "sphere:" ) + std::to_string( CMeshBuilder::s_numSpheres++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { 2.0f * radius, 2.0f * radius, 2.0f * radius } );
         _mesh->cullFaces = true;
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
+    std::unique_ptr<CMesh> CMeshBuilder::createEllipsoid( float radX, float radY, float radZ, int nDiv1, int nDiv2 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -202,14 +202,14 @@ namespace engine
         }
 
         auto _name = std::string( "ellipsoid:" ) + std::to_string( CMeshBuilder::s_numEllipsoids++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( { 2.0f * radX, 2.0f * radY, 2.0f * radZ } );
         _mesh->cullFaces = true;
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
+    std::unique_ptr<CMesh> CMeshBuilder::createCylinder( float radius, float height, const eAxis& axis, int nDiv1 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -292,14 +292,14 @@ namespace engine
             _indices.push_back( { _baseIndx, _baseIndx + q + 1, _baseIndx + q } );
 
         auto _name = std::string( "cylinder:" ) + std::to_string( CMeshBuilder::s_numCylinders++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height }, axis ) );
         _mesh->cullFaces = true;
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
+    std::unique_ptr<CMesh> CMeshBuilder::createCapsule( float radius, float height, const eAxis& axis, int nDiv1, int nDiv2 )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -452,14 +452,14 @@ namespace engine
         }
 
         auto _name = std::string( "capsule:" ) + std::to_string( CMeshBuilder::s_numCapsules++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 2.0f * radius, 2.0f * radius, height + 2.0f * radius }, axis ) );
         _mesh->cullFaces = true;
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createArrow( float length, const eAxis& axis )
+    std::unique_ptr<CMesh> CMeshBuilder::createArrow( float length, const eAxis& axis )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -623,23 +623,23 @@ namespace engine
         }
 
         auto _name = std::string( "arrow:" ) + std::to_string( CMeshBuilder::s_numArrows++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals,_texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals,_texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { 0.2f * length, 0.2f * length, 1.0f * length }, axis ) );
         _mesh->setBoundCenter( _rotateToMatchUpAxis( { 0.0f, 0.0f, 0.5f * length }, axis ) );
         _mesh->cullFaces = false; // don't cull these type of meshes, pretty please :(
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CModel* CMeshBuilder::createAxes( float length )
+    std::unique_ptr<CModel> CMeshBuilder::createAxes( float length )
     {
         auto _name = std::string( "axes:" ) + std::to_string( CMeshBuilder::s_numAxes++ );
-        auto _axesModel = new CModel( _name );
+        auto _axesModel = std::make_unique<CModel>( _name );
 
-        auto _axisX         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::X ) );
-        auto _axisY         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::Y ) );
-        auto _axisZ         = std::unique_ptr< CMesh >( CMeshBuilder::createArrow( length, eAxis::Z ) );
-        auto _axisCenter    = std::unique_ptr< CMesh >( CMeshBuilder::createSphere( 0.2 * length ) );
+        auto _axisX = CMeshBuilder::createArrow( length, eAxis::X );
+        auto _axisY = CMeshBuilder::createArrow( length, eAxis::Y );
+        auto _axisZ = CMeshBuilder::createArrow( length, eAxis::Z );
+        auto _axisCenter = CMeshBuilder::createSphere( 0.2 * length );
 
         _axisX->material()->ambient  = { 1.0, 0.0, 0.0 };
         _axisX->material()->diffuse  = { 1.0, 0.0, 0.0 };
@@ -665,12 +665,13 @@ namespace engine
         _axesModel->setBoundCenter( { 0.4f * length, 0.4f * length, 0.4f * length } );
         _axesModel->cullFaces = false; // don't cull faces, pretty please :(
 
-        return _axesModel;
+        return std::move( _axesModel );
     }
 
-    CMesh* CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision, 
-                                            int nOctaves, float nPersistance, float nLacunarity, float nScale, 
-                                            const eAxis& axis )
+    std::unique_ptr<CMesh> CMeshBuilder::createPerlinPatch( float width, float depth, int cellDivision,
+                                                            int nOctaves, float nPersistance,
+                                                            float nLacunarity, float nScale,
+                                                            const eAxis& axis )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -781,18 +782,18 @@ namespace engine
         }
 
         auto _name = std::string( "perlinPatch:" ) + std::to_string( CMeshBuilder::s_numPerlinPatches++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoord, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoord, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { width, depth, 4.0f }, axis ) );
         _mesh->cullFaces = false; // don't cull perlin patches, pretty please .(
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
-    CMesh* CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
-                                            float widthExtent, float depthExtent, 
-                                            float centerX, float centerY,
-                                            const std::vector< float >& heightData, float heightBase,
-                                            const eAxis& axis )
+    std::unique_ptr<CMesh> CMeshBuilder::createHeightField( int nWidthSamples, int nDepthSamples, 
+                                                            float widthExtent, float depthExtent, 
+                                                            float centerX, float centerY,
+                                                            const std::vector< float >& heightData, float heightBase,
+                                                            const eAxis& axis )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -1003,14 +1004,14 @@ namespace engine
         }
 
         auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
         _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
         _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
 
         auto _duration = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - _start );
         ENGINE_CORE_TRACE( "time taken (ms) to create hfield: {0}", _duration.count() );
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
     // format is row-major, so j <> column <> x, i <> row <> y
@@ -1062,7 +1063,7 @@ namespace engine
         return _n;
     }
 
-    CModel* CMeshBuilder::createModelFromFile( const std::string& filename )
+    std::unique_ptr<CModel> CMeshBuilder::createModelFromFile( const std::string& filename )
     {
         auto _assimpScenePtr = aiImportFile( filename.c_str(),
                                              aiProcessPreset_TargetRealtime_MaxQuality |
@@ -1076,7 +1077,7 @@ namespace engine
 
         // Create a temporary holder to place the processes data from assimp
         auto _name = std::string( "aim:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ ) + "//" + engine::getFilenameNoExtensionFromFilePath( filename );
-        auto _model = new CModel( _name );
+        auto _model = std::make_unique<CModel>( _name );
         // recursively copy the data from assimp to our data structure
         _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr, engine::getFolderpathFromFilePath( filename ) );
 
@@ -1107,10 +1108,10 @@ namespace engine
         _model->setBoundExtents( { _max_x - _min_x, _max_y - _min_y, _max_z - _min_z } );
         _model->cullFaces = false; // don't cull models (we don't know if they're closed), pretty please :(
 
-        return _model;
+        return std::move( _model );
     }
 
-    void CMeshBuilder::_processAssimpNode( CModel* modelPtr, 
+    void CMeshBuilder::_processAssimpNode( std::unique_ptr<CModel>& modelPtr, 
                                            aiNode* assimpNodePtr, 
                                            const aiScene* assimpScenePtr,
                                            const std::string& folderPath )
@@ -1118,7 +1119,7 @@ namespace engine
         for ( size_t i = 0; i < assimpNodePtr->mNumMeshes; i++ )
         {
             aiMesh* _assimpMeshPtr = assimpScenePtr->mMeshes[ assimpNodePtr->mMeshes[i] ];
-            auto _meshPtr = std::unique_ptr< CMesh >( _processAssimpMesh( modelPtr, _assimpMeshPtr, assimpScenePtr, folderPath ) );
+            auto _meshPtr = _processAssimpMesh( modelPtr, _assimpMeshPtr, assimpScenePtr, folderPath );
             modelPtr->addMesh( std::move( _meshPtr ), CMat4() );
         }
 
@@ -1131,10 +1132,10 @@ namespace engine
         }
     }
 
-    CMesh* CMeshBuilder::_processAssimpMesh( CModel* modelPtr, 
-                                             aiMesh* assimpMeshPtr,
-                                             const aiScene* assimpScenePtr,
-                                             const std::string& folderPath )
+    std::unique_ptr<CMesh> CMeshBuilder::_processAssimpMesh( std::unique_ptr<CModel>& modelPtr, 
+                                                             aiMesh* assimpMeshPtr,
+                                                             const aiScene* assimpScenePtr,
+                                                             const std::string& folderPath )
     {
         std::vector< CVec3 > _vertices;
         std::vector< CVec3 > _normals;
@@ -1174,7 +1175,7 @@ namespace engine
         }
 
         auto _name = modelPtr->name() + std::string( ":submesh:" ) + std::to_string( CMeshBuilder::s_numAssimpSubmeshes++ );
-        auto _mesh = new CMesh( _name, _vertices, _normals, _texCoords, _indices );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
 
         // collect material information
         if ( assimpMeshPtr->mMaterialIndex >= 0 )
@@ -1254,7 +1255,7 @@ namespace engine
         _mesh->material()->setAlbedoMap( _albedoMap );
         _mesh->material()->setSpecularMap( _specularMap );
 
-        return _mesh;
+        return std::move( _mesh );
     }
 
     /***********************************************************************

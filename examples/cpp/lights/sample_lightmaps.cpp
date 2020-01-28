@@ -9,8 +9,8 @@ public :
     GuiLightmapsLayer( const std::string& name ) 
         : engine::CImGuiLayer( name ) 
     {
-        m_light = nullptr;
-        m_material = nullptr;
+        m_lightRef = nullptr;
+        m_materialRef = nullptr;
         m_lightsAnimated = false;
 
         auto _box       = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
@@ -27,10 +27,20 @@ public :
         auto _arrowZ    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::Z );
         auto _axes      = engine::CMeshBuilder::createAxes( 1.0f );
 
-        m_meshes = { _box, _sphere, _ellipsoid, _cylinderX, _cylinderY, _cylinderZ, 
-                     _capsuleX, _capsuleY, _capsuleZ, _arrowX, _arrowY, _arrowZ, _axes };
-        m_meshesNames = { "box", "sphere", "ellipsoid", "cylinderX", "cylinderY", "cylinderZ", 
-                          "capsuleX", "capsuleY", "capsuleZ", "arrowX", "arrowY", "arrowZ", "axes" };
+        m_meshes.push_back( std::move( _box ) ); m_meshesNames.push_back( "box" );
+        m_meshes.push_back( std::move( _sphere ) ); m_meshesNames.push_back( "sphere" );
+        m_meshes.push_back( std::move( _ellipsoid ) ); m_meshesNames.push_back( "ellipsoid" );
+        m_meshes.push_back( std::move( _cylinderX ) ); m_meshesNames.push_back( "cylinderX" );
+        m_meshes.push_back( std::move( _cylinderY ) ); m_meshesNames.push_back( "cylinderY" );
+        m_meshes.push_back( std::move( _cylinderZ ) ); m_meshesNames.push_back( "cylinderZ" );
+        m_meshes.push_back( std::move( _capsuleX ) ); m_meshesNames.push_back( "capsuleX" );
+        m_meshes.push_back( std::move( _capsuleY ) ); m_meshesNames.push_back( "capsuleY" );
+        m_meshes.push_back( std::move( _capsuleZ ) ); m_meshesNames.push_back( "capsuleZ" );
+        m_meshes.push_back( std::move( _arrowX ) ); m_meshesNames.push_back( "arrowX" );
+        m_meshes.push_back( std::move( _arrowY ) ); m_meshesNames.push_back( "arrowY" );
+        m_meshes.push_back( std::move( _arrowZ ) ); m_meshesNames.push_back( "arrowZ" );
+        m_meshes.push_back( std::move( _axes ) ); m_meshesNames.push_back( "axes" );
+
         m_meshSelectedName = "box";
         m_meshSelectedIndex = 0;
         m_meshRotationAngle = 0.0f;
@@ -48,26 +58,23 @@ public :
 
     ~GuiLightmapsLayer() 
     {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
         m_meshes.clear();
         m_cachedTextures.clear();
     }
 
     void setMaterial( engine::CMaterial* material )
     {
-        m_material = material;
+        m_materialRef = material;
     }
 
     void setLight( engine::CILight* light )
     {
-        m_light = light;
+        m_lightRef = light;
     }
 
     engine::CIRenderable* selectedMesh()
     {
-        return m_meshes[ m_meshSelectedIndex ];
+        return m_meshes[ m_meshSelectedIndex ].get();
     }
 
     void render() override
@@ -95,17 +102,17 @@ private :
 
     void _menuUiMaterial()
     {
-        if ( !m_material )
+        if ( !m_materialRef )
             return;
 
         ImGui::Begin( "Material-properties" );
 
         /* diffuse properties (phong and lambert materials) */
-        if ( m_material->type() == engine::eMaterialType::PHONG || m_material->type() == engine::eMaterialType::LAMBERT )
+        if ( m_materialRef->type() == engine::eMaterialType::PHONG || m_materialRef->type() == engine::eMaterialType::LAMBERT )
         {
             if ( ImGui::BeginCombo( "Albedo-map", m_currentAlbedoMapName.c_str() ) )
             {
-                for ( auto& _cachedTexture : m_cachedTextures )
+                for ( auto _cachedTexture : m_cachedTextures )
                 {
                     std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
                     bool _isSelected = ( _textureName == m_currentAlbedoMapName );
@@ -123,7 +130,7 @@ private :
                 ImGui::EndCombo();
             }
 
-            m_material->setAlbedoMap( m_currentAlbedoMap );
+            m_materialRef->setAlbedoMap( m_currentAlbedoMap );
 
             if ( m_currentAlbedoMap )
                 ImGui::Image( (void*)(intptr_t) m_currentAlbedoMap->openglId(), ImVec2( 64, 64 ) );
@@ -132,11 +139,11 @@ private :
         }
 
         /* specular properties (phong material only) */
-        if ( m_material->type() == engine::eMaterialType::PHONG )
+        if ( m_materialRef->type() == engine::eMaterialType::PHONG )
         {
             if ( ImGui::BeginCombo( "Specular-map", m_currentSpecularMapName.c_str() ) )
             {
-                for ( auto& _cachedTexture : m_cachedTextures )
+                for ( auto _cachedTexture : m_cachedTextures )
                 {
                     std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
                     bool _isSelected = ( _textureName == m_currentSpecularMapName );
@@ -152,7 +159,7 @@ private :
                 }
             }
 
-            m_material->setSpecularMap( m_currentSpecularMap );
+            m_materialRef->setSpecularMap( m_currentSpecularMap );
 
             if ( m_currentSpecularMap )
                 ImGui::Image( (void*)(intptr_t) m_currentSpecularMap->openglId(), ImVec2( 64, 64 ) );
@@ -161,7 +168,7 @@ private :
         }
 
         ImGui::Spacing();
-        ImGui::Text( m_material->toString().c_str() );
+        ImGui::Text( m_materialRef->toString().c_str() );
 
         m_anyMenuHovered |= ImGui::IsWindowHovered();
 
@@ -170,25 +177,25 @@ private :
 
     void _menuUiDiffuseProps()
     {
-        float _cAmbient[3]  = { m_material->ambient.x(), m_material->ambient.y(), m_material->ambient.z() };
-        float _cDiffuse[3]  = { m_material->diffuse.x(), m_material->diffuse.y(), m_material->diffuse.z() };
+        float _cAmbient[3]  = { m_materialRef->ambient.x(), m_materialRef->ambient.y(), m_materialRef->ambient.z() };
+        float _cDiffuse[3]  = { m_materialRef->diffuse.x(), m_materialRef->diffuse.y(), m_materialRef->diffuse.z() };
         ImGui::ColorEdit3( "cAmbient", _cAmbient );
         ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
-        m_material->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-        m_material->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
+        m_materialRef->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
+        m_materialRef->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
     }
 
     void _menuUiSpecularProps()
     {
-        float _cSpecular[3] = { m_material->specular.x(), m_material->specular.y(), m_material->specular.z() };
+        float _cSpecular[3] = { m_materialRef->specular.x(), m_materialRef->specular.y(), m_materialRef->specular.z() };
         ImGui::ColorEdit3( "cSpecular", _cSpecular );
-        ImGui::SliderFloat( "cShininess", &m_material->shininess, 32.0f, 256.0f );
-        m_material->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
+        ImGui::SliderFloat( "cShininess", &m_materialRef->shininess, 32.0f, 256.0f );
+        m_materialRef->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
     }
 
     void _menuUiLight()
     {
-        if ( !m_light )
+        if ( !m_lightRef )
             return;
 
         ImGui::Begin( "Light-color-properties" );
@@ -197,30 +204,30 @@ private :
 
         if ( m_lightsAnimated )
         {
-            m_light->ambient.x() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 2.0f );
-            m_light->ambient.y() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 0.7f );
-            m_light->ambient.z() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 1.3f );
-            m_light->diffuse = 5.0f * m_light->ambient;
-            m_light->specular = { 1.0f, 1.0f, 1.0f };
+            m_lightRef->ambient.x() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 2.0f );
+            m_lightRef->ambient.y() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 0.7f );
+            m_lightRef->ambient.z() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 1.3f );
+            m_lightRef->diffuse = 5.0f * m_lightRef->ambient;
+            m_lightRef->specular = { 1.0f, 1.0f, 1.0f };
         }
         else
         {
-            float _cAmbient[3]  = { m_light->ambient.x(), m_light->ambient.y(), m_light->ambient.z() };
-            float _cDiffuse[3]  = { m_light->diffuse.x(), m_light->diffuse.y(), m_light->diffuse.z() };
-            float _cSpecular[3] = { m_light->specular.x(), m_light->specular.y(), m_light->specular.z() };
+            float _cAmbient[3]  = { m_lightRef->ambient.x(), m_lightRef->ambient.y(), m_lightRef->ambient.z() };
+            float _cDiffuse[3]  = { m_lightRef->diffuse.x(), m_lightRef->diffuse.y(), m_lightRef->diffuse.z() };
+            float _cSpecular[3] = { m_lightRef->specular.x(), m_lightRef->specular.y(), m_lightRef->specular.z() };
 
             ImGui::ColorEdit3( "cAmbient", _cAmbient );
             ImGui::ColorEdit3( "cDiffuse", _cDiffuse );
             ImGui::ColorEdit3( "cSpecular", _cSpecular );
-            ImGui::SliderFloat( "cIntensity", &m_light->intensity, 0.1f, 1.0f );
+            ImGui::SliderFloat( "cIntensity", &m_lightRef->intensity, 0.1f, 1.0f );
 
-            m_light->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
-            m_light->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
-            m_light->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
+            m_lightRef->ambient  = { _cAmbient[0], _cAmbient[1], _cAmbient[2] };
+            m_lightRef->diffuse  = { _cDiffuse[0], _cDiffuse[1], _cDiffuse[2] };
+            m_lightRef->specular = { _cSpecular[0], _cSpecular[1], _cSpecular[2] };
         }
 
         ImGui::Spacing();
-        ImGui::Text( m_light->toString().c_str() );
+        ImGui::Text( m_lightRef->toString().c_str() );
 
         m_anyMenuHovered |= ImGui::IsWindowHovered();
 
@@ -260,8 +267,8 @@ private :
         ImGui::End();
     }
 
-    engine::CMaterial* m_material;
-    engine::CILight* m_light;
+    engine::CMaterial* m_materialRef;
+    engine::CILight* m_lightRef;
     bool m_lightsAnimated;
 
     std::string m_currentAlbedoMapName;
@@ -270,7 +277,7 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::CIRenderable* > m_meshes;
+    std::vector< std::unique_ptr<engine::CIRenderable> > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
@@ -283,9 +290,9 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new GuiLightmapsLayer( "Lightmaps-utils" );
-    _app->addGuiLayer( std::unique_ptr< GuiLightmapsLayer >( _uiLayer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<GuiLightmapsLayer>( "Lightmaps-utils" );
+    auto _uiLayerRef = dynamic_cast<GuiLightmapsLayer*>( _app->addGuiLayer( std::move( _uiLayer ) ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -294,50 +301,50 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightmaps";
-    auto _shaderLighting = engine::CShaderManager::CreateShaderFromFiles( "phong_lightmaps_shader",
-                                                                       _baseNamePhong + "_vs.glsl",
-                                                                       _baseNamePhong + "_fs.glsl" );
+    auto _shaderLightingRef = engine::CShaderManager::CreateShaderFromFiles( "phong_lightmaps_shader",
+                                                                             _baseNamePhong + "_vs.glsl",
+                                                                             _baseNamePhong + "_fs.glsl" );
 
-    ENGINE_ASSERT( _shaderLighting, "Could not load phong-material shader for our tests :(" );
+    ENGINE_ASSERT( _shaderLightingRef, "Could not load phong-material shader for our tests :(" );
 
     /* grab a simple shader to render the camera gizmo */
-    auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
+    auto _shaderGizmoRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderGizmoRef, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     /* create material properties */
-    auto _phongMaterial = new engine::CMaterial( "phong_material", 
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 32.0f );
+    auto _phongMaterial = std::make_unique<engine::CMaterial>( "phong_material", 
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               32.0f );
 
     /* create light properties */
-    auto _pointLight = new engine::CPointLight( "point_light",
-                                                { 0.1f, 0.1f, 0.1f },
-                                                { 1.0f, 1.0f, 1.0f },
-                                                { 1.0f, 1.0f, 1.0f },
-                                                _gizmo->position,
-                                                1.0, 0.7, 1.8 );
+    auto _pointLight = std::make_unique<engine::CPointLight>( "point_light",
+                                                              engine::CVec3( 0.1f, 0.1f, 0.1f ),
+                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                              _gizmo->position,
+                                                              1.0, 0.7, 1.8 );
 
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    _uiLayer->setMaterial( _phongMaterial );
-    _uiLayer->setLight( _pointLight );
+    _uiLayerRef->setMaterial( _phongMaterial.get() );
+    _uiLayerRef->setLight( _pointLight.get() );
 
     while( _app->active() )
     {
@@ -348,12 +355,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
-            _uiLayer->setActive( true );
+            _uiLayerRef->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
-            _uiLayer->setActive( false );
+            _uiLayerRef->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
         {
@@ -380,37 +387,37 @@ int main()
             _pointLight->position.z() = 0.0f;
         }
 
-        auto _mesh = _uiLayer->selectedMesh();
+        auto _mesh = _uiLayerRef->selectedMesh();
 
         _gizmo->position = _pointLight->position;
 
         /* do our thing here ************************/
-        _shaderLighting->bind();
-        _shaderLighting->setMat4( "u_modelMatrix", _mesh->matModel() );
-        _shaderLighting->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _shaderLighting->setMat4( "u_normalMatrix", tinymath::inverse( _mesh->matModel() ).transpose() );
-        _phongMaterial->bind( _shaderLighting );
-        _shaderLighting->setVec3( "u_light.ambient", _pointLight->ambient );
-        _shaderLighting->setVec3( "u_light.diffuse", _pointLight->diffuse );
-        _shaderLighting->setVec3( "u_light.specular", _pointLight->specular );
-        _shaderLighting->setFloat( "u_light.intensity", _pointLight->intensity );
-        _shaderLighting->setVec3( "u_light.position", _pointLight->position );
-        _shaderLighting->setVec3( "u_viewerPosition", _camera->position() );
+        _shaderLightingRef->bind();
+        _shaderLightingRef->setMat4( "u_modelMatrix", _mesh->matModel() );
+        _shaderLightingRef->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
+        _shaderLightingRef->setMat4( "u_normalMatrix", tinymath::inverse( _mesh->matModel() ).transpose() );
+        _phongMaterial->bind( _shaderLightingRef );
+        _shaderLightingRef->setVec3( "u_light.ambient", _pointLight->ambient );
+        _shaderLightingRef->setVec3( "u_light.diffuse", _pointLight->diffuse );
+        _shaderLightingRef->setVec3( "u_light.specular", _pointLight->specular );
+        _shaderLightingRef->setFloat( "u_light.intensity", _pointLight->intensity );
+        _shaderLightingRef->setVec3( "u_light.position", _pointLight->position );
+        _shaderLightingRef->setVec3( "u_viewerPosition", _camera->position() );
 
         _mesh->render();
 
         _phongMaterial->unbind();
-        _shaderLighting->unbind();
+        _shaderLightingRef->unbind();
 
-        _shaderGizmo->bind();
-        _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
-        _shaderGizmo->setMat4( "u_tView", _camera->matView() );
-        _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
-        _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
+        _shaderGizmoRef->bind();
+        _shaderGizmoRef->setMat4( "u_tModel", _gizmo->matModel() );
+        _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
+        _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+        _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
         _gizmo->render();
 
-        _shaderGizmo->unbind();
+        _shaderGizmoRef->unbind();
         /********************************************/
 
         _app->render();

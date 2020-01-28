@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -12,25 +12,25 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Z,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Z,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-//     const float _cameraSensitivity  = 0.25f;
-//     const float _cameraSpeed        = 25.0f;
-//     const float _cameraMaxDelta     = 10.0f;
-//     auto _camera = new engine::CFpsCamera( "fps",
-//                                            { 0.0f, 0.0f, 3.0f },
-//                                            { 0.0f, 0.0f, 0.0f },
-//                                            engine::eAxis::Z,
-//                                            _cameraProjData,
-//                                            _cameraSensitivity,
-//                                            _cameraSpeed,
-//                                            _cameraMaxDelta );
+////     const float _cameraSensitivity  = 0.25f;
+////     const float _cameraSpeed        = 25.0f;
+////     const float _cameraMaxDelta     = 10.0f;
+////     auto _camera = std::make_unique<engine::CFpsCamera>( "fps",
+////                                                          engine::CVec3( 0.0f, 0.0f, 3.0f ),
+////                                                          engine::CVec3( 0.0f, 0.0f, 0.0f ),
+////                                                          engine::eAxis::Z,
+////                                                          _cameraProjData,
+////                                                          _cameraSensitivity,
+////                                                          _cameraSpeed,
+////                                                          _cameraMaxDelta );
 
     auto _box = engine::CMeshBuilder::createBox( 3.0f, 3.0f, 3.0f );
     auto _sphere = engine::CMeshBuilder::createSphere( 1.5f );
@@ -39,25 +39,25 @@ int main()
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong";
-    auto _shaderPhong = engine::CShaderManager::CreateShaderFromFiles( "phong_shader",
+    auto _shaderPhongRef = engine::CShaderManager::CreateShaderFromFiles( "phong_shader",
                                                                        _baseNamePhong + "_vs.glsl",
                                                                        _baseNamePhong + "_fs.glsl" );
 
     std::string _baseNameGouraud = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/gouraud";
-    auto _shaderGouraud = engine::CShaderManager::CreateShaderFromFiles( "gouraud_shader",
+    auto _shaderGouraudRef = engine::CShaderManager::CreateShaderFromFiles( "gouraud_shader",
                                                                          _baseNameGouraud + "_vs.glsl",
                                                                          _baseNameGouraud + "_fs.glsl" );
 
-    ENGINE_ASSERT( _shaderPhong, "Could not load phong shader for our tests :(" );
-    ENGINE_ASSERT( _shaderGouraud, "Could not load gouraud shader for our tests :(" );
+    ENGINE_ASSERT( _shaderPhongRef, "Could not load phong shader for our tests :(" );
+    ENGINE_ASSERT( _shaderGouraudRef, "Could not load gouraud shader for our tests :(" );
 
     /* grab a simple shader to render the camera gizmo */
-    auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
+    auto _shaderGizmoRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderGizmoRef, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     // select shader to use
-    auto _shaderLighting = _shaderPhong;
-    auto _mesh = _sphere;
+    auto _shaderLighting = _shaderPhongRef;
+    auto& _mesh = _sphere;
     // _mesh->position = { 1.0f, 1.0f, 0.0f };
     // _mesh->scale = { 0.5f, 1.0f, 1.5f };
 
@@ -72,7 +72,7 @@ int main()
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_S ) )
         {
-            _shaderLighting = ( _shaderLighting->name() == "phong_shader" ) ? _shaderGouraud : _shaderPhong;
+            _shaderLighting = ( _shaderLighting->name() == "phong_shader" ) ? _shaderGouraudRef : _shaderPhongRef;
             ENGINE_INFO( "Using shader: {0}", _shaderLighting->name() );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
@@ -113,19 +113,19 @@ int main()
 
         _shaderLighting->unbind();
 
-        _shaderGizmo->bind();
-        _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
-        _shaderGizmo->setMat4( "u_tView", _camera->matView() );
-        _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
-        _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
+        _shaderGizmoRef->bind();
+        _shaderGizmoRef->setMat4( "u_tModel", _gizmo->matModel() );
+        _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
+        _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+        _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
         _gizmo->render();
 
-        _shaderGizmo->unbind();
+        _shaderGizmoRef->unbind();
         /********************************************/
 
         // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
-        engine::CDebugDrawer::Render( _camera );
+        engine::CDebugDrawer::Render( _camera.get() );
 
         _app->end();
 

@@ -43,7 +43,7 @@ namespace engine
         CApplication();
         virtual ~CApplication();
 
-        void setScene( std::unique_ptr< CScene > scene );
+        CScene* setScene( std::unique_ptr< CScene > scene );
 
         void setOffscreenRendering( bool enabled );
 
@@ -53,7 +53,7 @@ namespace engine
 
         void setGuiSceneViewActive( bool enabled );
 
-        void addGuiLayer( std::unique_ptr< CImGuiLayer > layer );
+        CImGuiLayer* addGuiLayer( std::unique_ptr< CImGuiLayer > layer );
 
         void update();
 

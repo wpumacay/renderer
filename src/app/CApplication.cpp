@@ -100,11 +100,13 @@ namespace engine
         engine::CLogger::Release();
     }
 
-    void CApplication::setScene( std::unique_ptr< CScene > scene )
+    CScene* CApplication::setScene( std::unique_ptr< CScene > scene )
     {
         m_scene = std::move( scene );
         // update resources that require the scene reference
         m_guiUtilsLayer->setScene( m_scene.get() );
+        // return a reference for the user to play with
+        return m_scene.get();
     }
 
     void CApplication::setOffscreenRendering( bool enabled )
@@ -128,9 +130,11 @@ namespace engine
         // @todo: activate scene-view and enable render-target to use it for later visualization
     }
 
-    void CApplication::addGuiLayer( std::unique_ptr< CImGuiLayer > layer )
+    CImGuiLayer* CApplication::addGuiLayer( std::unique_ptr< CImGuiLayer > layer )
     {
         m_guiLayers.push_back( std::move( layer ) );
+        // return a reference for the user to play with
+        return m_guiLayers.back().get();
     }
 
     void CApplication::update()

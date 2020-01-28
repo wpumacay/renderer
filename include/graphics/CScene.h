@@ -29,11 +29,11 @@ namespace engine
         CScene();
         ~CScene();
 
-        void addFog( std::unique_ptr< CFog > fog );
-        void addSkybox( std::unique_ptr< CSkybox > skybox );
-        void addCamera( std::unique_ptr< CICamera > camera );
-        void addLight( std::unique_ptr< CILight > light );
-        void addRenderable( std::unique_ptr< CIRenderable > renderable );
+        CFog* addFog( std::unique_ptr< CFog > fog );
+        CSkybox* addSkybox( std::unique_ptr< CSkybox > skybox );
+        CICamera* addCamera( std::unique_ptr< CICamera > camera );
+        CILight* addLight( std::unique_ptr< CILight > light );
+        CIRenderable* addRenderable( std::unique_ptr< CIRenderable > renderable );
 
         void clearScene();
         void changeToCamera( const std::string& name ); // change current working camera
@@ -54,17 +54,6 @@ namespace engine
         std::vector< CIRenderable* > renderables() const;
         bool hasRenderable( const std::string& name ) const;
         CIRenderable* getRenderable( const std::string& name );
-
-        template< typename T >
-        std::vector< T* > collectTypedRenderables() const
-        {
-            std::vector< T* > _typedRenderables;
-            for ( auto& renderable : m_renderables )
-                if ( renderable->type() == T::GetStaticType() )
-                    _typedRenderables.push_back( dynamic_cast< T* >( renderable.get() ) );
-
-            return _typedRenderables;
-        }
 
         std::vector< CILight* > lights() const;
         bool hasLight( const std::string& name ) const;

@@ -25,10 +25,20 @@ public :
         auto _arrowZ    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::Z );
         auto _axes      = engine::CMeshBuilder::createAxes( 1.0f );
 
-        m_meshes = { _box, _sphere, _ellipsoid, _cylinderX, _cylinderY, _cylinderZ, 
-                     _capsuleX, _capsuleY, _capsuleZ, _arrowX, _arrowY, _arrowZ, _axes };
-        m_meshesNames = { "box", "sphere", "ellipsoid", "cylinderX", "cylinderY", "cylinderZ", 
-                          "capsuleX", "capsuleY", "capsuleZ", "arrowX", "arrowY", "arrowZ", "axes" };
+        m_meshes.push_back( std::move( _box ) ); m_meshesNames.push_back( "box" );
+        m_meshes.push_back( std::move( _sphere ) ); m_meshesNames.push_back( "sphere" );
+        m_meshes.push_back( std::move( _ellipsoid ) ); m_meshesNames.push_back( "ellipsoid" );
+        m_meshes.push_back( std::move( _cylinderX ) ); m_meshesNames.push_back( "cylinderX" );
+        m_meshes.push_back( std::move( _cylinderY ) ); m_meshesNames.push_back( "cylinderY" );
+        m_meshes.push_back( std::move( _cylinderZ ) ); m_meshesNames.push_back( "cylinderZ" );
+        m_meshes.push_back( std::move( _capsuleX ) ); m_meshesNames.push_back( "capsuleX" );
+        m_meshes.push_back( std::move( _capsuleY ) ); m_meshesNames.push_back( "capsuleY" );
+        m_meshes.push_back( std::move( _capsuleZ ) ); m_meshesNames.push_back( "capsuleZ" );
+        m_meshes.push_back( std::move( _arrowX ) ); m_meshesNames.push_back( "arrowX" );
+        m_meshes.push_back( std::move( _arrowY ) ); m_meshesNames.push_back( "arrowY" );
+        m_meshes.push_back( std::move( _arrowZ ) ); m_meshesNames.push_back( "arrowZ" );
+        m_meshes.push_back( std::move( _axes ) ); m_meshesNames.push_back( "axes" );
+
         m_meshSelectedName = "box";
         m_meshSelectedIndex = 0;
         m_meshesUseRandomPattern = true;
@@ -40,12 +50,13 @@ public :
         m_currentAlbedoMap = nullptr;
         m_currentSpecularMap = nullptr;
 
-        m_directionalLight = new engine::CDirectionalLight( "directional",
-                                                            { 0.2f, 0.2f, 0.2f },
-                                                            { 0.5f, 0.5f, 0.5f },
-                                                            { 1.0f, 1.0f, 1.0f },
-                                                            { -0.2f, -1.0f, -0.3f } );
-        m_lights.push_back( m_directionalLight );
+        auto _dirlight = std::make_unique<engine::CDirectionalLight>( "directional",
+                                                                      engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                      engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                      engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                      engine::CVec3( -0.2f, -1.0f, -0.3f ) );
+        m_directionalLightRef = _dirlight.get();
+        m_lights.push_back( std::move( _dirlight ) );
         m_lightsNames.push_back( "directional" );
 
         // positions of the pointLights
@@ -58,30 +69,32 @@ public :
 
         for ( size_t i = 0; i < _pointLightPositions.size(); i++ )
         {
-            auto _pointLight = new engine::CPointLight( std::string( "point_" ) + std::to_string( i ),
-                                                        { 0.2f, 0.2f, 0.2f },
-                                                        { 0.5f, 0.5f, 0.5f },
-                                                        { 1.0f, 1.0f, 1.0f },
-                                                        _pointLightPositions[i],
-                                                        1.0f, 0.09f, 0.032f );
-            m_lights.push_back( _pointLight );
-            m_pointLights.push_back( _pointLight );
+            auto _pointLight = std::make_unique<engine::CPointLight>( std::string( "point_" ) + std::to_string( i ),
+                                                                      engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                      engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                      engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                      _pointLightPositions[i],
+                                                                      1.0f, 0.09f, 0.032f );
+            auto _pointLightRef = _pointLight.get();
+            m_lights.push_back( std::move( _pointLight ) );
+            m_pointLights.push_back( _pointLightRef );
             m_lightsNames.push_back( std::string( "point_" ) + std::to_string( i ) );
         }
 
-        m_spotLight = new engine::CSpotLight( "spot",
-                                              { 0.2f, 0.2f, 0.2f },
-                                              { 0.5f, 0.5f, 0.5f },
-                                              { 1.0f, 1.0f, 1.0f },
-                                              { 0.0f, 0.0f, 2.0f },
-                                              { 0.0f, 0.0f, -1.0f },
-                                              1.0f, 0.09f, 0.032f,
-                                              ENGINE_PI / 4.0f,
-                                              ENGINE_PI / 3.0f );
-        m_lights.push_back( m_spotLight );
+        auto _spotLight = std::make_unique<engine::CSpotLight>( "spot",
+                                                                engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, 2.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, -1.0f ),
+                                                                1.0f, 0.09f, 0.032f,
+                                                                ENGINE_PI / 4.0f,
+                                                                ENGINE_PI / 3.0f );
+        m_spotLightRef = _spotLight.get();
+        m_lights.push_back( std::move( _spotLight ) );
         m_lightsNames.push_back( "spot" );
 
-        m_lightSelectedName = m_directionalLight->name();
+        m_lightSelectedName = m_directionalLightRef->name();
         m_lightSelectedIndex = 0;
         m_lightDirection = { -0.2f, -1.0f, -0.3f };
 
@@ -90,14 +103,8 @@ public :
 
     ~GuiMultipleLightsLayer() 
     {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
-        for ( auto _light : m_lights )
-            delete _light;
-
-        m_directionalLight = nullptr;
-        m_spotLight = nullptr;
+        m_directionalLightRef = nullptr;
+        m_spotLightRef = nullptr;
 
         m_meshes.clear();
         m_lights.clear();
@@ -112,7 +119,7 @@ public :
 
     engine::CIRenderable* selectedMesh()
     {
-        return m_meshes[ m_meshSelectedIndex ];
+        return m_meshes[ m_meshSelectedIndex ].get();
     }
 
     std::vector< engine::CPointLight* > pointLights()
@@ -122,12 +129,12 @@ public :
 
     engine::CDirectionalLight* directionalLight()
     {
-        return m_directionalLight;
+        return m_directionalLightRef;
     }
 
     engine::CSpotLight* spotLight()
     {
-        return m_spotLight;
+        return m_spotLightRef;
     }
 
     bool useRandomPattern()
@@ -170,7 +177,7 @@ private :
         {
             if ( ImGui::BeginCombo( "Albedo-map", m_currentAlbedoMapName.c_str() ) )
             {
-                for ( auto& _cachedTexture : m_cachedTextures )
+                for ( auto _cachedTexture : m_cachedTextures )
                 {
                     std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
                     bool _isSelected = ( _textureName == m_currentAlbedoMapName );
@@ -201,7 +208,7 @@ private :
         {
             if ( ImGui::BeginCombo( "Specular-map", m_currentSpecularMapName.c_str() ) )
             {
-                for ( auto& _cachedTexture : m_cachedTextures )
+                for ( auto _cachedTexture : m_cachedTextures )
                 {
                     std::string _textureName = ( _cachedTexture ) ? _cachedTexture->name() : "none";
                     bool _isSelected = ( _textureName == m_currentSpecularMapName );
@@ -289,7 +296,7 @@ private :
     {
         ImGui::Checkbox( "enabled", &m_lights[m_lightSelectedIndex]->enabled );
 
-        auto _light = m_lights[m_lightSelectedIndex];
+        auto& _light = m_lights[m_lightSelectedIndex];
         auto _type = _light->type();
         if ( _type == engine::eLightType::DIRECTIONAL )
         {
@@ -362,16 +369,16 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::CIRenderable* > m_meshes;
+    std::vector< std::unique_ptr<engine::CIRenderable> > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
     bool m_meshesUseRandomPattern;
 
-    std::vector< engine::CILight* > m_lights;
+    std::vector< std::unique_ptr<engine::CILight> > m_lights;
     std::vector< engine::CPointLight* > m_pointLights;
-    engine::CDirectionalLight* m_directionalLight;
-    engine::CSpotLight* m_spotLight;
+    engine::CDirectionalLight* m_directionalLightRef;
+    engine::CSpotLight* m_spotLightRef;
     std::vector< std::string > m_lightsNames;
     std::string m_lightSelectedName;
     int m_lightSelectedIndex;
@@ -383,9 +390,9 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new GuiMultipleLightsLayer( "MultipleLight-utils" );
-    _app->addGuiLayer( std::unique_ptr< GuiMultipleLightsLayer >( _uiLayer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<GuiMultipleLightsLayer>( "MultipleLight-utils" );
+    auto _uiLayerRef = dynamic_cast<GuiMultipleLightsLayer*>( _app->addGuiLayer( std::move( _uiLayer ) ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -394,38 +401,38 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_multiple_lights";
-    auto _shaderMultipleLights = engine::CShaderManager::CreateShaderFromFiles( "phong_multiple_lights_shader",
+    auto _shaderMultipleLightsRef = engine::CShaderManager::CreateShaderFromFiles( "phong_multiple_lights_shader",
                                                                        _baseNamePhong + "_vs.glsl",
                                                                        _baseNamePhong + "_fs.glsl" );
 
-    ENGINE_ASSERT( _shaderMultipleLights, "Could not load phong-multiple-lights shader for our tests :(" );
+    ENGINE_ASSERT( _shaderMultipleLightsRef, "Could not load phong-multiple-lights shader for our tests :(" );
 
     /* grab a simple shader to render the camera gizmo */
-    auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
+    auto _shaderGizmoRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderGizmoRef, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     /* create material properties */
-    auto _phongMaterial = new engine::CMaterial( "phong_material", 
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 32.0f );
+    auto _phongMaterial = std::make_unique<engine::CMaterial>( "phong_material", 
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               32.0f );
 
-    _uiLayer->setMaterial( _phongMaterial );
+    _uiLayerRef->setMaterial( _phongMaterial.get() );
 
     std::vector< engine::CVec3 > _meshPositions =  {
         {  0.0f,  0.0f,  0.0f },
@@ -449,12 +456,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
-            _uiLayer->setActive( true );
+            _uiLayerRef->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
-            _uiLayer->setActive( false );
+            _uiLayerRef->setActive( false );
         }
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
@@ -464,61 +471,61 @@ int main()
         _app->begin();
         _camera->update();
 
-        auto _mesh = _uiLayer->selectedMesh();
+        auto _mesh = _uiLayerRef->selectedMesh();
 
         /* do our thing here ************************/
-        _shaderMultipleLights->bind();
-        _shaderMultipleLights->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _shaderMultipleLights->setVec3( "u_viewerPosition", _camera->position() );
-        _shaderMultipleLights->setInt( "u_numberOfPointLights", _uiLayer->pointLights().size() );
-        _shaderMultipleLights->setInt( "u_numberOfSpotLights", 1 );
+        _shaderMultipleLightsRef->bind();
+        _shaderMultipleLightsRef->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
+        _shaderMultipleLightsRef->setVec3( "u_viewerPosition", _camera->position() );
+        _shaderMultipleLightsRef->setInt( "u_numberOfPointLights", _uiLayerRef->pointLights().size() );
+        _shaderMultipleLightsRef->setInt( "u_numberOfSpotLights", 1 );
 
         // set directional light uniforms
-        auto _directionalLight = _uiLayer->directionalLight();
-        _shaderMultipleLights->setInt( "u_directionalLight.enabled", ( _directionalLight->enabled ) ? 1 : 0 );
-        _shaderMultipleLights->setVec3( "u_directionalLight.ambient", _directionalLight->ambient );
-        _shaderMultipleLights->setVec3( "u_directionalLight.diffuse", _directionalLight->diffuse );
-        _shaderMultipleLights->setVec3( "u_directionalLight.specular", _directionalLight->specular );
-        _shaderMultipleLights->setFloat( "u_directionalLight.intensity", _directionalLight->intensity );
-        _shaderMultipleLights->setVec3( "u_directionalLight.direction", _directionalLight->direction );
+        auto _directionalLight = _uiLayerRef->directionalLight();
+        _shaderMultipleLightsRef->setInt( "u_directionalLight.enabled", ( _directionalLight->enabled ) ? 1 : 0 );
+        _shaderMultipleLightsRef->setVec3( "u_directionalLight.ambient", _directionalLight->ambient );
+        _shaderMultipleLightsRef->setVec3( "u_directionalLight.diffuse", _directionalLight->diffuse );
+        _shaderMultipleLightsRef->setVec3( "u_directionalLight.specular", _directionalLight->specular );
+        _shaderMultipleLightsRef->setFloat( "u_directionalLight.intensity", _directionalLight->intensity );
+        _shaderMultipleLightsRef->setVec3( "u_directionalLight.direction", _directionalLight->direction );
 
         // set all point light uniforms
-        auto _pointLights = _uiLayer->pointLights();
+        auto _pointLights = _uiLayerRef->pointLights();
         for ( size_t i = 0; i < _pointLights.size(); i++ )
         {
-            _shaderMultipleLights->setInt( "u_pointLights[" + std::to_string( i ) + "].enabled", ( _pointLights[i]->enabled ) ? 1 : 0 );
-            _shaderMultipleLights->setVec3( "u_pointLights[" + std::to_string( i ) + "].ambient", _pointLights[i]->ambient );
-            _shaderMultipleLights->setVec3( "u_pointLights[" + std::to_string( i ) + "].diffuse", _pointLights[i]->diffuse );
-            _shaderMultipleLights->setVec3( "u_pointLights[" + std::to_string( i ) + "].specular", _pointLights[i]->specular );
-            _shaderMultipleLights->setFloat( "u_pointLights[" + std::to_string( i ) + "].intensity", _pointLights[i]->intensity );
-            _shaderMultipleLights->setVec3( "u_pointLights[" + std::to_string( i ) + "].position", _pointLights[i]->position );
-            _shaderMultipleLights->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk0", _pointLights[i]->atnConstant );
-            _shaderMultipleLights->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk1", _pointLights[i]->atnLinear );
-            _shaderMultipleLights->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk2", _pointLights[i]->atnQuadratic );
+            _shaderMultipleLightsRef->setInt( "u_pointLights[" + std::to_string( i ) + "].enabled", ( _pointLights[i]->enabled ) ? 1 : 0 );
+            _shaderMultipleLightsRef->setVec3( "u_pointLights[" + std::to_string( i ) + "].ambient", _pointLights[i]->ambient );
+            _shaderMultipleLightsRef->setVec3( "u_pointLights[" + std::to_string( i ) + "].diffuse", _pointLights[i]->diffuse );
+            _shaderMultipleLightsRef->setVec3( "u_pointLights[" + std::to_string( i ) + "].specular", _pointLights[i]->specular );
+            _shaderMultipleLightsRef->setFloat( "u_pointLights[" + std::to_string( i ) + "].intensity", _pointLights[i]->intensity );
+            _shaderMultipleLightsRef->setVec3( "u_pointLights[" + std::to_string( i ) + "].position", _pointLights[i]->position );
+            _shaderMultipleLightsRef->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk0", _pointLights[i]->atnConstant );
+            _shaderMultipleLightsRef->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk1", _pointLights[i]->atnLinear );
+            _shaderMultipleLightsRef->setFloat( "u_pointLights[" + std::to_string( i ) + "].attnk2", _pointLights[i]->atnQuadratic );
         }
 
         // set spot light uniforms
-        auto _spotLight = _uiLayer->spotLight();
-        _shaderMultipleLights->setInt( "u_spotLights[0].enabled", ( _spotLight->enabled ) ? 1 : 0 );
-        _shaderMultipleLights->setVec3( "u_spotLights[0].ambient", _spotLight->ambient );
-        _shaderMultipleLights->setVec3( "u_spotLights[0].diffuse", _spotLight->diffuse );
-        _shaderMultipleLights->setVec3( "u_spotLights[0].specular", _spotLight->specular );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].intensity", _spotLight->intensity );
-        _shaderMultipleLights->setVec3( "u_spotLights[0].position", _spotLight->position );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].attnk0", _spotLight->atnConstant );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].attnk1", _spotLight->atnLinear );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].attnk2", _spotLight->atnQuadratic );
-        _shaderMultipleLights->setVec3( "u_spotLights[0].direction", _spotLight->direction );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].innerCutoffCos", std::cos( _spotLight->innerCutoff ) );
-        _shaderMultipleLights->setFloat( "u_spotLights[0].outerCutoffCos", std::cos( _spotLight->outerCutoff ) );
+        auto _spotLight = _uiLayerRef->spotLight();
+        _shaderMultipleLightsRef->setInt( "u_spotLights[0].enabled", ( _spotLight->enabled ) ? 1 : 0 );
+        _shaderMultipleLightsRef->setVec3( "u_spotLights[0].ambient", _spotLight->ambient );
+        _shaderMultipleLightsRef->setVec3( "u_spotLights[0].diffuse", _spotLight->diffuse );
+        _shaderMultipleLightsRef->setVec3( "u_spotLights[0].specular", _spotLight->specular );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].intensity", _spotLight->intensity );
+        _shaderMultipleLightsRef->setVec3( "u_spotLights[0].position", _spotLight->position );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].attnk0", _spotLight->atnConstant );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].attnk1", _spotLight->atnLinear );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].attnk2", _spotLight->atnQuadratic );
+        _shaderMultipleLightsRef->setVec3( "u_spotLights[0].direction", _spotLight->direction );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].innerCutoffCos", std::cos( _spotLight->innerCutoff ) );
+        _shaderMultipleLightsRef->setFloat( "u_spotLights[0].outerCutoffCos", std::cos( _spotLight->outerCutoff ) );
 
-        _phongMaterial->bind( _shaderMultipleLights );
+        _phongMaterial->bind( _shaderMultipleLightsRef );
 
         for ( size_t i = 0; i < _meshPositions.size(); i++ )
         {
             engine::CMat4 _modelMat;
 
-            if ( _uiLayer->useRandomPattern() )
+            if ( _uiLayerRef->useRandomPattern() )
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
@@ -533,28 +540,28 @@ int main()
                 _modelMat = engine::translation( _xyz );
             }
 
-            _shaderMultipleLights->setMat4( "u_modelMatrix", _modelMat );
-            _shaderMultipleLights->setMat4( "u_normalMatrix", tinymath::inverse( _modelMat ).transpose() );
+            _shaderMultipleLightsRef->setMat4( "u_modelMatrix", _modelMat );
+            _shaderMultipleLightsRef->setMat4( "u_normalMatrix", tinymath::inverse( _modelMat ).transpose() );
             _mesh->render();
         }
 
         _phongMaterial->unbind();
-        _shaderMultipleLights->unbind();
+        _shaderMultipleLightsRef->unbind();
 
         for ( size_t i = 0; i < _pointLights.size(); i++ )
         {
             if ( !_pointLights[i]->enabled )
                 continue;
 
-            _shaderGizmo->bind();
-            _shaderGizmo->setMat4( "u_tModel", engine::translation( _pointLights[i]->position ) );
-            _shaderGizmo->setMat4( "u_tView", _camera->matView() );
-            _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
-            _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
+            _shaderGizmoRef->bind();
+            _shaderGizmoRef->setMat4( "u_tModel", engine::translation( _pointLights[i]->position ) );
+            _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
+            _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+            _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
             _gizmo->render();
 
-            _shaderGizmo->unbind();
+            _shaderGizmoRef->unbind();
         }
         /********************************************/
 

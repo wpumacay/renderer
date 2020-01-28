@@ -96,7 +96,7 @@ std::vector< engine::CIRenderable* > _createScene0();
 std::vector< engine::CIRenderable* > _createScene1();
 std::vector< engine::CIRenderable* > _createScene2();
 
-engine::CFrameBuffer* createRenderTarget();
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget();
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
@@ -112,35 +112,36 @@ public :
         m_meshRendererPtr = nullptr;
         m_objectPickerPtr = nullptr;
 
-        auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                        { 0.4f, 0.4f, 0.4f },
-                                                        { 0.4f, 0.4f, 0.4f },
-                                                        { 0.8f, 0.8f, 0.8f },
-                                                        g_lightDirDirection );
+        auto _dirlight = std::make_unique<engine::CDirectionalLight>( "directional",
+                                                                      engine::CVec3( 0.4f, 0.4f, 0.4f ),
+                                                                      engine::CVec3( 0.4f, 0.4f, 0.4f ),
+                                                                      engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                                      g_lightDirDirection );
 
-        auto _pointlight = new engine::CPointLight( "point",
-                                                    { 0.2f, 0.2f, 0.2f },
-                                                    { 0.5f, 0.5f, 0.5f },
-                                                    { 0.8f, 0.8f, 0.8f },
-                                                    g_lightPointPosition,
-                                                    1.0f, 0.05f, 0.005f );
+        auto _pointlight = std::make_unique<engine::CPointLight>( "point",
+                                                                  engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                  engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                  engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                                  g_lightPointPosition,
+                                                                  1.0f, 0.05f, 0.005f );
 
-        auto _spotLight = new engine::CSpotLight( "spot",
-                                                  { 0.2f, 0.2f, 0.2f },
-                                                  { 0.5f, 0.5f, 0.5f },
-                                                  { 0.8f, 0.8f, 0.8f },
-                                                  g_lightSpotPosition,
-                                                  g_lightSpotDirection,
-                                                  1.0f, 0.05f, 0.005f,
-                                                  ENGINE_PI / 4.0f,
-                                                  ENGINE_PI / 3.0f );
+        auto _spotlight = std::make_unique<engine::CSpotLight>( "spot",
+                                                                engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                                g_lightSpotPosition,
+                                                                g_lightSpotDirection,
+                                                                1.0f, 0.05f, 0.005f,
+                                                                ENGINE_PI / 4.0f,
+                                                                ENGINE_PI / 3.0f );
 
-        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _dirlight ) );
-        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
-        engine::CApplication::GetInstance()->scene()->addLight( std::unique_ptr< engine::CILight >( _spotLight ) );
+        auto _dirlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _dirlight ) );
+        auto _pointlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _pointlight ) );
+        auto _spotlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _spotlight ) );
 
-        m_lights = { _dirlight, _pointlight, _spotLight };
+        m_lights = { _dirlightRef, _pointlightRef, _spotlightRef };
         m_lightsNames = { "directional", "point", "spot" };
+
         m_lightSelectedIndex = 2;
         m_lightSelectedName = m_lightsNames[m_lightSelectedIndex];
 
@@ -151,8 +152,8 @@ public :
         m_lightPointPosition    = g_lightPointPosition;
         m_lightSpotPosition     = g_lightSpotPosition;
 
-        auto _cubemapsPtrs = engine::CTextureManager::GetAllCachedTexturesCube();
-        for ( auto& _cubemapPtr : _cubemapsPtrs )
+        auto _cubemapsRefs = engine::CTextureManager::GetAllCachedTexturesCube();
+        for ( auto _cubemapPtr : _cubemapsRefs )
         {
             m_cubemaps.push_back( _cubemapPtr );
             m_cubemapsNames.push_back( _cubemapPtr->name() );
@@ -794,16 +795,16 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _ui = new ObjectPickingGuiLayer( "Object-picking-utils" );
-    _app->addGuiLayer( std::unique_ptr< ObjectPickingGuiLayer >( _ui ) );
-    _ui->setRenderer( _app->renderer() );
-    _ui->setMeshRenderer( _app->renderer()->meshRenderer() );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _ui = std::make_unique<ObjectPickingGuiLayer>( "Object-picking-utils" );
+    auto _uiRef = dynamic_cast<ObjectPickingGuiLayer*>( _app->addGuiLayer( std::move( _ui ) ) );
+    _uiRef->setRenderer( _app->renderer() );
+    _uiRef->setMeshRenderer( _app->renderer()->meshRenderer() );
 
-    auto _objectPicker = new engine::CObjectPicker( engine::CApplication::GetInstance()->window()->width(),
-                                                    engine::CApplication::GetInstance()->window()->height() );
+    auto _objectPicker = std::make_unique<engine::CObjectPicker>( _app->window()->width(),
+                                                                  _app->window()->height() );
     _objectPicker->setMode( engine::ePickerMode::VISUALIZE );
-    _ui->setObjectPicker( _objectPicker );
+    _uiRef->setObjectPicker( _objectPicker.get() );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -812,28 +813,28 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             engine::CApplication::GetInstance()->window()->width(),
-                                             engine::CApplication::GetInstance()->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
-    auto _fog = new engine::CFog( engine::eFogType::EXPONENTIAL,
-                                  { 0.2f, 0.2f, 0.2f },
-                                  0.05f, 1.5f,
-                                  0.0f, 10.0f );
+    auto _fog = std::make_unique<engine::CFog>( engine::eFogType::EXPONENTIAL,
+                                                engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                0.05f, 1.5f,
+                                                0.0f, 10.0f );
 
-    _app->scene()->addFog( std::unique_ptr< engine::CFog >( _fog ) );
-    _ui->setFogReference( _fog );
+    auto _fogRef = _app->scene()->addFog( std::move( _fog ) );
+    _uiRef->setFogReference( _fogRef );
 
-    auto _skybox = new engine::CSkybox();
+    auto _skybox = std::make_unique<engine::CSkybox>();
     _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
-    _app->scene()->addSkybox( std::unique_ptr< engine::CSkybox >( _skybox ) );
-    _ui->setSkyboxReference( _skybox );
+    auto _skyboxRef = _app->scene()->addSkybox( std::move( _skybox ) );
+    _uiRef->setSkyboxReference( _skyboxRef );
 
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
@@ -846,9 +847,9 @@ int main()
     auto _renderablesScene1 = _createScene1();
     auto _renderablesScene2 = _createScene2();
 
-    _ui->setRenderablesScene0( _renderablesScene0 );
-    _ui->setRenderablesScene1( _renderablesScene1 );
-    _ui->setRenderablesScene2( _renderablesScene2 );
+    _uiRef->setRenderablesScene0( _renderablesScene0 );
+    _uiRef->setRenderablesScene1( _renderablesScene1 );
+    _uiRef->setRenderablesScene2( _renderablesScene2 );
 
     for ( auto renderablePtr : _renderablesScene0 )
     {
@@ -875,11 +876,11 @@ int main()
     g_renderOptions.redrawShadowMap = true;
     g_renderOptions.viewportWidth = engine::CApplication::GetInstance()->window()->width();
     g_renderOptions.viewportHeight = engine::CApplication::GetInstance()->window()->height();
-    g_renderOptions.cameraPtr = _camera;
-    g_renderOptions.lightPtr = _ui->selectedLight();
+    g_renderOptions.cameraPtr = _cameraRef;
+    g_renderOptions.lightPtr = _uiRef->selectedLight();
     g_renderOptions.shadowMapPtr = _app->renderer()->shadowMap();
-    g_renderOptions.fogPtr = _fog;
-    g_renderOptions.skyboxPtr = _skybox;
+    g_renderOptions.fogPtr = _fogRef;
+    g_renderOptions.skyboxPtr = _skyboxRef;
     g_renderOptions.renderTargetPtr = nullptr;
 
     g_renderOptions.depthViewZmin = 0.0f;
@@ -896,9 +897,9 @@ int main()
     auto _renderTargetDepth = createRenderTarget();
     auto _renderTargetSemantic = createRenderTarget();
 
-    _ui->setRenderTargetNormal( _renderTargetNormal );
-    _ui->setRenderTargetDepth( _renderTargetDepth );
-    _ui->setRenderTargetSemantic( _renderTargetSemantic );
+    _uiRef->setRenderTargetNormal( _renderTargetNormal.get() );
+    _uiRef->setRenderTargetDepth( _renderTargetDepth.get() );
+    _uiRef->setRenderTargetSemantic( _renderTargetSemantic.get() );
 
     // configure render target - normal-render mode
     g_renderOptionsTargetNormal.mode = engine::eRenderMode::NORMAL;
@@ -910,14 +911,14 @@ int main()
     g_renderOptionsTargetNormal.useSkybox = g_useSkybox;
     g_renderOptionsTargetNormal.useShadowMapping = g_useShadowMapping;
     g_renderOptionsTargetNormal.redrawShadowMap = false;
-    g_renderOptionsTargetNormal.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    g_renderOptionsTargetNormal.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
-    g_renderOptionsTargetNormal.cameraPtr = _camera;
-    g_renderOptionsTargetNormal.lightPtr = _ui->selectedLight();
+    g_renderOptionsTargetNormal.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetNormal.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetNormal.cameraPtr = _cameraRef;
+    g_renderOptionsTargetNormal.lightPtr = _uiRef->selectedLight();
     g_renderOptionsTargetNormal.shadowMapPtr = _app->renderer()->shadowMap();
-    g_renderOptionsTargetNormal.fogPtr = _fog;
-    g_renderOptionsTargetNormal.skyboxPtr = _skybox;
-    g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal;
+    g_renderOptionsTargetNormal.fogPtr = _fogRef;
+    g_renderOptionsTargetNormal.skyboxPtr = _skyboxRef;
+    g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal.get();
 
     // configure render-target - depth-render mode
     g_renderOptionsTargetDepth.mode = engine::eRenderMode::DEPTH_ONLY;
@@ -929,12 +930,12 @@ int main()
     g_renderOptionsTargetDepth.useSkybox = false;
     g_renderOptionsTargetDepth.useShadowMapping = false;
     g_renderOptionsTargetDepth.redrawShadowMap = false;
-    g_renderOptionsTargetDepth.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    g_renderOptionsTargetDepth.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
-    g_renderOptionsTargetDepth.cameraPtr = _camera;
+    g_renderOptionsTargetDepth.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetDepth.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetDepth.cameraPtr = _cameraRef;
     g_renderOptionsTargetDepth.lightPtr = nullptr;
     g_renderOptionsTargetDepth.shadowMapPtr = nullptr;
-    g_renderOptionsTargetDepth.renderTargetPtr = _renderTargetDepth;
+    g_renderOptionsTargetDepth.renderTargetPtr = _renderTargetDepth.get();
     g_renderOptionsTargetDepth.depthViewZmin = 0.0f;
     g_renderOptionsTargetDepth.depthViewZmax = 20.0f;
     g_renderOptionsTargetDepth.depthViewZminColor = { 1.0f, 1.0f, 1.0f };
@@ -950,12 +951,12 @@ int main()
     g_renderOptionsTargetSemantic.useSkybox = false;
     g_renderOptionsTargetSemantic.useShadowMapping = false;
     g_renderOptionsTargetSemantic.redrawShadowMap = false;
-    g_renderOptionsTargetSemantic.viewportWidth = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    g_renderOptionsTargetSemantic.viewportHeight = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
-    g_renderOptionsTargetSemantic.cameraPtr = _camera;
+    g_renderOptionsTargetSemantic.viewportWidth = _app->window()->width() / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportHeight = _app->window()->height() / g_target_factor;
+    g_renderOptionsTargetSemantic.cameraPtr = _cameraRef;
     g_renderOptionsTargetSemantic.lightPtr = nullptr;
     g_renderOptionsTargetSemantic.shadowMapPtr = nullptr;
-    g_renderOptionsTargetSemantic.renderTargetPtr = _renderTargetSemantic;
+    g_renderOptionsTargetSemantic.renderTargetPtr = _renderTargetSemantic.get();
     g_renderOptionsTargetSemantic.semanticViewIdMap = { { 0, { 0.5f, 0.7f, 0.3f } },
                                                         { 1, { 0.3f, 0.5f, 0.7f } },
                                                         { 2, { 0.7f, 0.3f, 0.5f } } };
@@ -991,13 +992,13 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _cameraRef->setActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _cameraRef->setActiveMode( true );
 
-        if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
+        if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
-            if ( _camera->active() )
+            if ( _cameraRef->active() )
                 engine::CApplication::GetInstance()->window()->disableCursor();
             else
                 engine::CApplication::GetInstance()->window()->enableCursor();
@@ -1074,7 +1075,7 @@ int main()
         }
 
         // use user-selected light
-        auto lightPtr = _ui->selectedLight();
+        auto lightPtr = _uiRef->selectedLight();
         g_renderOptions.lightPtr = lightPtr;
         g_renderOptionsTargetNormal.lightPtr = lightPtr;
 
@@ -1091,7 +1092,7 @@ int main()
         {
             _config.type        = engine::eShadowRangeType::AUTOFIX_CAMERA;
             _config.worldUp     = g_worldUp;
-            _config.cameraPtr   = _camera;
+            _config.cameraPtr   = _cameraRef;
             _config.extraWidth  = g_extraWidth;
             _config.extraHeight = g_extraHeight;
             _config.extraDepth  = g_extraDepth;
@@ -1163,7 +1164,7 @@ int main()
 
         _app->end();
 
-        _objectPicker->begin( _camera );
+        _objectPicker->begin( _cameraRef );
         _objectPicker->submit( _app->scene()->renderables() );
         _objectPicker->render();
 
@@ -1216,25 +1217,26 @@ void renderShadowMap( engine::CILight* lightPtr,
 
 std::vector< engine::CIRenderable* > _createScene0()
 {
-    auto _renderables = std::vector< engine::CIRenderable* >();
+    auto _renderables = std::vector< std::unique_ptr<engine::CIRenderable> >();
+    auto _renderablesRefs = std::vector< engine::CIRenderable* >();
 
-    _renderables.push_back( engine::CMeshBuilder::createPlane( 20.0f, 20.0f, engine::eAxis::Y ) );
-    _renderables.push_back( engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f ) );
-    _renderables.push_back( engine::CMeshBuilder::createSphere( 0.5f ) );
-    _renderables.push_back( engine::CMeshBuilder::createEllipsoid( 0.2f, 0.4f, 0.6f ) );
-    _renderables.push_back( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::X ) );
-    _renderables.push_back( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::Y ) );
-    _renderables.push_back( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::Z ) );
-    _renderables.push_back( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::X ) );
-    _renderables.push_back( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::Y ) );
-    _renderables.push_back( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::Z ) );
-    _renderables.push_back( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::X ) );
-    _renderables.push_back( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Y ) );
-    _renderables.push_back( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Z ) );
-    _renderables.push_back( engine::CMeshBuilder::createAxes( 0.5f ) );
-    _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/chassis.stl" ) ) );
-    // _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/nanosuit/nanosuit.obj" ) ) );
-    _renderables.push_back( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/fox/fox.obj" ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createPlane( 20.0f, 20.0f, engine::eAxis::Y ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createSphere( 0.5f ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createEllipsoid( 0.2f, 0.4f, 0.6f ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::X ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::Y ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCylinder( 0.25f, 0.5f, engine::eAxis::Z ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::X ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::Y ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createCapsule( 0.25f, 0.5f, engine::eAxis::Z ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::X ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Y ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createArrow( 0.5f, engine::eAxis::Z ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createAxes( 0.5f ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/chassis.stl" ) ) ) );
+    //// _renderables.push_back( std::move( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/nanosuit/nanosuit.obj" ) ) ) );
+    _renderables.push_back( std::move( engine::CMeshBuilder::createModelFromFile( ENGINE_RESOURCES_PATH + std::string( "models/fox/fox.obj" ) ) ) );
 
     _renderables[1]->position = { -1.0f, 1.0f, -1.0f };
     _renderables[2]->position = { -1.0f, 1.0f,  1.0f };
@@ -1255,28 +1257,29 @@ std::vector< engine::CIRenderable* > _createScene0()
     _renderables[14]->position = { 0.0f, 2.0f, 0.0f };
     _renderables[15]->position = { 0.0f, 3.0f, 0.0f };
 
-    for ( auto renderablePtr : _renderables )
+    auto _sceneRef = engine::CApplication::GetInstance()->scene();
+    for ( auto& renderablePtr : _renderables )
     {
         renderablePtr->setMaskId( g_numRenderables );
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
     }
 
-    auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
+    auto _renderableTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
 
     // give the floor a specific id to avoid setting transparency to it
-    _renderables[0]->setObjectId( 1000 );
+    _renderablesRefs[0]->setObjectId( 1000 );
 
     // give the renderables a little rotation and scale
     std::default_random_engine _randomGenerator;
     std::uniform_real_distribution< float > _randomDistribution( 0.5f, 1.0f );
-    for ( auto renderablePtr : _renderables )
+    for ( auto renderablePtr : _renderablesRefs )
     {
-        if ( renderablePtr == _renderables.front() ) // leave plane unchanged
+        if ( renderablePtr == _renderablesRefs.front() ) // leave plane unchanged
         {
-            renderablePtr->material()->setAlbedoMap( _renderableTexture );
+            renderablePtr->material()->setAlbedoMap( _renderableTextureRef );
             continue;
         }
 
@@ -1286,7 +1289,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         float _scale = _randomDistribution( _randomGenerator );
         renderablePtr->scale = { _scale, _scale, _scale };
 
-        renderablePtr->material()->setAlbedoMap( _renderableTexture );
+        renderablePtr->material()->setAlbedoMap( _renderableTextureRef );
         if ( renderablePtr->type() == engine::eRenderableType::MODEL )
         {
             auto _submeshes = dynamic_cast< engine::CModel* >( renderablePtr )->meshes();
@@ -1295,20 +1298,21 @@ std::vector< engine::CIRenderable* > _createScene0()
                 submeshPtr->material()->ambient = { 0.4f, 0.4f, 0.4f };
                 submeshPtr->material()->diffuse = { 0.8f, 0.8f, 0.8f };
                 submeshPtr->material()->specular = { 0.8f, 0.8f, 0.8f };
-                //// submeshPtr->material()->setAlbedoMap( _renderableTexture );
+                //// submeshPtr->material()->setAlbedoMap( _renderableTextureRef );
             }
         }
     }
 
-    _renderables[15]->scale = { 1.0f, 1.0f, 1.0f };
-    _renderables[15]->setMaskId( g_numRenderables );
+    _renderablesRefs[15]->scale = { 1.0f, 1.0f, 1.0f };
+    _renderablesRefs[15]->setMaskId( g_numRenderables );
 
-    return _renderables;
+    return _renderablesRefs;
 }
 
 std::vector< engine::CIRenderable* > _createScene1()
 {
-    auto _renderables = std::vector< engine::CIRenderable* >();
+    auto _renderables = std::vector< std::unique_ptr<engine::CIRenderable> >();
+    auto _renderablesRefs = std::vector< engine::CIRenderable* >();
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
@@ -1324,65 +1328,69 @@ std::vector< engine::CIRenderable* > _createScene1()
     _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 30.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
-    auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
-    auto _cubeTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
+    auto _floorTextureRef = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
+    auto _cubeTextureRef = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
 
-    ENGINE_ASSERT( _floorTexture, "Could not retrieve valid texture for the sample - floor" );
-    ENGINE_ASSERT( _cubeTexture, "Could not retrieve valid texture for the sample - cube" );
+    ENGINE_ASSERT( _floorTextureRef, "Could not retrieve valid texture for the sample - floor" );
+    ENGINE_ASSERT( _cubeTextureRef, "Could not retrieve valid texture for the sample - cube" );
 
-    auto _floorMaterial = new engine::CMaterial( "floor_material",
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 64.0f,
-                                                 _floorTexture,
-                                                 _floorTexture );
+    auto _floorMaterial = std::make_unique<engine::CMaterial>( "floor_material",
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               64.0f,
+                                                               _floorTextureRef,
+                                                               _floorTextureRef );
 
-    auto _cube1Material = new engine::CMaterial( "cube_material1",
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 64.0f,
-                                                 _floorTexture,
-                                                 _floorTexture );
+    auto _cube1Material = std::make_unique<engine::CMaterial>( "cube_material1",
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               64.0f,
+                                                               _floorTextureRef,
+                                                               _floorTextureRef );
 
-    auto _cube2Material = new engine::CMaterial( "cube_material2",
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 64.0f,
-                                                 _floorTexture,
-                                                 _floorTexture );
+    auto _cube2Material = std::make_unique<engine::CMaterial>( "cube_material2",
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               64.0f,
+                                                               _floorTextureRef,
+                                                               _floorTextureRef );
 
-    auto _cube3Material = new engine::CMaterial( "cube_material3",
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 64.0f,
-                                                 _floorTexture,
-                                                 _floorTexture );
+    auto _cube3Material = std::make_unique<engine::CMaterial>( "cube_material3",
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               64.0f,
+                                                               _floorTextureRef,
+                                                               _floorTextureRef );
 
-    _floor->setMaterial( std::unique_ptr< engine::CMaterial >( _floorMaterial ) );
-    _cube1->setMaterial( std::unique_ptr< engine::CMaterial >( _cube1Material ) );
-    _cube2->setMaterial( std::unique_ptr< engine::CMaterial >( _cube2Material ) );
-    _cube3->setMaterial( std::unique_ptr< engine::CMaterial >( _cube3Material ) );
+    _floor->setMaterial( std::move( _floorMaterial ) );
+    _cube1->setMaterial( std::move( _cube1Material ) );
+    _cube2->setMaterial( std::move( _cube2Material ) );
+    _cube3->setMaterial( std::move( _cube3Material ) );
 
-    _renderables = { _floor, _cube1, _cube2, _cube3 };
+    _renderables.push_back( std::move( _floor ) );
+    _renderables.push_back( std::move( _cube1 ) );
+    _renderables.push_back( std::move( _cube2 ) );
+    _renderables.push_back( std::move( _cube3 ) );
 
-    for ( auto renderablePtr : _renderables )
+    auto _sceneRef = engine::CApplication::GetInstance()->scene();
+    for ( auto& renderablePtr : _renderables )
     {
         renderablePtr->setMaskId( g_numRenderables );
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( renderablePtr ) );
+        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
     }
 
-    return _renderables;
+    return _renderablesRefs;
 }
 
 std::vector< engine::CIRenderable* > _createScene2()
@@ -1390,9 +1398,10 @@ std::vector< engine::CIRenderable* > _createScene2()
     std::default_random_engine _randomGenerator;
     std::uniform_real_distribution< float > _randomDistribution( -1.0f, 1.0f );
 
-    auto _renderableTexture = engine::CTextureManager::GetCachedTexture( "img_grid" );
-    auto _renderables = std::vector< engine::CIRenderable* >();
+    auto _renderableTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
+    auto _renderablesRefs = std::vector< engine::CIRenderable* >();
 
+    auto _sceneRef = engine::CApplication::GetInstance()->scene();
     for ( size_t i = 0; i < 100; i++ )
     {
         auto _renderablePtr = engine::CMeshBuilder::createSphere( 0.5f );
@@ -1407,16 +1416,15 @@ std::vector< engine::CIRenderable* > _createScene2()
         float _scale = 0.5f + ( 1.0f + _randomDistribution( _randomGenerator ) ) * 0.5f;
         _renderablePtr->scale = { _scale, _scale, _scale };
 
-        _renderablePtr->material()->setAlbedoMap( _renderableTexture );
+        _renderablePtr->material()->setAlbedoMap( _renderableTextureRef );
 
-        _renderables.push_back( _renderablePtr );
-        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderablePtr ) );
+        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _renderablePtr ) ) );
 
         // create a cube inside the sphere
         auto _cubePtr = engine::CMeshBuilder::createBox( 0.5f, 0.5f, 0.5f );
-        _cubePtr->position = _renderablePtr->position;
-        _cubePtr->rotation = _renderablePtr->rotation;
-        _cubePtr->scale = 0.5f * _renderablePtr->scale;
+        _cubePtr->position = _renderablesRefs.back()->position;
+        _cubePtr->rotation = _renderablesRefs.back()->rotation;
+        _cubePtr->scale = 0.5f * _renderablesRefs.back()->scale;
 
         _cubePtr->setObjectId( 1000 );
 
@@ -1424,21 +1432,19 @@ std::vector< engine::CIRenderable* > _createScene2()
         _cubePtr->material()->diffuse = { 0.8f, 0.1f, 0.1f };
         _cubePtr->material()->specular = { 0.8f, 0.1f, 0.1f };
 
-        _renderables.push_back( _cubePtr );
-        engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _cubePtr ) );
+        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _cubePtr ) ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
-    _floor->material()->setAlbedoMap( _renderableTexture );
+    _floor->material()->setAlbedoMap( _renderableTextureRef );
     _floor->setObjectId( 1000 );
-    _renderables.push_back( _floor );
-    engine::CApplication::GetInstance()->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _floor ) ) );
 
-    return _renderables;
+    return _renderablesRefs;
 }
 
-engine::CFrameBuffer* createRenderTarget()
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget()
 {
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
@@ -1462,11 +1468,11 @@ engine::CFrameBuffer* createRenderTarget()
     _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
     _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-    auto _framebuffer = new engine::CFrameBuffer();
+    auto _framebuffer = std::make_unique<engine::CFrameBuffer>();
     _framebuffer->addAttachment( _fbColorConfig );
     _framebuffer->addAttachment( _fbDepthConfig );
 
-    return _framebuffer;
+    return std::move( _framebuffer );
 }
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name )
@@ -1477,13 +1483,11 @@ void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& n
     auto _width = _colorAttachmentConfig.width;
     auto _height = _colorAttachmentConfig.height;
 
-    engine::uint8* _buffer = new engine::uint8[3 * _width * _height];
+    auto _buffer = std::unique_ptr< engine::uint8[] >( new engine::uint8[3 * _width * _height] );
 
     renderTarget->bind();
-    glReadPixels( 0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, _buffer );
+    glReadPixels( 0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, _buffer.get() );
     renderTarget->unbind();
 
-    stbi_write_jpg( name.c_str(), _width, _height, 3, _buffer, 100 );
-    
-    delete[] _buffer;
+    stbi_write_jpg( name.c_str(), _width, _height, 3, _buffer.get(), 100 );
 }

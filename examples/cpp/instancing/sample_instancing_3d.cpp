@@ -24,20 +24,20 @@ void drawGrid_Instancing( engine::CShader* shader,
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     /* load the shader used for instancing-3d */
     std::string _baseNameInstancing3d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/instancing_3d";
-    auto _shaderInstancing3d = engine::CShaderManager::CreateShaderFromFiles( "instancing_3d",
-                                                                  _baseNameInstancing3d + "_vs.glsl",
-                                                                  _baseNameInstancing3d + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderInstancing3d, "Couldn't load instancing-3d shader for our demo T_T" );
+    auto _shaderInstancing3dRef = engine::CShaderManager::CreateShaderFromFiles( "instancing_3d",
+                                                                                 _baseNameInstancing3d + "_vs.glsl",
+                                                                                 _baseNameInstancing3d + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderInstancing3dRef, "Couldn't load instancing-3d shader for our demo T_T" );
 
     std::string _baseNameNoInstancing3d = std::string( ENGINE_EXAMPLES_PATH ) + "instancing/shaders/no_instancing_3d";
-    auto _shaderNoInstancing3d = engine::CShaderManager::CreateShaderFromFiles( "no_instancing_3d",
-                                                                                _baseNameNoInstancing3d + "_vs.glsl",
-                                                                                _baseNameNoInstancing3d + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderNoInstancing3d, "Couldn't load no-instancing-3d shader for our demo T_T" );
+    auto _shaderNoInstancing3dRef = engine::CShaderManager::CreateShaderFromFiles( "no_instancing_3d",
+                                                                                   _baseNameNoInstancing3d + "_vs.glsl",
+                                                                                   _baseNameNoInstancing3d + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderNoInstancing3dRef, "Couldn't load no-instancing-3d shader for our demo T_T" );
 
     g_cubeVAO_NoInstancing = createCube_noInstancing();
     g_cubeVAO_Instancing = createCube_Instancing();
@@ -51,15 +51,15 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
     while( _app->active() )
     {
@@ -68,16 +68,16 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_I ) )
         {
             g_useInstancing = !g_useInstancing;
-            std::cout << std::string( g_useInstancing ? "using instancing" : "not using instancing" ) << std::endl;
+            ENGINE_TRACE( g_useInstancing ? "Using instancing" : "Not using instancing" );
         }
 
         _app->update();
         _app->begin();
 
         if ( g_useInstancing )
-            drawGrid_Instancing( _shaderInstancing3d, _camera, g_cubeVAO_Instancing.get(), _bufferModelMatrices );
+            drawGrid_Instancing( _shaderInstancing3dRef, _camera.get(), g_cubeVAO_Instancing.get(), _bufferModelMatrices );
         else
-            drawGrid_noInstancing( _shaderNoInstancing3d, _camera, g_cubeVAO_NoInstancing.get() );
+            drawGrid_noInstancing( _shaderNoInstancing3dRef, _camera.get(), g_cubeVAO_NoInstancing.get() );
 
         _app->render();
         _app->end();

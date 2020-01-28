@@ -10,64 +10,59 @@ int main()
     _windowProperties.clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
     _windowProperties.resizable = true;
 
-    auto _app = new engine::CApplication( _windowProperties );
+    auto _app = std::make_unique<engine::CApplication>( _windowProperties );
     _app->setGuiUtilsActive( true );
 
-    auto _scene = new engine::CScene();
+    auto _scene = std::make_unique<engine::CScene>();
 
     /* create some lights for the scene ***********************************************************/
-    auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                    { 0.4f, 0.4f, 0.4f },
-                                                    { 0.8f, 0.8f, 0.8f },
-                                                    { 0.8f, 0.8f, 0.8f },
-                                                    { -1.0f, -1.0f, -1.0f } );
+    auto _dirlight = std::make_unique<engine::CDirectionalLight>( "directional",
+                                                                  engine::CVec3( 0.4f, 0.4f, 0.4f ),
+                                                                  engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                                  engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                                  engine::CVec3( -1.0f, -1.0f, -1.0f ) );
+    auto _dirlightRef = dynamic_cast<engine::CDirectionalLight*>( _scene->addLight( std::move( _dirlight ) ) );
 
-    _scene->addLight( std::unique_ptr< engine::CILight >( _dirlight ) );
-
-    auto _pointlight = new engine::CPointLight( "point",
-                                                { 0.4f, 0.4f, 0.4f },
-                                                { 0.8f, 0.8f, 0.8f },
-                                                { 0.8f, 0.8f, 0.8f },
-                                                { 5.0f, 5.0f, 5.0f },
-                                                1.0f, 0.0f, 0.0f );
-
-    _scene->addLight( std::unique_ptr< engine::CILight >( _pointlight ) );
+    auto _pointlight = std::make_unique<engine::CPointLight>( "point",
+                                                              engine::CVec3( 0.4f, 0.4f, 0.4f ),
+                                                              engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                              engine::CVec3( 0.8f, 0.8f, 0.8f ),
+                                                              engine::CVec3( 5.0f, 5.0f, 5.0f ),
+                                                              1.0f, 0.0f, 0.0f );
+    auto _pointlightRef = dynamic_cast<engine::CPointLight*>( _scene->addLight( std::move( _pointlight ) ) );
     /* create some cameras for the scene **********************************************************/
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.aspect = _app->window()->aspect();
     _cameraProjData.width = 10.0f * _app->window()->aspect();
     _cameraProjData.height = 10.0f;
 
-    auto _orbitCamera = new engine::COrbitCamera( "orbit",
-                                                  { 0.0f, 3.0f, 0.0f },
-                                                  { 0.0f, 0.0f, 0.0f },
-                                                  engine::eAxis::Y,
-                                                  _cameraProjData,
-                                                  _app->window()->width(),
-                                                  _app->window()->height() );
-
-    _scene->addCamera( std::unique_ptr< engine::CICamera >( _orbitCamera ) );
+    auto _orbitCamera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                                engine::CVec3( 0.0f, 3.0f, 0.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                                engine::eAxis::Y,
+                                                                _cameraProjData,
+                                                                _app->window()->width(),
+                                                                _app->window()->height() );
+    auto _orbitCameraRef = _scene->addCamera( std::move( _orbitCamera ) );
 
     const float _cameraSensitivity  = 0.1f;
     const float _cameraSpeed        = 50.0f;
     const float _cameraMaxDelta     = 10.0f;
     
-    auto _fpsCamera = new engine::CFpsCamera( "fps",
-                                              { 3.0f, 3.0f, 3.0f },
-                                              { 0.0f, 0.0f, 0.0f },
-                                              engine::eAxis::Y,
-                                              _cameraProjData,
-                                              _cameraSensitivity,
-                                              _cameraSpeed,
-                                              _cameraMaxDelta );
-
-    _scene->addCamera( std::unique_ptr< engine::CICamera >( _fpsCamera ) );
+    auto _fpsCamera = std::make_unique<engine::CFpsCamera>( "fps",
+                                                            engine::CVec3( 3.0f, 3.0f, 3.0f ),
+                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                            engine::eAxis::Y,
+                                                            _cameraProjData,
+                                                            _cameraSensitivity,
+                                                            _cameraSpeed,
+                                                            _cameraMaxDelta );
+    auto _fpsCameraRef = _scene->addCamera( std::move( _fpsCamera ) );
     /* add some effects like fog and a skybox *****************************************************/
 
-    auto _skybox = new engine::CSkybox();
+    auto _skybox = std::make_unique<engine::CSkybox>();
     _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
-
-    _scene->addSkybox( std::unique_ptr< engine::CSkybox >( _skybox ) );
+    auto _skyboxRef = _scene->addSkybox( std::move( _skybox ) );
 
     /**********************************************************************************************/
     const int _nWidthSamples = 50;
@@ -123,22 +118,22 @@ int main()
     _model->scale = { 0.1f, 0.1f, 0.1f };
     _model->position = { 0.0f, 2.0f, 0.0f };
 
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _model ) );
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _patch ) );
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _floor ) );
+    auto _modelRef = _scene->addRenderable( std::move( _model ) );
+    auto _patchRef = _scene->addRenderable( std::move( _patch ) );
+    auto _floorRef = _scene->addRenderable( std::move( _floor ) );
     /**********************************************************************************************/
 
-    _app->setScene( std::unique_ptr< engine::CScene >( _scene ) );
+    _app->setScene( std::move( _scene ) );
 
     _app->renderOptions().useShadowMapping = true;
     _app->renderOptions().shadowMapRangeConfig.type = engine::eShadowRangeType::FIXED_USER;
     _app->renderOptions().shadowMapRangeConfig.worldUp = { 0.0f, 1.0f, 0.0f };
-    _app->renderOptions().shadowMapRangeConfig.cameraPtr = _orbitCamera;
+    _app->renderOptions().shadowMapRangeConfig.cameraPtr = _orbitCameraRef;
     _app->renderOptions().shadowMapRangeConfig.clipSpaceWidth   = 40.0f;
     _app->renderOptions().shadowMapRangeConfig.clipSpaceHeight  = 40.0f;
     _app->renderOptions().shadowMapRangeConfig.clipSpaceDepth   = 40.0f;
-    //// _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlight;
-    _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlight;
+    //// _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlightRef;
+    _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlightRef;
 
     while ( _app->active() )
     {
@@ -152,10 +147,6 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
-
-        //// engine::CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::translation( _pointlight->position ), { 1.0f, 1.0f, 1.0f } );
-
-        //// engine::CDebugDrawer::DrawNormals( _patch, { 1.0f, 0.0f, 1.0f } );
 
         _app->update();
 

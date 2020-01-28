@@ -155,9 +155,9 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new GeometricHelpersLayer( "GeometricHelpers-utils" );
-    _app->addGuiLayer( std::unique_ptr< GeometricHelpersLayer >( _uiLayer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<GeometricHelpersLayer>( "GeometricHelpers-utils" );
+    auto _uiLayerRef = dynamic_cast<GeometricHelpersLayer*>( _app->addGuiLayer( std::move( _uiLayer ) ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -166,15 +166,15 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
     auto _cameraProjDataTest = engine::CCameraProjData();
     _cameraProjDataTest.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -183,11 +183,11 @@ int main()
     _cameraProjDataTest.zNear       = 1.0f;
     _cameraProjDataTest.zFar        = 3.0f;
 
-    auto _cameraTest = new engine::CFixedCamera( "fixed",
-                                                  engine::CVec3( -3.0f, 3.0f, -3.0f ),
-                                                  engine::CVec3( 0.0f, 0.0f, 0.0f ),
-                                                  engine::eAxis::Y,
-                                                  _cameraProjDataTest );
+    auto _cameraTest = std::make_unique<engine::CFixedCamera>( "fixed",
+                                                               engine::CVec3( -3.0f, 3.0f, -3.0f ),
+                                                               engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                               engine::eAxis::Y,
+                                                               _cameraProjDataTest );
 
     engine::CVec3 _point = { 2.0f, 3.0f, 2.0f };
 
@@ -196,13 +196,13 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _cameraRef->setActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _cameraRef->setActiveMode( true );
 
-        if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
+        if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
-            if ( _camera->active() )
+            if ( _cameraRef->active() )
                 _app->window()->disableCursor();
             else
                 _app->window()->enableCursor();

@@ -261,7 +261,7 @@ namespace engine
         auto _indices = std::vector< CInd3 >();
 
         // create dummy meshes to grab the geometry (vertices, ...)
-        CMesh* _dummyMesh = nullptr;
+        std::unique_ptr<CMesh> _dummyMesh;
         if ( primitive == DD_PRIMITIVE_BOX )
             _dummyMesh = CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
         else if ( primitive == DD_PRIMITIVE_SPHERE )
@@ -287,10 +287,11 @@ namespace engine
         else
             ENGINE_CORE_ASSERT( false, "Invalid primitive id given while constructing instanced buffers" );
 
+        // copy vertex data from the primitive
         _vertices = _dummyMesh->vertices();
         _normals = _dummyMesh->normals();
         _indices = _dummyMesh->indices();
-        delete _dummyMesh;
+        _dummyMesh = nullptr;
 
         // Create the VBOs that hold fixed data of the shape and normals of the primitives (these 
         // don't change during updates, unlike their instanced counterparts)

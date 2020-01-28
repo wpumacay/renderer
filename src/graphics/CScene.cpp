@@ -26,85 +26,92 @@ namespace engine
         m_spotLights.clear();
     }
 
-    void CScene::addFog( std::unique_ptr< CFog > fog )
+    CFog* CScene::addFog( std::unique_ptr< CFog > fog )
     {
         if ( !fog )
             ENGINE_CORE_WARN( "Tried to add a null-fog to the scene" );
         else
             m_fog = std::move( fog );
+        return m_fog.get();
     }
 
-    void CScene::addSkybox( std::unique_ptr< CSkybox > skybox )
+    CSkybox* CScene::addSkybox( std::unique_ptr< CSkybox > skybox )
     {
         if ( !skybox )
             ENGINE_CORE_WARN( "Tried to add a null-skybox to the scene" );
         else
             m_skybox = std::move( skybox );
+        return m_skybox.get();
     }
 
-    void CScene::addCamera( std::unique_ptr< CICamera > camera )
+    CICamera* CScene::addCamera( std::unique_ptr< CICamera > camera )
     {
         if ( !camera )
         {
             ENGINE_CORE_WARN( "Tried to add a null-camera to the scene" );
-            return;
+            return nullptr;
         }
 
         if ( m_camerasMap.find( camera->name() ) != m_camerasMap.end() )
             ENGINE_CORE_WARN( "Adding a camera with the same name. Deleting the previous one" );
 
-        auto _cameraPtr = camera.get();
+        auto _cameraRef = camera.get();
 
         // keep ownership of this camera
         m_cameras.push_back( std::move( camera ) );
         
         // keep access through its name
-        m_camerasMap[_cameraPtr->name()] = _cameraPtr;
+        m_camerasMap[_cameraRef->name()] = _cameraRef;
         // setup as current if there's no camera yet
         if ( !m_currentCamera )
-            m_currentCamera = _cameraPtr;
+            m_currentCamera = _cameraRef;
+        return _cameraRef;
     }
 
-    void CScene::addLight( std::unique_ptr< CILight > light )
+    CILight* CScene::addLight( std::unique_ptr< CILight > light )
     {
         if ( !light )
         {
             ENGINE_CORE_WARN( "Tried to add a null-light to the scene" );
-            return;
+            return nullptr;
         }
 
         if ( m_lightsMap.find( light->name() ) != m_lightsMap.end() )
             ENGINE_CORE_WARN( "Adding a light with the same name. Deleting the previous one" );
 
-        auto _lightPtr = light.get();
+        auto _lightRef = light.get();
 
         // keep ownership of this light
         m_lights.push_back( std::move( light ) );
 
         // keep access through its name
-        m_lightsMap[_lightPtr->name()] = _lightPtr;
+        m_lightsMap[_lightRef->name()] = _lightRef;
         // setup as main if there's no lights yet
         if ( !m_mainLight )
-            m_mainLight = _lightPtr;
+            m_mainLight = _lightRef;
 
         // keep access through its type
-        if ( _lightPtr->type() == eLightType::DIRECTIONAL )
-            m_directionalLights.push_back( dynamic_cast< CDirectionalLight* >( _lightPtr ) );
+        if ( _lightRef->type() == eLightType::DIRECTIONAL )
+            m_directionalLights.push_back( dynamic_cast< CDirectionalLight* >( _lightRef ) );
 
-        else if ( _lightPtr->type() == eLightType::POINT )
-            m_pointLights.push_back( dynamic_cast< CPointLight* >( _lightPtr ) );
+        else if ( _lightRef->type() == eLightType::POINT )
+            m_pointLights.push_back( dynamic_cast< CPointLight* >( _lightRef ) );
 
-        else if ( _lightPtr->type() == eLightType::SPOT )
-            m_spotLights.push_back( dynamic_cast< CSpotLight* >( _lightPtr ) );
+        else if ( _lightRef->type() == eLightType::SPOT )
+            m_spotLights.push_back( dynamic_cast< CSpotLight* >( _lightRef ) );
+
+        return _lightRef;
     }
 
-    void CScene::addRenderable( std::unique_ptr< CIRenderable > renderable )
+    CIRenderable* CScene::addRenderable( std::unique_ptr< CIRenderable > renderable )
     {
         if ( m_renderablesMap.find( renderable->name() ) != m_renderablesMap.end() )
             ENGINE_CORE_WARN( "Adding a renderable with the same name. Deleting the previous one" );
 
         m_renderables.push_back( std::move( renderable ) );
         m_renderablesMap[ m_renderables.back()->name() ] = m_renderables.back().get();
+
+        return m_renderables.back().get();
     }
 
     void CScene::clearScene()

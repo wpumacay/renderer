@@ -99,15 +99,15 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             engine::CVec3( 2.0f, 2.0f, 2.0f ),
-                                             engine::CVec3( 0.0f, 0.0f, 0.0f ),
-                                             engine::eAxis::Z,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 2.0f, 2.0f, 2.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Z,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _scene->addCamera( std::unique_ptr<engine::CICamera>( _camera ) );
+    _scene->addCamera( std::move( _camera ) );
 
     auto _textureCubemap = _textureCubeCloudtop;
     // auto _textureCubemap = _textureCubeStarfield;

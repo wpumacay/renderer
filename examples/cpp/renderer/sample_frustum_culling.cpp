@@ -74,10 +74,10 @@ void renderScene( engine::CICamera* cameraPtr,
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new FrustumCullingGuiLayer( "Frustum-culling-utils" );
-    _app->addGuiLayer( std::unique_ptr< FrustumCullingGuiLayer >( _uiLayer ) );
-    _uiLayer->setRenderer( _app->renderer() );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<FrustumCullingGuiLayer>( "Frustum-culling-utils" );
+    auto _uiLayerRef = dynamic_cast<FrustumCullingGuiLayer*>( _app->addGuiLayer( std::move( _uiLayer ) ) );
+    _uiLayerRef->setRenderer( _app->renderer() );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -86,15 +86,15 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
     auto _plane     = engine::CMeshBuilder::createPlane( 2.0f, 2.0f, engine::eAxis::Y );
     auto _boxy      = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
@@ -137,29 +137,42 @@ int main()
 
     _boxy->scale = { 0.2f, 0.2f, 0.2f };
 
-    std::vector< engine::CIRenderable* > _renderables = { _plane, _boxy, _sphery, _ellipsy, 
-                                                          _cylindyX, _cylindyY, _cylindyZ,
-                                                          _capsulyX, _capsulyY, _capsulyZ,
-                                                          _arrowyX, _arrowyY, _arrowyZ,
-                                                          _axy, _model };
+    auto _renderables = std::vector< std::unique_ptr< engine::CIRenderable > >();
+    auto _renderablesRefs = std::vector< engine::CIRenderable* >();
+
+    _renderables.push_back( std::move( _plane ) ) ;
+    _renderables.push_back( std::move( _boxy ) ) ;
+    _renderables.push_back( std::move( _sphery ) ) ;
+    _renderables.push_back( std::move( _ellipsy ) ) ;
+    _renderables.push_back( std::move( _cylindyX ) ) ;
+    _renderables.push_back( std::move( _cylindyY ) ) ;
+    _renderables.push_back( std::move( _cylindyZ ) ) ;
+    _renderables.push_back( std::move( _capsulyX ) ) ;
+    _renderables.push_back( std::move( _capsulyY ) ) ;
+    _renderables.push_back( std::move( _capsulyZ ) ) ;
+    _renderables.push_back( std::move( _arrowyX ) ) ;
+    _renderables.push_back( std::move( _arrowyY ) ) ;
+    _renderables.push_back( std::move( _arrowyZ ) ) ;
+    _renderables.push_back( std::move( _axy ) ) ;
+    _renderables.push_back( std::move( _model ) ) ;
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
-        _app->scene()->addRenderable( std::unique_ptr< engine::CIRenderable >( _renderables[i] ) );
+        _renderablesRefs.push_back( _app->scene()->addRenderable( std::move( _renderables[i] ) ) );
 
     // give the renderables a little rotation and scale
     std::default_random_engine _randomGenerator;
     std::uniform_real_distribution< float > _randomDistribution( 0.5f, 1.0f );
-    for ( size_t i = 0; i < _renderables.size(); i++ )
+    for ( size_t i = 0; i < _renderablesRefs.size(); i++ )
     {
-        _renderables[i]->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+        _renderablesRefs[i]->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
                                                                        _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
                                                                        _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
         float _scale = _randomDistribution( _randomGenerator );
-        _renderables[i]->scale = { _scale, _scale, _scale };
+        _renderablesRefs[i]->scale = { _scale, _scale, _scale };
     }
 
-    auto _shader = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shader, "Could not grab the basic3d shader to render the scene :(" );
+    auto _shaderRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderRef, "Could not grab the basic3d shader to render the scene :(" );
 
     // configure render options
     g_renderOptions.mode = engine::eRenderMode::NO_SUBMIT;
@@ -169,7 +182,7 @@ int main()
     g_renderOptions.useShadowMapping = false;
     g_renderOptions.viewportWidth = _app->window()->width();
     g_renderOptions.viewportHeight = _app->window()->height();
-    g_renderOptions.cameraPtr = _camera;
+    g_renderOptions.cameraPtr = _cameraRef;
     g_renderOptions.lightPtr = nullptr;
     g_renderOptions.shadowMapPtr = nullptr;
     g_renderOptions.renderTargetPtr = nullptr;
@@ -179,13 +192,13 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _cameraRef->setActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _cameraRef->setActiveMode( true );
 
-        if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
+        if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
-            if ( _camera->active() )
+            if ( _cameraRef->active() )
                 _app->window()->disableCursor();
             else
                 _app->window()->enableCursor();
@@ -200,7 +213,7 @@ int main()
 
         /****************************************************/
         // render the objects with plain colors (just to check)
-        renderScene( _camera, _shader, _renderables );
+        renderScene( _cameraRef, _shaderRef, _renderablesRefs );
 
         // check if the renderer is culling properly
         _app->renderer()->begin( g_renderOptions );

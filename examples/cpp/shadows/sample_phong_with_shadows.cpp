@@ -25,28 +25,28 @@ engine::CVec3 g_lightPosition = { -2.0f, 4.0f, -1.0f };
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     /* load the shader used to render the scene normally (single-light for now) */
     std::string _baseNamePhongWithShadows = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/phong_with_shadows";
-    auto _shaderPhongWithShadows = engine::CShaderManager::CreateShaderFromFiles( "phong_with_shadows_shader",
-                                                                                  _baseNamePhongWithShadows + "_vs.glsl",
-                                                                                  _baseNamePhongWithShadows + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderPhongWithShadows, "Could not load phong-with-shadows shader to render the scene using the shadowmap T_T" );
+    auto _shaderPhongWithShadowsRef = engine::CShaderManager::CreateShaderFromFiles( "phong_with_shadows_shader",
+                                                                                     _baseNamePhongWithShadows + "_vs.glsl",
+                                                                                     _baseNamePhongWithShadows + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderPhongWithShadowsRef, "Could not load phong-with-shadows shader to render the scene using the shadowmap T_T" );
 
     /* load the shader used for shadow mapping */
     std::string _baseNameShadowMapProjection = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_projection";
-    auto _shaderShadowMapProj = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_projection_shader",
-                                                                               _baseNameShadowMapProjection + "_vs.glsl",
-                                                                               _baseNameShadowMapProjection + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderShadowMapProj, "Couldn't load shadow-mapping shader use to create the depth-map T_T" );
+    auto _shaderShadowMapProjRef = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_projection_shader",
+                                                                                  _baseNameShadowMapProjection + "_vs.glsl",
+                                                                                  _baseNameShadowMapProjection + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderShadowMapProjRef, "Couldn't load shadow-mapping shader use to create the depth-map T_T" );
 
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
-    auto _shaderShadowMapViz = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_visualization_shader",
-                                                                             _baseNameShadowMapViz + "_vs.glsl",
-                                                                             _baseNameShadowMapViz + "_fs.glsl" );
-    ENGINE_ASSERT( _shaderShadowMapViz, "Couldn't load the visualization shader to check the depth-map T_T" );
+    auto _shaderShadowMapVizRef = engine::CShaderManager::CreateShaderFromFiles( "shadowmap_visualization_shader",
+                                                                                 _baseNameShadowMapViz + "_vs.glsl",
+                                                                                 _baseNameShadowMapViz + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderShadowMapVizRef, "Couldn't load the visualization shader to check the depth-map T_T" );
 
     /* Create a simple scene for testing **********************************************************/
 
@@ -57,28 +57,28 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    // auto _camera = new engine::COrbitCamera( "orbit",
-    //                                          { 0.0f, 0.0f, 3.0f },
-    //                                          { 0.0f, 0.0f, 0.0f },
-    //                                          engine::eAxis::Y,
-    //                                          _cameraProjData,
-    //                                          _app->window()->width(),
-    //                                          _app->window()->height() );
+    //// auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+    ////                                                        engine::CVec3( 0.0f, 0.0f, 3.0f ),
+    ////                                                        engine::CVec3( 0.0f, 0.0f, 0.0f ),
+    ////                                                        engine::eAxis::Y,
+    ////                                                        _cameraProjData,
+    ////                                                        _app->window()->width(),
+    ////                                                        _app->window()->height() );
 
     const float _cameraSensitivity  = 0.25f;
     const float _cameraSpeed        = 25.0f;
     const float _cameraMaxDelta     = 10.0f;
     
-    auto _camera = new engine::CFpsCamera( "fps",
-                                           { 2.0f, 2.0f, 2.0f },
-                                           { 0.0f, 0.0f, 0.0f },
-                                           engine::eAxis::Y,
-                                           _cameraProjData,
-                                           _cameraSensitivity,
-                                           _cameraSpeed,
-                                           _cameraMaxDelta );
+    auto _camera = std::make_unique<engine::CFpsCamera>( "fps",
+                                                         engine::CVec3( 2.0f, 2.0f, 2.0f ),
+                                                         engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                         engine::eAxis::Y,
+                                                         _cameraProjData,
+                                                         _cameraSensitivity,
+                                                         _cameraSpeed,
+                                                         _cameraMaxDelta );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
     auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
@@ -94,47 +94,47 @@ int main()
     _cube3->rotation = tinymath::rotation( engine::CVec3( 1.0f, 0.0f, 1.0f ), engine::toRadians( 60.0f ) );
     _cube3->scale = { 0.5f, 0.5f, 0.5f };
 
-    auto _floorTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
-    auto _cubeTexture = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
+    auto _floorTextureRef = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
+    auto _cubeTextureRef = engine::CTextureManager::GetCachedTexture( "img_wooden_floor" );
 
-    ENGINE_ASSERT( _floorTexture, "Could not retrieve valid texture for the sample - floor" );
-    ENGINE_ASSERT( _cubeTexture, "Could not retrieve valid texture for the sample - cube" );
+    ENGINE_ASSERT( _floorTextureRef, "Could not retrieve valid texture for the sample - floor" );
+    ENGINE_ASSERT( _cubeTextureRef, "Could not retrieve valid texture for the sample - cube" );
 
-    auto _floorMaterial = new engine::CMaterial( "floor_material",
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 { 1.0f, 1.0f, 1.0f },
-                                                 64.0f,
-                                                 _floorTexture,
-                                                 _floorTexture );
+    auto _floorMaterial = std::make_unique<engine::CMaterial>( "floor_material",
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                               64.0f,
+                                                               _floorTextureRef,
+                                                               _floorTextureRef );
 
-    auto _cubeMaterial = new engine::CMaterial( "cube_material",
-                                                engine::eMaterialType::PHONG,
-                                                { 1.0f, 1.0f, 1.0f },
-                                                { 1.0f, 1.0f, 1.0f },
-                                                { 1.0f, 1.0f, 1.0f },
-                                                64.0f,
-                                                _floorTexture,
-                                                _floorTexture );
+    auto _cubeMaterial = std::make_unique<engine::CMaterial>( "cube_material",
+                                                              engine::eMaterialType::PHONG,
+                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                              64.0f,
+                                                              _floorTextureRef,
+                                                              _floorTextureRef );
 
-    auto _dirlight = new engine::CDirectionalLight( "directional",
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    { 0.3f, 0.3f, 0.3f },
-                                                    ( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ).normalized() );
+    auto _dirlight = std::make_unique<engine::CDirectionalLight>( "directional",
+                                                                  engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                                  engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                                  engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                                  ( engine::CVec3( 0.0f, 0.0f, 0.0f ) - g_lightPosition ).normalized() );
 
-    auto _pointlight = new engine::CPointLight( "point",
-                                                { 0.3f, 0.3f, 0.3f },
-                                                { 0.3f, 0.3f, 0.3f },
-                                                { 0.3f, 0.3f, 0.3f },
-                                                g_lightPosition,
-                                                1.0f, 0.09f, 0.032f );
+    auto _pointlight = std::make_unique<engine::CPointLight>( "point",
+                                                              engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                              engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                              engine::CVec3( 0.3f, 0.3f, 0.3f ),
+                                                              g_lightPosition,
+                                                              1.0f, 0.09f, 0.032f );
 
     /**********************************************************************************************/
 
-    auto _currentLight = _dirlight;
-    auto _shadowmap = new engine::CShadowMap( 2048, 2048 );
+    auto _currentLightRef = _dirlight.get();
+    auto _shadowmap = std::make_unique<engine::CShadowMap>( 2048, 2048 );
 
     engine::float32 _quad_buffData[] = {
      /*|  positions |     uvs    |*/
@@ -166,13 +166,13 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _cameraRef->setActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _cameraRef->setActiveMode( true );
 
-        if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
+        if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
-            if ( _camera->active() )
+            if ( _cameraRef->active() )
                 _app->window()->disableCursor();
             else
                 _app->window()->enableCursor();
@@ -184,18 +184,18 @@ int main()
 
         _app->update();
         _app->begin();
-        _camera->update();
+        _cameraRef->update();
 
         /* do our thing here ************************/
 
         // render to shadow map first
-        renderToShadowMap( _currentLight, _shadowmap, _shaderShadowMapProj, _floor, { _cube1, _cube2, _cube3 } );
+        renderToShadowMap( _currentLightRef, _shadowmap.get(), _shaderShadowMapProjRef, _floor.get(), { _cube1.get(), _cube2.get(), _cube3.get() } );
 
         // render the scene normally
-        renderSceneWithShadows( _currentLight, _camera, _shadowmap, _shaderPhongWithShadows, _floorMaterial, _cubeMaterial, _floor, { _cube1, _cube2, _cube3 } );
+        renderSceneWithShadows( _currentLightRef, _cameraRef, _shadowmap.get(), _shaderPhongWithShadowsRef, _floorMaterial.get(), _cubeMaterial.get(), _floor.get(), { _cube1.get(), _cube2.get(), _cube3.get() } );
 
         // render the shadowmap to a quad
-        renderShadowMapVisualization( _quad_varray.get(), _shaderShadowMapViz, _shadowmap );
+        renderShadowMapVisualization( _quad_varray.get(), _shaderShadowMapVizRef, _shadowmap.get() );
 
         /********************************************/
 

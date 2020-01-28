@@ -93,6 +93,17 @@ namespace engine
         void _submenuLight( CILight* light, bool refresh );
         void _submenuCamera( CICamera* camera, bool refresh );
 
+        template< typename T >
+        std::vector< T* > _collectTypedRenderables( std::vector< CIRenderable* > renderables ) const
+        {
+            std::vector< T* > _typedRenderables;
+            for ( auto renderable : renderables )
+                if ( renderable->type() == T::GetStaticType() )
+                    _typedRenderables.push_back( dynamic_cast< T* >( renderable ) );
+
+            return _typedRenderables;
+        }
+
     private :
 
         CScene*             m_scene;

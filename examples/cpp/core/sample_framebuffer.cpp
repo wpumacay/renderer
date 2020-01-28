@@ -75,27 +75,27 @@ int main()
                                                            _cameraProjData,
                                                            _app->window()->width(),
                                                            _app->window()->height() );
-    _scene->addCamera( std::move( _camera ) );
+    auto _cameraRef = _scene->addCamera( std::move( _camera ) );
 
     auto _light = std::make_unique<engine::CDirectionalLight>( "directional_1",
                                                                engine::CVec3( 0.8f, 0.8f, 0.8f ), 
                                                                engine::CVec3( 0.8f, 0.8f, 0.8f ),
                                                                engine::CVec3( 0.3f, 0.3f, 0.3f ), 
                                                                engine::CVec3( 0.0f, 0.0f, -1.0f ) );
-    _scene->addLight( std::move( _light ) );
+    auto _lightRef = _scene->addLight( std::move( _light ) );
 
     auto _plane = engine::CMeshBuilder::createPlane( 10.0f, 10.0f );
     _plane->material()->ambient  = { 0.2f, 0.3f, 0.4f };
     _plane->material()->diffuse  = { 0.2f, 0.3f, 0.4f };
     _plane->material()->specular = { 0.2f, 0.3f, 0.4f };
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _plane ) );
+    auto _planeRef = _scene->addRenderable( std::move( _plane ) );
 
     auto _box = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
     _box->material()->ambient  = { 0.7f, 0.5f, 0.3f };
     _box->material()->diffuse  = { 0.7f, 0.5f, 0.3f };
     _box->material()->specular = { 0.7f, 0.5f, 0.3f };
     _box->position = { 1.0f, 1.0f, 1.0f };
-    _scene->addRenderable( std::unique_ptr< engine::CIRenderable >( _box ) );
+    auto _boxRef = _scene->addRenderable( std::move( _box ) );
 
     std::cout << engine::toString( _framebuffer->getConfigAttachment( "color_attachment" ) ) << std::endl;
     std::cout << engine::toString( _framebuffer->getConfigAttachment( "depth_attachment" ) ) << std::endl;

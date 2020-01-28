@@ -1,13 +1,13 @@
 
 #include <CEngine.h>
 
-void renderScene( engine::CICamera* cameraPtr,
-                  engine::CShader* shaderPtr,
-                  const std::vector< engine::CIRenderable* >& renderables );
+void renderScene( engine::CICamera* cameraRef,
+                  engine::CShader* shaderRef,
+                  std::vector< std::unique_ptr<engine::CIRenderable> >& renderables );
 
 int main()
 {
-    auto _app = new engine::CApplication();
+    auto _app = std::make_unique<engine::CApplication>();
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -16,15 +16,15 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 50.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
-    _app->scene()->addCamera( std::unique_ptr< engine::CICamera >( _camera ) );
+    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
 
     auto _plane     = engine::CMeshBuilder::createPlane( 2.0f, 2.0f, engine::eAxis::Y );
     auto _boxy      = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
@@ -67,39 +67,50 @@ int main()
 
     _boxy->scale = { 0.2f, 0.2f, 0.2f };
 
-    std::vector< engine::CIRenderable* > _renderables = { _plane, _boxy, _sphery, _ellipsy, 
-                                                          _cylindyX, _cylindyY, _cylindyZ,
-                                                          _capsulyX, _capsulyY, _capsulyZ,
-                                                          _arrowyX, _arrowyY, _arrowyZ,
-                                                          _axy, _model };
+    std::vector< std::unique_ptr<engine::CIRenderable> > _renderables;
+    _renderables.push_back( std::move( _plane ) );
+    _renderables.push_back( std::move( _boxy ) );
+    _renderables.push_back( std::move( _sphery ) );
+    _renderables.push_back( std::move( _ellipsy ) );
+    _renderables.push_back( std::move( _cylindyX ) );
+    _renderables.push_back( std::move( _cylindyY ) );
+    _renderables.push_back( std::move( _cylindyZ ) );
+    _renderables.push_back( std::move( _capsulyX ) );
+    _renderables.push_back( std::move( _capsulyY ) );
+    _renderables.push_back( std::move( _capsulyZ ) );
+    _renderables.push_back( std::move( _arrowyX ) );
+    _renderables.push_back( std::move( _arrowyY ) );
+    _renderables.push_back( std::move( _arrowyZ ) );
+    _renderables.push_back( std::move( _axy ) );
+    _renderables.push_back( std::move( _model ) );
 
     // give the renderables a little rotation and scale
     std::default_random_engine _randomGenerator;
     std::uniform_real_distribution< float > _randomDistribution( 0.5f, 1.0f );
-    for ( size_t i = 0; i < _renderables.size(); i++ )
+    for ( auto& renderablePtr : _renderables )
     {
-        _renderables[i]->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
-                                                                       _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
+        renderablePtr->rotation = tinymath::rotation( engine::CVec3( _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                     _randomDistribution( _randomGenerator ) * (float) ENGINE_PI,
+                                                                     _randomDistribution( _randomGenerator ) * (float) ENGINE_PI ) );
         float _scale = _randomDistribution( _randomGenerator );
-        _renderables[i]->scale = { _scale, _scale, _scale };
+        renderablePtr->scale = { _scale, _scale, _scale };
     }
 
-    auto _shader = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shader, "Could not grab the basic3d shader to render the scene :(" );
+    auto _shaderRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderRef, "Could not grab the basic3d shader to render the scene :(" );
 
     while( _app->active() )
     {
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _cameraRef->setActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _cameraRef->setActiveMode( true );
 
-        if ( _camera->type() == engine::CFpsCamera::GetStaticType() )
+        if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
-            if ( _camera->active() )
+            if ( _cameraRef->active() )
                 _app->window()->disableCursor();
             else
                 _app->window()->enableCursor();
@@ -114,7 +125,7 @@ int main()
 
         /* do some custom rendering here */
 
-        renderScene( _camera, _shader, _renderables );
+        renderScene( _cameraRef, _shaderRef, _renderables );
 
         /*********************************/
 
@@ -125,18 +136,18 @@ int main()
     return 0;
 }
 
-void renderScene( engine::CICamera* cameraPtr,
-                  engine::CShader* shaderPtr,
-                  const std::vector< engine::CIRenderable* >& renderables )
+void renderScene( engine::CICamera* cameraRef,
+                  engine::CShader* shaderRef,
+                  std::vector< std::unique_ptr<engine::CIRenderable> >& renderables )
 {
-    shaderPtr->bind();
-    shaderPtr->setMat4( "u_tView", cameraPtr->matView() );
-    shaderPtr->setMat4( "u_tProj", cameraPtr->matProj() );
+    shaderRef->bind();
+    shaderRef->setMat4( "u_tView", cameraRef->matView() );
+    shaderRef->setMat4( "u_tProj", cameraRef->matProj() );
 
-    for ( auto renderablePtr : renderables )
+    for ( auto& renderablePtr : renderables )
     {
-        shaderPtr->setVec3( "u_color", renderablePtr->material()->ambient );
-        shaderPtr->setMat4( "u_tModel", renderablePtr->matModel() );
+        shaderRef->setVec3( "u_color", renderablePtr->material()->ambient );
+        shaderRef->setMat4( "u_tModel", renderablePtr->matModel() );
         renderablePtr->render();
 
         auto _bbox = renderablePtr->bbox();
@@ -146,5 +157,5 @@ void renderScene( engine::CICamera* cameraPtr,
         engine::CDebugDrawer::DrawSphere( _bsphere.radius, engine::translation( _bsphere.worldPosition ), { 0.2f, 0.8f, 0.2f } );
     }
 
-    shaderPtr->unbind();
+    shaderRef->unbind();
 }

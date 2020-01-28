@@ -1,6 +1,10 @@
 
 #include <CEngine.h>
 
+const std::string DIRECTIONAL_LIGHT_NAME = "directional";
+const std::string POINT_LIGHT_NAME = "point";
+const std::string SPOT_LIGHT_NAME = "spot";
+
 class GuiLightCastersLayer : public engine::CImGuiLayer
 {
 
@@ -25,10 +29,20 @@ public :
         auto _arrowZ    = engine::CMeshBuilder::createArrow( 1.0f, engine::eAxis::Z );
         auto _axes      = engine::CMeshBuilder::createAxes( 1.0f );
 
-        m_meshes = { _box, _sphere, _ellipsoid, _cylinderX, _cylinderY, _cylinderZ, 
-                     _capsuleX, _capsuleY, _capsuleZ, _arrowX, _arrowY, _arrowZ, _axes };
-        m_meshesNames = { "box", "sphere", "ellipsoid", "cylinderX", "cylinderY", "cylinderZ", 
-                          "capsuleX", "capsuleY", "capsuleZ", "arrowX", "arrowY", "arrowZ", "axes" };
+        m_meshes.push_back( std::move( _box ) ); m_meshesNames.push_back( "box" );
+        m_meshes.push_back( std::move( _sphere ) ); m_meshesNames.push_back( "sphere" );
+        m_meshes.push_back( std::move( _ellipsoid ) ); m_meshesNames.push_back( "ellipsoid" );
+        m_meshes.push_back( std::move( _cylinderX ) ); m_meshesNames.push_back( "cylinderX" );
+        m_meshes.push_back( std::move( _cylinderY ) ); m_meshesNames.push_back( "cylinderY" );
+        m_meshes.push_back( std::move( _cylinderZ ) ); m_meshesNames.push_back( "cylinderZ" );
+        m_meshes.push_back( std::move( _capsuleX ) ); m_meshesNames.push_back( "capsuleX" );
+        m_meshes.push_back( std::move( _capsuleY ) ); m_meshesNames.push_back( "capsuleY" );
+        m_meshes.push_back( std::move( _capsuleZ ) ); m_meshesNames.push_back( "capsuleZ" );
+        m_meshes.push_back( std::move( _arrowX ) ); m_meshesNames.push_back( "arrowX" );
+        m_meshes.push_back( std::move( _arrowY ) ); m_meshesNames.push_back( "arrowY" );
+        m_meshes.push_back( std::move( _arrowZ ) ); m_meshesNames.push_back( "arrowZ" );
+        m_meshes.push_back( std::move( _axes ) ); m_meshesNames.push_back( "axes" );
+
         m_meshSelectedName = "box";
         m_meshSelectedIndex = 0;
         m_meshesUseRandomPattern = true;
@@ -40,32 +54,33 @@ public :
         m_currentSpecularMap = nullptr;
         m_currentAlbedoMap = nullptr;
 
-        auto _directionalLight = new engine::CDirectionalLight( "directional",
-                                                                { 0.2f, 0.2f, 0.2f },
-                                                                { 0.5f, 0.5f, 0.5f },
-                                                                { 1.0f, 1.0f, 1.0f },
-                                                                { -0.2f, -1.0f, -0.3f } );
+        auto _directionalLight = std::make_unique<engine::CDirectionalLight>( DIRECTIONAL_LIGHT_NAME,
+                                                                              engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                              engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                              engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                              engine::CVec3( -0.2f, -1.0f, -0.3f ) );
 
-        auto _pointLight = new engine::CPointLight( "point",
-                                                    { 0.2f, 0.2f, 0.2f },
-                                                    { 0.5f, 0.5f, 0.5f },
-                                                    { 1.0f, 1.0f, 1.0f },
-                                                    { 1.2f, 1.0f, 2.0f },
-                                                    1.0f, 0.09f, 0.032f );
+        auto _pointLight = std::make_unique<engine::CPointLight>( POINT_LIGHT_NAME,
+                                                                  engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                  engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                  engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                  engine::CVec3( 1.2f, 1.0f, 2.0f ),
+                                                                  1.0f, 0.09f, 0.032f );
 
-        auto _spotLight = new engine::CSpotLight( "spot",
-                                                  { 0.2f, 0.2f, 0.2f },
-                                                  { 0.5f, 0.5f, 0.5f },
-                                                  { 1.0f, 1.0f, 1.0f },
-                                                  { 0.0f, 0.0f, 2.0f },
-                                                  { 0.0f, 0.0f, -1.0f },
-                                                  1.0f, 0.09f, 0.032f,
-                                                  ENGINE_PI / 4.0f,
-                                                  ENGINE_PI / 3.0f );
+        auto _spotLight = std::make_unique<engine::CSpotLight>( SPOT_LIGHT_NAME,
+                                                                engine::CVec3( 0.2f, 0.2f, 0.2f ),
+                                                                engine::CVec3( 0.5f, 0.5f, 0.5f ),
+                                                                engine::CVec3( 1.0f, 1.0f, 1.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, 2.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, -1.0f ),
+                                                                1.0f, 0.09f, 0.032f,
+                                                                ENGINE_PI / 4.0f,
+                                                                ENGINE_PI / 3.0f );
 
-        m_lights = { _directionalLight, _pointLight, _spotLight };
-        m_lightsNames = { _directionalLight->name(), _pointLight->name(), _spotLight->name() };
-        m_lightSelectedName = _directionalLight->name();
+        m_lights.push_back( std::move( _directionalLight ) ); m_lightsNames.push_back( DIRECTIONAL_LIGHT_NAME );
+        m_lights.push_back( std::move( _pointLight ) ); m_lightsNames.push_back( POINT_LIGHT_NAME );
+        m_lights.push_back( std::move( _spotLight ) ); m_lightsNames.push_back( SPOT_LIGHT_NAME );
+        m_lightSelectedName = DIRECTIONAL_LIGHT_NAME;
         m_lightSelectedIndex = 0;
         m_lightLockedToCamera = false;
         m_lightDirection = { -0.2f, -1.0f, -0.3f };
@@ -75,12 +90,6 @@ public :
 
     ~GuiLightCastersLayer() 
     {
-        for ( auto _mesh : m_meshes )
-            delete _mesh;
-
-        for ( auto _light : m_lights )
-            delete _light;
-
         m_meshes.clear();
         m_lights.clear();
         m_cachedTextures.clear();
@@ -93,12 +102,12 @@ public :
 
     engine::CIRenderable* selectedMesh()
     {
-        return m_meshes[ m_meshSelectedIndex ];
+        return m_meshes[ m_meshSelectedIndex ].get();
     }
 
     engine::CILight* selectedLight()
     {
-        return m_lights[ m_lightSelectedIndex ];
+        return m_lights[ m_lightSelectedIndex ].get();
     }
 
     bool useRandomPattern()
@@ -272,8 +281,8 @@ private :
 
     void _menuUiLightProperties()
     {
-        auto _lightPtr = m_lights[m_lightSelectedIndex];
-        auto _type = _lightPtr->type();
+        auto _lightRef = m_lights[m_lightSelectedIndex].get();
+        auto _type = _lightRef->type();
         if ( _type == engine::eLightType::DIRECTIONAL )
         {
             if ( !m_lightLockedToCamera )
@@ -281,39 +290,39 @@ private :
                 float _vDirection[3] = { m_lightDirection.x(), m_lightDirection.y(), m_lightDirection.z() };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _lightPtr->direction = m_lightDirection.normalized();
+                _lightRef->direction = m_lightDirection.normalized();
             }
         }
         else if ( _type == engine::eLightType::POINT )
         {
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _lightPtr->position.x(), _lightPtr->position.y(), _lightPtr->position.z() };
+                float _vPosition[3] = { _lightRef->position.x(), _lightRef->position.y(), _lightRef->position.z() };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-                _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+                _lightRef->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
             }
 
-            ImGui::SliderFloat( "attn-linear", &_lightPtr->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_lightPtr->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-linear", &_lightRef->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_lightRef->atnQuadratic, 0.0f, 1.0f );
         }
         else if ( _type == engine::eLightType::SPOT )
         {
             if ( !m_lightLockedToCamera )
             {
-                float _vPosition[3] = { _lightPtr->position.x(), _lightPtr->position.y(), _lightPtr->position.z() };
+                float _vPosition[3] = { _lightRef->position.x(), _lightRef->position.y(), _lightRef->position.z() };
                 ImGui::SliderFloat3( "position", _vPosition, -10.0f, 10.0f );
-                _lightPtr->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
+                _lightRef->position = { _vPosition[0], _vPosition[1], _vPosition[2] };
 
                 float _vDirection[3] = { m_lightDirection.x(), m_lightDirection.y(), m_lightDirection.z() };
                 ImGui::SliderFloat3( "direction", _vDirection, -1.0f, 1.0f );
                 m_lightDirection = { _vDirection[0], _vDirection[1], _vDirection[2] };
-                _lightPtr->direction = m_lightDirection.normalized();
+                _lightRef->direction = m_lightDirection.normalized();
             }
 
-            ImGui::SliderFloat( "attn-linear", &_lightPtr->atnLinear, 0.0f, 1.0f );
-            ImGui::SliderFloat( "attn-quadratic", &_lightPtr->atnQuadratic, 0.0f, 1.0f );
-            ImGui::SliderFloat( "inner-cutoff", &_lightPtr->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
-            ImGui::SliderFloat( "outer-cutoff", &_lightPtr->outerCutoff, _lightPtr->innerCutoff, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "attn-linear", &_lightRef->atnLinear, 0.0f, 1.0f );
+            ImGui::SliderFloat( "attn-quadratic", &_lightRef->atnQuadratic, 0.0f, 1.0f );
+            ImGui::SliderFloat( "inner-cutoff", &_lightRef->innerCutoff, ENGINE_PI / 20.0f, ENGINE_PI / 3.0f );
+            ImGui::SliderFloat( "outer-cutoff", &_lightRef->outerCutoff, _lightRef->innerCutoff, ENGINE_PI / 3.0f );
         }
     }
 
@@ -354,13 +363,13 @@ private :
     engine::CTexture* m_currentSpecularMap;
     std::vector< engine::CTexture* > m_cachedTextures;
 
-    std::vector< engine::CIRenderable* > m_meshes;
+    std::vector< std::unique_ptr<engine::CIRenderable> > m_meshes;
     std::vector< std::string > m_meshesNames;
     std::string m_meshSelectedName;
     int m_meshSelectedIndex;
     bool m_meshesUseRandomPattern;
 
-    std::vector< engine::CILight* > m_lights;
+    std::vector< std::unique_ptr<engine::CILight> > m_lights;
     std::vector< std::string > m_lightsNames;
     std::string m_lightSelectedName;
     int m_lightSelectedIndex;
@@ -373,9 +382,9 @@ private :
 
 int main()
 {
-    auto _app = new engine::CApplication();
-    auto _uiLayer = new GuiLightCastersLayer( "LightCasters-utils" );
-    _app->addGuiLayer( std::unique_ptr< GuiLightCastersLayer >( _uiLayer ) );
+    auto _app = std::make_unique<engine::CApplication>();
+    auto _uiLayer = std::make_unique<GuiLightCastersLayer>( "LightCasters-utils" );
+    auto _uiLayerRef = dynamic_cast<GuiLightCastersLayer*>( _app->addGuiLayer( std::move( _uiLayer ) ) );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -384,41 +393,40 @@ int main()
     _cameraProjData.zNear       = 0.1f;
     _cameraProjData.zFar        = 100.0f;
 
-    auto _camera = new engine::COrbitCamera( "orbit",
-                                             { 0.0f, 0.0f, 3.0f },
-                                             { 0.0f, 0.0f, 0.0f },
-                                             engine::eAxis::Y,
-                                             _cameraProjData,
-                                             _app->window()->width(),
-                                             _app->window()->height() );
+    auto _camera = std::make_unique<engine::COrbitCamera>( "orbit",
+                                                           engine::CVec3( 0.0f, 0.0f, 3.0f ),
+                                                           engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                           engine::eAxis::Y,
+                                                           _cameraProjData,
+                                                           _app->window()->width(),
+                                                           _app->window()->height() );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->position = { 0.0f, 0.0f, 2.0f };
 
     /* load the shader used for this example */
     std::string _baseNamePhong = std::string( ENGINE_EXAMPLES_PATH ) + "lights/shaders/phong_lightcasters";
-    auto _shaderLightCasters = engine::CShaderManager::CreateShaderFromFiles( "phong_lightcasters_shader",
-                                                                       _baseNamePhong + "_vs.glsl",
-                                                                       _baseNamePhong + "_fs.glsl" );
-
-    ENGINE_ASSERT( _shaderLightCasters, "Could not load phong-lightcasters shader for our tests :(" );
+    auto _shaderLightCastersRef = engine::CShaderManager::CreateShaderFromFiles( "phong_lightcasters_shader",
+                                                                                 _baseNamePhong + "_vs.glsl",
+                                                                                 _baseNamePhong + "_fs.glsl" );
+    ENGINE_ASSERT( _shaderLightCastersRef, "Could not load phong-lightcasters shader for our tests :(" );
 
     /* grab a simple shader to render the camera gizmo */
-    auto _shaderGizmo = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
-    ENGINE_ASSERT( _shaderGizmo, "Could not grab the basic3d shader to render the light gizmo :(" );
+    auto _shaderGizmoRef = engine::CShaderManager::GetCachedShader( "basic3d_no_textures" );
+    ENGINE_ASSERT( _shaderGizmoRef, "Could not grab the basic3d shader to render the light gizmo :(" );
 
     /* create material properties */
-    auto _phongMaterial = new engine::CMaterial( "phong_material", 
-                                                 engine::eMaterialType::PHONG,
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 { 1.0f, 0.5f, 0.31f },
-                                                 32.0f );
+    auto _phongMaterial = std::make_unique<engine::CMaterial>( "phong_material", 
+                                                               engine::eMaterialType::PHONG,
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               engine::CVec3( 1.0f, 0.5f, 0.31f ),
+                                                               32.0f );
 
     bool _moveLight = false;
     float _mvParam = 0.0f;
 
-    _uiLayer->setMaterial( _phongMaterial );
+    _uiLayerRef->setMaterial( _phongMaterial.get() );
 
     std::vector< engine::CVec3 > _meshPositions =  {
         {  0.0f,  0.0f,  0.0f },
@@ -442,12 +450,12 @@ int main()
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
-            _uiLayer->setActive( true );
+            _uiLayerRef->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
             _camera->setActiveMode( true );
-            _uiLayer->setActive( false );
+            _uiLayerRef->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
         {
@@ -462,15 +470,15 @@ int main()
         _app->begin();
         _camera->update();
 
-        auto _mesh = _uiLayer->selectedMesh();
-        auto _light = _uiLayer->selectedLight();
+        auto _mesh = _uiLayerRef->selectedMesh();
+        auto _light = _uiLayerRef->selectedLight();
 
-        if ( _uiLayer->isLightLockedToCamera() )
+        if ( _uiLayerRef->isLightLockedToCamera() )
         {
             if ( _light->type() == engine::eLightType::DIRECTIONAL )
             {
                 _light->direction = _camera->front();
-                _uiLayer->updateLightDirection( _camera->front() );
+                _uiLayerRef->updateLightDirection( _camera->front() );
             }
             else if ( _light->type() == engine::eLightType::POINT )
             {
@@ -480,11 +488,11 @@ int main()
             {
                 _light->position = _camera->position();
                 _light->direction = _camera->front();
-                _uiLayer->updateLightDirection( _camera->front() );
+                _uiLayerRef->updateLightDirection( _camera->front() );
             }
         }
 
-        _gizmo->setVisibility( !_uiLayer->isLightLockedToCamera() );
+        _gizmo->setVisibility( !_uiLayerRef->isLightLockedToCamera() );
 
         if ( _light->type() == engine::eLightType::POINT )
             _gizmo->position = _light->position;
@@ -501,58 +509,58 @@ int main()
         }
 
         /* do our thing here ************************/
-        _shaderLightCasters->bind();
-        _shaderLightCasters->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
-        _phongMaterial->bind( _shaderLightCasters );
+        _shaderLightCastersRef->bind();
+        _shaderLightCastersRef->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
+        _phongMaterial->bind( _shaderLightCastersRef );
         // deactivate all lights first
-        _shaderLightCasters->setInt( "u_pointLight.enabled", 0 );
-        _shaderLightCasters->setInt( "u_directionalLight.enabled", 0 );
-        // _shaderLightCasters->setInt( "u_spotLIght.enabled", 0 );
+        _shaderLightCastersRef->setInt( "u_pointLight.enabled", 0 );
+        _shaderLightCastersRef->setInt( "u_directionalLight.enabled", 0 );
+        // _shaderLightCastersRef->setInt( "u_spotLIght.enabled", 0 );
 
         if ( _light->type() == engine::eLightType::DIRECTIONAL )
         {
-            _shaderLightCasters->setInt( "u_directionalLight.enabled", 1 );
-            _shaderLightCasters->setVec3( "u_directionalLight.ambient", _light->ambient );
-            _shaderLightCasters->setVec3( "u_directionalLight.diffuse", _light->diffuse );
-            _shaderLightCasters->setVec3( "u_directionalLight.specular", _light->specular );
-            _shaderLightCasters->setFloat( "u_directionalLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_directionalLight.direction", _light->direction );
+            _shaderLightCastersRef->setInt( "u_directionalLight.enabled", 1 );
+            _shaderLightCastersRef->setVec3( "u_directionalLight.ambient", _light->ambient );
+            _shaderLightCastersRef->setVec3( "u_directionalLight.diffuse", _light->diffuse );
+            _shaderLightCastersRef->setVec3( "u_directionalLight.specular", _light->specular );
+            _shaderLightCastersRef->setFloat( "u_directionalLight.intensity", _light->intensity );
+            _shaderLightCastersRef->setVec3( "u_directionalLight.direction", _light->direction );
         }
         else if ( _light->type() == engine::eLightType::POINT )
         {
-            _shaderLightCasters->setInt( "u_pointLight.enabled", 1 );
-            _shaderLightCasters->setVec3( "u_pointLight.ambient", _light->ambient );
-            _shaderLightCasters->setVec3( "u_pointLight.diffuse", _light->diffuse );
-            _shaderLightCasters->setVec3( "u_pointLight.specular", _light->specular );
-            _shaderLightCasters->setFloat( "u_pointLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_pointLight.position", _light->position );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk0", _light->atnConstant );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk1", _light->atnLinear );
-            _shaderLightCasters->setFloat( "u_pointLight.attnk2", _light->atnQuadratic );
+            _shaderLightCastersRef->setInt( "u_pointLight.enabled", 1 );
+            _shaderLightCastersRef->setVec3( "u_pointLight.ambient", _light->ambient );
+            _shaderLightCastersRef->setVec3( "u_pointLight.diffuse", _light->diffuse );
+            _shaderLightCastersRef->setVec3( "u_pointLight.specular", _light->specular );
+            _shaderLightCastersRef->setFloat( "u_pointLight.intensity", _light->intensity );
+            _shaderLightCastersRef->setVec3( "u_pointLight.position", _light->position );
+            _shaderLightCastersRef->setFloat( "u_pointLight.attnk0", _light->atnConstant );
+            _shaderLightCastersRef->setFloat( "u_pointLight.attnk1", _light->atnLinear );
+            _shaderLightCastersRef->setFloat( "u_pointLight.attnk2", _light->atnQuadratic );
         }
         else if ( _light->type() == engine::eLightType::SPOT )
         {
-            _shaderLightCasters->setInt( "u_spotLight.enabled", 1 );
-            _shaderLightCasters->setVec3( "u_spotLight.ambient", _light->ambient );
-            _shaderLightCasters->setVec3( "u_spotLight.diffuse", _light->diffuse );
-            _shaderLightCasters->setVec3( "u_spotLight.specular", _light->specular );
-            _shaderLightCasters->setFloat( "u_spotLight.intensity", _light->intensity );
-            _shaderLightCasters->setVec3( "u_spotLight.position", _light->position );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk0", _light->atnConstant );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk1", _light->atnLinear );
-            _shaderLightCasters->setFloat( "u_spotLight.attnk2", _light->atnQuadratic );
-            _shaderLightCasters->setVec3( "u_spotLight.direction", _light->direction );
-            _shaderLightCasters->setFloat( "u_spotLight.innerCutoffCos", std::cos( _light->innerCutoff ) );
-            _shaderLightCasters->setFloat( "u_spotLight.outerCutoffCos", std::cos( _light->outerCutoff ) );
+            _shaderLightCastersRef->setInt( "u_spotLight.enabled", 1 );
+            _shaderLightCastersRef->setVec3( "u_spotLight.ambient", _light->ambient );
+            _shaderLightCastersRef->setVec3( "u_spotLight.diffuse", _light->diffuse );
+            _shaderLightCastersRef->setVec3( "u_spotLight.specular", _light->specular );
+            _shaderLightCastersRef->setFloat( "u_spotLight.intensity", _light->intensity );
+            _shaderLightCastersRef->setVec3( "u_spotLight.position", _light->position );
+            _shaderLightCastersRef->setFloat( "u_spotLight.attnk0", _light->atnConstant );
+            _shaderLightCastersRef->setFloat( "u_spotLight.attnk1", _light->atnLinear );
+            _shaderLightCastersRef->setFloat( "u_spotLight.attnk2", _light->atnQuadratic );
+            _shaderLightCastersRef->setVec3( "u_spotLight.direction", _light->direction );
+            _shaderLightCastersRef->setFloat( "u_spotLight.innerCutoffCos", std::cos( _light->innerCutoff ) );
+            _shaderLightCastersRef->setFloat( "u_spotLight.outerCutoffCos", std::cos( _light->outerCutoff ) );
         }
 
-        _shaderLightCasters->setVec3( "u_viewerPosition", _camera->position() );
+        _shaderLightCastersRef->setVec3( "u_viewerPosition", _camera->position() );
 
         for ( size_t i = 0; i < _meshPositions.size(); i++ )
         {
             engine::CMat4 _modelMat;
 
-            if ( _uiLayer->useRandomPattern() )
+            if ( _uiLayerRef->useRandomPattern() )
             {
                 auto _xyz = _meshPositions[i];
                 float _theta = engine::toRadians( 20.0f * i );
@@ -567,25 +575,25 @@ int main()
                 _modelMat = engine::translation( _xyz );
             }
 
-            _shaderLightCasters->setMat4( "u_modelMatrix", _modelMat );
-            _shaderLightCasters->setMat4( "u_normalMatrix", tinymath::inverse( _modelMat ).transpose() );
+            _shaderLightCastersRef->setMat4( "u_modelMatrix", _modelMat );
+            _shaderLightCastersRef->setMat4( "u_normalMatrix", tinymath::inverse( _modelMat ).transpose() );
             _mesh->render();
         }
 
         _phongMaterial->unbind();
-        _shaderLightCasters->unbind();
+        _shaderLightCastersRef->unbind();
 
         if ( _gizmo->visible() )
         {
-            _shaderGizmo->bind();
-            _shaderGizmo->setMat4( "u_tModel", _gizmo->matModel() );
-            _shaderGizmo->setMat4( "u_tView", _camera->matView() );
-            _shaderGizmo->setMat4( "u_tProj", _camera->matProj() );
-            _shaderGizmo->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
+            _shaderGizmoRef->bind();
+            _shaderGizmoRef->setMat4( "u_tModel", _gizmo->matModel() );
+            _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
+            _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+            _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
             _gizmo->render();
 
-            _shaderGizmo->unbind();
+            _shaderGizmoRef->unbind();
         }
         /********************************************/
 

@@ -200,7 +200,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Meshes" ) )
             return;
 
-        auto _meshes = m_scene->collectTypedRenderables< CMesh >();
+        auto _meshes = _collectTypedRenderables< CMesh >( m_scene->renderables() );
 
         if ( _meshes.size() < 1 )
         {
@@ -341,7 +341,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Models" ) )
             return;
 
-        auto _models = m_scene->collectTypedRenderables< CModel >();
+        auto _models = _collectTypedRenderables< CModel >( m_scene->renderables() );
 
         if ( _models.size() < 1 )
         {
