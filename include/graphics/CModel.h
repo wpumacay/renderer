@@ -16,8 +16,6 @@ namespace engine
         CModel( const std::string& name );
         ~CModel();
 
-        void render() override;
-
         void addMesh( std::unique_ptr< CMesh > mesh, const CMat4& localTransform );
 
         std::vector< CMesh* > meshes() const;
@@ -26,6 +24,10 @@ namespace engine
         std::vector< CMat4 >& localTransforms() { return m_localTransforms; }
 
         static eRenderableType GetStaticType() { return eRenderableType::MODEL; }
+
+    protected :
+
+        void _renderInternal() override;
 
     private :
 

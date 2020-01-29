@@ -21,7 +21,7 @@ namespace engine
         m_localTransforms.push_back( localTransform );
     }
 
-    void CModel::render()
+    void CModel::_renderInternal()
     {
         for ( auto& meshPtr : m_meshes )
             meshPtr->render();

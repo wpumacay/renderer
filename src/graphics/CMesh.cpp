@@ -49,7 +49,7 @@ namespace engine
         m_varray = nullptr;
     }
 
-    void CMesh::render()
+    void CMesh::_renderInternal()
     {
         ENGINE_CORE_ASSERT( m_varray, "Mesh should have a valid GL-VAO" );
         ENGINE_CORE_ASSERT( m_varray->indexBuffer(), "Mesh's VAO should have index data" );

@@ -37,6 +37,11 @@ namespace engine
         // nothing to release manually
     }
 
+    void CIRenderable::render()
+    {
+        _renderInternal();
+    }
+
     CMat4 CIRenderable::matModel() const
     {
         return engine::translation( position ) * engine::rotation( rotation ) * engine::scale( scale );

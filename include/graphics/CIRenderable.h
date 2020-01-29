@@ -33,7 +33,7 @@ namespace engine
         CIRenderable( const std::string& name );
         virtual ~CIRenderable();
 
-        virtual void render() = 0;
+        void render();
 
         void setBoundExtents( const CVec3& extents ) { m_boundExtents = extents; }
         void setBoundCenter( const CVec3& center ) { m_boundCenter = center; }
@@ -59,6 +59,10 @@ namespace engine
         int32 objectId() const { return m_objectId; }
 
         static eRenderableType GetStaticType() { return eRenderableType::BASE; }
+
+    protected :
+
+        virtual void _renderInternal() = 0;
 
     protected :
 

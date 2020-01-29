@@ -32,9 +32,11 @@ namespace engine
         std::vector< CVec2 >& uvs() { return m_texCoords; }
         std::vector< CInd3 >& indices() { return m_indices; }
 
-        void render() override;
-
         static eRenderableType GetStaticType() { return eRenderableType::MESH; }
+
+    protected :
+
+        void _renderInternal() override;
 
     private :
 
