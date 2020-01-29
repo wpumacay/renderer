@@ -10,6 +10,8 @@ PYBIND11_MODULE( tinyrenderer, m )
 
     // common bindings
     engine::bindings_common( m );
+    // math-helpers bindings
+    engine::bindings_mathHelpers( m );
     // window bindings
     engine::bindings_window( m );
     // input bindings
