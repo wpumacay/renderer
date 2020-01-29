@@ -31,6 +31,8 @@ PYBIND11_MODULE( tinyrenderer, m )
     // camera bindings
     engine::bindings_cameraBase( m );
     engine::bindings_cameraTypes( m );
+    // debug bindings
+    engine::bindings_debugDrawer( m );
     // scene bindings
     engine::bindings_scene( m );
     // application bindings

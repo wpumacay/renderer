@@ -113,17 +113,16 @@ if __name__ == '__main__' :
 
     scene.addCamera( camera )
 
-    #### textureCubemap = textureCubeCloudtop
+    textureCubemap = textureCubeCloudtop
     #### textureCubemap = textureCubeStarfield
-    textureCubemap = textureCubeSiege
+    #### textureCubemap = textureCubeSiege
 
     correctionMat = computeSkyboxCorrectionMat( camera.upAxis() )
 
     while( app.active() ) :
-        # @firsttodo : impl debug-drawer bindings
-        ### tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
-        ### tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
-        ### tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
+        tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
+        tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
+        tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
         app.update()
 

@@ -8,4 +8,5 @@
 #include <texture_py.h>
 #include <camera_py.h>
 #include <scene_py.h>
+#include <debug_py.h>
 #include <application_py.h>
