@@ -79,6 +79,9 @@ namespace engine
                             py::arg( "widthExtent" ), py::arg( "depthExtent" ),
                             py::arg( "centerX" ), py::arg( "centerY" ),
                             py::arg( "heightData" ), py::arg( "heightBase" ),
-                            py::arg( "axis" ) );
+                            py::arg( "axis" ) )
+            .def_static( "CreateModelFromFile",
+                         &CMeshBuilder::createModelFromFile,
+                         py::arg( "filename" ) );
     }
 }

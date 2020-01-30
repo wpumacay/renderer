@@ -7,7 +7,9 @@
 #include <shader_py.h>
 #include <buffers_py.h>
 #include <texture_py.h>
+#include <material_py.h>
 #include <camera_py.h>
+#include <lights_py.h>
 #include <scene_py.h>
 #include <debug_py.h>
 #include <utils_py.h>

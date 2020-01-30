@@ -30,9 +30,16 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_texture( m );
     engine::bindings_textureCube( m );
     engine::bindings_textureManager( m );
+    // material bindings
+    engine::bindings_material( m );
     // camera bindings
     engine::bindings_cameraBase( m );
     engine::bindings_cameraTypes( m );
+    // light bindings
+    engine::bindings_lightBase( m );
+    engine::bindings_lightDirectional( m );
+    engine::bindings_lightPoint( m );
+    engine::bindings_lightSpot( m );
     // debug bindings
     engine::bindings_debugDrawer( m );
     // utils bindings
@@ -50,6 +57,7 @@ PYBIND11_MODULE( tinyrenderer, m )
 
     // expose some #define(s)
     m.attr( "ENGINE_EXAMPLES_PATH" ) = py::cast( ENGINE_EXAMPLES_PATH );
+    m.attr( "ENGINE_RESOURCES_PATH" ) = py::cast( ENGINE_RESOURCES_PATH );
 
     // execute some required initialization steps
     engine::CLogger::Init();
