@@ -193,7 +193,7 @@ private :
         ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
         ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
         ImGui::PlotLines( "fps-avg", 
-                          engine::CTime::GetFpsAvgs(), 
+                          engine::CTime::GetFpsAvgs().data(), 
                           engine::CTime::GetNumFramesForAvg(), 
                           engine::CTime::GetFrameTimeIndex(),
                           ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),

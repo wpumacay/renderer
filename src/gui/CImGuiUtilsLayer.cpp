@@ -132,7 +132,7 @@ namespace engine
             ImGui::Text( "Fps-avg       : %.2f", CTime::GetAvgFps() );
             ImGui::Text( "Frametime-avg : %.5f", CTime::GetAvgTimeStep() );
             ImGui::PlotLines( "Fps-avg", 
-                              engine::CTime::GetFpsAvgs(), 
+                              engine::CTime::GetFpsAvgs().data(), 
                               engine::CTime::GetNumFramesForAvg(), 
                               engine::CTime::GetFrameTimeIndex(),
                               ( std::string( "average: " ) + std::to_string( engine::CTime::GetAvgFps() ) ).c_str(),

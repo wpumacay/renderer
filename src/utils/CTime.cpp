@@ -94,14 +94,14 @@ namespace engine
         return CTime::_instance->m_timeCurrent;
     }
 
-    float* CTime::GetFrameTimes()
+    std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> CTime::GetFrameTimes()
     {
         ENGINE_CORE_ASSERT( CTime::_instance, "Should have initialized time keeper before using it" );
 
         return CTime::_instance->m_frameTimes;
     }
 
-    float* CTime::GetFpsAvgs()
+    std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> CTime::GetFpsAvgs()
     {
         ENGINE_CORE_ASSERT( CTime::_instance, "Should have initialized time keeper before using it" );
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <utils/CLogger.h>
 
 #define TIME_NUM_FRAMES_TO_AVERAGE 100
@@ -20,8 +21,8 @@ namespace engine
         static float GetAvgTimeStep();
         static float GetAvgFps();
         static float GetWallTime();
-        static float* GetFrameTimes();
-        static float* GetFpsAvgs();
+        static std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> GetFrameTimes();
+        static std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> GetFpsAvgs();
         static int GetNumFramesForAvg();
         static int GetFrameTimeIndex();
 
@@ -43,9 +44,8 @@ namespace engine
         float m_timeDelta;
         float m_timeDeltaAvg;
         float m_timeDeltaRaw;
-
-        float m_frameTimes[TIME_NUM_FRAMES_TO_AVERAGE];
-        float m_fpsTimesAvg[TIME_NUM_FRAMES_TO_AVERAGE];
+        std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> m_frameTimes;
+        std::array<float, TIME_NUM_FRAMES_TO_AVERAGE> m_fpsTimesAvg;
         int m_frameTimeIndex;
     };
 
