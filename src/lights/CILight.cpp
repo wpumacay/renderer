@@ -42,7 +42,7 @@ namespace engine
         // nothing to release for now
     }
 
-    std::string CILight::toString()
+    std::string CILight::toString() const
     {
         std::string _strRep;
 

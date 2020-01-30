@@ -53,7 +53,7 @@ namespace engine
         void bind( CShader* shaderPtr );
         void unbind();
 
-        std::string toString();
+        std::string toString() const;
 
         void setType( const eMaterialType& type ) { m_type = type; }
         void setAlbedoMap( CTexture* albedoMap ) { m_albedoMap = albedoMap; }

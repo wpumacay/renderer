@@ -8,11 +8,25 @@ namespace engine
     {
         m_name      = name;
         m_openglId  = openglId;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created Shader @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created Shader @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     CShader::~CShader()
     {
         glDeleteProgram( m_openglId );
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Shader @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed Shader @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     void CShader::bind()

@@ -19,9 +19,26 @@ namespace engine
         atnConstant     = attenuationFactorConstant;
         atnLinear       = attenuationFactorLinear;
         atnQuadratic    = attenuationFactorQuadratic;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created PointLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
-    std::string CPointLight::_toStringInternal()
+    CPointLight::~CPointLight()
+    {
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed PointLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
+    }
+
+    std::string CPointLight::_toStringInternal() const
     {
         std::string _strRep;
 

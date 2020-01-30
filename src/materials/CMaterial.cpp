@@ -36,12 +36,26 @@ namespace engine
 
         m_albedoMap     = albedoMap;
         m_specularMap   = specularMap;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created Material @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created Material @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     CMaterial::~CMaterial()
     {
         m_albedoMap = nullptr;
         m_specularMap = nullptr;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Material @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed Material @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
     void CMaterial::bind( engine::CShader* shaderPtr )
@@ -109,12 +123,12 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
 
-    std::string CMaterial::toString()
+    std::string CMaterial::toString() const
     {
         std::string _strRep;
 
-        _strRep += "name    : " + m_name + "\n\r";
-        _strRep += "type    : " + engine::toString( m_type ) + "\n\r";
+        _strRep += "name        : " + m_name + "\n\r";
+        _strRep += "type        : " + engine::toString( m_type ) + "\n\r";
         
         if ( m_type == eMaterialType::LAMBERT )
         {
@@ -129,7 +143,7 @@ namespace engine
             _strRep += "diffuse     : " + engine::toString( diffuse ) + "\n\r";
             _strRep += "specular    : " + engine::toString( specular ) + "\n\r";
             _strRep += "shininess   : " + std::to_string( shininess ) + "\n\r";
-            _strRep += "albedoMap  : " + ( ( m_albedoMap ) ? m_albedoMap->name() : "none" ) + "\n\r";
+            _strRep += "albedoMap   : " + ( ( m_albedoMap ) ? m_albedoMap->name() : "none" ) + "\n\r";
             _strRep += "specularMap : " + ( ( m_specularMap ) ? m_specularMap->name() : "none" ) + "\n\r";
         }
  

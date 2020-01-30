@@ -25,9 +25,26 @@ namespace engine
         atnQuadratic    = attenuationFactorQuadratic;
         innerCutoff     = lightInnerCutoff;
         outerCutoff     = lightOuterCutoff;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created SpotLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created SpotLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
-    std::string CSpotLight::_toStringInternal()
+    CSpotLight::~CSpotLight()
+    {
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed SpotLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed SpotLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
+    }
+
+    std::string CSpotLight::_toStringInternal() const
     {
         std::string _strRep;
 

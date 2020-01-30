@@ -45,14 +45,14 @@ namespace engine
 
         virtual ~CILight();
 
-        std::string toString();
+        std::string toString() const;
 
         std::string name() const { return m_name; }
         eLightType type() const { return m_type; }
 
     protected :
 
-        virtual std::string _toStringInternal() = 0;
+        virtual std::string _toStringInternal() const = 0;
 
         std::string m_name;
         eLightType  m_type;

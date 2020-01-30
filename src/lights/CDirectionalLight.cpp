@@ -13,9 +13,26 @@ namespace engine
     {
         m_type      = eLightType::DIRECTIONAL;
         direction   = lightDirection;
+
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created DirectionalLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Created DirectionalLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
     }
 
-    std::string CDirectionalLight::_toStringInternal()
+    CDirectionalLight::~CDirectionalLight()
+    {
+    #ifdef ENGINE_TRACK_ALLOCS
+        if ( CLogger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed DirectionalLight @ {0}", engine::pointerToHexAddress( this ) );
+        else
+            std::cout << "Allocs: Destroyed DirectionalLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+    #endif
+    }
+
+    std::string CDirectionalLight::_toStringInternal() const
     {
         std::string _strRep;
 

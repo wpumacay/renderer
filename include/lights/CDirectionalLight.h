@@ -15,10 +15,11 @@ namespace engine
                            const CVec3& diffuseColor,
                            const CVec3& specularColor,
                            const CVec3& lightDirection );
+        ~CDirectionalLight();
 
     protected :
 
-        std::string _toStringInternal() override;
+        std::string _toStringInternal() const override;
 
     };
 

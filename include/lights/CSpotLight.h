@@ -22,9 +22,11 @@ namespace engine
                     float32 innerCutoff,
                     float32 outerCUtoff );
 
+        ~CSpotLight();
+
     protected :
 
-        std::string _toStringInternal() override;
+        std::string _toStringInternal() const override;
 
     };
 

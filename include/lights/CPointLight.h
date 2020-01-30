@@ -19,9 +19,11 @@ namespace engine
                      float32 attenuationFactorLinear,
                      float32 attenuationFactorQuadratic );
 
+        ~CPointLight();
+
     protected :
 
-        std::string _toStringInternal() override;
+        std::string _toStringInternal() const override;
 
     };
 
