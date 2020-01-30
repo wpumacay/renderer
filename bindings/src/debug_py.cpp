@@ -3,6 +3,8 @@
 
 namespace py = pybind11;
 
+//// @todo: requires testing each function (thoroughly)
+
 namespace engine
 {
     void bindings_debugDrawer( py::module& m )
@@ -82,7 +84,7 @@ namespace engine
                     }
 
                     const float32* bufferData = (float32*) bufferInfo.ptr;
-                    const bool columnMajor = bufferInfo.shape[0] < bufferInfo.shape[1];
+                    const bool columnMajor = bufferInfo.strides[0] < bufferInfo.strides[1];
                     std::vector< CVec3 > points;
                     for ( size_t i = 0; i < bufferInfo.shape[0]; i++ )
                     {
@@ -134,8 +136,7 @@ namespace engine
                             {
                                 CDebugDrawer::DrawFrame( tinymath::nparray_to_matrix<float32,4>( arr_frame ), size );
                             } )
-            // @todo: enable when CPlane is exposed (math_py)
-            //// .def_static( "DrawPlane", &CDebugDrawer::DrawPlane )
+            .def_static( "DrawPlane", &CDebugDrawer::DrawPlane )
             .def_static( "DrawSolidBox",
                          []( const py::array_t<float32>& arr_size,
                              const py::array_t<float32>& arr_transform,

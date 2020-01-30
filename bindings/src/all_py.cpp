@@ -35,10 +35,21 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_cameraTypes( m );
     // debug bindings
     engine::bindings_debugDrawer( m );
+    // utils bindings
+    engine::bindings_utilTime( m );
     // scene bindings
     engine::bindings_scene( m );
+    // renderable bindings
+    engine::bindings_renderableBase( m );
+    engine::bindings_renderableMesh( m );
+    engine::bindings_renderableModel( m );
+    // mesh-builder bindings
+    engine::bindings_meshBuilder( m );
     // application bindings
     engine::bindings_application( m );
+
+    // expose some #define(s)
+    m.attr( "ENGINE_EXAMPLES_PATH" ) = py::cast( ENGINE_EXAMPLES_PATH );
 
     // execute some required initialization steps
     engine::CLogger::Init();

@@ -10,4 +10,7 @@
 #include <camera_py.h>
 #include <scene_py.h>
 #include <debug_py.h>
+#include <utils_py.h>
+#include <renderable_py.h>
+#include <meshBuilder_py.h>
 #include <application_py.h>

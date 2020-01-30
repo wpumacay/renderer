@@ -136,7 +136,7 @@ if __name__ == '__main__' :
 
         shader.bind()
         shader.setMat4( 'u_tProj', camera.matProj() )
-        shader.setMat4( 'u_tView', tm.Matrix4f( tm.Matrix3f( camera.matView() ), [ 0.0, 0.0, 0.0 ] ) * correctionMat )
+        shader.setMat4( 'u_tView', np.dot( tm.Matrix4f( tm.Matrix3f( camera.matView() ), [ 0.0, 0.0, 0.0 ] ), correctionMat ) )
 
         textureCubemap.bind()
         varray.bind()
