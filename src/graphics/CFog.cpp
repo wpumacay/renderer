@@ -52,7 +52,7 @@ namespace engine
         // nothing to unbind for now
     }
 
-    std::string CFog::toString()
+    std::string CFog::toString() const
     {
         std::string _strRep;
 

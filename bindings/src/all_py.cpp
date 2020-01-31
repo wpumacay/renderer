@@ -23,6 +23,8 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_vertexBuffer( m );
     engine::bindings_indexBuffer( m );
     engine::bindings_vertexArray( m );
+    // frameBuffer bindings
+    engine::bindings_frameBuffer( m );
     // shader bindings
     engine::bindings_shader( m );
     engine::bindings_shaderManager( m );
@@ -35,6 +37,10 @@ PYBIND11_MODULE( tinyrenderer, m )
     // camera bindings
     engine::bindings_cameraBase( m );
     engine::bindings_cameraTypes( m );
+    // graphics bindings
+    engine::bindings_fog( m );
+    engine::bindings_skybox( m );
+    engine::bindings_shadowMap( m );
     // light bindings
     engine::bindings_lightBase( m );
     engine::bindings_lightDirectional( m );

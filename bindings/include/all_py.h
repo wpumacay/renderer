@@ -6,9 +6,11 @@
 #include <input_py.h>
 #include <shader_py.h>
 #include <buffers_py.h>
+#include <frameBuffer_py.h>
 #include <texture_py.h>
 #include <material_py.h>
 #include <camera_py.h>
+#include <graphics_py.h>
 #include <lights_py.h>
 #include <scene_py.h>
 #include <debug_py.h>

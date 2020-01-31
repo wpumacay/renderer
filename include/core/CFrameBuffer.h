@@ -55,6 +55,8 @@ namespace engine
         std::map< std::string, CTexture* > textures() const;
         std::map< std::string, CAttachmentConfig > configs() const;
 
+        uint32 width() const { return m_width; }
+        uint32 height() const { return m_height; }
         uint32 openglId() const { return m_openglId; }
 
     private :

@@ -39,7 +39,7 @@ namespace engine
         void bind( CShader* shaderPtr );
         void unbind();
 
-        std::string toString();
+        std::string toString() const;
 
         void setType( const eFogType& type ) { m_type = type; }
         void setActive( bool active ) { m_active = active; }

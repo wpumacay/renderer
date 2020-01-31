@@ -93,7 +93,7 @@ namespace engine
 
         void setup( const CShadowMapRangeConfig& config );
 
-        CFrameBuffer* frameBuffer() const { return m_frameBuffer.get(); };
+        CFrameBuffer* frameBuffer() const { return m_frameBuffer.get(); }
 
         int32 width() const { return m_shadowMapWidth; }
         int32 height() const { return m_shadowMapHeight; }
