@@ -1,6 +1,10 @@
 #pragma once
 
-#include <GL/glew.h>
+#ifdef ENGINE_HEADLESS_EGL
+    #include <glad/gl.h>
+#else
+    #include <GL/glew.h>
+#endif
 #include <array>
 #include <cassert>
 #include <cmath>

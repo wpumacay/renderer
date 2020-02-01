@@ -10,7 +10,7 @@
 #include <renderers/CMainRenderer.h>
 #include <graphics/CScene.h>
 #include <gui/CImGuiManager.h>
-#include <gl/COpenGLWindow.h> 
+#include <gl/CIWindow.h> 
 
 #define IMGUI_COMBO_CONSTRUCT( combo_name, current_name_str, vect_container )       \
         if ( ImGui::BeginCombo( combo_name, current_name_str.c_str() ) )            \
@@ -63,7 +63,7 @@ namespace engine
                           CMainRenderer* mainRenderer,
                           CRenderOptions* renderOptions,
                           CImGuiManager* imguiManager,
-                          COpenGLWindow* window );
+                          CIWindow* window );
         ~CImGuiUtilsLayer();
 
         void setScene( CScene* scene ) { m_scene = scene; }
@@ -112,7 +112,7 @@ namespace engine
         CMeshRenderer*      m_meshRenderer;
         CSkyboxRenderer*    m_skyboxRenderer;
         CImGuiManager*      m_imguiManager;
-        COpenGLWindow*      m_window;
+        CIWindow*           m_window;
 
         bool m_wantsToCaptureMouse;
         bool m_cursorDisabledByFpsCamera;

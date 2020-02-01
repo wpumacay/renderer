@@ -30,7 +30,7 @@ if __name__ == '__main__' :
     windowProps.title = 'sample-window-python'
     windowProps.clearColor = [ 0.2, 0.4, 0.8, 1.0 ]
 
-    windowGL = tr.OpenGLWindow( windowProps )
+    windowGL = tr.WindowGLFW( windowProps )
     windowGL.registerKeyCallback( keyCallback )
     windowGL.registerMouseCallback( mouseCallback )
     windowGL.registerMouseMoveCallback( mouseMoveCallback )

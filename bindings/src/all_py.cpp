@@ -13,7 +13,12 @@ PYBIND11_MODULE( tinyrenderer, m )
     // math-helpers bindings
     engine::bindings_mathHelpers( m );
     // window bindings
-    engine::bindings_window( m );
+    engine::bindings_windowBase( m );
+#ifndef ENGINE_HEADLESS_EGL
+    engine::bindings_windowGLFW( m );
+#else
+    engine::bindings_windowEGL( m );
+#endif /* ENGINE_HEADLESS_EGL */
     // input bindings
     engine::bindings_inputKey( m );
     engine::bindings_inputMouse( m );

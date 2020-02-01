@@ -14,7 +14,11 @@
 #include <input/CInputManager.h>
 #include <input/CInputEvent.h>
 
-#include <gl/COpenGLWindow.h>
+#ifndef ENGINE_HEADLESS_EGL
+    #include <gl/CWindowGLFW.h>
+#else
+    #include <gl/CWindowEGL.h>
+#endif /* ENGINE_HEADLESS_EGL */
 
 #include <utils/CLogger.h>
 #include <utils/CTime.h>
@@ -22,10 +26,12 @@
 #include <utils/CNoiseGenerator.h>
 #include <utils/CProfiling.h>
 
+#ifndef ENGINE_HEADLESS_EGL
 #include <gui/CImGuiManager.h>
 #include <gui/CImGuiLayer.h>
 #include <gui/CImGuiUtilsLayer.h>
 #include <gui/CImGuiSceneLayer.h>
+#endif /* ENGINE_HEADLESS_EGL */
 
 namespace engine
 {
@@ -37,8 +43,10 @@ namespace engine
 
         static CApplication* GetInstance();
 
+    #ifndef ENGINE_HEADLESS_EGL
         CApplication( const CWindowProps& windowProperties,
                       const CImGuiProps& imguiProperties );
+    #endif /* ENGINE_HEADLESS_EGL */
         CApplication( const CWindowProps& windowProperties );
         CApplication();
         virtual ~CApplication();
@@ -46,14 +54,6 @@ namespace engine
         CScene* setScene( std::unique_ptr< CScene > scene );
 
         void setOffscreenRendering( bool enabled );
-
-        void setGuiActive( bool enabled );
-
-        void setGuiUtilsActive( bool enabled );
-
-        void setGuiSceneViewActive( bool enabled );
-
-        CImGuiLayer* addGuiLayer( std::unique_ptr< CImGuiLayer > layer );
 
         void update();
 
@@ -75,31 +75,41 @@ namespace engine
         static void CallbackScroll( double xOff, double yOff );
         static void CallbackResize( int width, int height );
 
-        std::vector< CImGuiLayer* > guiLayers() const;
-
         CRenderOptions& renderOptions() { return m_renderOptions; }
 
         CFrameBuffer* renderTarget() const { return m_renderTarget.get(); }
 
         CScene* scene() const { return m_scene.get(); }
 
-        COpenGLWindow* window() const { return m_window.get(); }
+        CIWindow* window() const { return m_window.get(); }
 
         CMainRenderer* renderer() const { return m_mainRenderer.get(); }
 
-        CImGuiManager* imguiManager() const { return m_imguiManager.get(); }
-
         bool active() const { return m_window->active(); }
+
+    #ifndef ENGINE_HEADLESS_EGL
+        void setGuiActive( bool enabled );
+
+        void setGuiUtilsActive( bool enabled );
+
+        void setGuiSceneViewActive( bool enabled );
+
+        CImGuiLayer* addGuiLayer( std::unique_ptr< CImGuiLayer > layer );
+
+        std::vector< CImGuiLayer* > guiLayers() const;
+
+        CImGuiManager* imguiManager() const { return m_imguiManager.get(); }
 
         bool guiActive() const { return m_imguiManager->active(); }
 
         bool guiUtilsActive() const { return m_guiUtilsLayer->active(); }
 
         bool guiSceneViewActive() const { return false; }
+    #endif /* ENGINE_HEADLESS_EGL */
 
     protected :
 
-        CFrameBuffer* _createRenderTarget();
+        std::unique_ptr<CFrameBuffer> _createRenderTarget();
 
         static CApplication* s_instance;
 
@@ -107,12 +117,14 @@ namespace engine
         CRenderOptions                                  m_renderOptions;
         std::unique_ptr< CFrameBuffer >                 m_renderTarget;
         std::unique_ptr< CScene >                       m_scene;
-        std::unique_ptr< COpenGLWindow >                m_window;
+        std::unique_ptr< CIWindow >                     m_window;
         std::unique_ptr< CMainRenderer >                m_mainRenderer;
-        std::unique_ptr< CImGuiManager >                m_imguiManager;
-        std::vector< std::unique_ptr< CImGuiLayer > >   m_guiLayers;
 
+    #ifndef ENGINE_HEADLESS_EGL
+        std::unique_ptr< CImGuiManager > m_imguiManager;
+        std::vector< std::unique_ptr< CImGuiLayer > > m_guiLayers;
         CImGuiUtilsLayer* m_guiUtilsLayer;
+    #endif /* ENGINE_HEADLESS_EGL */
 
         bool m_useRenderTarget;
 

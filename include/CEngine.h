@@ -7,17 +7,17 @@
 
 #include <utils/CTime.h>
 #include <utils/CLogger.h>
-#include <utils/CImguiUi.h>
-#include <utils/CImguiUiDemo.h>
 #include <utils/CNoiseGenerator.h>
 #include <utils/CDebugDrawer.h>
 #include <utils/CObjectPicker.h>
 #include <utils/CProfiling.h>
 
+#ifndef ENGINE_HEADLESS_EGL
 #include <gui/CImGuiManager.h>
 #include <gui/CImGuiLayer.h>
 #include <gui/CImGuiSceneLayer.h>
 #include <gui/CImGuiUtilsLayer.h>
+#endif /* ENGINE_HEADLESS_EGL */
 
 #include <input/CInputCallbacks.h>
 #include <input/CInputKey.h>
@@ -62,8 +62,12 @@
 
 #include <assets/CTextureManager.h>
 
-#include <gl/COpenGLWindow.h>
-#include <gl/COpenGLContext.h>
+#include <gl/CIWindow.h>
+#ifndef ENGINE_HEADLESS_EGL
+    #include <gl/CWindowGLFW.h>
+#else
+    #include <gl/CWindowEGL.h>
+#endif /* ENGINE_HEADLESS_EGL */
 
 #include <app/CApplication.h>
 

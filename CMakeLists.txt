@@ -31,6 +31,7 @@ else()
     message( "TINYRENDERER> Configuring as CHILD project" )
 endif()
 
+option( TINYRENDERER_BUILD_HEADLESS_EGL "Build in headless mode using EGL" OFF )
 option( TINYRENDERER_BUILD_DOCS "Build documentation (requires Doxygen)" ON )
 option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
 option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
@@ -47,11 +48,8 @@ if ( TINYRENDERER_IS_MASTER_PROJECT )
     add_subdirectory( ext )
 endif()
 
-find_package( OpenGL REQUIRED )
-find_package( GLEW REQUIRED )
+# Assimp is required in both normal and headless modes
 find_package( ASSIMP REQUIRED )
-find_package( PkgConfig REQUIRED )
-pkg_search_module( GLFW REQUIRED glfw3 )
 
 if ( APPLE )
     include_directories( /usr/local/include )
@@ -59,16 +57,8 @@ if ( APPLE )
 endif()
 
 message( "ASSIMP_INCLUDE_DIRS   : ${ASSIMP_INCLUDE_DIRS}" )
-message( "GLFW_INCLUDE_DIRS     : ${GLFW_INCLUDE_DIRS}" )
-message( "GLFW_LIBRARIES        : ${GLFW_LIBRARIES}" )
-message( "GLFW_LIBRARY_DIRS     : ${GLFW_LIBRARY_DIRS}" )
-message( "GLEW_INCLUDE_DIRS     : ${GLEW_INCLUDE_DIRS}" )
-message( "GLEW_LIBRARIES        : ${GLEW_LIBRARIES}" )
-message( "OPENGL_LIBRARIES      : ${OPENGL_LIBRARIES}" )
 
 set( TINYRENDERER_INCLUDES_DIRS
-     "${GLFW_INCLUDE_DIRS}"
-     "${GLEW_INCLUDE_DIRS}"
      "${CMAKE_CURRENT_SOURCE_DIR}/include"
      "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb"
      "${CMAKE_SOURCE_DIR}/ext/tinymath/include"
@@ -76,9 +66,19 @@ set( TINYRENDERER_INCLUDES_DIRS
      "${CMAKE_SOURCE_DIR}/ext/imgui/examples"
      "${CMAKE_SOURCE_DIR}/ext/spdlog/include" )
 include_directories( ${TINYRENDERER_INCLUDES_DIRS} )
+if ( TINYRENDERER_BUILD_HEADLESS_EGL )
+    include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad" )
+endif()
 
 add_definitions( -DENGINE_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/res/")
 add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/cpp/" )
+
+if ( TINYRENDERER_BUILD_HEADLESS_EGL )
+    set( ENGINE_HEADLESS_EGL "YES" )
+    add_definitions( -DENGINE_HEADLESS_EGL )
+else()
+    set( ENGINE_HEADLESS_EGL "NO" )
+endif()
 
 if ( TINYRENDERER_BUILD_WITH_LOGS OR ( CMAKE_BUILD_TYPE STREQUAL Debug ) )
     set( ENGINE_USE_LOGS "YES" )
@@ -94,17 +94,141 @@ else()
     set( ENGINE_TRACK_ALLOCS "NO" )
 endif()
 
-file( GLOB_RECURSE SRCS "src/*.cpp" )
+if ( NOT TINYRENDERER_BUILD_HEADLESS_EGL )
+    # Use GLFW and default OpengGL requirements
+    find_package( PkgConfig REQUIRED )
+    find_package( OpenGL REQUIRED )
+    find_package( GLEW REQUIRED )
+    pkg_search_module( GLFW REQUIRED glfw3 )
+    message( "GLFW_INCLUDE_DIRS     : ${GLFW_INCLUDE_DIRS}" )
+    message( "GLFW_LIBRARIES        : ${GLFW_LIBRARIES}" )
+    message( "GLFW_LIBRARY_DIRS     : ${GLFW_LIBRARY_DIRS}" )
+    message( "GLEW_INCLUDE_DIRS     : ${GLEW_INCLUDE_DIRS}" )
+    message( "GLEW_LIBRARIES        : ${GLEW_LIBRARIES}" )
+    message( "OPENGL_LIBRARIES      : ${OPENGL_LIBRARIES}" )
+    include_directories( ${GLFW_INCLUDE_DIRS} )
+    include_directories( ${GLEW_INCLUDE_DIRS} )
 
-add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
-target_link_libraries( tinyrenderer_cpp_lib
-                       ${GLFW_LIBRARIES}
-                       ${OPENGL_LIBRARIES}
-                       ${GLEW_LIBRARIES}
-                       tinymath_cpp_lib
-                       assimp
-                       spdlog
-                       imgui )
+    set( SRCS
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowGLFW.cpp" # use GLFW to create a window
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiLayer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiUtilsLayer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CLogger.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CNoiseGenerator.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp" )
+
+    add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
+    target_link_libraries( tinyrenderer_cpp_lib
+                           ${GLFW_LIBRARIES}
+                           ${OPENGL_LIBRARIES}
+                           ${GLEW_LIBRARIES}
+                           tinymath_cpp_lib
+                           assimp
+                           spdlog
+                           imgui )
+else()
+    # Use EGL and EGL-specific OpengGL requirements
+    find_package( OpenGL REQUIRED OpenGL EGL )
+    message( "OPENGL_LIBRARIES      : ${OPENGL_LIBRARIES}" )
+
+    set( SRCS
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowEGL.cpp" # use EGL to create a "window"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CLogger.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CNoiseGenerator.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/egl.c"
+         "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c" )
+
+    add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
+    target_link_libraries( tinyrenderer_cpp_lib
+                           OpenGL::OpenGL
+                           OpenGL::EGL
+                           tinymath_cpp_lib
+                           assimp
+                           spdlog
+                           dl )
+endif()
 
 set_property( TARGET tinyrenderer_cpp_lib PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
@@ -123,6 +247,7 @@ endif()
 message( "***************************************************************************************" )
 message( "BUILD-OPTIONS SUMMARY:" )
 message( "CMAKE_BUILD_TYPE                      : ${CMAKE_BUILD_TYPE}" )
+message( "TINYRENDERER_BUILD_HEADLESS_EGL       : ${TINYRENDERER_BUILD_HEADLESS_EGL}" )
 message( "TINYRENDERER_BUILD_DOCS               : ${TINYRENDERER_BUILD_DOCS}" )
 message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}" )
 message( "TNIYRENDERER_BUILD_PYTHON_BINDINGS    : ${TINYRENDERER_BUILD_PYTHON_BINDINGS}" )

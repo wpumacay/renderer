@@ -12,18 +12,27 @@ namespace engine
         return CApplication::s_instance;
     }
 
+#ifndef ENGINE_HEADLESS_EGL
+    CApplication::CApplication( const CWindowProps& windowProperties )
+        : CApplication( windowProperties, CImGuiProps() ) {}
+
     CApplication::CApplication( const CWindowProps& windowProperties,
                                 const CImGuiProps& imguiProperties )
+#else
+    CApplication::CApplication( const CWindowProps& windowProperties )
+#endif /* ENGINE_HEADLESS_EGL */
     {
         // create the global reference for other systems to use
         CApplication::s_instance = this;
 
         engine::CLogger::Init();
         ENGINE_CORE_INFO( "GL-Application: starting..." );
-
-        m_window = std::unique_ptr< COpenGLWindow >( new COpenGLWindow( windowProperties ) );
-
-        ENGINE_CORE_ASSERT( m_window->glfwWindow(), "There was an error while creating the opengl-window" );
+    #ifdef ENGINE_HEADLESS_EGL
+        m_window = std::make_unique< CWindowEGL >( windowProperties );
+    #else
+        m_window = std::make_unique< CWindowGLFW >( windowProperties );
+        ENGINE_CORE_ASSERT( dynamic_cast<CWindowGLFW*>( m_window.get() )->glfwWindow(), "There was an error while creating the opengl-window" );
+    #endif /* ENGINE_HEADLESS_EGL */
 
         //// engine::CProfilingManager::Init( eProfilerType::INTERNAL );
         engine::CProfilingManager::Init( eProfilerType::EXTERNAL_CHROME );
@@ -39,10 +48,12 @@ namespace engine
         engine::CNoiseGenerator::Init();
 
         //// PROFILE_SCOPE_IN_SESSION( "app_initialization", "sess_core_init" );
-        m_scene         = std::unique_ptr< CScene >( new CScene() );
-        m_mainRenderer  = std::unique_ptr< CMainRenderer >( new CMainRenderer() );
-        m_imguiManager  = std::unique_ptr< CImGuiManager >( new CImGuiManager( m_window->glfwWindow(), imguiProperties ) );
-        m_renderTarget  = std::unique_ptr< CFrameBuffer >( _createRenderTarget() );
+        m_scene         = std::make_unique< CScene >();
+        m_mainRenderer  = std::make_unique< CMainRenderer >();
+    #ifndef ENGINE_HEADLESS_EGL
+        m_imguiManager  = std::make_unique< CImGuiManager >( dynamic_cast<CWindowGLFW*>( m_window.get() )->glfwWindow(), imguiProperties );
+    #endif /* ENGINE_HEADLESS_EGL */
+        m_renderTarget  = _createRenderTarget();
 
         m_window->registerKeyCallback( &CApplication::CallbackKey );
         m_window->registerMouseCallback( &CApplication::CallbackMouseButton );
@@ -57,7 +68,7 @@ namespace engine
         // start keeping track of time
         engine::CTime::Start();
         m_timeStamp = 0.0f;
-
+    #ifndef ENGINE_HEADLESS_EGL
         // create a utils panel by default (the user can choose to use it or not)
         m_guiUtilsLayer = new CImGuiUtilsLayer( "Utils-layer",
                                                 m_scene.get(),
@@ -68,15 +79,12 @@ namespace engine
 
         m_guiUtilsLayer->setActive( false );
         addGuiLayer( std::unique_ptr< CImGuiLayer >( m_guiUtilsLayer ) );
-
+    #endif /* ENGINE_HEADLESS_EGL */
         ENGINE_CORE_INFO( "GL-Application started successfully!!!" );
     }
 
-    CApplication::CApplication( const CWindowProps& windowProperties )
-        : CApplication( windowProperties, CImGuiProps() ) {}
-
     CApplication::CApplication()
-        : CApplication( CWindowProps(), CImGuiProps() ) {}
+        : CApplication( CWindowProps() ) {}
 
     CApplication::~CApplication()
     {
@@ -84,7 +92,9 @@ namespace engine
 
         m_scene         = nullptr;
         m_mainRenderer  = nullptr;
+    #ifndef ENGINE_HEADLESS_EGL
         m_imguiManager  = nullptr;
+    #endif /* ENGINE_HEADLESS_EGL */
         m_window        = nullptr;
 
         //// // flush results from initialization
@@ -103,8 +113,10 @@ namespace engine
     CScene* CApplication::setScene( std::unique_ptr< CScene > scene )
     {
         m_scene = std::move( scene );
+    #ifndef ENGINE_HEADLESS_EGL
         // update resources that require the scene reference
         m_guiUtilsLayer->setScene( m_scene.get() );
+    #endif /* ENGINE_HEADLESS_EGL */
         // return a reference for the user to play with
         return m_scene.get();
     }
@@ -114,7 +126,7 @@ namespace engine
         m_useRenderTarget = enabled;
         m_renderOptions.renderTargetPtr = ( enabled ) ? m_renderTarget.get() : nullptr;
     }
-
+#ifndef ENGINE_HEADLESS_EGL
     void CApplication::setGuiActive( bool enabled )
     {
         m_imguiManager->setActive( enabled );
@@ -136,6 +148,7 @@ namespace engine
         // return a reference for the user to play with
         return m_guiLayers.back().get();
     }
+#endif /* ENGINE_HEADLESS_EGL */
 
     void CApplication::update()
     {
@@ -143,18 +156,21 @@ namespace engine
         if ( m_scene )
             m_scene->update();
 
+    #ifndef ENGINE_HEADLESS_EGL
         // update all gui-layers
         if ( m_imguiManager->active() )
             for ( auto& layer : m_guiLayers )
                 if ( layer->active() )
                     layer->update();
+    #endif
     }
 
     void CApplication::begin()
     {
         engine::CProfilingManager::BeginSession( "sess_core_render" );
-
+    #ifndef ENGINE_HEADLESS_EGL
         m_timeStamp = glfwGetTime();
+    #endif /* ENGINE_HEADLESS_EGL */
         // prepare window for rendering, and poll events
         m_window->begin();
 
@@ -208,15 +224,15 @@ namespace engine
 
         // render all commands requested to our renderer
         m_mainRenderer->render();
-
+    #ifndef ENGINE_HEADLESS_EGL
         // prepare imgui prior to accepts any rendering commands
         m_imguiManager->begin();
-
         // render all gui-layers
         if ( m_imguiManager->active() )
             for ( auto& layer : m_guiLayers )
                 if ( layer->active() )
                     layer->render();
+    #endif /* ENGINE_HEADLESS_EGL */
 
         // render all commands requested to the debug drawer
         auto _camera = m_scene->currentCamera();
@@ -225,9 +241,10 @@ namespace engine
             CDebugDrawer::Render( _camera, _light );
         else if ( _camera )
             CDebugDrawer::Render( _camera );
-
+    #ifndef ENGINE_HEADLESS_EGL
         // render all commands requested to imgui so far
         m_imguiManager->render();
+    #endif /* ENGINE_HEADLESS_EGL */
     }
 
     void CApplication::end()
@@ -235,13 +252,17 @@ namespace engine
         // swap buffers such that we see that juicy frame (if we rendered to default target)
         m_window->end();
 
+    #ifndef ENGINE_HEADLESS_EGL
         // tick-tock, in the main thread (might need to handle it differently in multi-threading mode)
         auto _timeNow = glfwGetTime();
         auto _timeDelta = _timeNow - m_timeStamp;
         m_timeStamp = _timeNow;
-
         // update time keeper for our other systems to use
         engine::CTime::Update( _timeDelta );
+    #else
+        engine::CTime::Update( 0.001 );
+    #endif /* ENGINE_HEADLESS_EGL */
+
 
         engine::CProfilingManager::EndSession( "sess_core_render" );
     }
@@ -249,6 +270,7 @@ namespace engine
     void CApplication::CallbackKey( int key, int action )
     {
         auto _app = CApplication::GetInstance();
+    #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "key_event: " ) + std::to_string( key ) + " - " + std::to_string( action );
 
@@ -294,6 +316,7 @@ namespace engine
                     return;
             }
         }
+    #endif /* ENGINE_HEADLESS_EGL */
 
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_keyboardCallbacks )
@@ -305,11 +328,12 @@ namespace engine
     void CApplication::CallbackMouseButton( int button, int action, double x, double y )
     {
         auto _app = CApplication::GetInstance();
+        bool _handled = false;
+    #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "mouse_button_event: " ) + std::to_string( button ) + " - " + 
                             std::to_string( action ) + " - " + std::to_string( x ) + " - " + std::to_string( y );
 
-        bool _handled = false;
         if ( action == MouseAction::BUTTON_PRESSED ) 
         {
             auto _ev = CMousePressedEvent( _name, button, { (float)x, (float)y } );
@@ -339,7 +363,8 @@ namespace engine
                 if ( _handled )
                     break;
             }
-        };
+        }
+    #endif /* ENGINE_HEADLESS_EGL */
 
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_mouseButtonCallbacks )
@@ -354,6 +379,7 @@ namespace engine
     void CApplication::CallbackMouseMove( double x, double y )
     {
         auto _app = CApplication::GetInstance();
+    #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "mouse_move_event: " ) + std::to_string( x ) + " - " + std::to_string( y );
 
@@ -368,6 +394,7 @@ namespace engine
             if ( _layer->onEvent( _ev ) )
                 return;
         }
+    #endif /* ENGINE_HEADLESS_EGL */
 
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_mouseMoveCallbacks )
@@ -379,6 +406,7 @@ namespace engine
     void CApplication::CallbackScroll( double xOff, double yOff )
     {
         auto _app = CApplication::GetInstance();
+    #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "mouse_scroll_event: " ) + std::to_string( xOff ) + " - " + std::to_string( yOff );
 
@@ -393,6 +421,7 @@ namespace engine
             if ( _layer->onEvent( _ev ) )
                 return;
         }
+    #endif /* ENGINE_HEADLESS_EGL */
 
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_scrollCallbacks )
@@ -405,6 +434,8 @@ namespace engine
     {
         auto _app = CApplication::GetInstance();
         auto& _scene = _app->m_scene;
+
+    #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
         auto _name = std::string( "resize_event: " ) + std::to_string( width ) + " - " + std::to_string( height );
 
@@ -414,6 +445,7 @@ namespace engine
         /* all layers should receive the resize-event */
         for ( auto& _layer : _layers )
             _layer->onEvent( _ev );
+    #endif /* ENGINE_HEADLESS_EGL */
 
         /* all resources on the scene should be notified that the dimensions have changed */
         if ( _scene )
@@ -429,6 +461,7 @@ namespace engine
             _callback( width, height );
     }
 
+#ifndef ENGINE_HEADLESS_EGL
     std::vector< CImGuiLayer* > CApplication::guiLayers() const
     {
         std::vector< CImGuiLayer* > _layersPtrs;
@@ -437,8 +470,9 @@ namespace engine
 
         return _layersPtrs;
     }
+#endif
 
-    CFrameBuffer* CApplication::_createRenderTarget()
+    std::unique_ptr<CFrameBuffer> CApplication::_createRenderTarget()
     {
         engine::CAttachmentConfig _fbColorConfig;
         _fbColorConfig.name                 = "color_attachment";
@@ -463,10 +497,10 @@ namespace engine
         _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
         _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-        auto _frameBuffer = new CFrameBuffer();
+        auto _frameBuffer = std::make_unique<CFrameBuffer>();
         _frameBuffer->addAttachment( _fbColorConfig );
         _frameBuffer->addAttachment( _fbDepthConfig );
 
-        return _frameBuffer;
+        return std::move( _frameBuffer );
     }
 }

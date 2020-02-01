@@ -2,16 +2,14 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <GLFW/glfw3.h>
+#include <utils/CLogger.h>
 
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
 #include <input/CInputCallbacks.h>
-#include <gl/COpenGLContext.h>
 
 namespace engine
 {
-
     struct CWindowProps
     {
         int width;
@@ -42,12 +40,21 @@ namespace engine
         }
     };
 
-    class COpenGLWindow
+    enum eWindowType
+    {
+        NONE = 0,
+        GLFW,
+        HEADLESS_EGL
+    };
+
+    std::string toString( const eWindowType& type );
+
+    class CIWindow
     {
     public :
 
-        COpenGLWindow( const CWindowProps& properties );
-        ~COpenGLWindow();
+        CIWindow( const CWindowProps& properties ) : m_properties( properties ) {}
+        virtual ~CIWindow() {}
 
         void registerKeyCallback( FnPtr_keyboard_callback callback );
         void registerMouseCallback( FnPtr_mouse_callback callback );
@@ -64,22 +71,27 @@ namespace engine
         bool active();
         void requestClose();
 
-        int width() { return m_properties.width; }
-        int height() { return m_properties.height; }
-        float aspect() { return ((float) m_properties.width) / m_properties.height; }
-        std::string title() { return m_properties.title; }
+        int width() const { return m_properties.width; }
+        int height() const { return m_properties.height; }
+        float aspect() const { return ((float) m_properties.width) / m_properties.height; }
+        std::string title() const { return m_properties.title; }
+        eWindowType type() const { return m_type; }
         
         CWindowProps properties() { return m_properties; }
-        COpenGLContext* context() { return m_glContext; }
-        GLFWwindow* glfwWindow() { return m_glfwWindowPtr; }
 
-    private :
+    protected :
 
-        GLFWwindow* m_glfwWindowPtr;
+        virtual void _enableCursorInternal() = 0;
+        virtual void _disableCursorInternal() = 0;
+        virtual void _beginInternal() = 0;
+        virtual void _endInternal() = 0;
+        virtual bool _activeInternal() = 0;
+        virtual void _requestCloseInternal() = 0;
+
+    protected :
 
         CWindowProps m_properties;
-
-        COpenGLContext* m_glContext;
+        eWindowType m_type;
     };
 
 }

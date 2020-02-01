@@ -9,7 +9,7 @@ namespace engine
                                         CMainRenderer* mainRenderer,
                                         CRenderOptions* renderOptions,
                                         CImGuiManager* imguiManager,
-                                        COpenGLWindow* window )
+                                        CIWindow* window )
         : CImGuiLayer( name )
     {
         m_scene = scene;
