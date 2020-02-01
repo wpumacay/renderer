@@ -75,7 +75,7 @@ namespace engine
     CVertexBufferElement::CVertexBufferElement()
     {
         this->name          = "none";
-        this->type          = eElementType::None;
+        this->type          = eElementType::Undefined;
         this->size          = 0;
         this->offset        = 0;
         this->count         = 0;

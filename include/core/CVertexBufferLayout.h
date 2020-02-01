@@ -15,15 +15,15 @@ namespace engine
     /// Type of element used for part (of all) elements in a Vertex Buffer
     enum class eElementType
     {
-        None,   //!< None type (undefined) for error checking
-        Float,  //!< Single float, size 4-bytes
-        Float2, //!< Two float compound (vec2), size 8-bytes
-        Float3, //!< Three float compound (vec3), size 12-bytes
-        Float4, //!< Four float compound (vec4), size 16-bytes
-        Int,    //!< Single integer, size 4-bytes (=int32)
-        Int2,   //!< Two integer compound (int2), size 8-bytes
-        Int3,   //!< Three integer compound (int3), size 12-bytes
-        Int4,   //!< Four integer compound (int4), size 16-bytes
+        Undefined,  //!< None type (undefined) for error checking
+        Float,      //!< Single float, size 4-bytes
+        Float2,     //!< Two float compound (vec2), size 8-bytes
+        Float3,     //!< Three float compound (vec3), size 12-bytes
+        Float4,     //!< Four float compound (vec4), size 16-bytes
+        Int,        //!< Single integer, size 4-bytes (=int32)
+        Int2,       //!< Two integer compound (int2), size 8-bytes
+        Int3,       //!< Three integer compound (int3), size 12-bytes
+        Int4,       //!< Four integer compound (int4), size 16-bytes
     };
 
     /// @brief Returns the string representation of the given element-type enum
