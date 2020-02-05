@@ -28,8 +28,6 @@ namespace engine
         CAttachmentConfig _fbDepthConfig;
         _fbDepthConfig.name                 = "shadow_depth_attachment";
         _fbDepthConfig.attachment           = eFboAttachment::DEPTH;
-        _fbDepthConfig.width                = m_shadowMapWidth;
-        _fbDepthConfig.height               = m_shadowMapHeight;
         _fbDepthConfig.texInternalFormat    = eTextureFormat::DEPTH;
         _fbDepthConfig.texFormat            = eTextureFormat::DEPTH;
         _fbDepthConfig.texPixelDataType     = ePixelDataType::FLOAT_32;
@@ -39,7 +37,7 @@ namespace engine
         _fbDepthConfig.texBorderColorV      = { 1.0f, 1.0f, 1.0f, 1.0f };
 
         /* create the framebuffer with an attachment given by the config. above */
-        m_frameBuffer = std::unique_ptr< CFrameBuffer >( new CFrameBuffer() );
+        m_frameBuffer = std::make_unique< CFrameBuffer >( m_shadowMapWidth, m_shadowMapHeight );
         m_frameBuffer->addAttachment( _fbDepthConfig );
 
         /* tell opengl we don't need a color attachment */

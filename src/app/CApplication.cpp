@@ -456,6 +456,10 @@ namespace engine
         _renderOptions.viewportWidth = width;
         _renderOptions.viewportHeight = height;
 
+        /* the offscreen render target should be resized as well */
+        if ( _app->m_renderTarget )
+            _app->m_renderTarget->resize( width, height );
+
         /* call extra user-installed callbacks */
         for ( auto _callback : _app->m_resizeCallbacks )
             _callback( width, height );
@@ -477,8 +481,6 @@ namespace engine
         engine::CAttachmentConfig _fbColorConfig;
         _fbColorConfig.name                 = "color_attachment";
         _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-        _fbColorConfig.width                = m_window->width();
-        _fbColorConfig.height               = m_window->height();
         _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
         _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
         _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -489,15 +491,13 @@ namespace engine
         engine::CAttachmentConfig _fbDepthConfig;
         _fbDepthConfig.name                 = "depth_attachment";
         _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-        _fbDepthConfig.width                = m_window->width();
-        _fbDepthConfig.height               = m_window->height();
         _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
         _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
         _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
         _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
         _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-        auto _frameBuffer = std::make_unique<CFrameBuffer>();
+        auto _frameBuffer = std::make_unique<CFrameBuffer>( m_window->width(), m_window->height() );
         _frameBuffer->addAttachment( _fbColorConfig );
         _frameBuffer->addAttachment( _fbDepthConfig );
 

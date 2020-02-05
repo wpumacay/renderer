@@ -24,8 +24,6 @@ namespace engine
         engine::CAttachmentConfig _fbColorConfig;
         _fbColorConfig.name                 = "color_attachment";
         _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-        _fbColorConfig.width                = m_viewportWidth;
-        _fbColorConfig.height               = m_viewportHeight;
         _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
         _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
         _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -35,15 +33,13 @@ namespace engine
         engine::CAttachmentConfig _fbDepthConfig;
         _fbDepthConfig.name                 = "depth_attachment";
         _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-        _fbDepthConfig.width                = m_viewportWidth;
-        _fbDepthConfig.height               = m_viewportHeight;
         _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
         _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
         _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
         _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
         _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-        m_fboObjsIds = std::unique_ptr< CFrameBuffer >( new CFrameBuffer() );
+        m_fboObjsIds = std::make_unique< CFrameBuffer >( m_viewportWidth, m_viewportHeight );
         m_fboObjsIds->addAttachment( _fbColorConfig );
         m_fboObjsIds->addAttachment( _fbDepthConfig );
 

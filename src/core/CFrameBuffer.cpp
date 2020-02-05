@@ -53,7 +53,8 @@ namespace engine
     *                            CFrameBuffer impl.                           *
     ***************************************************************************/
 
-    CFrameBuffer::CFrameBuffer()
+    CFrameBuffer::CFrameBuffer( int32 width, int32 height )
+        : m_width( width ), m_height( height )
     {
         // create gl-texture resource (will configure it later)
         glGenFramebuffers( 1, &m_openglId );
@@ -63,6 +64,8 @@ namespace engine
     {
         glDeleteFramebuffers( 1, &m_openglId );
 
+        for ( auto& pair : m_textures )
+            delete pair.second;
         m_textures.clear();
         m_configs.clear();
     }
@@ -78,8 +81,8 @@ namespace engine
         auto _textureData = std::make_unique<CTextureData>();
         _textureData->name              = config.name;
         _textureData->data              = NULL;
-        _textureData->width             = config.width;
-        _textureData->height            = config.height;
+        _textureData->width             = m_width;
+        _textureData->height            = m_height;
         _textureData->channels          = 0; // not used for our case
         _textureData->internalFormat    = config.texInternalFormat;
         _textureData->format            = config.texFormat;
@@ -93,7 +96,7 @@ namespace engine
         _textureOpts.borderColorV   = config.texBorderColorV;
         _textureOpts.dtype          = config.texPixelDataType;
 
-        auto _texture = std::make_unique<CTexture>( std::move( _textureData ), _textureOpts );
+        auto _texture = new CTexture( std::move( _textureData ), _textureOpts );
 
         /************************************************************************/
 
@@ -112,7 +115,7 @@ namespace engine
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
         // keep ownership of the texture of this attachment
-        m_textures[config.name] = std::move( _texture );
+        m_textures[config.name] = _texture;
     }
 
     void CFrameBuffer::bind()
@@ -127,9 +130,32 @@ namespace engine
 
     void CFrameBuffer::resize( int32 width, int32 height )
     {
+        m_width = width;
+        m_height = height;
         // should resize textures to handle the required available space
         for ( auto& pair : m_textures )
             pair.second->resize( width, height );
+    }
+
+    std::unique_ptr< uint8[] > CFrameBuffer::read()
+    {
+        auto _colorAttachment = getTextureAttachment( "color_attachment" );
+        auto _colorAttachmentConfig = getConfigAttachment( "color_attachment" );
+
+        if ( !_colorAttachment )
+        {
+            // @firsttodo: make this more general (it's specific to this particular attachment)
+            ENGINE_CORE_WARN( "CFrameBuffer::read >>> can't read from framebuffer without color attachment" );
+            return nullptr;
+        }
+
+        auto _buffer = std::unique_ptr< engine::uint8[] >( new engine::uint8[3 * m_width * m_height] );
+
+        glBindFramebuffer( GL_FRAMEBUFFER, m_openglId );
+        glReadPixels( 0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, _buffer.get() );
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        return std::move( _buffer );
     }
 
     CTexture* CFrameBuffer::getTextureAttachment( const std::string& name )
@@ -140,7 +166,7 @@ namespace engine
             return nullptr;
         }
 
-        return m_textures[name].get();
+        return m_textures[name];
     }
 
     CAttachmentConfig CFrameBuffer::getConfigAttachment( const std::string& name )
@@ -159,7 +185,7 @@ namespace engine
         std::map< std::string, CTexture* > _texturesMap;
 
         for ( auto& pair : m_textures )
-            _texturesMap[pair.first] = pair.second.get();
+            _texturesMap[pair.first] = pair.second;
 
         return _texturesMap;
     }

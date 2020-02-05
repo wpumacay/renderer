@@ -8,8 +8,6 @@ int main()
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = _app->window()->width();
-    _fbColorConfig.height               = _app->window()->height();
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -19,15 +17,14 @@ int main()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = _app->window()->width();
-    _fbDepthConfig.height               = _app->window()->height();
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
     _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
     _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-    auto _framebuffer = std::make_unique<engine::CFrameBuffer>();
+    auto _framebuffer = std::make_unique<engine::CFrameBuffer>( _app->window()->width(),
+                                                                _app->window()->height() );
     _framebuffer->addAttachment( _fbColorConfig );
     _framebuffer->addAttachment( _fbDepthConfig );
 

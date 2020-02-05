@@ -96,7 +96,7 @@ std::vector< engine::CIRenderable* > _createScene0();
 std::vector< engine::CIRenderable* > _createScene1();
 std::vector< engine::CIRenderable* > _createScene2();
 
-std::unique_ptr<engine::CFrameBuffer> createRenderTarget();
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget( int width, int height );
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
@@ -593,8 +593,8 @@ private :
                 writeRenderTarget( m_renderTargetNormal, "target-normal.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetNormal->width(), 
+                                  m_renderTargetNormal->height() ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -608,8 +608,8 @@ private :
                 writeRenderTarget( m_renderTargetDepth, "target-depth.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetDepth->width(), 
+                                  m_renderTargetDepth->height() ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -623,8 +623,8 @@ private :
                 writeRenderTarget( m_renderTargetSemantic, "target-semantic.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetSemantic->width(), 
+                                  m_renderTargetSemantic->height() ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -893,9 +893,9 @@ int main()
                                           { 2, { 0.7f, 0.3f, 0.5f } } };
 
     // create render targets
-    auto _renderTargetNormal = createRenderTarget();
-    auto _renderTargetDepth = createRenderTarget();
-    auto _renderTargetSemantic = createRenderTarget();
+    auto _renderTargetNormal = createRenderTarget( _app->window()->width(), _app->window()->height() );
+    auto _renderTargetDepth = createRenderTarget( _app->window()->width(), _app->window()->height() );
+    auto _renderTargetSemantic = createRenderTarget( _app->window()->width(), _app->window()->height() );
 
     _uiRef->setRenderTargetNormal( _renderTargetNormal.get() );
     _uiRef->setRenderTargetDepth( _renderTargetDepth.get() );
@@ -1444,13 +1444,11 @@ std::vector< engine::CIRenderable* > _createScene2()
     return _renderablesRefs;
 }
 
-std::unique_ptr<engine::CFrameBuffer> createRenderTarget()
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget( int width, int height )
 {
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    _fbColorConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -1460,15 +1458,13 @@ std::unique_ptr<engine::CFrameBuffer> createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    _fbDepthConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
     _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
     _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-    auto _framebuffer = std::make_unique<engine::CFrameBuffer>();
+    auto _framebuffer = std::make_unique<engine::CFrameBuffer>( width / g_target_factor, height / g_target_factor );
     _framebuffer->addAttachment( _fbColorConfig );
     _framebuffer->addAttachment( _fbDepthConfig );
 
@@ -1480,8 +1476,8 @@ void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& n
     auto _colorAttachment = renderTarget->getTextureAttachment( "color_attachment" );
     auto _colorAttachmentConfig = renderTarget->getConfigAttachment( "color_attachment" );
 
-    auto _width = _colorAttachmentConfig.width;
-    auto _height = _colorAttachmentConfig.height;
+    auto _width = renderTarget->width();
+    auto _height = renderTarget->height();
 
     auto _buffer = std::unique_ptr< engine::uint8[] >( new engine::uint8[3 * _width * _height] );
 

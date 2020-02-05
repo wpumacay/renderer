@@ -37,9 +37,9 @@ int main()
     _cameraProjData.height = 10.0f;
 
     auto _orbitCamera = std::make_unique<engine::COrbitCamera>( "orbit",
-                                                                engine::CVec3( 0.0f, 3.0f, 0.0f ),
+                                                                engine::CVec3( 5.0f, 5.0f, 5.0f ),
                                                                 engine::CVec3( 0.0f, 0.0f, 0.0f ),
-                                                                engine::eAxis::Y,
+                                                                engine::eAxis::Z,
                                                                 _cameraProjData,
                                                                 _app->window()->width(),
                                                                 _app->window()->height() );
@@ -50,14 +50,22 @@ int main()
     const float _cameraMaxDelta     = 10.0f;
     
     auto _fpsCamera = std::make_unique<engine::CFpsCamera>( "fps",
-                                                            engine::CVec3( 3.0f, 3.0f, 3.0f ),
+                                                            engine::CVec3( 5.0f, 5.0f, 5.0f ),
                                                             engine::CVec3( 0.0f, 0.0f, 0.0f ),
-                                                            engine::eAxis::Y,
+                                                            engine::eAxis::Z,
                                                             _cameraProjData,
                                                             _cameraSensitivity,
                                                             _cameraSpeed,
                                                             _cameraMaxDelta );
     auto _fpsCameraRef = _scene->addCamera( std::move( _fpsCamera ) );
+
+    auto _fixedCamera = std::make_unique<engine::CFixedCamera>( "fixed",
+                                                                engine::CVec3( 5.0f, 5.0f, 5.0f ),
+                                                                engine::CVec3( 0.0f, 0.0f, 0.0f ),
+                                                                engine::eAxis::Z,
+                                                                _cameraProjData );
+    auto _fixedCameraRef = _scene->addCamera( std::move( _fixedCamera ) );
+    _scene->changeToCamera( _fixedCameraRef->name() );
     /* add some effects like fog and a skybox *****************************************************/
 
     auto _skybox = std::make_unique<engine::CSkybox>();
@@ -94,13 +102,13 @@ int main()
                                                            _widthExtent, _depthExtent,
                                                            _centerX, _centerY,
                                                            _heightData, 1.0f,
-                                                           engine::eAxis::Y );
+                                                           engine::eAxis::Z );
     _patch->material()->ambient = { 0.5f, 0.5f, 0.5f };
     _patch->material()->diffuse = { 0.5f, 0.5f, 0.5f };
     _patch->material()->specular = { 0.5f, 0.5f, 0.5f };
     _patch->material()->shininess = 32.0f;
 
-    auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Y );
+    auto _floor = engine::CMeshBuilder::createPlane( _widthExtent, _depthExtent, engine::eAxis::Z );
     _floor->material()->ambient = { 0.3f, 0.5f, 0.8f };
     _floor->material()->diffuse = { 0.3f, 0.5f, 0.8f };
     _floor->material()->specular = { 0.3f, 0.5f, 0.8f };
@@ -116,7 +124,8 @@ int main()
     std::string _modelpath = std::string( ENGINE_RESOURCES_PATH ) + "models/pokemons/lizardon/lizardon.obj";
     auto _model = engine::CMeshBuilder::createModelFromFile( _modelpath );
     _model->scale = { 0.1f, 0.1f, 0.1f };
-    _model->position = { 0.0f, 2.0f, 0.0f };
+    _model->position = { 0.0f, 0.0f, 2.0f };
+    _model->rotation = engine::rotationZ( ENGINE_PI / 2.0f ) * engine::rotationX( ENGINE_PI / 2.0f );
 
     auto _modelRef = _scene->addRenderable( std::move( _model ) );
     auto _patchRef = _scene->addRenderable( std::move( _patch ) );
@@ -135,6 +144,10 @@ int main()
     //// _app->renderOptions().shadowMapRangeConfig.pointLightPtr = _pointlightRef;
     _app->renderOptions().shadowMapRangeConfig.dirLightPtr = _dirlightRef;
 
+    const float rho = 8.660254037844386f; // fixed rho, computed from initial camera position (5,5,5)
+    const float phi = 0.6154797086703873f; // fixed phi, computed from initial camera position (5,5,5)
+    float theta = 0.7853981633974483f; // initial rho, computed from initial camera position (5,5,5)
+
     while ( _app->active() )
     {
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
@@ -147,6 +160,18 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
+
+        theta += 0.2f * engine::CTime::GetAvgTimeStep();
+        float _sphi = std::sin( phi );
+        float _cphi = std::cos( phi );
+        float _stheta = std::sin( theta );
+        float _ctheta = std::cos( theta );
+
+        float x = rho * _sphi * _ctheta;
+        float y = rho * _sphi * _stheta;
+        float z = rho * _cphi;
+
+        _fixedCameraRef->setPosition( { x, y, z } );
 
         _app->update();
 

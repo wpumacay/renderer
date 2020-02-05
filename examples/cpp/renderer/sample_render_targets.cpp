@@ -53,7 +53,7 @@ bool g_showRenderTargetNormal = false;
 bool g_showRenderTargetDepth = false;
 bool g_showRenderTargetSemantic = false;
 
-float g_target_factor = 2.0f;
+float g_target_factor = 1.0f;
 bool g_useFaceCulling = false;
 
 void renderShadowMap( engine::CILight* lightPtr,
@@ -65,7 +65,11 @@ std::vector< engine::CIRenderable* > _createScene0();
 std::vector< engine::CIRenderable* > _createScene1();
 std::vector< engine::CIRenderable* > _createScene2();
 
-std::unique_ptr<engine::CFrameBuffer> createRenderTarget();
+std::unique_ptr< engine::CFrameBuffer > g_renderTargetNormal = nullptr;
+std::unique_ptr< engine::CFrameBuffer > g_renderTargetDepth = nullptr;
+std::unique_ptr< engine::CFrameBuffer > g_renderTargetSemantic = nullptr;
+
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget( int width, int height );
 
 void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& name );
 
@@ -272,8 +276,8 @@ private :
                 writeRenderTarget( m_renderTargetNormal, "target-normal.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetNormal->width() / g_target_factor, 
+                                  m_renderTargetNormal->height() / g_target_factor ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -287,8 +291,8 @@ private :
                 writeRenderTarget( m_renderTargetDepth, "target-depth.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetDepth->width() / g_target_factor, 
+                                  m_renderTargetDepth->height() / g_target_factor ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -302,8 +306,8 @@ private :
                 writeRenderTarget( m_renderTargetSemantic, "target-semantic.jpg" );
 
             ImGui::Image( (void*)(intptr_t) _textureAttachment->openglId(),
-                          ImVec2( _textureAttachment->width(), 
-                                  _textureAttachment->height() ),
+                          ImVec2( m_renderTargetSemantic->width() / g_target_factor, 
+                                  m_renderTargetSemantic->height() / g_target_factor ),
                           { 0.0f, 1.0f }, { 1.0f, 0.0f } );
             ImGui::End();
         }
@@ -463,13 +467,46 @@ private :
     bool m_wantsToCaptureMouse;
 };
 
+void onResizeCallback( int new_width, int new_height )
+{
+    ENGINE_TRACE( "RESIZE!!! {0}, {1}", new_width, new_height );
+    if ( g_renderTargetNormal )
+        g_renderTargetNormal->resize( new_width, new_height );
+    if ( g_renderTargetDepth )
+        g_renderTargetDepth->resize( new_width, new_height );
+    if ( g_renderTargetSemantic )
+        g_renderTargetSemantic->resize( new_width, new_height );
+
+    g_renderOptions.viewportWidth = new_width;
+    g_renderOptions.viewportHeight = new_height;
+
+    g_renderOptionsTargetNormal.viewportWidth = new_width / g_target_factor;
+    g_renderOptionsTargetNormal.viewportHeight = new_height / g_target_factor;
+
+    g_renderOptionsTargetDepth.viewportWidth = new_width / g_target_factor;
+    g_renderOptionsTargetDepth.viewportHeight = new_height / g_target_factor;
+
+    g_renderOptionsTargetSemantic.viewportWidth = new_width / g_target_factor;
+    g_renderOptionsTargetSemantic.viewportHeight = new_height / g_target_factor;
+}
+
 int main()
 {
-    auto _app = std::make_unique<engine::CApplication>();
+    auto _windowProperties = engine::CWindowProps();
+    _windowProperties.width = 1024;
+    _windowProperties.height = 768;
+    _windowProperties.title = "resizable-application";
+    _windowProperties.clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+    _windowProperties.resizable = true;
+
+    auto _app = std::make_unique<engine::CApplication>( _windowProperties );
     auto _ui = std::make_unique<RenderTargetsGuiLayer>( "RenderTargets-utils" );
     auto _uiRef = dynamic_cast<RenderTargetsGuiLayer*>( _app->addGuiLayer( std::move( _ui ) ) );
     _uiRef->setRenderer( _app->renderer() );
     _uiRef->setMeshRenderer( _app->renderer()->meshRenderer() );
+
+    // add callback to resize the render-targets if required
+    _app->addResizeCallback( onResizeCallback );
 
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.projection  = engine::eCameraProjection::PERSPECTIVE;
@@ -536,13 +573,13 @@ int main()
                                           { 2, { 0.7f, 0.3f, 0.5f } } };
 
     // create render targets
-    auto _renderTargetNormal = createRenderTarget();
-    auto _renderTargetDepth = createRenderTarget();
-    auto _renderTargetSemantic = createRenderTarget();
+    g_renderTargetNormal = createRenderTarget( _app->window()->width(), _app->window()->height() );
+    g_renderTargetDepth = createRenderTarget( _app->window()->width(), _app->window()->height() );
+    g_renderTargetSemantic = createRenderTarget( _app->window()->width(), _app->window()->height() );
 
-    _uiRef->setRenderTargetNormal( _renderTargetNormal.get() );
-    _uiRef->setRenderTargetDepth( _renderTargetDepth.get() );
-    _uiRef->setRenderTargetSemantic( _renderTargetSemantic.get() );
+    _uiRef->setRenderTargetNormal( g_renderTargetNormal.get() );
+    _uiRef->setRenderTargetDepth( g_renderTargetDepth.get() );
+    _uiRef->setRenderTargetSemantic( g_renderTargetSemantic.get() );
 
     // configure render target - normal-render mode
     g_renderOptionsTargetNormal.mode = engine::eRenderMode::NORMAL;
@@ -556,7 +593,7 @@ int main()
     g_renderOptionsTargetNormal.cameraPtr = _cameraRef;
     g_renderOptionsTargetNormal.lightPtr = _uiRef->selectedLight();
     g_renderOptionsTargetNormal.shadowMapPtr = _app->renderer()->shadowMap();
-    g_renderOptionsTargetNormal.renderTargetPtr = _renderTargetNormal.get();
+    g_renderOptionsTargetNormal.renderTargetPtr = g_renderTargetNormal.get();
 
     // configure render-target - depth-render mode
     g_renderOptionsTargetDepth.mode = engine::eRenderMode::DEPTH_ONLY;
@@ -570,7 +607,7 @@ int main()
     g_renderOptionsTargetDepth.cameraPtr = _cameraRef;
     g_renderOptionsTargetDepth.lightPtr = nullptr;
     g_renderOptionsTargetDepth.shadowMapPtr = nullptr;
-    g_renderOptionsTargetDepth.renderTargetPtr = _renderTargetDepth.get();
+    g_renderOptionsTargetDepth.renderTargetPtr = g_renderTargetDepth.get();
     g_renderOptionsTargetDepth.depthViewZmin = 0.0f;
     g_renderOptionsTargetDepth.depthViewZmax = 20.0f;
     g_renderOptionsTargetDepth.depthViewZminColor = { 1.0f, 1.0f, 1.0f };
@@ -588,7 +625,7 @@ int main()
     g_renderOptionsTargetSemantic.cameraPtr = _cameraRef;
     g_renderOptionsTargetSemantic.lightPtr = nullptr;
     g_renderOptionsTargetSemantic.shadowMapPtr = nullptr;
-    g_renderOptionsTargetSemantic.renderTargetPtr = _renderTargetSemantic.get();
+    g_renderOptionsTargetSemantic.renderTargetPtr = g_renderTargetSemantic.get();
     g_renderOptionsTargetSemantic.semanticViewIdMap = { { 0, { 0.5f, 0.7f, 0.3f } },
                                                         { 1, { 0.3f, 0.5f, 0.7f } },
                                                         { 2, { 0.7f, 0.3f, 0.5f } } };
@@ -971,13 +1008,11 @@ std::vector< engine::CIRenderable* > _createScene2()
     return _renderablesRefs;
 }
 
-std::unique_ptr<engine::CFrameBuffer> createRenderTarget()
+std::unique_ptr<engine::CFrameBuffer> createRenderTarget( int width, int height )
 {
     engine::CAttachmentConfig _fbColorConfig;
     _fbColorConfig.name                 = "color_attachment";
     _fbColorConfig.attachment           = engine::eFboAttachment::COLOR;
-    _fbColorConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    _fbColorConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbColorConfig.texInternalFormat    = engine::eTextureFormat::RGB;
     _fbColorConfig.texFormat            = engine::eTextureFormat::RGB;
     _fbColorConfig.texPixelDataType     = engine::ePixelDataType::UINT_8;
@@ -987,15 +1022,13 @@ std::unique_ptr<engine::CFrameBuffer> createRenderTarget()
     engine::CAttachmentConfig _fbDepthConfig;
     _fbDepthConfig.name                 = "depth_attachment";
     _fbDepthConfig.attachment           = engine::eFboAttachment::DEPTH;
-    _fbDepthConfig.width                = engine::CApplication::GetInstance()->window()->width() / g_target_factor;
-    _fbDepthConfig.height               = engine::CApplication::GetInstance()->window()->height() / g_target_factor;
     _fbDepthConfig.texInternalFormat    = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texFormat            = engine::eTextureFormat::DEPTH;
     _fbDepthConfig.texPixelDataType     = engine::ePixelDataType::UINT_32;
     _fbDepthConfig.texWrapU             = engine::eTextureWrap::REPEAT;
     _fbDepthConfig.texWrapV             = engine::eTextureWrap::REPEAT;
 
-    auto _framebuffer = std::make_unique<engine::CFrameBuffer>();
+    auto _framebuffer = std::make_unique<engine::CFrameBuffer>( width / g_target_factor, height / g_target_factor );
     _framebuffer->addAttachment( _fbColorConfig );
     _framebuffer->addAttachment( _fbDepthConfig );
 
@@ -1007,8 +1040,8 @@ void writeRenderTarget( engine::CFrameBuffer* renderTarget, const std::string& n
     auto _colorAttachment = renderTarget->getTextureAttachment( "color_attachment" );
     auto _colorAttachmentConfig = renderTarget->getConfigAttachment( "color_attachment" );
 
-    auto _width = _colorAttachmentConfig.width;
-    auto _height = _colorAttachmentConfig.height;
+    auto _width = renderTarget->width();
+    auto _height = renderTarget->height();
 
     auto _buffer = std::unique_ptr< engine::uint8[] >( new engine::uint8[3 * _width * _height] );
 

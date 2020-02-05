@@ -1,7 +1,15 @@
 cmake_minimum_required( VERSION 3.0.0 )
 
-# aka cat1-project (=ↀωↀ=)
+#### aka Cat1 project (=ↀωↀ=)
 project( TinyRenderer )
+message( "|---------------------------------------------------------|" )
+message( "|                  TINY RENDERING ENGINE                  |" )
+message( "|---------------------------------------------------------|" )
+message( "
+                      |\\      _,,,---,,_
+                ZZZzz /,`.-'`'    -.  ;-;;,_
+                     |,4-  ) )-,_. ,\\ (  `'-'
+                    '---''(_/--'  `-'\\_)" )
 
 set( CMAKE_CXX_STANDARD 11 )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-format-security -Wno-endif-labels -fPIC" )

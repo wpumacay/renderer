@@ -20,8 +20,6 @@ namespace engine
     {
         std::string     name;
         eFboAttachment  attachment;
-        uint32          width;
-        uint32          height;
         eTextureFormat  texInternalFormat;
         eTextureFormat  texFormat;
         ePixelDataType  texPixelDataType;
@@ -40,7 +38,7 @@ namespace engine
 
     public :
 
-        CFrameBuffer();
+        CFrameBuffer( int32 width, int32 height );
         ~CFrameBuffer();
 
         void addAttachment( const CAttachmentConfig& config );
@@ -49,23 +47,25 @@ namespace engine
 
         void resize( int32 width, int32 height );
 
+        std::unique_ptr< uint8[] > read();
+
         CTexture* getTextureAttachment( const std::string& name );
         CAttachmentConfig getConfigAttachment( const std::string& name );
 
         std::map< std::string, CTexture* > textures() const;
         std::map< std::string, CAttachmentConfig > configs() const;
 
-        uint32 width() const { return m_width; }
-        uint32 height() const { return m_height; }
+        int32 width() const { return m_width; }
+        int32 height() const { return m_height; }
         uint32 openglId() const { return m_openglId; }
 
     private :
 
         std::map< std::string, CAttachmentConfig > m_configs;
-        std::map< std::string, std::unique_ptr< CTexture > > m_textures;
+        std::map< std::string, CTexture* > m_textures; // owns, but use raw-pointers to avoid pybind11 conflicts
 
-        uint32 m_width;
-        uint32 m_height;
+        int32 m_width;
+        int32 m_height;
         uint32 m_openglId;
     };
 
