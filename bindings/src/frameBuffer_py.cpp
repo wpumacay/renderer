@@ -18,8 +18,6 @@ namespace engine
             .def( py::init<>() )
             .def_readwrite( "name", &CAttachmentConfig::name )
             .def_readwrite( "attachment", &CAttachmentConfig::attachment )
-            .def_readwrite( "width", &CAttachmentConfig::width )
-            .def_readwrite( "height", &CAttachmentConfig::height )
             .def_readwrite( "texInternalFormat", &CAttachmentConfig::texInternalFormat )
             .def_readwrite( "texFormat", &CAttachmentConfig::texFormat )
             .def_readwrite( "texPixelDataType", &CAttachmentConfig::texPixelDataType )
@@ -48,8 +46,6 @@ namespace engine
                     auto _strrep = std::string( "AttachmentConfig(\n" );
                     _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
                     _strrep += "name        : " + self->name + "\n";
-                    _strrep += "width       : " + std::to_string( self->width ) + "\n";
-                    _strrep += "height      : " + std::to_string( self->height ) + "\n";
                     _strrep += "texIntFormat: " + engine::toString( self->texInternalFormat ) + "\n";
                     _strrep += "texFormat   : " + engine::toString( self->texFormat ) + "\n";
                     _strrep += "pixelType   : " + engine::toString( self->texPixelDataType ) + "\n";
@@ -61,7 +57,7 @@ namespace engine
                 } );
 
         py::class_< CFrameBuffer >( m, "FrameBuffer" )
-            .def( py::init<>() )
+            .def( py::init<int32, int32>() )
             .def( "addAttachment", &CFrameBuffer::addAttachment, py::arg( "config" ) )
             .def( "bind", &CFrameBuffer::bind )
             .def( "unbind", &CFrameBuffer::unbind )
@@ -74,6 +70,31 @@ namespace engine
                   py::arg( "name" ), py::return_value_policy::reference )
             .def( "textures", &CFrameBuffer::textures, py::return_value_policy::reference )
             .def( "configs", &CFrameBuffer::configs, py::return_value_policy::reference )
+            .def( "read", []( CFrameBuffer* self ) -> py::array_t<uint8>
+                {
+                    auto colorAttachment = self->getTextureAttachment( "color_attachment" );
+                    auto colorAttachmentConfig = self->getConfigAttachment( "color_attachment" );
+                    if ( !colorAttachment )
+                        throw std::runtime_error( "FrameBuffer::read >>> no color-attachment to read from" );
+                    const int32 width = self->width();
+                    const int32 height = self->height();
+                    auto data = self->read();
+
+                    auto nparray = py::array_t<uint8>( width * height * 3 );
+                    auto bufferInfo = nparray.request();
+                    auto bufferData = bufferInfo.ptr;
+                    memcpy( bufferData, data.get(), sizeof( uint8 ) * width * height * 3 );
+                    return nparray;
+
+                    //// auto bufferInfo = py::buffer_info( 
+                    ////                         data.get(),
+                    ////                         sizeof( uint8 ),
+                    ////                         py::format_descriptor<uint8>::format(),
+                    ////                         3,
+                    ////                         { height, width },
+                    ////                         { sizeof( uint8 ) * width, sizeof( uint8 ) } );
+                    //// return py::array_t<uint8>( bufferInfo );
+                } )
             .def_property_readonly( "width", &CFrameBuffer::width )
             .def_property_readonly( "height", &CFrameBuffer::height )
             .def_property_readonly( "openglId", &CFrameBuffer::openglId )

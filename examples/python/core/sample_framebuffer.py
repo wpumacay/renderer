@@ -11,8 +11,6 @@ if __name__ == '__main__' :
     fbColorConfig = tr.AttachmentConfig()
     fbColorConfig.name                 = 'color_attachment'
     fbColorConfig.attachment           = tr.FboAttachment.COLOR
-    fbColorConfig.width                = app.window().width
-    fbColorConfig.height               = app.window().height
     fbColorConfig.texInternalFormat    = tr.TextureFormat.RGB
     fbColorConfig.texFormat            = tr.TextureFormat.RGB
     fbColorConfig.texPixelDataType     = tr.PixelDataType.UINT_8
@@ -22,15 +20,13 @@ if __name__ == '__main__' :
     fbDepthConfig = tr.AttachmentConfig()
     fbDepthConfig.name                 = 'depth_attachment'
     fbDepthConfig.attachment           = tr.FboAttachment.DEPTH
-    fbDepthConfig.width                = app.window().width
-    fbDepthConfig.height               = app.window().height
     fbDepthConfig.texInternalFormat    = tr.TextureFormat.DEPTH
     fbDepthConfig.texFormat            = tr.TextureFormat.DEPTH
     fbDepthConfig.texPixelDataType     = tr.PixelDataType.UINT_32
     fbDepthConfig.texWrapU             = tr.TextureWrap.REPEAT
     fbDepthConfig.texWrapV             = tr.TextureWrap.REPEAT
 
-    framebuffer = tr.FrameBuffer()
+    framebuffer = tr.FrameBuffer( app.window().width, app.window().height )
     framebuffer.addAttachment( fbColorConfig )
     framebuffer.addAttachment( fbDepthConfig )
 

@@ -15,11 +15,17 @@ namespace engine
             .def( "setScene", &CApplication::setScene, py::arg( "scene" ),
                   py::return_value_policy::reference,
                   py::keep_alive<1, 2>() )
+            .def( "setOffScreenRendering", &CApplication::setOffscreenRendering )
             .def( "begin", &CApplication::begin )
             .def( "render", &CApplication::render )
             .def( "update", &CApplication::update )
             .def( "end", &CApplication::end )
             .def( "active", &CApplication::active )
+            .def( "renderOptions", []( CApplication* self ) -> CRenderOptions*
+                {
+                    return &self->renderOptions();
+                }, py::return_value_policy::reference, py::keep_alive< 1, 0 >() )
+            .def( "renderTarget", &CApplication::renderTarget, py::return_value_policy::reference )
             .def( "addKeyboardCallback", &CApplication::addKeyboardCallback )
             .def( "addMouseButtonCallback", &CApplication::addMouseButtonCallback )
             .def( "addMouseMoveCallback", &CApplication::addMouseMoveCallback )

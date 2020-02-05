@@ -63,6 +63,8 @@ PYBIND11_MODULE( tinyrenderer, m )
     engine::bindings_renderableModel( m );
     // mesh-builder bindings
     engine::bindings_meshBuilder( m );
+    // renderers bindings
+    engine::bindings_renderers( m );
     // application bindings
     engine::bindings_application( m );
 

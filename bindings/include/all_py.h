@@ -17,4 +17,5 @@
 #include <utils_py.h>
 #include <renderable_py.h>
 #include <meshBuilder_py.h>
+#include <renderer_py.h>
 #include <application_py.h>
