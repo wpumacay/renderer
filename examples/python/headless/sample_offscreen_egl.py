@@ -4,7 +4,7 @@ import tinyrenderer as tr
 import tinymath as tm
 import numpy as np
 from OpenGL.GL import *
-import matplotlib.pyplot as plt
+from numpngw import write_apng
 
 if __name__ == '__main__' :
     windowProps = tr.WindowProps()
@@ -147,7 +147,7 @@ if __name__ == '__main__' :
     phi = 0.6154797086703873 # fixed phi, computed from initial camera position (5,5,5)
     theta = 0.7853981633974483 # initial rho, computed from initial camera position (5,5,5)
 
-    plt.ion()
+    frames = []
     while ( app.active() ) :
         if ( tr.InputManager.IsKeyDown( tr.Keys.KEY_ESCAPE ) ) :
             break
@@ -179,10 +179,14 @@ if __name__ == '__main__' :
         app.render()
         app.end()
 
-        frame = app.renderTarget().read().astype( np.float32 ) / 255.
+        frame = app.renderTarget().read()
         frame = frame.reshape( app.renderTarget().height,
                                app.renderTarget().width, 3 )
-        print( 'frame: \n{}'.format( frame ) )
-        plt.imshow( frame )
-        plt.show()
-        plt.pause( 0.00001 )
+        frames.append( frame )
+
+        if ( len( frames ) > 60 * 1 ) :
+          break
+
+        print( 'frame {}'.format( len( frames ) ) )
+
+    write_apng( 'sample.png', frames, delay=100 )
