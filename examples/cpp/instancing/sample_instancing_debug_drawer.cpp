@@ -130,9 +130,9 @@ public :
                                                                 ENGINE_PI / 4.0f,
                                                                 ENGINE_PI / 3.0f );
 
-        auto _dirlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _dirlight ) );
-        auto _pointlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _pointlight ) );
-        auto _spotlightRef = engine::CApplication::GetInstance()->scene()->addLight( std::move( _spotlight ) );
+        auto _dirlightRef = engine::CApplication::GetInstance()->scene()->AddLight( std::move( _dirlight ) );
+        auto _pointlightRef = engine::CApplication::GetInstance()->scene()->AddLight( std::move( _pointlight ) );
+        auto _spotlightRef = engine::CApplication::GetInstance()->scene()->AddLight( std::move( _spotlight ) );
 
         m_lights = { _dirlightRef, _pointlightRef, _spotlightRef };
         m_lightsNames = { "directional", "point", "spot" };
@@ -756,18 +756,18 @@ int main()
                                                            _cameraProjData,
                                                            engine::CApplication::GetInstance()->window()->width(),
                                                            engine::CApplication::GetInstance()->window()->height() );
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     auto _fog = std::make_unique<engine::CFog>( engine::eFogType::EXPONENTIAL,
                                                 engine::CVec3( 0.2f, 0.2f, 0.2f ),
                                                 0.05f, 1.5f,
                                                 0.0f, 10.0f );
 
-    auto _fogRef = _app->scene()->addFog( std::move( _fog ) );
+    auto _fogRef = _app->scene()->SetFog( std::move( _fog ) );
     _uiLayerRef->setFogReference( _fogRef );
 
     auto _skybox = std::make_unique<engine::CSkybox>();
-    auto _skyboxRef = _app->scene()->addSkybox( std::move( _skybox ) );
+    auto _skyboxRef = _app->scene()->SetSkybox( std::move( _skybox ) );
     _skyboxRef->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
     _uiLayerRef->setSkyboxReference( _skyboxRef );
 
@@ -1074,21 +1074,21 @@ int main()
         if ( g_showRenderTargetDepth )
         {
             _app->renderer()->begin( g_renderOptionsTargetDepth );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
         if ( g_showRenderTargetSemantic )
         {
             _app->renderer()->begin( g_renderOptionsTargetSemantic );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
         if ( g_showRenderTargetNormal )
         {
             _app->renderer()->begin( g_renderOptionsTargetNormal );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
@@ -1190,7 +1190,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     auto _renderableTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -1313,7 +1313,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     return _renderablesRefs;
@@ -1344,7 +1344,7 @@ std::vector< engine::CIRenderable* > _createScene2()
 
         _renderablePtr->material()->setAlbedoMap( _renderableTextureRef );
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( _renderablePtr ) ) );
 
         // create a cube inside the sphere
         auto _cubePtr = engine::CMeshBuilder::createBox( 0.5f, 0.5f, 0.5f );
@@ -1358,14 +1358,14 @@ std::vector< engine::CIRenderable* > _createScene2()
         _cubePtr->material()->diffuse = { 0.8f, 0.1f, 0.1f };
         _cubePtr->material()->specular = { 0.8f, 0.1f, 0.1f };
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _cubePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( _cubePtr ) ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
     _floor->material()->setAlbedoMap( _renderableTextureRef );
     _floor->setObjectId( 1000 );
-    _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _floor ) ) );
+    _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( _floor ) ) );
 
     return _renderablesRefs;
 }

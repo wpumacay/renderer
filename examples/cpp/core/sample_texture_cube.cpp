@@ -107,7 +107,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _scene->addCamera( std::move( _camera ) );
+    auto _cameraRef = _scene->AddCamera( std::move( _camera ) );
     ENGINE_TRACE( "cam-info: \n\r{0}", _cameraRef->toString() );
 
     auto _textureCubemap = _textureCubeCloudtop;

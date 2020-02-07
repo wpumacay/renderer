@@ -59,7 +59,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     while( _app->active() )
     {

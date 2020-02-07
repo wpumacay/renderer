@@ -18,69 +18,105 @@
 #include <camera/COrbitCamera.h>
 #include <camera/CFpsCamera.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// @note: We're returning raw pointers (*) instead of refs (&) to avoid inconsistencies, because so
+//        far the user has to keep in mind two usage syntaxes: auto& (when returning refs), and auto
+//        (when using pointers). The problem arises if the user uses auto instead of auto&, resulting
+//        in a copy of the object (if has copy constructor),
+//        An options could be to delete all copy|assign constructors and related operator to avoid
+//        these issues at compile time (in case a plain 'auto' is used instead of 'auto&'), but for
+//        now we'll skip to the following approach:
+//        "Ownership is handled using smart pointers (almost always unique_ptr), and references are
+//         passed via raw pointers (*), either as arguments to functions, or as references for the
+//         user to use. The user|developer should keep this in mind: just avoid using using the given
+//         raw pointer references as true owned objects (don't try to manage their lifetime)".
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 namespace engine
 {
-
     class CScene
     {
-
     public :
 
         CScene();
         ~CScene();
 
-        CFog* addFog( std::unique_ptr< CFog > fog );
-        CSkybox* addSkybox( std::unique_ptr< CSkybox > skybox );
-        CICamera* addCamera( std::unique_ptr< CICamera > camera );
-        CILight* addLight( std::unique_ptr< CILight > light );
-        CIRenderable* addRenderable( std::unique_ptr< CIRenderable > renderable );
+        CFog* SetFog( std::unique_ptr< CFog > fog );
+        CSkybox* SetSkybox( std::unique_ptr< CSkybox > skybox );
+        CICamera* AddCamera( std::unique_ptr< CICamera > camera );
+        CILight* AddLight( std::unique_ptr< CILight > light );
+        CIRenderable* AddRenderable( std::unique_ptr< CIRenderable > renderable );
 
-        void clearScene();
-        void changeToCamera( const std::string& name ); // change current working camera
-        void changeMainLight( const std::string& name ); // change current working light
+        void ChangeCurrentCamera( const std::string& name );
+        void ChangeCurrentLight( const std::string& name );
 
-        void update();
-        void resize( int32 width, int32 height );
+        void Update();
+        void Resize( int32 width, int32 height );
+        void RemoveAllRenderables();
 
-        CFog* fog() const { return m_fog.get(); }
-        CSkybox* skybox() const { return m_skybox.get(); }
-        CICamera* currentCamera() const { return m_currentCamera; }
-        CILight* mainLight() const { return m_mainLight; }
+        const CFog* GetCurrentFog() const;
+        const CSkybox* GetCurrentSkybox() const;
+        const CICamera* GetCurrentCamera() const;
+        const CILight* GetCurrentLight() const;
 
-        std::vector< CICamera* > cameras() const;
-        bool hasCamera( const std::string& name ) const;
-        CICamera* getCamera( const std::string& name );
+        CFog* GetCurrentFog();
+        CSkybox* GetCurrentSkybox();
+        CICamera* GetCurrentCamera();
+        CILight* GetCurrentLight();
 
-        std::vector< CIRenderable* > renderables() const;
-        bool hasRenderable( const std::string& name ) const;
-        CIRenderable* getRenderable( const std::string& name );
+        const CICamera* GetCameraByName( const std::string& name ) const;
+        const CILight* GetLightByName( const std::string& name ) const;
+        const CIRenderable* GetRenderableByName( const std::string& name ) const;
 
-        std::vector< CILight* > lights() const;
-        bool hasLight( const std::string& name ) const;
-        CILight* getLight( const std::string& name );
+        CICamera* GetCameraByName( const std::string& name );
+        CILight* GetLightByName( const std::string& name );
+        CIRenderable* GetRenderableByName( const std::string& name );
 
-        std::vector< CDirectionalLight* > directionalLights() const;
-        std::vector< CPointLight* > pointLights() const;
-        std::vector< CSpotLight* > spotLights() const;
+        size_t GetNumCameras() const;
+        size_t GetNumLights() const;
+        size_t GetNumRenderables() const;
+
+        bool HasCurrentFog() const;
+        bool HasCurrentSkybox() const;
+        bool HasCurrentCamera() const;
+        bool HasCurrentLight() const;
+
+        bool HasCameraNamed( const std::string& name ) const;
+        bool HasLightNamed( const std::string& name ) const;
+        bool HasRenderableNamed( const std::string& name ) const;
+
+        std::vector<const CICamera*> GetCamerasList() const;
+        std::vector<const CILight*> GetLightsList() const;
+        std::vector<const CIRenderable*> GetRenderablesList() const;
+
+        std::vector<CICamera*> GetCamerasList();
+        std::vector<CILight*> GetLightsList();
+        std::vector<CIRenderable*> GetRenderablesList();
+
+    private :
+
+        const CICamera* _get_camera( ssize_t index ) const;
+        const CILight* _get_light( ssize_t index ) const;
+        const CIRenderable* _get_renderable( ssize_t index ) const;
+
+        CICamera* _get_mutable_camera( ssize_t index );
+        CILight* _get_mutable_light( ssize_t index );
+        CIRenderable* _get_mutable_renderable( ssize_t index );
 
     private :
 
         std::unique_ptr< CFog > m_fog;
         std::unique_ptr< CSkybox > m_skybox;
 
-        CICamera*                                       m_currentCamera;
-        std::vector< std::unique_ptr< CICamera > >      m_cameras;
-        std::unordered_map< std::string, CICamera* >    m_camerasMap;
+        std::vector< std::unique_ptr< CICamera > > m_cameras;
+        std::vector< std::unique_ptr< CILight > > m_lights;
+        std::vector< std::unique_ptr< CIRenderable > > m_renderables;
 
-        CILight*                                    m_mainLight;
-        std::vector< std::unique_ptr< CILight > >   m_lights;
-        std::map< std::string, CILight* >           m_lightsMap;
-        std::vector< CDirectionalLight* >           m_directionalLights;
-        std::vector< CPointLight* >                 m_pointLights;
-        std::vector< CSpotLight* >                  m_spotLights;
+        ssize_t m_currentCameraIndex;
+        ssize_t m_currentLightIndex;
 
-        std::vector< std::unique_ptr< CIRenderable > >      m_renderables;
-        std::unordered_map< std::string, CIRenderable* >    m_renderablesMap;
+        std::unordered_map< std::string, ssize_t > m_camerasMap;
+        std::unordered_map< std::string, ssize_t > m_lightsMap;
+        std::unordered_map< std::string, ssize_t > m_renderablesMap;
     };
-
 }

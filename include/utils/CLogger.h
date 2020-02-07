@@ -125,7 +125,7 @@ namespace engine
     #define ENGINE_CORE_CRITICAL(...)   ::engine::CLogger::CoreCritical(__VA_ARGS__)
     #define ENGINE_CORE_ASSERT(x, ...) \
         {                                                                               \
-            if( !x )                                                                    \
+            if( !(x) )                                                                  \
             {                                                                           \
                 ENGINE_CORE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ );    \
                 exit( EXIT_FAILURE );                                                   \
@@ -139,7 +139,7 @@ namespace engine
     #define ENGINE_CRITICAL(...)    ::engine::CLogger::ClientCritical(__VA_ARGS__)
     #define ENGINE_ASSERT(x, ...) \
         {                                                                       \
-            if( !x )                                                            \
+            if( !(x) )                                                          \
             {                                                                   \
                 ENGINE_CRITICAL( "Failed due to assertion: {0}", __VA_ARGS__ ); \
                 exit( EXIT_FAILURE );                                           \
@@ -153,7 +153,7 @@ namespace engine
     #define ENGINE_CORE_CRITICAL(...) ((void)0)
     #define ENGINE_CORE_ASSERT(x, ...) \
         {                               \
-            if( !x )                    \
+            if( !(x) )                  \
             {                           \
                 exit( EXIT_FAILURE );   \
             }                           \
@@ -166,7 +166,7 @@ namespace engine
     #define ENGINE_CRITICAL(...) ((void)0)
     #define ENGINE_ASSERT(x, ...) \
         {                               \
-            if( !x )                    \
+            if( !(x) )                  \
             {                           \
                 exit( EXIT_FAILURE );   \
             }                           \

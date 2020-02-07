@@ -38,30 +38,33 @@ namespace engine
         if ( !m_scene )
             return;
 
-        auto _currentCamera = m_scene->currentCamera();
-        auto _cameraType = ( _currentCamera ) ? _currentCamera->type() : eCameraType::BASE;
-        m_cursorDisabledByFpsCamera = ( _cameraType == eCameraType::FPS ) ? _currentCamera->active() : false;
-
-        // restore cursor if disabled by fps camera
-        if ( m_cursorDisabledByFpsCamera && CInputManager::IsKeyDown( engine::Keys::KEY_SPACE ) )
+        if ( m_scene->HasCurrentCamera() )
         {
-            m_window->enableCursor();
-            m_cursorDisabledByFpsCamera = false;
-            _currentCamera->setActiveMode( false );
+            auto _currentCamera = m_scene->GetCurrentCamera();
+            auto _cameraType = _currentCamera->type();
+            m_cursorDisabledByFpsCamera = ( _cameraType == eCameraType::FPS ) ? _currentCamera->active() : false;
+
+            // restore cursor if disabled by fps camera
+            if ( m_cursorDisabledByFpsCamera && CInputManager::IsKeyDown( engine::Keys::KEY_SPACE ) )
+            {
+                m_window->enableCursor();
+                m_cursorDisabledByFpsCamera = false;
+                _currentCamera->setActiveMode( false );
+            }
         }
 
         // draw some gizmos for the lights
-        auto _lights = m_scene->lights();
+        auto _lights = m_scene->GetLightsList();
         for ( auto _light : _lights )
             if ( _light->type() != eLightType::DIRECTIONAL )
                 CDebugDrawer::DrawBox( { 0.1f, 0.1f, 0.1f }, engine::translation( _light->position ), { 1.0f, 1.0f, 1.0f } );
 
         // draw some gizmos for the cameras
-        auto _cameras = m_scene->cameras();
+        auto _cameras = m_scene->GetCamerasList();
         for ( auto _camera : _cameras )
         {
             auto _projData = _camera->projData();
-            if ( _camera == m_scene->currentCamera() )
+            if ( _camera->name() == m_scene->GetCurrentCamera()->name() )
                 continue;
 
             if ( _camera->projData().projection == eCameraProjection::PERSPECTIVE )
@@ -167,14 +170,11 @@ namespace engine
         {
             ENGINE_CORE_ASSERT( m_scene, "Must provide a scene to gui-utils" );
 
-            ImGui::Text( "num-cameras       : %lu", m_scene->cameras().size() );
-            ImGui::Text( "num-lights        : %lu", m_scene->lights().size() );
-            ImGui::Text( "\tpoint-lights    : %lu", m_scene->pointLights().size() );
-            ImGui::Text( "\tdir-light       : %lu", m_scene->directionalLights().size() );
-            ImGui::Text( "\tspot-light      : %lu", m_scene->spotLights().size() );
-            ImGui::Text( "num-renderables   : %lu", m_scene->renderables().size() );
-            ImGui::Text( "skybox            : %s", m_scene->skybox() ? "true" : "false" );
-            ImGui::Text( "fog               : %s", m_scene->fog() ? "true" : "false" );
+            ImGui::Text( "num-cameras       : %lu", m_scene->GetNumCameras() );
+            ImGui::Text( "num-lights        : %lu", m_scene->GetNumLights() );
+            ImGui::Text( "num-renderables   : %lu", m_scene->GetNumRenderables() );
+            ImGui::Text( "skybox            : %s", m_scene->HasCurrentSkybox() ? "true" : "false" );
+            ImGui::Text( "fog               : %s", m_scene->HasCurrentFog() ? "true" : "false" );
         }
 
         ImGui::End();
@@ -200,7 +200,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Meshes" ) )
             return;
 
-        auto _meshes = _collectTypedRenderables< CMesh >( m_scene->renderables() );
+        auto _meshes = _collectTypedRenderables< CMesh >( m_scene->GetRenderablesList() );
 
         if ( _meshes.size() < 1 )
         {
@@ -215,8 +215,8 @@ namespace engine
         bool _refresh = ( _currentMeshName != _lastMeshName );
         _lastMeshName = _currentMeshName;
 
-        if ( m_scene->hasRenderable( _currentMeshName ) )
-            _submenuMesh( dynamic_cast< CMesh* >( m_scene->getRenderable( _currentMeshName ) ), _refresh );
+        if ( m_scene->HasRenderableNamed( _currentMeshName ) )
+            _submenuMesh( dynamic_cast< CMesh* >( m_scene->GetRenderableByName( _currentMeshName ) ), _refresh );
     }
 
     void CImGuiUtilsLayer::_submenuMesh( CMesh* mesh, bool refresh )
@@ -341,7 +341,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Models" ) )
             return;
 
-        auto _models = _collectTypedRenderables< CModel >( m_scene->renderables() );
+        auto _models = _collectTypedRenderables< CModel >( m_scene->GetRenderablesList() );
 
         if ( _models.size() < 1 )
         {
@@ -356,8 +356,8 @@ namespace engine
         bool _refresh = ( _currentModelName != _lastModelName );
         _lastModelName = _currentModelName;
 
-        if ( m_scene->hasRenderable( _currentModelName ) )
-            _submenuModel( dynamic_cast< CModel* >( m_scene->getRenderable( _currentModelName ) ), _refresh );
+        if ( m_scene->HasRenderableNamed( _currentModelName ) )
+            _submenuModel( dynamic_cast< CModel* >( m_scene->GetRenderableByName( _currentModelName ) ), _refresh );
     }
 
     void CImGuiUtilsLayer::_submenuModel( CModel* model, bool refresh )
@@ -418,7 +418,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Lights" ) )
             return;
 
-        auto _lights = m_scene->lights();
+        auto _lights = m_scene->GetLightsList();
 
         if ( _lights.size() < 1 )
         {
@@ -427,12 +427,12 @@ namespace engine
         }
 
         // show the main-light in the scene
-        auto _mainLight = m_scene->mainLight();
-        if ( _mainLight )
+        if ( m_scene->HasCurrentLight() )
         {
+            auto _currentLight = m_scene->GetCurrentLight();
             ImGui::Text( "Main-light: " ); 
             ImGui::SameLine();
-            ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), _mainLight->name().c_str() );
+            ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), _currentLight->name().c_str() );
         }
 
         static std::string _lastLightName = "";
@@ -441,13 +441,13 @@ namespace engine
         bool _refresh = ( _currentLightName != _lastLightName );
         _lastLightName = _currentLightName;
 
-        if ( m_scene->hasLight( _currentLightName ) )
+        if ( m_scene->HasLightNamed( _currentLightName ) )
         {
             // give an option to set this as current light
             if ( ImGui::Button( "Set as main light" ) )
-                m_scene->changeMainLight( _currentLightName );
+                m_scene->ChangeCurrentLight( _currentLightName );
 
-            auto _light = m_scene->getLight( _currentLightName );
+            auto _light = m_scene->GetLightByName( _currentLightName );
             _submenuLight( _light, _refresh );
         }
     }
@@ -511,7 +511,7 @@ namespace engine
         if ( !ImGui::CollapsingHeader( "Cameras" ) )
             return;
 
-        auto _cameras = m_scene->cameras();
+        auto _cameras = m_scene->GetCamerasList();
 
         if ( _cameras.size() < 1 )
         {
@@ -521,9 +521,9 @@ namespace engine
         }
 
         // show the current-camera in the scene
-        auto _currentCamera = m_scene->currentCamera();
-        if ( _currentCamera )
+        if ( m_scene->HasCurrentCamera() )
         {
+            auto _currentCamera = m_scene->GetCurrentCamera();
             ImGui::Text( "Current-camera: " ); 
             ImGui::SameLine();
             ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), _currentCamera->name().c_str() );
@@ -535,16 +535,16 @@ namespace engine
         bool _refresh = ( _currentCameraName != _lastCameraName );
         _lastCameraName = _currentCameraName;
 
-        if ( m_scene->hasCamera( _currentCameraName ) )
+        if ( m_scene->HasCameraNamed( _currentCameraName ) )
         {
-            auto _camera = m_scene->getCamera( _currentCameraName );
+            auto _camera = m_scene->GetCameraByName( _currentCameraName );
             auto _cameraType = _camera->type();
 
             // give an option to set this as current camera
             if ( ImGui::Button( ( _cameraType != eCameraType::FPS ) ? "Set current" : "Set current (press SPACE to toggle cursor)" ) )
             {
-                m_scene->changeToCamera( _currentCameraName );
-                if ( m_scene->currentCamera()->type() == eCameraType::FPS )
+                m_scene->ChangeCurrentCamera( _currentCameraName );
+                if ( m_scene->GetCurrentCamera()->type() == eCameraType::FPS )
                 {
                     m_cursorDisabledByFpsCamera = true;
                     _camera->setActiveMode( true );

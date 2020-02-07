@@ -94,7 +94,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     auto _plane     = engine::CMeshBuilder::createPlane( 2.0f, 2.0f, engine::eAxis::Y );
     auto _boxy      = engine::CMeshBuilder::createBox( 0.25f, 0.5f, 1.0f );
@@ -157,7 +157,7 @@ int main()
     _renderables.push_back( std::move( _model ) ) ;
 
     for ( size_t i = 0; i < _renderables.size(); i++ )
-        _renderablesRefs.push_back( _app->scene()->addRenderable( std::move( _renderables[i] ) ) );
+        _renderablesRefs.push_back( _app->scene()->AddRenderable( std::move( _renderables[i] ) ) );
 
     // give the renderables a little rotation and scale
     std::default_random_engine _randomGenerator;
@@ -217,7 +217,7 @@ int main()
 
         // check if the renderer is culling properly
         _app->renderer()->begin( g_renderOptions );
-        _app->renderer()->submit( _app->scene()->renderables() );
+        _app->renderer()->submit( _app->scene()->GetRenderablesList() );
         /****************************************************/
 
         _app->render();

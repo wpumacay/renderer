@@ -320,7 +320,7 @@ int main()
 //                                                          _cameraSpeed,
 //                                                          _cameraMaxDelta );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     /* create a dummy camera to visualize the clipping volume */
     auto _cameraProjDataTest = engine::CCameraProjData();

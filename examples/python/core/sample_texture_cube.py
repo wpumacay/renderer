@@ -111,7 +111,7 @@ if __name__ == '__main__' :
                              app.window().height )
     print( 'cam-info: \n{}'.format( camera ) )
 
-    scene.addCamera( camera )
+    scene.AddCamera( camera )
 
     textureCubemap = textureCubeCloudtop
     #### textureCubemap = textureCubeStarfield

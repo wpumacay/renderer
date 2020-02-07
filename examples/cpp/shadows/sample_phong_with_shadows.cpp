@@ -78,7 +78,7 @@ int main()
                                                          _cameraSpeed,
                                                          _cameraMaxDelta );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     auto _floor = engine::CMeshBuilder::createPlane( 50.0f, 50.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };

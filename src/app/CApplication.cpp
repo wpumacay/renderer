@@ -154,7 +154,7 @@ namespace engine
     {
         // update scene resources (cameras, ...)
         if ( m_scene )
-            m_scene->update();
+            m_scene->Update();
 
     #ifndef ENGINE_HEADLESS_EGL
         // update all gui-layers
@@ -175,12 +175,12 @@ namespace engine
         m_window->begin();
 
         // configure some resources (if available) required for rendering
-        if ( m_scene && m_scene->currentCamera() )
-            m_renderOptions.cameraPtr = m_scene->currentCamera();
+        if ( m_scene && m_scene->HasCurrentCamera() )
+            m_renderOptions.cameraPtr = m_scene->GetCurrentCamera();
 
-        if ( m_scene && m_scene->mainLight() )
+        if ( m_scene && m_scene->HasCurrentLight() )
         {
-            auto _light = m_scene->mainLight();
+            auto _light = m_scene->GetCurrentLight();
             auto _lightType = _light->type();
 
             // use this main light for rendering purposes
@@ -201,11 +201,11 @@ namespace engine
                 m_renderOptions.shadowMapRangeConfig.spotLightPtr = dynamic_cast< CSpotLight* >( _light );
         }
 
-        if ( m_scene && m_scene->skybox() )
-            m_renderOptions.skyboxPtr = m_scene->skybox();
+        if ( m_scene && m_scene->HasCurrentSkybox() )
+            m_renderOptions.skyboxPtr = m_scene->GetCurrentSkybox();
 
-        if ( m_scene && m_scene->fog() )
-            m_renderOptions.fogPtr = m_scene->fog();
+        if ( m_scene && m_scene->HasCurrentFog() )
+            m_renderOptions.fogPtr = m_scene->GetCurrentFog();
 
         if ( m_scene && m_mainRenderer && m_mainRenderer->shadowMap() )
             m_renderOptions.shadowMapPtr = m_mainRenderer->shadowMap();
@@ -220,7 +220,7 @@ namespace engine
         PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
 
         // submit the renderables of this scene to the renderer
-        m_mainRenderer->submit( m_scene->renderables() );
+        m_mainRenderer->submit( m_scene->GetRenderablesList() );
 
         // render all commands requested to our renderer
         m_mainRenderer->render();
@@ -235,12 +235,10 @@ namespace engine
     #endif /* ENGINE_HEADLESS_EGL */
 
         // render all commands requested to the debug drawer
-        auto _camera = m_scene->currentCamera();
-        auto _light = m_scene->mainLight();
-        if ( _camera && _light )
-            CDebugDrawer::Render( _camera, _light );
-        else if ( _camera )
-            CDebugDrawer::Render( _camera );
+        if ( m_scene->HasCurrentCamera() && m_scene->HasCurrentLight() )
+            CDebugDrawer::Render( m_scene->GetCurrentCamera(), m_scene->GetCurrentLight() );
+        else if ( m_scene->HasCurrentCamera() )
+            CDebugDrawer::Render( m_scene->GetCurrentCamera() );
     #ifndef ENGINE_HEADLESS_EGL
         // render all commands requested to imgui so far
         m_imguiManager->render();
@@ -433,7 +431,7 @@ namespace engine
     void CApplication::CallbackResize( int width, int height )
     {
         auto _app = CApplication::GetInstance();
-        auto& _scene = _app->m_scene;
+        auto _scene = _app->m_scene.get();
 
     #ifndef ENGINE_HEADLESS_EGL
         auto& _layers = _app->m_guiLayers;
@@ -449,7 +447,7 @@ namespace engine
 
         /* all resources on the scene should be notified that the dimensions have changed */
         if ( _scene )
-            _scene->resize( width, height );
+            _scene->Resize( width, height );
 
         /* the renderer viewport should also change accordingly  */
         auto& _renderOptions = _app->m_renderOptions;

@@ -364,7 +364,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
@@ -498,7 +498,7 @@ int main()
         /****************************************************/
         // render our scene
         _app->renderer()->begin( g_renderOptions );
-        _app->renderer()->submit( _app->scene()->renderables() );
+        _app->renderer()->submit( _app->scene()->GetRenderablesList() );
         _app->render();
 
         // visualize the shadow-map
@@ -579,7 +579,7 @@ std::vector< engine::CMesh* > _createScene0()
 
     auto _sceneRef = engine::CApplication::GetInstance()->scene();
     for ( auto& meshPtr : _meshes )
-        _meshesRefs.push_back( dynamic_cast<engine::CMesh*>( _sceneRef->addRenderable( std::move( meshPtr ) ) ) );
+        _meshesRefs.push_back( dynamic_cast<engine::CMesh*>( _sceneRef->AddRenderable( std::move( meshPtr ) ) ) );
 
     auto _meshTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
 
@@ -679,7 +679,7 @@ std::vector< engine::CMesh* > _createScene1()
 
     auto _sceneRef = engine::CApplication::GetInstance()->scene();
     for ( auto& meshPtr : _meshes )
-        _meshesRefs.push_back( dynamic_cast<engine::CMesh*>( _sceneRef->addRenderable( std::move( meshPtr ) ) ) );
+        _meshesRefs.push_back( dynamic_cast<engine::CMesh*>( _sceneRef->AddRenderable( std::move( meshPtr ) ) ) );
 
     return _meshesRefs;
 }

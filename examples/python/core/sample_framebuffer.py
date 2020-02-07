@@ -76,27 +76,27 @@ if __name__ == '__main__' :
                              cameraProjData,
                              app.window().width,
                              app.window().height )
-    scene.addCamera( camera )
+    scene.AddCamera( camera )
 
     light = tr.DirectionalLight( 'directional_1',
                                  [ 0.8, 0.8, 0.8 ],
                                  [ 0.8, 0.8, 0.8 ],
                                  [ 0.3, 0.3, 0.3 ],
                                  [ 0.0, 0.0, -1.0 ] )
-    scene.addLight( light )
+    scene.AddLight( light )
 
     plane = tr.MeshBuilder.CreatePlane( 10.0, 10.0 )
     plane.material.ambient  = [ 0.2, 0.3, 0.4 ]
     plane.material.diffuse  = [ 0.2, 0.3, 0.4 ]
     plane.material.specular = [ 0.2, 0.3, 0.4 ]
-    scene.addRenderable( plane )
+    scene.AddRenderable( plane )
 
     box = tr.MeshBuilder.CreateBox( 0.25, 0.5, 1.0 )
     box.material.ambient  = [ 0.7, 0.5, 0.3 ]
     box.material.diffuse  = [ 0.7, 0.5, 0.3 ]
     box.material.specular = [ 0.7, 0.5, 0.3 ]
     box.position = [ 1.0, 1.0, 1.0 ]
-    scene.addRenderable( box )
+    scene.AddRenderable( box )
 
     print( 'fbo-config - color_attachment: \n{}'.format( framebuffer.getConfigAttachment( 'color_attachment' ) ) )
     print( 'fbo-config - depth_attachment: \n{}'.format( framebuffer.getConfigAttachment( 'depth_attachment' ) ) )

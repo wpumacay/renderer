@@ -523,7 +523,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
@@ -736,21 +736,21 @@ int main()
         if ( g_showRenderTargetDepth )
         {
             _app->renderer()->begin( g_renderOptionsTargetDepth );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
         if ( g_showRenderTargetSemantic )
         {
             _app->renderer()->begin( g_renderOptionsTargetSemantic );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
         if ( g_showRenderTargetNormal )
         {
             _app->renderer()->begin( g_renderOptionsTargetNormal );
-            _app->renderer()->submit( _app->scene()->renderables() );
+            _app->renderer()->submit( _app->scene()->GetRenderablesList() );
             _app->renderer()->render();
         }
 
@@ -851,7 +851,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     auto _renderableTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -966,7 +966,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     return _renderablesRefs;
@@ -997,13 +997,13 @@ std::vector< engine::CIRenderable* > _createScene2()
 
         _renderablePtr->material()->setAlbedoMap( _renderableTextureRef );
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _renderablePtr) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( _renderablePtr) ) );
     }
 
     auto _floor = engine::CMeshBuilder::createPlane( 30.0f, 30.0f, engine::eAxis::Y );
     _floor->position = { 0.0f, 0.0f, 0.0f };
     _floor->material()->setAlbedoMap( _renderableTextureRef );
-    _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( _floor ) ) );
+    _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( _floor ) ) );
 
     return _renderablesRefs;
 }

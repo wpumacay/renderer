@@ -21,7 +21,7 @@ int main()
                                                                   engine::CVec3( 0.8f, 0.8f, 0.8f ),
                                                                   engine::CVec3( 0.8f, 0.8f, 0.8f ),
                                                                   engine::CVec3( -1.0f, -1.0f, -1.0f ) );
-    auto _dirlightRef = dynamic_cast<engine::CDirectionalLight*>( _scene->addLight( std::move( _dirlight ) ) );
+    auto _dirlightRef = dynamic_cast<engine::CDirectionalLight*>( _scene->AddLight( std::move( _dirlight ) ) );
 
     auto _pointlight = std::make_unique<engine::CPointLight>( "point",
                                                               engine::CVec3( 0.4f, 0.4f, 0.4f ),
@@ -29,7 +29,7 @@ int main()
                                                               engine::CVec3( 0.8f, 0.8f, 0.8f ),
                                                               engine::CVec3( 5.0f, 5.0f, 5.0f ),
                                                               1.0f, 0.0f, 0.0f );
-    auto _pointlightRef = dynamic_cast<engine::CPointLight*>( _scene->addLight( std::move( _pointlight ) ) );
+    auto _pointlightRef = dynamic_cast<engine::CPointLight*>( _scene->AddLight( std::move( _pointlight ) ) );
     /* create some cameras for the scene **********************************************************/
     auto _cameraProjData = engine::CCameraProjData();
     _cameraProjData.aspect = _app->window()->aspect();
@@ -43,7 +43,7 @@ int main()
                                                                 _cameraProjData,
                                                                 _app->window()->width(),
                                                                 _app->window()->height() );
-    auto _orbitCameraRef = _scene->addCamera( std::move( _orbitCamera ) );
+    auto _orbitCameraRef = _scene->AddCamera( std::move( _orbitCamera ) );
 
     const float _cameraSensitivity  = 0.1f;
     const float _cameraSpeed        = 50.0f;
@@ -57,20 +57,20 @@ int main()
                                                             _cameraSensitivity,
                                                             _cameraSpeed,
                                                             _cameraMaxDelta );
-    auto _fpsCameraRef = _scene->addCamera( std::move( _fpsCamera ) );
+    auto _fpsCameraRef = _scene->AddCamera( std::move( _fpsCamera ) );
 
     auto _fixedCamera = std::make_unique<engine::CFixedCamera>( "fixed",
                                                                 engine::CVec3( 5.0f, 5.0f, 5.0f ),
                                                                 engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                                 engine::eAxis::Z,
                                                                 _cameraProjData );
-    auto _fixedCameraRef = _scene->addCamera( std::move( _fixedCamera ) );
-    _scene->changeToCamera( _fixedCameraRef->name() );
+    auto _fixedCameraRef = _scene->AddCamera( std::move( _fixedCamera ) );
+    _scene->ChangeCurrentCamera( _fixedCameraRef->name() );
     /* add some effects like fog and a skybox *****************************************************/
 
     auto _skybox = std::make_unique<engine::CSkybox>();
     _skybox->setCubemap( engine::CTextureManager::GetCachedTextureCube( "cloudtop" ) );
-    auto _skyboxRef = _scene->addSkybox( std::move( _skybox ) );
+    auto _skyboxRef = _scene->SetSkybox( std::move( _skybox ) );
 
     /**********************************************************************************************/
     const int _nWidthSamples = 50;
@@ -127,9 +127,9 @@ int main()
     _model->position = { 0.0f, 0.0f, 2.0f };
     _model->rotation = engine::rotationZ( ENGINE_PI / 2.0f ) * engine::rotationX( ENGINE_PI / 2.0f );
 
-    auto _modelRef = _scene->addRenderable( std::move( _model ) );
-    auto _patchRef = _scene->addRenderable( std::move( _patch ) );
-    auto _floorRef = _scene->addRenderable( std::move( _floor ) );
+    auto _modelRef = _scene->AddRenderable( std::move( _model ) );
+    auto _patchRef = _scene->AddRenderable( std::move( _patch ) );
+    auto _floorRef = _scene->AddRenderable( std::move( _floor ) );
     /**********************************************************************************************/
 
     _app->setScene( std::move( _scene ) );

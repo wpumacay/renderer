@@ -379,7 +379,7 @@ int main()
                                                            _app->window()->width(),
                                                            _app->window()->height() );
 
-    auto _cameraRef = _app->scene()->addCamera( std::move( _camera ) );
+    auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     /* load the shader in charge of depth-map visualization */
     std::string _baseNameShadowMapViz = std::string( ENGINE_EXAMPLES_PATH ) + "shadows/shaders/shadowmap_visualization";
@@ -522,7 +522,7 @@ int main()
         /****************************************************/
         // render our scene
         _app->renderer()->begin( g_renderOptions );
-        _app->renderer()->submit( _app->scene()->renderables() );
+        _app->renderer()->submit( _app->scene()->GetRenderablesList() );
         _app->render();
 
         // visualize the shadow-map
@@ -613,7 +613,7 @@ std::vector< engine::CIRenderable* > _createScene0()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     auto _renderableTextureRef = engine::CTextureManager::GetCachedTexture( "img_grid" );
@@ -725,7 +725,7 @@ std::vector< engine::CIRenderable* > _createScene1()
         renderablePtr->setObjectId( g_numRenderables );
         g_numRenderables++;
 
-        _renderablesRefs.push_back( _sceneRef->addRenderable( std::move( renderablePtr ) ) );
+        _renderablesRefs.push_back( _sceneRef->AddRenderable( std::move( renderablePtr ) ) );
     }
 
     return _renderablesRefs;

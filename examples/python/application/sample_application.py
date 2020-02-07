@@ -31,8 +31,8 @@ if __name__ == '__main__' :
                                 [ 5.0, 5.0, 5.0 ],
                                 1.0, 0.0, 0.0 )
 
-    scene.addLight( dirLight )
-    scene.addLight( pointLight )
+    scene.AddLight( dirLight )
+    scene.AddLight( pointLight )
     #### create some cameras for the scene #########################################################
     cameraProjData = tr.CameraProjData()
     cameraProjData.aspect = app.window().aspect
@@ -46,7 +46,7 @@ if __name__ == '__main__' :
                                   cameraProjData,
                                   app.window().width,
                                   app.window().height )
-    scene.addCamera( orbitCamera )
+    scene.AddCamera( orbitCamera )
 
     cameraSensitivity  = 0.1
     cameraSpeed        = 50.0
@@ -60,12 +60,12 @@ if __name__ == '__main__' :
                               cameraSensitivity,
                               cameraSpeed,
                               cameraMaxDelta )
-    scene.addCamera( fpsCamera )
+    scene.AddCamera( fpsCamera )
     #### add some effects like fog and a skybox ####################################################
 
     #### skybox = tr.Skybox()
     #### skybox.setCubemap( tr.TextureManager.GetCachedTextureCube( 'cloudtop' ) )
-    #### scene.addSkybox( skybox )
+    #### scene.AddSkybox( skybox )
 
     ################################################################################################
     nWidthSamples = 50
@@ -117,9 +117,9 @@ if __name__ == '__main__' :
     model.scale = [ 0.1, 0.1, 0.1 ]
     model.position = [ 0.0, 2.0, 0.0 ]
 
-    scene.addRenderable( model )
-    scene.addRenderable( patch )
-    scene.addRenderable( floor )
+    scene.AddRenderable( model )
+    scene.AddRenderable( patch )
+    scene.AddRenderable( floor )
     ################################################################################################
 
     app.setScene( scene )
@@ -145,6 +145,8 @@ if __name__ == '__main__' :
         tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
         tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
         tr.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
+
+        model.position = [ 0.0, 2.0 + 0.2 * tr.Time.GetWallTime(), 0.0 ]
 
         app.update()
 
