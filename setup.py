@@ -9,12 +9,28 @@ from setuptools.command.build_ext import build_ext
 
 DEBUG = True
 
-def buildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
+def BuildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
     if not os.path.exists( buildDir ) :
         os.makedirs( buildDir )
 
     subprocess.call( ['cmake', sourceDir] + cmakeArgs, cwd=buildDir, env=env )
     subprocess.call( ['cmake', '--build', '.'] + buildArgs, cwd=buildDir )
+
+# get installation path: https://stackoverflow.com/questions/36187264/how-to-get-installation-directory-using-setuptools-and-pkg-ressources
+def GetInstallationDir() :
+    py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
+    install_path_candidates = ( path % (py_version) for path in (
+                        sys.prefix + '/lib/python%s/dist-packages/',
+                        sys.prefix + '/lib/python%s/site-packages/',
+                        sys.prefix + '/local/lib/python%s/dist-packages/',
+                        sys.prefix + '/local/lib/python%s/site-packages/',
+                        '/Library/Python/%s/site-packages/' ) )
+    for path_candidate in install_path_candidates :
+        if os.path.exists( path_candidate ) :
+            return path_candidate
+
+    print( 'ERROR >>> No installation path found', file=sys.stderr )
+    return None
 
 class CMakeExtension( Extension ) :
 
@@ -44,6 +60,8 @@ class BuildCommand( build_ext ) :
         _cfg = 'Debug' if self.debug else 'Release'
         _buildArgs = ['--config', _cfg, '--', '-j8']
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
+                      '-DCMAKE_BUILD_RPATH=' + GetInstallationDir(),
+                      '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
                       '-DTINYRENDERER_BUILD_HEADLESS_EGL=OFF',
@@ -60,7 +78,7 @@ class BuildCommand( build_ext ) :
         _sourceDir = extension.sourceDir
         _buildDir = self.build_temp
 
-        buildBindings( _sourceDir, _buildDir, _cmakeArgs, _buildArgs, _env )
+        BuildBindings( _sourceDir, _buildDir, _cmakeArgs, _buildArgs, _env )
 
 with open( 'README.md', 'r' ) as fh :
     longDescriptionData = fh.read()
@@ -81,10 +99,23 @@ setup(
     keywords                        = 'graphics opengl',
     classifiers                     = [ "License :: OSI Approved :: MIT License",
                                         "Operating System :: POSIX :: Linux" ],
-    packages                        = find_packages(),
     zip_safe                        = False,
     install_requires                = requiredPackages,
-    package_data                    = {},
+    packages                        = find_packages(),
+    package_data                    = {
+                                        '': [ '../res/imgs/*.png',
+                                              '../res/imgs/*.jpg',
+                                              '../res/imgs/skyboxes/*.tga',
+                                              '../res/imgs/skyboxes/*.jpg',
+                                              '../res/models/*.stl',
+                                              '../res/models/fox/*.png',
+                                              '../res/models/fox/*.obj',
+                                              '../res/models/fox/*.mtl',
+                                              '../res/models/lizardon/*.png',
+                                              '../res/models/lizardon/*.obj',
+                                              '../res/models/lizardon/*.mtl',
+                                              '../res/shaders/*.glsl' ]
+                                    },
     ext_modules                     = [ CMakeExtension( 'tinyrenderer', '.' ) ],
     cmdclass                        = dict( build_ext = BuildCommand ) 
 )

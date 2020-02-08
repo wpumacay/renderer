@@ -10,33 +10,34 @@ message( "
                 ZZZzz /,`.-'`'    -.  ;-;;,_
                      |,4-  ) )-,_. ,\\ (  `'-'
                     '---''(_/--'  `-'\\_)" )
+# ASCII art from: https://www.asciiart.eu/animals/cats
 
 set( CMAKE_CXX_STANDARD 11 )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-format-security -Wno-endif-labels -fPIC" )
 
-# in case nobody set the project type, set it (parent project might have set it for all)
+# In case nobody set the project type, set it (parent project might have set it for all)
 if ( NOT CMAKE_BUILD_TYPE )
     set( CMAKE_BUILD_TYPE Debug )
 endif()
 
-# compile everything as shared libraries
+# Compile everything as shared libraries
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build libraries as shared" )
 
-# outputs of the build should be sent accordingly
+# Outputs of the build should be sent accordingly
 if ( NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY )
-    message( "TINYRENDERER> Sending generated libs to OWN build directory" )
+    message( "TINYRENDERER >>> Sending generated libs to OWN build directory" )
     set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/libs" )
 else()
-    message( "TINYRENDERER> Sending generated libs to EXTERNAL build directory" )
+    message( "TINYRENDERER >>> Sending generated libs to EXTERNAL build directory" )
 endif()
-message( "TINYRENDERER> LIBRARY_OUT_DIR: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
+message( "TINYRENDERER >>> LIBRARY_OUT_DIR: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
 
 set( TINYRENDERER_IS_MASTER_PROJECT OFF )
 if( CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR )
-    message( "TINYRENDERER> Configuring as MASTER project" )
+    message( "TINYRENDERER >>> Configuring as MASTER project" )
     set( TINYRENDERER_IS_MASTER_PROJECT ON )
 else()
-    message( "TINYRENDERER> Configuring as CHILD project" )
+    message( "TINYRENDERER >>> Configuring as CHILD project" )
 endif()
 
 option( TINYRENDERER_BUILD_HEADLESS_EGL "Build in headless mode using EGL" OFF )
@@ -255,6 +256,8 @@ endif()
 message( "***************************************************************************************" )
 message( "BUILD-OPTIONS SUMMARY:" )
 message( "CMAKE_BUILD_TYPE                      : ${CMAKE_BUILD_TYPE}" )
+message( "CMAKE_LIBRARY_OUTPUT_DIRECTORY        : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
+message( "CMAKE_BUILD_RPATH                     : ${CMAKE_BUILD_RPATH}" )
 message( "TINYRENDERER_BUILD_HEADLESS_EGL       : ${TINYRENDERER_BUILD_HEADLESS_EGL}" )
 message( "TINYRENDERER_BUILD_DOCS               : ${TINYRENDERER_BUILD_DOCS}" )
 message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}" )
