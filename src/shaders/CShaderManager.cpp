@@ -130,6 +130,8 @@ namespace engine
             if ( m_shaders.find( _shaderName ) != m_shaders.end() )
                 continue;
 
+            //// ENGINE_CORE_TRACE( "CShaderManager::_loadEngineShaders >>> loading vertex-shader : {0}", _shaderVrtFile );
+            //// ENGINE_CORE_TRACE( "CShaderManager::_loadEngineShaders >>> loading fragment-shader : {0}", _shaderFrgFile );
             _createShaderFromFiles( _shaderName, _shaderVrtFile, _shaderFrgFile );
         }
     }
@@ -156,11 +158,9 @@ namespace engine
         }
 
         // keep ownership of the created shaders
-        auto _shader = new CShader( name, _programOpenglId );
-        std::unique_ptr< CShader > _shaderPtr( _shader );
-        m_shaders[name] = std::move( _shaderPtr );
-
-        return _shader;
+        auto _shader = std::make_unique<CShader>( name, _programOpenglId );
+        m_shaders[name] = std::move( _shader );
+        return m_shaders[name].get();
     }
 
     CShader* CShaderManager::_createShaderFromFiles( const std::string& name,
@@ -185,11 +185,9 @@ namespace engine
         }
 
         // keep ownership of the created shaders
-        auto _shader = new CShader( name, _programOpenglId );
-        std::unique_ptr< CShader > _shaderPtr( _shader );
-        m_shaders[name] = std::move( _shaderPtr );
-
-        return _shader;
+        auto _shader = std::make_unique<CShader>( name, _programOpenglId );
+        m_shaders[name] = std::move( _shader );
+        return m_shaders[name].get();
     }
 
     uint32 CShaderManager::_compileShaderFromFile( const std::string& filepath, const eShaderType& type )

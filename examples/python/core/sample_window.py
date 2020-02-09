@@ -8,12 +8,12 @@ g_numClicks = 0
 def keyCallback( key : int, action : int ) :
     global g_terminate
     print( 'key: {}, action: {}'.format( key, action ) )
-    g_terminate = ( ( key == tr.Keys.KEY_ESCAPE ) and ( action == tr.KeyAction.KEY_PRESSED ) )
+    g_terminate = ( ( key == tr.core.Keys.KEY_ESCAPE ) and ( action == tr.core.KeyAction.KEY_PRESSED ) )
 
 def mouseCallback( button : int, action : int, x : float, y : float ) :
     global g_numClicks
     print( 'button: {}, action: {}, x: {}, y: {}'.format( button, action, x, y ) )
-    if ( ( button == tr.Mouse.BUTTON_LEFT ) and ( action == tr.MouseAction.BUTTON_PRESSED ) ) :
+    if ( ( button == tr.core.Mouse.BUTTON_LEFT ) and ( action == tr.core.MouseAction.BUTTON_PRESSED ) ) :
         g_numClicks += 1
     print( 'num-clicks: {}'.format( g_numClicks ) )
 
@@ -24,13 +24,13 @@ def scrollCallback( xOff : float, yOff : float ) :
     print( 'xOff: {}, yOff: {}'.format( xOff, yOff ) )
 
 if __name__ == '__main__' :
-    windowProps = tr.WindowProps()
+    windowProps = tr.core.WindowProps()
     windowProps.width = 800
     windowProps.height = 600
     windowProps.title = 'sample-window-python'
     windowProps.clearColor = [ 0.2, 0.4, 0.8, 1.0 ]
 
-    windowGL = tr.WindowGLFW( windowProps )
+    windowGL = tr.core.WindowGLFW( windowProps )
     windowGL.registerKeyCallback( keyCallback )
     windowGL.registerMouseCallback( mouseCallback )
     windowGL.registerMouseMoveCallback( mouseMoveCallback )

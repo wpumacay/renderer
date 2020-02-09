@@ -15,15 +15,15 @@ def createGeometryVer1NoIndices() :
         -0.5,  0.5, 1.0, 1.0, 1.0
     ], dtype = np.float32 )
 
-    layout = tr.VertexBufferLayout( [ [ 'pos', tr.ElementType.Float2, False ],
-                                      [ 'color', tr.ElementType.Float3, False ] ] )
+    layout = tr.core.VertexBufferLayout( [ [ 'pos', tr.core.ElementType.Float2, False ],
+                                      [ 'color', tr.core.ElementType.Float3, False ] ] )
 
-    vbuffer = tr.VertexBuffer( layout,
-                               tr.BufferUsage.STATIC,
+    vbuffer = tr.core.VertexBuffer( layout,
+                               tr.core.BufferUsage.STATIC,
                                bufferData.size * bufferData.itemsize,
                                bufferData )
 
-    varray = tr.VertexArray()
+    varray = tr.core.VertexArray()
     varray.addVertexBuffer( vbuffer )
     return varray
 
@@ -48,20 +48,20 @@ def createGeometryVer2NoIndices() :
         1.0, 1.0, 1.0
     ], dtype = np.float32 )
 
-    layoutPos = tr.VertexBufferLayout( [ [ 'pos', tr.ElementType.Float2, False ] ] )
-    layoutCol = tr.VertexBufferLayout( [ [ 'color', tr.ElementType.Float3, False ] ] )
+    layoutPos = tr.core.VertexBufferLayout( [ [ 'pos', tr.core.ElementType.Float2, False ] ] )
+    layoutCol = tr.core.VertexBufferLayout( [ [ 'color', tr.core.ElementType.Float3, False ] ] )
 
-    vbufferPos = tr.VertexBuffer( layoutPos,
-                                  tr.BufferUsage.STATIC,
+    vbufferPos = tr.core.VertexBuffer( layoutPos,
+                                  tr.core.BufferUsage.STATIC,
                                   bufferPosData.size * bufferPosData.itemsize,
                                   bufferPosData )
 
-    vbufferCol = tr.VertexBuffer( layoutCol,
-                                  tr.BufferUsage.STATIC,
+    vbufferCol = tr.core.VertexBuffer( layoutCol,
+                                  tr.core.BufferUsage.STATIC,
                                   bufferColData.size * bufferColData.itemsize,
                                   bufferColData )
 
-    varray = tr.VertexArray()
+    varray = tr.core.VertexArray()
     varray.addVertexBuffer( vbufferPos )
     varray.addVertexBuffer( vbufferCol )
 
@@ -81,17 +81,17 @@ def createGeometryVer1WithIndices() :
         0, 2, 3  # second triangle
     ], dtype = np.uint32 )
 
-    layout = tr.VertexBufferLayout( [ [ 'pos', tr.ElementType.Float2, False ],
-                                      [ 'color', tr.ElementType.Float3, False ] ] )
+    layout = tr.core.VertexBufferLayout( [ [ 'pos', tr.core.ElementType.Float2, False ],
+                                      [ 'color', tr.core.ElementType.Float3, False ] ] )
 
-    vbuffer = tr.VertexBuffer( layout,
-                               tr.BufferUsage.STATIC,
+    vbuffer = tr.core.VertexBuffer( layout,
+                               tr.core.BufferUsage.STATIC,
                                bufferData.size * bufferData.itemsize,
                                bufferData )
 
-    ibuffer = tr.IndexBuffer( tr.BufferUsage.STATIC, 6, indices )
+    ibuffer = tr.core.IndexBuffer( tr.core.BufferUsage.STATIC, 6, indices )
 
-    varray = tr.VertexArray()
+    varray = tr.core.VertexArray()
     varray.addVertexBuffer( vbuffer )
     varray.setIndexBuffer( ibuffer )
 
@@ -119,22 +119,22 @@ def createGeometryVer2WithIndices() :
         0, 2, 3  # second triangle
     ], dtype = np.uint32 )
 
-    layoutPos = tr.VertexBufferLayout( [ [ 'pos', tr.ElementType.Float2, False ] ] )
-    layoutCol = tr.VertexBufferLayout( [ [ 'color', tr.ElementType.Float3, False ] ] )
+    layoutPos = tr.core.VertexBufferLayout( [ [ 'pos', tr.core.ElementType.Float2, False ] ] )
+    layoutCol = tr.core.VertexBufferLayout( [ [ 'color', tr.core.ElementType.Float3, False ] ] )
 
-    vbufferPos = tr.VertexBuffer( layoutPos,
-                                  tr.BufferUsage.STATIC,
+    vbufferPos = tr.core.VertexBuffer( layoutPos,
+                                  tr.core.BufferUsage.STATIC,
                                   bufferPosData.size * bufferPosData.itemsize,
                                   bufferPosData )
 
-    vbufferCol = tr.VertexBuffer( layoutCol,
-                                  tr.BufferUsage.STATIC,
+    vbufferCol = tr.core.VertexBuffer( layoutCol,
+                                  tr.core.BufferUsage.STATIC,
                                   bufferColData.size * bufferColData.itemsize,
                                   bufferColData )
 
-    ibuffer = tr.IndexBuffer( tr.BufferUsage.STATIC, 6, indices )
+    ibuffer = tr.core.IndexBuffer( tr.core.BufferUsage.STATIC, 6, indices )
 
-    varray = tr.VertexArray()
+    varray = tr.core.VertexArray()
     varray.addVertexBuffer( vbufferPos )
     varray.addVertexBuffer( vbufferCol )
     varray.setIndexBuffer( ibuffer )
@@ -142,9 +142,9 @@ def createGeometryVer2WithIndices() :
     return varray
 
 if __name__ == '__main__' :
-    app = tr.Application()
+    app = tr.core.Application()
 
-    shader = tr.ShaderManager.GetCachedShader( 'basic2d_no_textures' )
+    shader = tr.core.ShaderManager.GetCachedShader( 'basic2d_no_textures' )
 
     geometryVAO = createGeometryVer1NoIndices()
     ## geometryVAO = createGeometryVer2NoIndices()
@@ -154,7 +154,7 @@ if __name__ == '__main__' :
     while app.active() :
         app.begin()
 
-        if ( tr.InputManager.IsKeyDown( tr.Keys.KEY_ESCAPE ) ) :
+        if ( tr.core.InputManager.IsKeyDown( tr.core.Keys.KEY_ESCAPE ) ) :
             break
 
         shader.bind()

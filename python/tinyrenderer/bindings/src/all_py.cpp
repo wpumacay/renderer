@@ -4,7 +4,7 @@
 // resources required for initialization
 #include <utils/CLogger.h>
 
-PYBIND11_MODULE( tinyrenderer, m )
+PYBIND11_MODULE( tinyrenderer_core, m )
 {
     py::module::import( "tinymath" );
 

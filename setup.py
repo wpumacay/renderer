@@ -2,12 +2,21 @@
 
 import os
 import sys
+import glob
 import subprocess
 
 from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
+
+# @todo: for now, installation-dir works when using "pip install .", but if using "python setup.py install"
+#        instead, we would be using the built libraries in the build directory. This is still fine if
+#        as the user would have to clone the repo and install it afterwards. The issue comes when the user
+#        deletes the build directory, causing a shared-library not found error. To fix this issue, we have
+#        to get the full target folder, which differs by one level "../" if using one method over the other.
 
 DEBUG = True
+PREFIX = 'wp_tinyrenderer_'
 
 def BuildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
     if not os.path.exists( buildDir ) :
@@ -31,6 +40,18 @@ def GetInstallationDir() :
 
     print( 'ERROR >>> No installation path found', file=sys.stderr )
     return None
+
+def GetFilesUnderPath( path, extension ) :
+    cwd_path = os.getcwd()
+    target_path = os.path.join( cwd_path, path )
+    if not os.path.exists( target_path ) :
+        return ( '', [] )
+
+    os.chdir( target_path )
+    files = glob.glob( '**/*.%s' % ( extension ), recursive=True )
+    files_paths = [ os.path.join( target_path, fpath ) for fpath in files ]
+    os.chdir( cwd_path )
+    return ( PREFIX + path, files_paths )
 
 class CMakeExtension( Extension ) :
 
@@ -64,6 +85,7 @@ class BuildCommand( build_ext ) :
                       '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
+                      '-DTINYRENDERER_RESOURCES_PATH=' + sys.prefix + '/' + PREFIX + 'res/',
                       '-DTINYRENDERER_BUILD_HEADLESS_EGL=OFF',
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
@@ -88,7 +110,7 @@ with open( 'requirements.txt', 'r' ) as fh :
 
 setup(
     name                            = 'wp-tinyrenderer',
-    version                         = '0.0.1',
+    version                         = '0.0.2',
     description                     = 'A minimal renderer for prototyping 3D applications',
     long_description                = longDescriptionData,
     long_description_content_type   = 'text/markdown',
@@ -101,21 +123,20 @@ setup(
                                         "Operating System :: POSIX :: Linux" ],
     zip_safe                        = False,
     install_requires                = requiredPackages,
-    packages                        = find_packages(),
-    package_data                    = {
-                                        '': [ '../res/imgs/*.png',
-                                              '../res/imgs/*.jpg',
-                                              '../res/imgs/skyboxes/*.tga',
-                                              '../res/imgs/skyboxes/*.jpg',
-                                              '../res/models/*.stl',
-                                              '../res/models/fox/*.png',
-                                              '../res/models/fox/*.obj',
-                                              '../res/models/fox/*.mtl',
-                                              '../res/models/lizardon/*.png',
-                                              '../res/models/lizardon/*.obj',
-                                              '../res/models/lizardon/*.mtl',
-                                              '../res/shaders/*.glsl' ]
-                                    },
-    ext_modules                     = [ CMakeExtension( 'tinyrenderer', '.' ) ],
+    package_dir                     = { '' : './python' },
+    packages                        = find_packages( './python' ),
+    data_files                      = [ GetFilesUnderPath( 'res/imgs', 'png' ),
+                                        GetFilesUnderPath( 'res/imgs', 'jpg' ),
+                                        GetFilesUnderPath( 'res/imgs/skyboxes', 'tga' ),
+                                        GetFilesUnderPath( 'res/imgs/skyboxes', 'jpg' ),
+                                        GetFilesUnderPath( 'res/models', 'stl' ),
+                                        GetFilesUnderPath( 'res/models/fox', 'png' ),
+                                        GetFilesUnderPath( 'res/models/fox', 'obj' ),
+                                        GetFilesUnderPath( 'res/models/fox', 'mtl' ),
+                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'png' ),
+                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'obj' ),
+                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'mtl' ),
+                                        GetFilesUnderPath( 'res/shaders', 'glsl' ) ],
+    ext_modules                     = [ CMakeExtension( 'tr_core', '.' ) ],
     cmdclass                        = dict( build_ext = BuildCommand ) 
 )
