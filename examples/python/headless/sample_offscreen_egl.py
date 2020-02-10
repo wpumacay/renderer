@@ -6,6 +6,8 @@ import numpy as np
 from OpenGL.GL import *
 from numpngw import write_apng
 
+from IPython.core.debugger import set_trace
+
 if __name__ == '__main__' :
     windowProps = tr.core.WindowProps()
     windowProps.width = 1024
@@ -180,11 +182,9 @@ if __name__ == '__main__' :
         app.end()
 
         frame = app.renderTarget().read()
-        frame = frame.reshape( app.renderTarget().height,
-                               app.renderTarget().width, 3 )
         frames.append( frame )
 
-        if ( len( frames ) > 60 * 1 ) :
+        if ( len( frames ) > 1 * 1 ) :
           break
 
         print( 'frame {}'.format( len( frames ) ) )

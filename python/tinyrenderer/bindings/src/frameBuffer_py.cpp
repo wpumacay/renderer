@@ -80,20 +80,20 @@ namespace engine
                     const int32 height = self->height();
                     auto data = self->read();
 
-                    auto nparray = py::array_t<uint8>( width * height * 3 );
-                    auto bufferInfo = nparray.request();
-                    auto bufferData = bufferInfo.ptr;
-                    memcpy( bufferData, data.get(), sizeof( uint8 ) * width * height * 3 );
-                    return nparray;
+                    //// auto nparray = py::array_t<uint8>( width * height * 3 );
+                    //// auto bufferInfo = nparray.request();
+                    //// auto bufferData = bufferInfo.ptr;
+                    //// memcpy( bufferData, data.get(), sizeof( uint8 ) * width * height * 3 );
+                    //// return nparray;
 
-                    //// auto bufferInfo = py::buffer_info( 
-                    ////                         data.get(),
-                    ////                         sizeof( uint8 ),
-                    ////                         py::format_descriptor<uint8>::format(),
-                    ////                         3,
-                    ////                         { height, width },
-                    ////                         { sizeof( uint8 ) * width, sizeof( uint8 ) } );
-                    //// return py::array_t<uint8>( bufferInfo );
+                    auto bufferInfo = py::buffer_info( 
+                                            data.get(),
+                                            sizeof( uint8 ),
+                                            py::format_descriptor<uint8>::format(),
+                                            3,
+                                            { height, width, 3 },
+                                            { sizeof( uint8 ) * width * 3, sizeof( uint8 ) * 3, sizeof( uint8 ) } );
+                    return py::array_t<uint8>( bufferInfo );
                 } )
             .def_property_readonly( "width", &CFrameBuffer::width )
             .def_property_readonly( "height", &CFrameBuffer::height )

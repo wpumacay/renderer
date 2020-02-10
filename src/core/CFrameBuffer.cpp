@@ -155,6 +155,20 @@ namespace engine
         glReadPixels( 0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, _buffer.get() );
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
+        struct _Pixel { uint8 r; uint8 g; uint8 b; };
+        auto _pixelBuffer = (_Pixel*) _buffer.get();
+        for ( size_t i = 0; i < std::floor( m_height / 2 ); i++ )
+        {
+            for ( size_t j = 0; j < m_width; j++ )
+            {
+                auto _srcIndex = j + i * m_width;
+                auto _dstIndex = j + ( m_height - i - 1 ) * m_width;
+                auto _temp = _pixelBuffer[_srcIndex];
+                _pixelBuffer[_srcIndex] = _pixelBuffer[_dstIndex];
+                _pixelBuffer[_dstIndex] = _temp;
+            }
+        }
+
         return std::move( _buffer );
     }
 

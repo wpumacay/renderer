@@ -20,5 +20,16 @@ namespace engine
             .value( "UINT_32", engine::ePixelDataType::UINT_32  )
             .value( "UINT_24_8", engine::ePixelDataType::UINT_24_8  )
             .value( "FLOAT_32", engine::ePixelDataType::FLOAT_32  );
+
+        m.def( "test_nparray_info", []( const py::array_t<float>& nparr )
+            {
+                auto info = nparr.request();
+                std::cout << "size : " << info.size << std::endl;
+                std::cout << "ndim : " << info.ndim << std::endl;
+                for ( size_t i = 0; i < info.shape.size(); i++ )
+                    std::cout << "shape[" << i << "] : " << info.shape[i] << std::endl;
+                for ( size_t i = 0; i < info.strides.size(); i++ )
+                    std::cout << "strides[" << i << "] : " << info.strides[i] << std::endl;
+            } );
     }
 }
