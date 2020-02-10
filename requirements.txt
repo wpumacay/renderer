@@ -1,5 +1,2 @@
 numpy
 setuptools
-PyOpenGL
-PyOpenGL_accelerate
-pytest

@@ -9,14 +9,13 @@ from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
 
-# @todo: for now, installation-dir works when using "pip install .", but if using "python setup.py install"
-#        instead, we would be using the built libraries in the build directory. This is still fine if
-#        as the user would have to clone the repo and install it afterwards. The issue comes when the user
-#        deletes the build directory, causing a shared-library not found error. To fix this issue, we have
-#        to get the full target folder, which differs by one level "../" if using one method over the other.
+# @todo: fix issue of not removing the shared libraries even after pip uninstall is run
 
-DEBUG = True
-PREFIX = 'wp_tinyrenderer_'
+VERSION_MAJOR = 0
+VERSION_MINOR = 0
+VERSION_MICRO = 4
+VERSION = '%d.%d.%d' % ( VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO )
+PREFIX = 'wp_tinyrenderer_%s_' % ( VERSION )
 
 def BuildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
     if not os.path.exists( buildDir ) :
@@ -61,6 +60,15 @@ class CMakeExtension( Extension ) :
 
 class BuildCommand( build_ext ) :
 
+    user_options = [ ( 'headless=', None, 'Whether to build in headless mode (uses EGL) or not (uses GLFW)' ),
+                     ( 'debug=', None, 'Whether to build in debug-mode or not' ) ]
+    boolean_options = [ 'headless', 'debug' ]
+
+    def initialize_options( self ) :
+        super( BuildCommand, self ).initialize_options()
+        self.headless = 0 # Build using non-headless mode (GLFW) by default
+        self.debug = 0 # Build in release mode by default
+
     def run( self ) :
         try :
             _ = subprocess.check_output( ['cmake', '--version'] )
@@ -72,21 +80,20 @@ class BuildCommand( build_ext ) :
             self.build_extension( _extension )
 
     def build_extension( self, extension ) :
-        global DEBUG
         _extensionFullPath = self.get_ext_fullpath( extension.name )
         _extensionDirName = os.path.dirname( _extensionFullPath )
         _extensionDirPath = os.path.abspath( _extensionDirName )
 
-        self.debug = True if DEBUG else False
         _cfg = 'Debug' if self.debug else 'Release'
-        _buildArgs = ['--config', _cfg, '--', '-j8']
+        _egl = 'ON' if self.headless else 'OFF'
+        _buildArgs = ['--config', _cfg, '--', '-j4']
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
                       '-DCMAKE_BUILD_RPATH=' + GetInstallationDir(),
                       '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
                       '-DTINYRENDERER_RESOURCES_PATH=' + sys.prefix + '/' + PREFIX + 'res/',
-                      '-DTINYRENDERER_BUILD_HEADLESS_EGL=OFF',
+                      '-DTINYRENDERER_BUILD_HEADLESS_EGL=' + _egl,
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
                       '-DTINYRENDERER_BUILD_PYTHON_BINDINGS=ON',
@@ -102,6 +109,21 @@ class BuildCommand( build_ext ) :
 
         BuildBindings( _sourceDir, _buildDir, _cmakeArgs, _buildArgs, _env )
 
+class InstallCommand( install ) :
+
+    user_options = install.user_options + BuildCommand.user_options
+    boolean_options = install.boolean_options + BuildCommand.boolean_options
+
+    def initialize_options( self ) :
+        super( InstallCommand, self ).initialize_options()
+        self.headless = 0 # Build using non-headless mode (GLFW) by default
+        self.debug = 0 # Build in release mode by default
+
+    def run( self ) :
+        self.reinitialize_command( 'build_ext', headless = self.headless, debug = self.debug )
+        self.run_command( 'build_ext' )
+        super( InstallCommand, self ).run()
+
 with open( 'README.md', 'r' ) as fh :
     longDescriptionData = fh.read()
 
@@ -110,7 +132,7 @@ with open( 'requirements.txt', 'r' ) as fh :
 
 setup(
     name                            = 'wp-tinyrenderer',
-    version                         = '0.0.2',
+    version                         = VERSION,
     description                     = 'A minimal renderer for prototyping 3D applications',
     long_description                = longDescriptionData,
     long_description_content_type   = 'text/markdown',
@@ -138,5 +160,5 @@ setup(
                                         GetFilesUnderPath( 'res/models/pokemons/lizardon', 'mtl' ),
                                         GetFilesUnderPath( 'res/shaders', 'glsl' ) ],
     ext_modules                     = [ CMakeExtension( 'tr_core', '.' ) ],
-    cmdclass                        = dict( build_ext = BuildCommand ) 
+    cmdclass                        = dict( build_ext = BuildCommand, install = InstallCommand ) 
 )
