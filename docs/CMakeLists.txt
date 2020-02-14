@@ -8,7 +8,7 @@ find_package( Doxygen )
 
 if ( DOXYGEN_FOUND )
     # find all tinyrenderer-related headers for the documentation
-    get_target_property( TINYRENDERER_PUBLIC_INCS_DIR tinyrenderer_cpp_lib TINYRENDERER_INCS_DIR )
+    get_property( TINYRENDERER_PUBLIC_INCS_DIR GLOBAL PROPERTY TINYRENDERER_INCS_DIR )
     file( GLOB_RECURSE TINYRENDERER_PUBLIC_INCS_FILES "${TINYRENDERER_PUBLIC_INCS_DIR}/*.h" )
     # configure doxygen
     set( DOXYGEN_INPUT_DIR "${TINYRENDERER_PUBLIC_INCS_DIR}" )

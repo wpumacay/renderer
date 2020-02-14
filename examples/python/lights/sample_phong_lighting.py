@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
-import tinyrenderer as tr
+from tinyrenderer.core import engine
 import tinymath as tm
 import numpy as np
 from OpenGL.GL import *
 
 if __name__ == '__main__' :
-    app = tr.core.Application()
+    app = engine.Application()
 
-    cameraProjData = tr.core.CameraProjData()
-    cameraProjData.projection  = tr.core.CameraProjection.PERSPECTIVE
+    cameraProjData = engine.CameraProjData()
+    cameraProjData.projection  = engine.CameraProjection.PERSPECTIVE
     cameraProjData.fov         = 45.0
     cameraProjData.aspect      = app.window().aspect
     cameraProjData.zNear       = 0.1
     cameraProjData.zFar        = 100.0
 
-    camera = tr.core.OrbitCamera( 'orbit',
+    camera = engine.OrbitCamera( 'orbit',
                              [ 0.0, 0.0, 3.0 ],
                              [ 0.0, 0.0, 0.0 ],
-                             tr.core.Axis.Z,
+                             engine.Axis.Z,
                              cameraProjData,
                              app.window().width,
                              app.window().height )
@@ -26,28 +26,28 @@ if __name__ == '__main__' :
     #### cameraSensitivity  = 0.25
     #### cameraSpeed        = 25.0
     #### cameraMaxDelta     = 10.0
-    #### camera = tr.core.FpsCamera( 'fps',
+    #### camera = engine.FpsCamera( 'fps',
     ####                        [ 0.0, 0.0, 3.0 ],
     ####                        [ 0.0, 0.0, 0.0 ],
-    ####                        tr.core.Axis.Z,
+    ####                        engine.Axis.Z,
     ####                        cameraProjData,
     ####                        cameraSensitivity,
     ####                        cameraSpeed,
     ####                        cameraMaxDelta )
 
-    box = tr.core.MeshBuilder.CreateBox( 3.0, 3.0, 3.0 )
-    sphere = tr.core.MeshBuilder.CreateSphere( 1.5 )
-    gizmo = tr.core.MeshBuilder.CreateBox( 0.2, 0.2, 0.2 )
+    box = engine.MeshBuilder.CreateBox( 3.0, 3.0, 3.0 )
+    sphere = engine.MeshBuilder.CreateSphere( 1.5 )
+    gizmo = engine.MeshBuilder.CreateBox( 0.2, 0.2, 0.2 )
     gizmo.position = [ 0.0, 0.0, 2.0 ]
 
     # load the shader used for this example
-    baseNamePhong = tr.core.ENGINE_EXAMPLES_PATH + 'lights/shaders/phong'
-    shaderPhong = tr.core.ShaderManager.CreateShaderFromFiles( 'phong_shader',
+    baseNamePhong = engine.ENGINE_EXAMPLES_PATH + 'lights/shaders/phong'
+    shaderPhong = engine.ShaderManager.CreateShaderFromFiles( 'phong_shader',
                                                           baseNamePhong + '_vs.glsl',
                                                           baseNamePhong + '_fs.glsl' )
 
-    baseNameGouraud = tr.core.ENGINE_EXAMPLES_PATH + 'lights/shaders/gouraud'
-    shaderGouraud = tr.core.ShaderManager.CreateShaderFromFiles( 'gouraud_shader',
+    baseNameGouraud = engine.ENGINE_EXAMPLES_PATH + 'lights/shaders/gouraud'
+    shaderGouraud = engine.ShaderManager.CreateShaderFromFiles( 'gouraud_shader',
                                                             baseNameGouraud + '_vs.glsl',
                                                             baseNameGouraud + '_fs.glsl' )
 
@@ -55,7 +55,7 @@ if __name__ == '__main__' :
     assert shaderGouraud, 'Could not load gouraud shader for our tests :('
 
     # grab a simple shader to render the camera gizmo
-    shaderGizmo = tr.core.ShaderManager.GetCachedShader( "basic3d_no_textures" )
+    shaderGizmo = engine.ShaderManager.GetCachedShader( "basic3d_no_textures" )
     assert shaderGizmo, 'Could not grab the basic3d shader to render the light gizmo :('
 
     # select shader to use
@@ -68,24 +68,24 @@ if __name__ == '__main__' :
     mvParam = 0.0
 
     while( app.active() ) :
-        if ( tr.core.InputManager.IsKeyDown( tr.core.Keys.KEY_ESCAPE ) ) :
+        if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
-        elif ( tr.core.InputManager.CheckSingleKeyPress( tr.core.Keys.KEY_S ) ) :
+        elif ( engine.InputManager.CheckSingleKeyPress( engine.Keys.KEY_S ) ) :
             shaderLighting = shaderGouraud if ( shaderLighting.name == 'phong_shader' ) else shaderPhong
             print( 'Using shader: {}'.format( shaderLighting.name ) )
-        elif ( tr.core.InputManager.CheckSingleKeyPress( tr.core.Keys.KEY_P ) ) :
+        elif ( engine.InputManager.CheckSingleKeyPress( engine.Keys.KEY_P ) ) :
             moveLight = not moveLight
             print( 'Light state: {}'.format( 'moving' if moveLight else 'fixed' ) )
 
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
         app.begin()
         camera.update()
 
         if ( moveLight ) :
-            mvParam += 10.0 * tr.core.Time.GetTimeStep()
+            mvParam += 10.0 * engine.Time.GetTimeStep()
             #### gizmo.position = [ 1.0 + np.sin( mvParam ) * 2.0, np.sin( mvParam / 2.0 ) * 1.0 ]
             gizmo.position = [ 10.0 * np.sin( mvParam ), 10.0 * np.cos( mvParam ), 0.0 ]
 
@@ -114,7 +114,7 @@ if __name__ == '__main__' :
         shaderGizmo.unbind()
         ##########################################################################
 
-        #### tr.core.DebugDrawer.DrawNormals( mesh, [ 0.0, 0.0, 1.0 ] )
-        tr.core.DebugDrawer.Render( camera )
+        #### engine.DebugDrawer.DrawNormals( mesh, [ 0.0, 0.0, 1.0 ] )
+        engine.DebugDrawer.Render( camera )
 
         app.end()

@@ -40,7 +40,8 @@ else()
     message( "TINYRENDERER >>> Configuring as CHILD project" )
 endif()
 
-option( TINYRENDERER_BUILD_HEADLESS_EGL "Build in headless mode using EGL" OFF )
+option( TINYRENDERER_BUILD_WINDOWED_GLFW "Build in normal windowed mode using GLFW" ON )
+option( TINYRENDERER_BUILD_HEADLESS_EGL "Build in headless mode using EGL" ON )
 option( TINYRENDERER_BUILD_DOCS "Build documentation (requires Doxygen)" ON )
 option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
 option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
@@ -86,11 +87,9 @@ endif()
 add_definitions( -DENGINE_RESOURCES_PATH="${TINYRENDERER_RESOURCES_PATH}")
 add_definitions( -DENGINE_EXAMPLES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/cpp/" )
 
-if ( TINYRENDERER_BUILD_HEADLESS_EGL )
-    set( ENGINE_HEADLESS_EGL "YES" )
-    add_definitions( -DENGINE_HEADLESS_EGL )
-else()
-    set( ENGINE_HEADLESS_EGL "NO" )
+if ( (NOT TINYRENDERER_BUILD_WINDOWED_GLFW) AND (NOT TINYRENDERER_BUILD_HEADLESS_EGL) )
+    message( "TINYRENDERER >>> at least one 'window' mode should be enabled : GLFW, EGL or both" )
+    return()
 endif()
 
 if ( TINYRENDERER_BUILD_WITH_LOGS OR ( CMAKE_BUILD_TYPE STREQUAL Debug ) )
@@ -107,7 +106,12 @@ else()
     set( ENGINE_TRACK_ALLOCS "NO" )
 endif()
 
-if ( NOT TINYRENDERER_BUILD_HEADLESS_EGL )
+# Default states (will properly set them below)
+set( ENGINE_WINDOWED_GLFW "NO" )
+set( ENGINE_HEADLESS_EGL "NO" )
+
+if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
+    message( "TINYRENDERER >>> Configuring windowed mode using GLFW" )
     # Use GLFW and default OpengGL requirements
     find_package( PkgConfig REQUIRED )
     find_package( OpenGL REQUIRED )
@@ -122,7 +126,7 @@ if ( NOT TINYRENDERER_BUILD_HEADLESS_EGL )
     include_directories( ${GLFW_INCLUDE_DIRS} )
     include_directories( ${GLEW_INCLUDE_DIRS} )
 
-    set( SRCS
+    set( SRCS_WINDOWED_GLFW
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
@@ -170,9 +174,10 @@ if ( NOT TINYRENDERER_BUILD_HEADLESS_EGL )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp" )
+    set( ENGINE_WINDOWED_GLFW "YES" )
 
-    add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
-    target_link_libraries( tinyrenderer_cpp_lib
+    add_library( tinyrenderer_cpp_lib_glfw SHARED ${SRCS_WINDOWED_GLFW} )
+    target_link_libraries( tinyrenderer_cpp_lib_glfw
                            ${GLFW_LIBRARIES}
                            ${OPENGL_LIBRARIES}
                            ${GLEW_LIBRARIES}
@@ -180,12 +185,16 @@ if ( NOT TINYRENDERER_BUILD_HEADLESS_EGL )
                            assimp
                            spdlog
                            imgui )
-else()
+    target_compile_definitions( tinyrenderer_cpp_lib_glfw PRIVATE ENGINE_WINDOWED_GLFW=1 )
+endif()
+
+if ( TINYRENDERER_BUILD_HEADLESS_EGL )
+    message( "TINYRENDERER >>> Configuring headless mode using EGL" )
     # Use EGL and EGL-specific OpengGL requirements
     find_package( OpenGL REQUIRED OpenGL EGL )
     message( "OPENGL_LIBRARIES      : ${OPENGL_LIBRARIES}" )
 
-    set( SRCS
+    set( SRCS_HEADLESS_EGL
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
@@ -232,20 +241,23 @@ else()
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/egl.c"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c" )
+    set( ENGINE_HEADLESS_EGL "YES" )
 
-    add_library( tinyrenderer_cpp_lib SHARED ${SRCS} )
-    target_link_libraries( tinyrenderer_cpp_lib
+    add_library( tinyrenderer_cpp_lib_egl SHARED ${SRCS_HEADLESS_EGL} )
+    target_link_libraries( tinyrenderer_cpp_lib_egl
                            OpenGL::OpenGL
                            OpenGL::EGL
                            tinymath_cpp_lib
                            assimp
                            spdlog
                            dl )
+    target_compile_definitions( tinyrenderer_cpp_lib_egl PRIVATE ENGINE_HEADLESS_EGL=1 )
 endif()
 
-set_property( TARGET tinyrenderer_cpp_lib PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+# For docs-generation to use
+set_property( GLOBAL PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
-if ( TINYRENDERER_BUILD_PYTHON_BINDINGS )
+if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_PYTHON_BINDINGS )
     add_subdirectory( python/tinyrenderer/bindings )
 endif()
 
@@ -263,6 +275,7 @@ message( "CMAKE_BUILD_TYPE                      : ${CMAKE_BUILD_TYPE}" )
 message( "CMAKE_LIBRARY_OUTPUT_DIRECTORY        : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
 message( "CMAKE_BUILD_RPATH                     : ${CMAKE_BUILD_RPATH}" )
 message( "TINYRENDERER_RESOURCES_PATH           : ${TINYRENDERER_RESOURCES_PATH}" )
+message( "TINYRENDERER_BUILD_WINDOWED_GLFW      : ${TINYRENDERER_BUILD_WINDOWED_GLFW}" )
 message( "TINYRENDERER_BUILD_HEADLESS_EGL       : ${TINYRENDERER_BUILD_HEADLESS_EGL}" )
 message( "TINYRENDERER_BUILD_DOCS               : ${TINYRENDERER_BUILD_DOCS}" )
 message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}" )

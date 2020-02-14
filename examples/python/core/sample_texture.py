@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-import tinyrenderer as tr
+from tinyrenderer.core import engine
 import numpy as np
 from OpenGL.GL import *
 
 if __name__ == '__main__' :
-    app = tr.core.Application()
+    app = engine.Application()
 
-    textureDataJpg = tr.core.TextureManager.GetCachedTextureData( 'img_container' )
-    textureDataPng = tr.core.TextureManager.GetCachedTextureData( 'img_smiley' )
+    textureDataJpg = engine.TextureManager.GetCachedTextureData( 'img_container' )
+    textureDataPng = engine.TextureManager.GetCachedTextureData( 'img_smiley' )
 
     if ( textureDataJpg ) :
         print( 'texture-data-jpg: \n\r{}'.format( textureDataJpg ) )
@@ -16,10 +16,10 @@ if __name__ == '__main__' :
     if ( textureDataPng ) :
         print( 'texture-data-png: \n\r{}'.format( textureDataPng ) )
 
-    textureContainer = tr.core.TextureManager.GetCachedTexture( 'img_container' )
+    textureContainer = engine.TextureManager.GetCachedTexture( 'img_container' )
     assert textureContainer, 'Could not retrieve a valid texture for the sample: container'
 
-    textureSmiley = tr.core.TextureManager.GetCachedTexture( 'img_smiley' )
+    textureSmiley = engine.TextureManager.GetCachedTexture( 'img_smiley' )
     assert textureSmiley, 'Could not retrieve a valid texture for the sample: smiley'
 
     bufferData = np.array( [
@@ -35,27 +35,27 @@ if __name__ == '__main__' :
         0, 2, 3  # second triangle
     ], dtype = np.uint32 )
 
-    layout = tr.core.VertexBufferLayout( [ [ 'pos', tr.core.ElementType.Float2, False ],
-                                      [ 'col', tr.core.ElementType.Float3, False ],
-                                      [ 'uv',  tr.core.ElementType.Float2, False ] ] )
+    layout = engine.VertexBufferLayout( [ [ 'pos', engine.ElementType.Float2, False ],
+                                      [ 'col', engine.ElementType.Float3, False ],
+                                      [ 'uv',  engine.ElementType.Float2, False ] ] )
 
-    vbuffer = tr.core.VertexBuffer( layout,
-                               tr.core.BufferUsage.STATIC,
+    vbuffer = engine.VertexBuffer( layout,
+                               engine.BufferUsage.STATIC,
                                bufferData.size * bufferData.itemsize,
                                bufferData )
 
-    ibuffer = tr.core.IndexBuffer( tr.core.BufferUsage.STATIC, 6, indices )
+    ibuffer = engine.IndexBuffer( engine.BufferUsage.STATIC, 6, indices )
 
-    varray = tr.core.VertexArray()
+    varray = engine.VertexArray()
     varray.addVertexBuffer( vbuffer )
     varray.setIndexBuffer( ibuffer )
 
-    shader = tr.core.ShaderManager.GetCachedShader( 'basic2d_textures' )
+    shader = engine.ShaderManager.GetCachedShader( 'basic2d_textures' )
 
     while app.active() :
         app.begin()
 
-        if ( tr.core.InputManager.IsKeyDown( tr.core.Keys.KEY_ESCAPE ) ) :
+        if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
 
         shader.bind()

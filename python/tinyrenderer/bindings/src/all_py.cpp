@@ -4,7 +4,11 @@
 // resources required for initialization
 #include <utils/CLogger.h>
 
+#ifndef ENGINE_HEADLESS_EGL
 PYBIND11_MODULE( tinyrenderer_core, m )
+#else
+PYBIND11_MODULE( tinyrenderer_core_egl, m )
+#endif
 {
     py::module::import( "tinymath" );
 

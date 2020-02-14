@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
-import tinyrenderer as tr
+from tinyrenderer.core import engine
 import tinymath as tm
 import numpy as np
 from OpenGL.GL import *
 
 def computeSkyboxCorrectionMat( axis ) :
-    if ( axis == tr.core.Axis.X ) :
+    if ( axis == engine.Axis.X ) :
         return tm.Matrix4f( tm.rotationZf( -tm.pi / 2.0 ), tm.Vector3f( [ 0.0, 0.0, 0.0 ] ) )
-    elif ( axis == tr.core.Axis.Z ) :
+    elif ( axis == engine.Axis.Z ) :
         return tm.Matrix4f( tm.rotationXf( tm.pi / 2.0 ), tm.Vector3f( [ 0.0, 0.0, 0.0 ] ) )
     else :
         return tm.Matrix4f()
 
 if __name__ == '__main__' :
-    app = tr.core.Application()
+    app = engine.Application()
 
-    textureCubeDataCloudtop   = tr.core.TextureManager.GetCachedTextureCubeData( 'cloudtop' )
-    textureCubeDataStarfield  = tr.core.TextureManager.GetCachedTextureCubeData( 'starfield' )
-    textureCubeDataSiege      = tr.core.TextureManager.GetCachedTextureCubeData( 'siege' )
+    textureCubeDataCloudtop   = engine.TextureManager.GetCachedTextureCubeData( 'cloudtop' )
+    textureCubeDataStarfield  = engine.TextureManager.GetCachedTextureCubeData( 'starfield' )
+    textureCubeDataSiege      = engine.TextureManager.GetCachedTextureCubeData( 'siege' )
 
     if ( textureCubeDataCloudtop ) :
         print( textureCubeDataCloudtop )
@@ -29,14 +29,14 @@ if __name__ == '__main__' :
     if ( textureCubeDataSiege ) :
         print( textureCubeDataSiege )
 
-    textureCubeCloudtop = tr.core.TextureManager.GetCachedTextureCube( 'cloudtop' )
-    textureCubeStarfield = tr.core.TextureManager.GetCachedTextureCube( 'starfield' )
-    textureCubeSiege = tr.core.TextureManager.GetCachedTextureCube( 'siege' )
+    textureCubeCloudtop = engine.TextureManager.GetCachedTextureCube( 'cloudtop' )
+    textureCubeStarfield = engine.TextureManager.GetCachedTextureCube( 'starfield' )
+    textureCubeSiege = engine.TextureManager.GetCachedTextureCube( 'siege' )
     assert textureCubeCloudtop, 'Could not retrieve valid texture-cube for the sample - cloudtop'
     assert textureCubeStarfield, 'Could not retrieve valid texture-cube for the sample - starfield'
     assert textureCubeSiege, 'Could not retrieve valid texture-cube for the sample - siege'
 
-    shader = tr.core.ShaderManager.GetCachedShader( 'skybox' )
+    shader = engine.ShaderManager.GetCachedShader( 'skybox' )
 
     cubemapVertices = np.array( [
             -1.0,  1.0, -1.0,
@@ -82,30 +82,30 @@ if __name__ == '__main__' :
              1.0, -1.0,  1.0
     ], dtype = np.float32 )
 
-    vbufferLayout = tr.core.VertexBufferLayout( [ [ 'position', tr.core.ElementType.Float3, False ] ] )
-    vbuffer = tr.core.VertexBuffer( vbufferLayout, 
-                               tr.core.BufferUsage.STATIC,
+    vbufferLayout = engine.VertexBufferLayout( [ [ 'position', engine.ElementType.Float3, False ] ] )
+    vbuffer = engine.VertexBuffer( vbufferLayout, 
+                               engine.BufferUsage.STATIC,
                                cubemapVertices.size * cubemapVertices.itemsize, 
                                cubemapVertices )
 
-    varray = tr.core.VertexArray()
+    varray = engine.VertexArray()
     varray.addVertexBuffer( vbuffer )
 
     scene = app.scene()
 
     # make a sample camera
-    cameraProjData = tr.core.CameraProjData()
-    cameraProjData.projection  = tr.core.CameraProjection.PERSPECTIVE
+    cameraProjData = engine.CameraProjData()
+    cameraProjData.projection  = engine.CameraProjection.PERSPECTIVE
     cameraProjData.fov         = 45.0
     cameraProjData.aspect      = app.window().aspect
     cameraProjData.zNear       = 0.1
     cameraProjData.zFar        = 100.0
     print( cameraProjData.aspect )
 
-    camera = tr.core.OrbitCamera( 'orbit',
+    camera = engine.OrbitCamera( 'orbit',
                              tm.Vector3f( [ 2.0, 2.0, 2.0 ] ),
                              tm.Vector3f( [ 0.0, 0.0, 0.0 ] ),
-                             tr.core.Axis.Z,
+                             engine.Axis.Z,
                              cameraProjData,
                              app.window().width,
                              app.window().height )
@@ -120,16 +120,16 @@ if __name__ == '__main__' :
     correctionMat = computeSkyboxCorrectionMat( camera.upAxis() )
 
     while( app.active() ) :
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
-        tr.core.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
+        engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
         app.update()
 
         app.begin()
         app.render()
 
-        if ( tr.core.InputManager.IsKeyDown( tr.core.Keys.KEY_ESCAPE ) ) :
+        if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
 
         glDepthFunc( GL_LEQUAL )

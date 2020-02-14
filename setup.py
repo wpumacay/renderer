@@ -60,13 +60,15 @@ class CMakeExtension( Extension ) :
 
 class BuildCommand( build_ext ) :
 
-    user_options = [ ( 'headless=', None, 'Whether to build in headless mode (uses EGL) or not (uses GLFW)' ),
+    user_options = [ ( 'windowed=', None, 'Whether to build in windowed mode (uses GLFW) or not' ),
+                     ( 'headless=', None, 'Whether to build in headless mode (uses EGL) or not' ),
                      ( 'debug=', None, 'Whether to build in debug-mode or not' ) ]
-    boolean_options = [ 'headless', 'debug' ]
+    boolean_options = [ 'windowed', 'headless', 'debug' ]
 
     def initialize_options( self ) :
         super( BuildCommand, self ).initialize_options()
-        self.headless = 0 # Build using non-headless mode (GLFW) by default
+        self.windowed = 1 # By default, build using windowed mode (GLFW)
+        self.headless = 0 # By default, don't build using headless mode (EGL)
         self.debug = 0 # Build in release mode by default
 
     def run( self ) :
@@ -86,13 +88,15 @@ class BuildCommand( build_ext ) :
 
         _cfg = 'Debug' if self.debug else 'Release'
         _egl = 'ON' if self.headless else 'OFF'
-        _buildArgs = ['--config', _cfg, '--', '-j4']
+        _glfw = 'ON' if self.windowed else 'OFF'
+        _buildArgs = ['--config', _cfg, '--', '-j8']
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
                       '-DCMAKE_BUILD_RPATH=' + GetInstallationDir(),
                       '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
                       '-DTINYRENDERER_RESOURCES_PATH=' + sys.prefix + '/' + PREFIX + 'res/',
+                      '-DTINYRENDERER_BUILD_WINDOWED_GLFW=' + _glfw,
                       '-DTINYRENDERER_BUILD_HEADLESS_EGL=' + _egl,
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
@@ -116,7 +120,8 @@ class InstallCommand( install ) :
 
     def initialize_options( self ) :
         super( InstallCommand, self ).initialize_options()
-        self.headless = 0 # Build using non-headless mode (GLFW) by default
+        self.windowed = 1 # By default, build using windowed mode (GLFW)
+        self.headless = 0 # By default, don't build using headless mode (EGL)
         self.debug = 0 # Build in release mode by default
 
     def run( self ) :

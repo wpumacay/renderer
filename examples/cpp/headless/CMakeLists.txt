@@ -8,6 +8,6 @@ foreach( sampleFile ${SampleFilesHeadless} )
     # remove other path components from file
     get_filename_component( executableName ${executableLongName} NAME )
 
-    FcnBuildExample( ${sampleFile} ${executableName} )
+    FcnBuildExampleHeadless( ${sampleFile} ${executableName} )
 
 endforeach( sampleFile )
