@@ -16,11 +16,18 @@ namespace engine
 
 #if defined( ENGINE_USE_LOGS )
         spdlog::set_pattern( "%^[%T] %n: %v%$" );
-
+    #ifndef ENGINE_HEADLESS_EGL
         s_CoreLogger = spdlog::stdout_color_mt( "ENGINE" );
+    #else
+        s_CoreLogger = spdlog::stdout_color_mt( "ENGINE_EGL" );
+    #endif /* ENGINE_HEADLESS_EGL */
         s_CoreLogger->set_level( spdlog::level::trace );
 
+    #ifndef ENGINE_HEADLESS_EGL
         s_ClientLogger = spdlog::stdout_color_mt( "APP" );
+    #else
+        s_ClientLogger = spdlog::stdout_color_mt( "APP_EGL" );
+    #endif
         s_ClientLogger->set_level( spdlog::level::trace );
 #endif
 

@@ -125,7 +125,7 @@ class InstallCommand( install ) :
         self.debug = 0 # Build in release mode by default
 
     def run( self ) :
-        self.reinitialize_command( 'build_ext', headless = self.headless, debug = self.debug )
+        self.reinitialize_command( 'build_ext', headless=self.headless, debug=self.debug, windowed=self.windowed )
         self.run_command( 'build_ext' )
         super( InstallCommand, self ).run()
 
