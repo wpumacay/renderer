@@ -95,17 +95,22 @@ namespace engine
     #ifndef ENGINE_HEADLESS_EGL
         m_imguiManager  = nullptr;
     #endif /* ENGINE_HEADLESS_EGL */
-        m_window        = nullptr;
+
+        // Release any gl-resources before destroying the context
+        m_renderTarget = nullptr;
+        engine::CDebugDrawer::Release();
+        engine::CInputManager::Release();
+        engine::CShaderManager::Release();
+        engine::CTextureManager::Release();
+
+        // Destroy the window (and the context as well)
+        m_window = nullptr;
 
         //// // flush results from initialization
         //// engine::CProfilingManager::EndSession( "sess_core_init" );
 
         engine::CTime::Release();
         engine::CProfilingManager::Release();
-        engine::CDebugDrawer::Release();
-        engine::CInputManager::Release();
-        engine::CShaderManager::Release();
-        engine::CTextureManager::Release();
         engine::CNoiseGenerator::Release();
         engine::CLogger::Release();
     }

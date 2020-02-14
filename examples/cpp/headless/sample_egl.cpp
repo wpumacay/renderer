@@ -147,7 +147,7 @@ int main()
     // auto _geometryVAO = createGeometryVer1Indices();
     // auto _geometryVAO = createGeometryVer2Indices();
 
-    while( _app->active() )
+    while( false )
     {
         _app->begin();
 
@@ -166,6 +166,9 @@ int main()
         _shader->unbind();
         _app->end();
     }
+
+    _geometryVAO = nullptr;
+    _app = nullptr;
 
     return 0;
 }
