@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef UNIQUE_PTR_EXTENSION
+#define UNIQUE_PTR_EXTENSION
+
 #include <memory>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -16,3 +19,5 @@ namespace std
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#endif /* UNIQUE_PTR_EXTENSION */
