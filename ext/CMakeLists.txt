@@ -16,7 +16,9 @@ set( TINYMATH_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Build tinymath's python-bindi
 # build ImGui without examples
 set( IMGUI_BUILD_EXAMPLES CACHE BOOL "Don't build ImGui examples" )
 
+if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
 add_subdirectory( imgui )
+endif()
 add_subdirectory( spdlog )
 add_subdirectory( pybind11 )
 add_subdirectory( tiny_math )

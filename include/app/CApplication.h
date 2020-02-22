@@ -33,6 +33,11 @@
 #include <gui/CImGuiSceneLayer.h>
 #endif /* ENGINE_HEADLESS_EGL */
 
+#ifdef ENGINE_HEADLESS_EGL
+// use chrono instead of glfw-timer (@todo: remove glfw-timer altogether)
+#include <chrono>
+#endif
+
 namespace engine
 {
 
@@ -113,7 +118,7 @@ namespace engine
 
         static CApplication* s_instance;
 
-        float32                                         m_timeStamp;
+        float64                                         m_timeStamp;
         CRenderOptions                                  m_renderOptions;
         std::unique_ptr< CFrameBuffer >                 m_renderTarget;
         std::unique_ptr< CScene >                       m_scene;

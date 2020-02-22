@@ -13,7 +13,7 @@ from setuptools.command.install import install
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_MICRO = 4
+VERSION_MICRO = 7
 VERSION = '%d.%d.%d' % ( VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO )
 PREFIX = 'wp_tinyrenderer_%s_' % ( VERSION )
 
@@ -40,6 +40,25 @@ def GetInstallationDir() :
     print( 'ERROR >>> No installation path found', file=sys.stderr )
     return None
 
+def GetResourcesDir() :
+    py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
+    install_path_candidates = ( path % (py_version) for path in (
+                        sys.prefix + '/lib/python%s/dist-packages/',
+                        sys.prefix + '/lib/python%s/site-packages/',
+                        sys.prefix + '/local/lib/python%s/dist-packages/',
+                        sys.prefix + '/local/lib/python%s/site-packages/',
+                        '/Library/Python/%s/site-packages/' ) )
+
+    for path_candidate in install_path_candidates :
+        if os.path.exists( path_candidate ) :
+            if path_candidate.find( 'local' ) != -1 :
+                return sys.prefix + '/local/' + PREFIX + 'res/'
+            else :
+                return sys.prefix + '/' + PREFIX + 'res/'
+
+    print( 'ERROR >>> No resources path found', file=sys.stderr )
+    return None
+
 def GetFilesUnderPath( path, extension ) :
     cwd_path = os.getcwd()
     target_path = os.path.join( cwd_path, path )
@@ -62,14 +81,16 @@ class BuildCommand( build_ext ) :
 
     user_options = [ ( 'windowed=', None, 'Whether to build in windowed mode (uses GLFW) or not' ),
                      ( 'headless=', None, 'Whether to build in headless mode (uses EGL) or not' ),
-                     ( 'debug=', None, 'Whether to build in debug-mode or not' ) ]
+                     ( 'debug=', None, 'Whether to build in debug-mode or not' ),
+                     ( 'njobs=', None, "Number of jobs used for building the project" ) ]
     boolean_options = [ 'windowed', 'headless', 'debug' ]
 
     def initialize_options( self ) :
         super( BuildCommand, self ).initialize_options()
         self.windowed = 1 # By default, build using windowed mode (GLFW)
         self.headless = 0 # By default, don't build using headless mode (EGL)
-        self.debug = 0 # Build in release mode by default
+        self.debug = 1 # Build in release mode by default
+        self.njobs = 8 # Use 8 jobs by default (mostly called locally, so keep it at 8 for now)
 
     def run( self ) :
         try :
@@ -89,13 +110,13 @@ class BuildCommand( build_ext ) :
         _cfg = 'Debug' if self.debug else 'Release'
         _egl = 'ON' if self.headless else 'OFF'
         _glfw = 'ON' if self.windowed else 'OFF'
-        _buildArgs = ['--config', _cfg, '--', '-j8']
+        _buildArgs = ['--config', _cfg, '--', '-j%d' % self.njobs]
         _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
                       '-DCMAKE_BUILD_RPATH=' + GetInstallationDir(),
                       '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_BUILD_TYPE=' + _cfg,
-                      '-DTINYRENDERER_RESOURCES_PATH=' + sys.prefix + '/' + PREFIX + 'res/',
+                      '-DTINYRENDERER_RESOURCES_PATH=' + GetResourcesDir(),
                       '-DTINYRENDERER_BUILD_WINDOWED_GLFW=' + _glfw,
                       '-DTINYRENDERER_BUILD_HEADLESS_EGL=' + _egl,
                       '-DTINYRENDERER_BUILD_DOCS=OFF',
@@ -122,10 +143,11 @@ class InstallCommand( install ) :
         super( InstallCommand, self ).initialize_options()
         self.windowed = 1 # By default, build using windowed mode (GLFW)
         self.headless = 0 # By default, don't build using headless mode (EGL)
-        self.debug = 0 # Build in release mode by default
+        self.debug = 1 # Build in release mode by default
+        self.njobs = 8 # Use 8 jobs by default (mostly called locally, so keep it at 8 for now)
 
     def run( self ) :
-        self.reinitialize_command( 'build_ext', headless=self.headless, debug=self.debug, windowed=self.windowed )
+        self.reinitialize_command( 'build_ext', headless=self.headless, debug=self.debug, windowed=self.windowed, njobs=self.njobs )
         self.run_command( 'build_ext' )
         super( InstallCommand, self ).run()
 

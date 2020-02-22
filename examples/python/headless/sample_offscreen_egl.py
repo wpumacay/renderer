@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 from tinyrenderer.core_egl import engine
+from numpngw import write_png
+import tinymath as tm
 import numpy as np
-from OpenGL.GL import *
-from numpngw import write_apng
-
-from IPython.core.debugger import set_trace
+import os
 
 if __name__ == '__main__' :
     windowProps = engine.WindowProps()
@@ -125,6 +124,7 @@ if __name__ == '__main__' :
     model = engine.MeshBuilder.CreateModelFromFile( modelpath )
     model.scale = [ 0.1, 0.1, 0.1 ]
     model.position = [ 0.0, 0.0, 2.0 ]
+    model.rotation = tm.rotationZf( np.pi / 2.0 ) * tm.rotationXf( np.pi / 2.0 )
 
     scene.AddRenderable( model )
     scene.AddRenderable( patch )
@@ -134,35 +134,31 @@ if __name__ == '__main__' :
     app.setScene( scene )
     app.setOffScreenRendering( True )
 
-    ## app.renderOptions.useShadowMapping = True
-    ## app.renderOptions.shadowMapRangeConfig.type = engine.ShadowRangeType.FIXED_USER
-    ## app.renderOptions.shadowMapRangeConfig.worldUp = [ 0.0, 1.0, 0.0 ]
-    ## app.renderOptions.shadowMapRangeConfig.camera = orbitCamera
-    ## app.renderOptions.shadowMapRangeConfig.clipSpaceWidth = 40.0
-    ## app.renderOptions.shadowMapRangeConfig.clipSpaceHeight = 40.0
-    ## app.renderOptions.shadowMapRangeConfig.clipSpaceDepth = 40.0
-    #### app.renderOptions.shadowMapRangeConfig.pointLight = pointLight
-    ## app.renderOptions.shadowMapRangeConfig.dirLight = dirLight
+    app.renderOptions().useShadowMapping = True
+    app.renderOptions().shadowMapRangeConfig.type = engine.ShadowRangeType.FIXED_USER
+    app.renderOptions().shadowMapRangeConfig.worldUp = [ 0.0, 1.0, 0.0 ]
+    app.renderOptions().shadowMapRangeConfig.camera = orbitCamera
+    app.renderOptions().shadowMapRangeConfig.clipSpaceWidth = 40.0
+    app.renderOptions().shadowMapRangeConfig.clipSpaceHeight = 40.0
+    app.renderOptions().shadowMapRangeConfig.clipSpaceDepth = 40.0
+    #### app.renderOptions().shadowMapRangeConfig.pointLight = pointLight
+    app.renderOptions().shadowMapRangeConfig.dirLight = dirLight
 
     rho = 8.660254037844386 # fixed rho, computed from initial camera position (5,5,5)
     phi = 0.6154797086703873 # fixed phi, computed from initial camera position (5,5,5)
     theta = 0.7853981633974483 # initial rho, computed from initial camera position (5,5,5)
 
     frames = []
+    num_frames = 60
     while ( app.active() ) :
         if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
-        #### else if ( engine.InputManager.CheckSingleKeyPress( engine.Keys.KEY_G ) )
-        ####     app.setGuiActive( !app.guiActive() )
-        #### else if ( engine.InputManager.CheckSingleKeyPress( engine.Keys.KEY_U ) )
-        ####     app.setGuiUtilsActive( !app.guiUtilsActive() )
 
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
         theta += 0.2 * engine.Time.GetAvgTimeStep()
-        ## theta += 0.2 * engine.Time.GetAvgTimeStep() * 50.
         _sphi = np.sin( phi )
         _cphi = np.cos( phi )
         _stheta = np.sin( theta )
@@ -183,9 +179,9 @@ if __name__ == '__main__' :
         frame = app.renderTarget().read()
         frames.append( frame )
 
-        if ( len( frames ) > 1 * 1 ) :
+        if ( len( frames ) > num_frames ) :
           break
 
-        print( 'frame {}'.format( len( frames ) ) )
-
-    write_apng( 'sample.png', frames, delay=100 )
+    os.makedirs( 'frames', exist_ok=True )
+    for i in range( len( frames ) ) :
+        write_png( 'frames/sample_%03d.png' % i, frames[i] )

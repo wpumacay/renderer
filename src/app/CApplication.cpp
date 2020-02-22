@@ -48,12 +48,13 @@ namespace engine
         engine::CNoiseGenerator::Init();
 
         //// PROFILE_SCOPE_IN_SESSION( "app_initialization", "sess_core_init" );
-        m_scene         = std::make_unique< CScene >();
-        m_mainRenderer  = std::make_unique< CMainRenderer >();
+        m_scene = std::make_unique< CScene >();
+        m_mainRenderer = std::make_unique< CMainRenderer >();
     #ifndef ENGINE_HEADLESS_EGL
         m_imguiManager  = std::make_unique< CImGuiManager >( dynamic_cast<CWindowGLFW*>( m_window.get() )->glfwWindow(), imguiProperties );
     #endif /* ENGINE_HEADLESS_EGL */
         m_renderTarget  = _createRenderTarget();
+        m_useRenderTarget = false;
 
         m_window->registerKeyCallback( &CApplication::CallbackKey );
         m_window->registerMouseCallback( &CApplication::CallbackMouseButton );
@@ -64,10 +65,11 @@ namespace engine
         // setup initial viewport
         m_renderOptions.viewportWidth = m_window->width();
         m_renderOptions.viewportHeight = m_window->height();
+        m_renderOptions.renderTargetPtr = nullptr;
 
         // start keeping track of time
         engine::CTime::Start();
-        m_timeStamp = 0.0f;
+        m_timeStamp = 0.0;
     #ifndef ENGINE_HEADLESS_EGL
         // create a utils panel by default (the user can choose to use it or not)
         m_guiUtilsLayer = new CImGuiUtilsLayer( "Utils-layer",
@@ -175,6 +177,9 @@ namespace engine
         engine::CProfilingManager::BeginSession( "sess_core_render" );
     #ifndef ENGINE_HEADLESS_EGL
         m_timeStamp = glfwGetTime();
+    #else
+        auto tpStart = std::chrono::high_resolution_clock::now();
+        m_timeStamp = std::chrono::time_point_cast<std::chrono::microseconds>( tpStart ).time_since_epoch().count() * 0.001;
     #endif /* ENGINE_HEADLESS_EGL */
         // prepare window for rendering, and poll events
         m_window->begin();
@@ -257,15 +262,18 @@ namespace engine
 
     #ifndef ENGINE_HEADLESS_EGL
         // tick-tock, in the main thread (might need to handle it differently in multi-threading mode)
-        auto _timeNow = glfwGetTime();
-        auto _timeDelta = _timeNow - m_timeStamp;
+        float64 _timeNow = glfwGetTime();
+        float64 _timeDelta = _timeNow - m_timeStamp;
         m_timeStamp = _timeNow;
         // update time keeper for our other systems to use
         engine::CTime::Update( _timeDelta );
     #else
-        engine::CTime::Update( 0.001 );
+        auto tpEnd = std::chrono::high_resolution_clock::now();
+        float64 _timeNow = std::chrono::time_point_cast<std::chrono::microseconds>( tpEnd ).time_since_epoch().count() * 0.001;
+        float64 _timeDelta = _timeNow - m_timeStamp;
+        m_timeStamp = _timeNow;
+        engine::CTime::Update( _timeDelta );
     #endif /* ENGINE_HEADLESS_EGL */
-
 
         engine::CProfilingManager::EndSession( "sess_core_render" );
     }
