@@ -29,7 +29,7 @@ matrix:
 
 before_install:
   - sudo apt-get -q update
-  - sudo apt-get -y install pkg-config
+  - sudo apt-get -y install pkg-config ffmpeg
   - sudo apt-get -y install libassimp-dev libglfw3-dev libglew-dev
   - ./scripts/setup_dependencies.sh
   - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
