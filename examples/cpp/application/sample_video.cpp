@@ -3,6 +3,7 @@
 
 int main()
 {
+#ifdef ENGINE_USE_FFMPEG
     auto _app = std::make_unique<engine::CApplication>();
     auto _decoder = std::make_unique<engine::CVideoDecoder>( engine::eDecodingMode::SYNC,
                                                              "/home/gregor/Documents/repos/cat1_workspace/cat1/frames/sample_movie.mp4" );
@@ -18,6 +19,6 @@ int main()
 
         _app->end();
     }
-
+#endif
     return 0;
 }

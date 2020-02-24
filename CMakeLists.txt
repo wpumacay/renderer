@@ -108,9 +108,6 @@ else()
 endif()
 
 if ( TINYRENDERER_BUILD_WITH_FFMPEG_UTILS )
-    set( ENGINE_USE_FFMPEG "YES" )
-    add_definitions( -DENGINE_USE_FFMPEG )
-
     # Search libav libraries
     find_path( AVCODEC_INCLUDE_DIRS     libavcodec/avcodec.h )
     find_path( AVFORMAT_INCLUDE_DIRS    libavformat/avformat.h )
@@ -140,18 +137,31 @@ if ( TINYRENDERER_BUILD_WITH_FFMPEG_UTILS )
     message( "SWRESAMPLE_LIB: ${SWRESAMPLE_LIB}" )
     message( "SWSCALE_LIB   : ${SWSCALE_LIB}" )
 
-    add_library( FFmpeg INTERFACE )
-    target_include_directories( FFmpeg INTERFACE
-        ${AVCODEC_INCLUDE_DIRS}
-        ${AVFORMAT_INCLUDE_DIRS}
-        ${AVFILTER_INCLUDE_DIRS}
-        ${AVDEVICE_INCLUDE_DIRS}
-        ${AVUTIL_INCLUDE_DIRS}
-        ${SWRESAMPLE_INCLUDE_DIRS}
-        ${SWSCALE_INCLUDE_DIRS} )
-    target_link_libraries( FFmpeg INTERFACE
-        ${AVCODEC_LIB} ${AVFORMAT_LIB} ${AVUTIL_LIB} swresample swscale )
+    if ( AVCODEC_LIB STREQUAL "AVCODEC_LIB-NOTFOUND" OR AVFORMAT_LIB STREQUAL "AVFORMAT_LIB-NOTFOUND" OR
+         AVUTIL_LIB STREQUAL "AVUTIL_LIB-NOTFOUND" OR AVDEVICE_LIB STREQUAL "AVDEVICE_LIB-NOTFOUND" OR
+         SWRESAMPLE_LIB STREQUAL "SWRESAMPLE_LIB-NOTFOUND" OR SWSCALE_LIB STREQUAL "SWSCALE_LIB-NOTFOUND" )
+        # Compile without support of ffmpeg
+        set( ENGINE_USE_FFMPEG "NO" )
 
+        add_library( FFmpeg INTERFACE )
+        message( "TINYRENDERER >>> COULDN'T FIND FFMPEG on your system. Building without this feature" )
+    else()
+        # Compile with support of ffmpeg for decoding and encoding
+        set( ENGINE_USE_FFMPEG "YES" )
+        add_definitions( -DENGINE_USE_FFMPEG )
+
+        add_library( FFmpeg INTERFACE )
+        target_include_directories( FFmpeg INTERFACE
+            ${AVCODEC_INCLUDE_DIRS}
+            ${AVFORMAT_INCLUDE_DIRS}
+            ${AVFILTER_INCLUDE_DIRS}
+            ${AVDEVICE_INCLUDE_DIRS}
+            ${AVUTIL_INCLUDE_DIRS}
+            ${SWRESAMPLE_INCLUDE_DIRS}
+            ${SWSCALE_INCLUDE_DIRS} )
+        target_link_libraries( FFmpeg INTERFACE
+            ${AVCODEC_LIB} ${AVFORMAT_LIB} ${AVUTIL_LIB} swresample swscale )
+    endif()
 else()
     set( ENGINE_USE_FFMPEG "NO" )
     add_library( FFmpeg INTERFACE )
