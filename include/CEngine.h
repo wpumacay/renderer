@@ -69,6 +69,10 @@
     #include <gl/CWindowEGL.h>
 #endif /* ENGINE_HEADLESS_EGL */
 
+#include <utils/CVideoCommon.h>
+#include <utils/CVideoDecoder.h>
+// #include <utils/CVideoEncoder.h
+
 #include <app/CApplication.h>
 
 

@@ -47,6 +47,7 @@ option( TINYRENDERER_BUILD_EXAMPLES "Build c/c++ examples" ON )
 option( TINYRENDERER_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
 option( TINYRENDERER_BUILD_WITH_LOGS "Build using logging functionality" ON )
 option( TINYRENDERER_BUILD_WITH_TRACK_ALLOCS "Build with obj-allocation tracking" ON )
+option( TINYRENDERER_BUILD_WITH_FFMPEG_UTILS "Build ffmpeg utils to read and write to video files" ON )
 
 # Add cmake find-modules helpers (for sphinx)
 if( TINYRENDERER_IS_MASTER_PROJECT )
@@ -104,6 +105,56 @@ if ( TINYRENDERER_BUILD_WITH_TRACK_ALLOCS OR ( CMAKE_BUILD_TYPE STREQUAL Debug )
     add_definitions( -DENGINE_TRACK_ALLOCS )
 else()
     set( ENGINE_TRACK_ALLOCS "NO" )
+endif()
+
+if ( TINYRENDERER_BUILD_WITH_FFMPEG_UTILS )
+    set( ENGINE_USE_FFMPEG "YES" )
+    add_definitions( -DENGINE_USE_FFMPEG )
+
+    # Search libav libraries
+    find_path( AVCODEC_INCLUDE_DIRS     libavcodec/avcodec.h )
+    find_path( AVFORMAT_INCLUDE_DIRS    libavformat/avformat.h )
+    find_path( AVUTIL_INCLUDE_DIRS      libavutil/avutil.h )
+    find_path( AVDEVICE_INCLUDE_DIRS    libavdevice/avdevice.h )
+    find_path( SWRESAMPLE_INCLUDE_DIRS  libswresample/swresample.h )
+    find_path( SWSCALE_INCLUDE_DIRS     libswscale/swscale.h )
+
+    find_library( AVCODEC_LIB       avcodec )
+    find_library( AVFORMAT_LIB      avformat )
+    find_library( AVUTIL_LIB        avutil )
+    find_library( AVDEVICE_LIB      avdevice )
+    find_library( SWRESAMPLE_LIB    swresample )
+    find_library( SWSCALE_LIB       swscale )
+
+####     message( "AVCODEC_INCLUDE_DIRS   : ${AVCODEC_INCLUDE_DIRS}" )
+####     message( "AVFORMAT_INCLUDE_DIRS  : ${AVFORMAT_INCLUDE_DIRS}" )
+####     message( "AVUTIL_INCLUDE_DIRS    : ${AVUTIL_INCLUDE_DIRS}" )
+####     message( "AVDEVICE_INCLUDE_DIRS  : ${AVDEVICE_INCLUDE_DIRS}" )
+####     message( "SWRESAMPLE_INCLUDE_DIRS: ${SWRESAMPLE_INCLUDE_DIRS}" )
+####     message( "SWSCALE_INCLUDE_DIRS   : ${SWSCALE_INCLUDE_DIRS}" )
+#### 
+####     message( "AVCODEC_LIB   : ${AVCODEC_LIB}" )
+####     message( "AVFORMAT_LIB  : ${AVFORMAT_LIB}" )
+####     message( "AVUTIL_LIB    : ${AVUTIL_LIB}" )
+####     message( "AVDEVICE_LIB  : ${AVDEVICE_LIB}" )
+####     message( "SWRESAMPLE_LIB: ${SWRESAMPLE_LIB}" )
+####     message( "SWSCALE_LIB   : ${SWSCALE_LIB}" )
+
+    add_library( FFmpeg INTERFACE )
+    target_include_directories( FFmpeg INTERFACE
+        ${AVCODEC_INCLUDE_DIRS}
+        ${AVFORMAT_INCLUDE_DIRS}
+        ${AVFILTER_INCLUDE_DIRS}
+        ${AVDEVICE_INCLUDE_DIRS}
+        ${AVUTIL_INCLUDE_DIRS}
+        ${SWRESAMPLE_INCLUDE_DIRS}
+        ${SWSCALE_INCLUDE_DIRS} )
+    target_link_libraries( FFmpeg INTERFACE
+        ${AVCODEC_LIB} ${AVFORMAT_LIB} ${AVUTIL_LIB} swresample swscale )
+
+else()
+    set( ENGINE_USE_FFMPEG "NO" )
+    add_library( FFmpeg INTERFACE )
 endif()
 
 # Default states (will properly set them below)
@@ -173,7 +224,8 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CNoiseGenerator.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp" )
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp" )
     set( ENGINE_WINDOWED_GLFW "YES" )
 
     add_library( tinyrenderer_cpp_lib_glfw SHARED ${SRCS_WINDOWED_GLFW} )
@@ -184,7 +236,8 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
                            tinymath_cpp_lib
                            assimp
                            spdlog
-                           imgui )
+                           imgui
+                           FFmpeg )
     target_compile_definitions( tinyrenderer_cpp_lib_glfw PRIVATE ENGINE_WINDOWED_GLFW=1 )
 endif()
 
@@ -239,6 +292,7 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/egl.c"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c" )
     set( ENGINE_HEADLESS_EGL "YES" )
@@ -250,7 +304,8 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
                            tinymath_cpp_lib
                            assimp
                            spdlog
-                           dl )
+                           dl
+                           FFmpeg )
     target_compile_definitions( tinyrenderer_cpp_lib_egl PRIVATE ENGINE_HEADLESS_EGL=1 )
 endif()
 
@@ -281,6 +336,8 @@ message( "TINYRENDERER_BUILD_DOCS               : ${TINYRENDERER_BUILD_DOCS}" )
 message( "TINYRENDERER_BUILD_EXAMPLES           : ${TINYRENDERER_BUILD_EXAMPLES}" )
 message( "TNIYRENDERER_BUILD_PYTHON_BINDINGS    : ${TINYRENDERER_BUILD_PYTHON_BINDINGS}" )
 message( "TINYRENDERER_BUILD_WITH_LOGS          : ${TINYRENDERER_BUILD_WITH_LOGS}" )
+message( "TINYRENDERER_BUILD_WITH_FFMPEG_UTILS  : ${TINYRENDERER_BUILD_WITH_FFMPEG_UTILS}" )
 message( "ENGINE_USE_LOGS                       : ${ENGINE_USE_LOGS}" )
 message( "ENGINE_TRACK_ALLOCS                   : ${ENGINE_TRACK_ALLOCS}" )
+message( "ENGINE_USE_FFMPEG                     : ${ENGINE_USE_FFMPEG}" )
 message( "***************************************************************************************" )

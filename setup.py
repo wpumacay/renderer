@@ -24,7 +24,7 @@ def BuildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
     subprocess.call( ['cmake', sourceDir] + cmakeArgs, cwd=buildDir, env=env )
     subprocess.call( ['cmake', '--build', '.'] + buildArgs, cwd=buildDir )
 
-# get installation path: https://stackoverflow.com/questions/36187264/how-to-get-installation-directory-using-setuptools-and-pkg-ressources
+# @hack: get installation path: https://stackoverflow.com/questions/36187264/how-to-get-installation-directory-using-setuptools-and-pkg-ressources
 def GetInstallationDir() :
     py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
     install_path_candidates = ( path % (py_version) for path in (
@@ -40,6 +40,7 @@ def GetInstallationDir() :
     print( 'ERROR >>> No installation path found', file=sys.stderr )
     return None
 
+# @hack: get resources path (should replace with proper find functionality)
 def GetResourcesDir() :
     py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
     install_path_candidates = ( path % (py_version) for path in (
