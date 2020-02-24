@@ -12,7 +12,21 @@ namespace engine
         ASYNC
     };
 
-    std::unique_ptr<uint8_t[]> DecodeOneFrame( AVCodecContext* codec_ctx );
+    std::string ToString( const eDecodingMode& mode );
+
+    enum class eDecodingState : uint8_t
+    {
+        IDLE = 0,
+        READY,
+        DECODING,
+        FINISHED
+    };
+
+    std::string ToString( const eDecodingState& state );
+
+    std::unique_ptr<uint8_t[]> DecodeOneFrame( AVFormatContext* format_ctx,
+                                               AVCodecContext* codec_ctx,
+                                               ssize_t video_frame_index );
 
     class CVideoDecoder
     {
@@ -29,11 +43,11 @@ namespace engine
 
         std::unique_ptr<uint8_t[]> GetNextFrame();
 
-        bool IsDecoding() const { return m_decoding; }
-
         bool loop() const { return m_loop; }
 
         eDecodingMode mode() const { return m_mode; }
+
+        eDecodingState state() const { return m_state; }
 
         std::string filepath() const { return m_filepath; }
 
@@ -43,13 +57,15 @@ namespace engine
 
         std::unique_ptr<AVFormatContext, AVFormatContextDeleter> m_formatContext;
 
+        ssize_t m_videoStreamIndex;
+
         std::unique_ptr<uint8_t[]> m_lastFrameData;
 
-        bool m_decoding;
+        eDecodingMode m_mode;
+
+        eDecodingState m_state;
 
         bool m_loop;
-
-        eDecodingMode m_mode;
 
         std::string m_filepath;
 
