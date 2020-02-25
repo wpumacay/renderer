@@ -71,7 +71,7 @@
 
 #include <utils/CVideoCommon.h>
 #include <utils/CVideoDecoder.h>
-// #include <utils/CVideoEncoder.h
+#include <utils/CVideoEncoder.h>
 
 #include <app/CApplication.h>
 

@@ -140,6 +140,7 @@ if ( TINYRENDERER_BUILD_WITH_FFMPEG_UTILS )
     if ( AVCODEC_LIB STREQUAL "AVCODEC_LIB-NOTFOUND" OR AVFORMAT_LIB STREQUAL "AVFORMAT_LIB-NOTFOUND" OR
          AVUTIL_LIB STREQUAL "AVUTIL_LIB-NOTFOUND" OR AVDEVICE_LIB STREQUAL "AVDEVICE_LIB-NOTFOUND" OR
          SWRESAMPLE_LIB STREQUAL "SWRESAMPLE_LIB-NOTFOUND" OR SWSCALE_LIB STREQUAL "SWSCALE_LIB-NOTFOUND" )
+        set( FFMPEG_FOUND OFF ) # @todo: check alternative using the old method (pkg-config + hard-coded /usr/lib/x86_64-linux-gnu)
         # Compile without support of ffmpeg
         set( ENGINE_USE_FFMPEG "NO" )
 
@@ -235,7 +236,9 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp" )
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp" )
     set( ENGINE_WINDOWED_GLFW "YES" )
 
     add_library( tinyrenderer_cpp_lib_glfw SHARED ${SRCS_WINDOWED_GLFW} )
@@ -302,7 +305,9 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/egl.c"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c" )
     set( ENGINE_HEADLESS_EGL "YES" )

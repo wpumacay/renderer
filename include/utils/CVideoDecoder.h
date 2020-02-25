@@ -83,8 +83,6 @@ namespace engine
         bool m_loop;
 
         std::string m_filepath;
-
-        static bool s_InitializedFFMPEG;
     };
 
 }

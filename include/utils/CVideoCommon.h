@@ -10,48 +10,36 @@ extern "C"
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
+    #include <libavutil/opt.h>
 }
 
 namespace engine
 {
+    extern bool g_InitializedFFMPEG;
+
     struct AVCodecContextDeleter
     {
-        void operator()( AVCodecContext* codec_context ) const
-        {
-            avcodec_free_context( &codec_context );
-        }
+        void operator()( AVCodecContext* codec_context ) const;
     };
 
     struct AVFormatContextDeleter
     {
-        void operator()( AVFormatContext* format_context ) const
-        {
-            avformat_close_input( &format_context );
-        }
+        void operator()( AVFormatContext* format_context ) const;
     };
 
     struct AVPacketDeleter
     {
-        void operator()( AVPacket* packet ) const
-        {
-            av_packet_free( &packet );
-        }
+        void operator()( AVPacket* packet ) const;
     };
 
     struct AVFrameDeleter
     {
-        void operator()( AVFrame* frame ) const
-        {
-            av_frame_free( &frame );
-        }
+        void operator()( AVFrame* frame ) const;
     };
 
     struct SwsContextDeleter
     {
-        void operator()( SwsContext* sws_context ) const
-        {
-            sws_freeContext( sws_context );
-        }
+        void operator()( SwsContext* sws_context ) const;
     };
 }
 

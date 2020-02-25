@@ -3,6 +3,7 @@
 
 int main()
 {
+#ifdef ENGINE_USE_FFMPEG
     auto _windowProperties = engine::CWindowProps();
     _windowProperties.width = 1024;
     _windowProperties.height = 768;
@@ -12,6 +13,10 @@ int main()
 
     auto _app = std::make_unique<engine::CApplication>( _windowProperties );
     _app->setGuiUtilsActive( true );
+    auto _encoder = std::make_unique<engine::CVideoEncoder>( engine::eEncodingMode::SYNC,
+                                                             "./sample_encoder.mp4",
+                                                             _windowProperties.width,
+                                                             _windowProperties.height );
 
     auto _scene = std::make_unique<engine::CScene>();
 
@@ -148,6 +153,9 @@ int main()
     const float phi = 0.6154797086703873f; // fixed phi, computed from initial camera position (5,5,5)
     float theta = 0.7853981633974483f; // initial rho, computed from initial camera position (5,5,5)
 
+    _app->setOffscreenRendering( true );
+
+    _encoder->BeginEncoding();
     while ( _app->active() )
     {
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
@@ -178,7 +186,12 @@ int main()
         _app->begin();
         _app->render();
         _app->end();
-    }
 
+        auto fboref = _app->renderTarget();
+        auto frame = fboref->read();
+        _encoder->SubmitFrame( frame.get(), fboref->width(), fboref->height() );
+    }
+    _encoder->EndEncoding();
+#endif /* ENGINE_USE_FFMPEG */
     return 0;
 }
