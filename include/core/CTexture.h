@@ -90,7 +90,7 @@ namespace engine
 
         void bind();
         void unbind();
-        void resize( int32 width, int32 height );
+        void resize( int32 width, int32 height, const uint8* data = nullptr );
 
         std::unique_ptr<CTextureData>& data() { return m_texDataPtr; }
         const std::unique_ptr<CTextureData>& data() const { return m_texDataPtr; }

@@ -24,30 +24,25 @@ namespace engine
 
     std::unique_ptr< uint8_t[] > DecodeOneFrame( AVFormatContext* format_ctx,
                                                  AVCodecContext* codec_ctx,
+                                                 AVFrame* frame_av,
+                                                 AVPacket* packet_av,
+                                                 SwsContext* sws_ctx,
                                                  ssize_t video_frame_index )
     {
-        const size_t frame_width = codec_ctx->width;
-        const size_t frame_height = codec_ctx->height;
-        const size_t frame_npixels = frame_width * frame_height;
-        const size_t frame_nbytes = 3 * frame_npixels;
+        const ssize_t frame_width = codec_ctx->width;
+        const ssize_t frame_height = codec_ctx->height;
+        const ssize_t frame_npixels = frame_width * frame_height;
+        const ssize_t frame_nbytes = 3 * frame_npixels;
 
         auto frame_data = std::unique_ptr< uint8_t[] >( new uint8_t[frame_nbytes] );
         memset( (void*)frame_data.get(), 0, sizeof( uint8_t ) * frame_nbytes );
 
-        auto libav_frame = std::unique_ptr<AVFrame>( av_frame_alloc() );
-        auto libav_packet = std::unique_ptr<AVPacket>( av_packet_alloc() );
-        if ( !libav_frame || !libav_packet )
+        while ( av_read_frame( format_ctx, packet_av ) >= 0 )
         {
-            ENGINE_CORE_ERROR( "DecodeOneFrame >>> Couldn't allocate avframe nor avpacket" );
-            return std::move( frame_data );
-        }
-
-        while ( av_read_frame( format_ctx, libav_packet.get() ) >= 0 )
-        {
-            if ( libav_packet->stream_index == video_frame_index )
+            if ( packet_av->stream_index == video_frame_index )
             {
-                ENGINE_CORE_TRACE( "DecodeOneFrame >>> packet-pts: {0}", libav_packet->pts );
-                ssize_t response = avcodec_send_packet( codec_ctx, libav_packet.get() );
+                ENGINE_CORE_TRACE( "DecodeOneFrame >>> packet-pts: {0}", packet_av->pts );
+                ssize_t response = avcodec_send_packet( codec_ctx, packet_av );
                 if( response < 0 )
                 {
                     ENGINE_CORE_ERROR( "DecodeOneFrame >>> Couldn't send a packet to the decoder: {0}", response );
@@ -57,7 +52,7 @@ namespace engine
                 bool finish_decoding = false;
                 while ( response >= 0 )
                 {
-                    response = avcodec_receive_frame( codec_ctx, libav_frame.get() );
+                    response = avcodec_receive_frame( codec_ctx, frame_av );
                     if ( response == AVERROR(EAGAIN) || response == AVERROR_EOF )
                     {
                         break;
@@ -73,11 +68,29 @@ namespace engine
                     {
                         ENGINE_CORE_TRACE( "DecodeOneFrame >>> frame-information" );
                         ENGINE_CORE_TRACE( "\tframe-number      : {0}", codec_ctx->frame_number );
-                        ENGINE_CORE_TRACE( "\tframe-type        : {0}", av_get_picture_type_char( libav_frame->pict_type ) );
-                        ENGINE_CORE_TRACE( "\tframe-size(bytes) : {0}", libav_frame->pkt_size );
-                        ENGINE_CORE_TRACE( "\tframe-pts         : {0}", libav_frame->pts );
-                        ENGINE_CORE_TRACE( "\tframe-keyframe    : {0}", libav_frame->key_frame );
-                        ENGINE_CORE_TRACE( "\tframe-pic-num(DTS): {0}", libav_frame->coded_picture_number );
+                        ENGINE_CORE_TRACE( "\tframe-type        : {0}", av_get_picture_type_char( frame_av->pict_type ) );
+                        ENGINE_CORE_TRACE( "\tframe-size(bytes) : {0}", frame_av->pkt_size );
+                        ENGINE_CORE_TRACE( "\tframe-pts         : {0}", frame_av->pts );
+                        ENGINE_CORE_TRACE( "\tframe-keyframe    : {0}", frame_av->key_frame );
+                        ENGINE_CORE_TRACE( "\tframe-pic-num(DTS): {0}", frame_av->coded_picture_number );
+
+                        uint8_t* dest_buffers[4] = { frame_data.get(), NULL, NULL, NULL };
+                        int dest_linesizes[4] = { (int) frame_width * 3, 0, 0, 0 };
+                        // @todo: iterate only over valid channels
+                        frame_av->data[0] += frame_av->linesize[0] * ( frame_height - 1 );
+                        frame_av->data[1] += frame_av->linesize[1] * ( frame_height - 1 );
+                        frame_av->data[2] += frame_av->linesize[2] * ( frame_height - 1 );
+                        frame_av->linesize[0] = -frame_av->linesize[0];
+                        frame_av->linesize[1] = -frame_av->linesize[1];
+                        frame_av->linesize[2] = -frame_av->linesize[2];
+                        sws_scale( sws_ctx,
+                                   frame_av->data,
+                                   frame_av->linesize,
+                                   0,
+                                   frame_av->height,
+                                   dest_buffers,
+                                   dest_linesizes );
+
                         finish_decoding = true;
                         break;
                     }
@@ -87,7 +100,7 @@ namespace engine
                     break;
             }
             // Detach the current packet from its buffer (to allow freeing it)
-            av_packet_unref( libav_packet.get() );
+            av_packet_unref( packet_av );
         }
 
         return std::move( frame_data );
@@ -107,6 +120,9 @@ namespace engine
             av_register_all();
             CVideoDecoder::s_InitializedFFMPEG = true;
         }
+
+        m_frame_av = std::unique_ptr<AVFrame, AVFrameDeleter>( av_frame_alloc() );
+        m_packet_av = std::unique_ptr<AVPacket, AVPacketDeleter>( av_packet_alloc() );
 
         if ( filepath != "" )
             Reset( filepath );
@@ -203,6 +219,14 @@ namespace engine
             return;
         }
 
+        m_swsContext = std::unique_ptr<SwsContext, SwsContextDeleter>( sws_getContext( m_codecContext->width,
+                                                                                       m_codecContext->height,
+                                                                                       m_codecContext->pix_fmt,
+                                                                                       m_codecContext->width,
+                                                                                       m_codecContext->height,
+                                                                                       AV_PIX_FMT_RGB24,
+                                                                                       SWS_BILINEAR, NULL, NULL, NULL ) );
+
         m_state = eDecodingState::READY;
     }
 
@@ -243,9 +267,64 @@ namespace engine
         }
 
         if ( m_mode == eDecodingMode::SYNC )
-            return std::move( DecodeOneFrame( m_formatContext.get(), m_codecContext.get(), m_videoStreamIndex ) );
+        {
+            auto next_frame_data = DecodeOneFrame( m_formatContext.get(),
+                                                   m_codecContext.get(),
+                                                   m_frame_av.get(),
+                                                   m_packet_av.get(),
+                                                   m_swsContext.get(),
+                                                   m_videoStreamIndex );
+            // Copy contents into last-frame
+            const ssize_t frame_width = m_codecContext->width;
+            const ssize_t frame_height = m_codecContext->height;
+            const ssize_t frame_npixels = frame_width * frame_height;
+            const ssize_t frame_nbytes = 3 * frame_npixels;
+            m_lastFrameData = std::unique_ptr< uint8_t[] >( new uint8_t[frame_nbytes] );
+            memcpy( m_lastFrameData.get(), next_frame_data.get(), sizeof( uint8_t ) * frame_nbytes );
 
+            return std::move( next_frame_data );
+        }
+
+        ENGINE_CORE_WARN( "CVideoDecoder::GetNextFrame >>> current mode not supported" );
         return nullptr;
+    }
+
+    std::unique_ptr<uint8_t[]> CVideoDecoder::GetLastFrame()
+    {
+        if ( !m_lastFrameData )
+            return nullptr;
+
+        // Make a copy of last frame's data
+        const ssize_t frame_width = m_codecContext->width;
+        const ssize_t frame_height = m_codecContext->height;
+        const ssize_t frame_npixels = frame_width * frame_height;
+        const ssize_t frame_nbytes = 3 * frame_npixels;
+        auto last_frame_data = std::unique_ptr< uint8_t[] >( new uint8_t[frame_nbytes] );
+        memcpy( last_frame_data.get(), m_lastFrameData.get(), sizeof( uint8_t ) * frame_nbytes );
+
+        return std::move( last_frame_data );
+    }
+
+    ssize_t CVideoDecoder::GetCurrentFrameWidth() const
+    {
+        if ( !m_codecContext )
+        {
+            ENGINE_CORE_ERROR( "CVideoDecoder::GetCurrentFrameWidth >>> there's no valid codec_ctx" );
+            return -1;
+        }
+
+        return m_codecContext->width;
+    }
+
+    ssize_t CVideoDecoder::GetCurrentFrameHeight() const
+    {
+        if ( !m_codecContext )
+        {
+            ENGINE_CORE_ERROR( "CVideoDecoder::GetCurrentFrameHeight >>> there's no valid codec_ctx" );
+            return -1;
+        }
+
+        return m_codecContext->height;
     }
 }
 

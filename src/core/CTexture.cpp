@@ -148,11 +148,11 @@ namespace engine
         m_texPixelDtype     = dtype;
         m_openglId          = 0;
 
-        /* create gl-texture resource with the given information ****************/
+        // Create gl-texture resource with the given information ***********************************
         glGenTextures( 1, &m_openglId );
         glBindTexture( GL_TEXTURE_2D, m_openglId );
 
-        /* configure wrapping mode */
+        // Configure wrapping mode
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, toOpenGLEnum( m_texWrapModeU ) );
         if ( m_texWrapModeU == eTextureWrap::CLAMP_TO_BORDER )
         {
@@ -171,17 +171,20 @@ namespace engine
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, toOpenGLEnum( m_texFilterModeMin ) );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, toOpenGLEnum( m_texFilterModeMag ) );
 
-        /* send our data to the texture buffer */
-        glTexImage2D( GL_TEXTURE_2D, 0, 
-                      toOpenGLEnum( m_texDataPtr->internalFormat ), m_texDataPtr->width, m_texDataPtr->height, 0,
-                      toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), m_texDataPtr->data );
+        if ( m_texDataPtr->width > 0 && m_texDataPtr->height > 0 )
+        {
+            // Send our data to the texture buffer
+            glTexImage2D( GL_TEXTURE_2D, 0, 
+                          toOpenGLEnum( m_texDataPtr->internalFormat ), m_texDataPtr->width, m_texDataPtr->height, 0,
+                          toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), m_texDataPtr->data );
+        }
 
-        // create mipmaps for textures loaded from disk, not for potential fbo attachments
+        // Create mipmaps for textures loaded from disk, not for potential fbo attachments
         if ( m_texDataPtr->data )
             glGenerateMipmap( GL_TEXTURE_2D );
 
         glBindTexture( GL_TEXTURE_2D, 0 );
-        /***********************************************************************/
+        /******************************************************************************************/
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( CLogger::IsActive() )
@@ -233,11 +236,18 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
 
-    void CTexture::resize( int32 width, int32 height )
+    void CTexture::resize( int32 width, int32 height, const uint8* data )
     {
         if ( m_texDataPtr->data )
         {
-            ENGINE_CORE_WARN( "CTexture::resize >>> Tried resizing a texture associated to non-null initial texture data. Skipping resize" );
+            ENGINE_CORE_WARN( "CTexture::resize >>> Tried resizing a texture associated to non-null \
+                               initial texture data. Skipping resize as initial data might no longer be valid." );
+            return;
+        }
+
+        if ( width <= 0 || height <= 0 )
+        {
+            ENGINE_CORE_WARN( "CTexture::resize >>> tried resizing with invalid dimensions: ({0},{1})", width, height );
             return;
         }
 
@@ -247,7 +257,7 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, m_openglId );
         glTexImage2D( GL_TEXTURE_2D, 0,
                       toOpenGLEnum( m_texDataPtr->internalFormat ), width, height, 0,
-                      toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), NULL );
+                      toOpenGLEnum( m_texDataPtr->format ), toOpenGLEnum( m_texPixelDtype ), data );
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
 

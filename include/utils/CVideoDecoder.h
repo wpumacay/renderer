@@ -26,6 +26,9 @@ namespace engine
 
     std::unique_ptr<uint8_t[]> DecodeOneFrame( AVFormatContext* format_ctx,
                                                AVCodecContext* codec_ctx,
+                                               AVFrame* frame_av,
+                                               AVPacket* packet_av,
+                                               SwsContext* sws_ctx,
                                                ssize_t video_frame_index );
 
     class CVideoDecoder
@@ -43,6 +46,12 @@ namespace engine
 
         std::unique_ptr<uint8_t[]> GetNextFrame();
 
+        std::unique_ptr<uint8_t[]> GetLastFrame();
+
+        ssize_t GetCurrentFrameWidth() const;
+
+        ssize_t GetCurrentFrameHeight() const;
+
         bool loop() const { return m_loop; }
 
         eDecodingMode mode() const { return m_mode; }
@@ -56,6 +65,12 @@ namespace engine
         std::unique_ptr<AVCodecContext, AVCodecContextDeleter> m_codecContext;
 
         std::unique_ptr<AVFormatContext, AVFormatContextDeleter> m_formatContext;
+
+        std::unique_ptr<AVFrame, AVFrameDeleter> m_frame_av;
+
+        std::unique_ptr<AVPacket, AVPacketDeleter> m_packet_av;
+
+        std::unique_ptr<SwsContext, SwsContextDeleter> m_swsContext;
 
         ssize_t m_videoStreamIndex;
 

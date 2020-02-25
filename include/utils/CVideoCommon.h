@@ -45,6 +45,14 @@ namespace engine
             av_frame_free( &frame );
         }
     };
+
+    struct SwsContextDeleter
+    {
+        void operator()( SwsContext* sws_context ) const
+        {
+            sws_freeContext( sws_context );
+        }
+    };
 }
 
 #endif /* ENGINE_USE_FFMPEG */

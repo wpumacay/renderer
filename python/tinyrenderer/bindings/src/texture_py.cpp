@@ -109,10 +109,16 @@ namespace engine
                 } ) )
             .def( "bind", &CTexture::bind )
             .def( "unbind", &CTexture::unbind )
-            .def( "resize", &CTexture::resize )
+            .def( "resize", []( CTexture& self, int width, int height, const py::array_t<uint8>& arr_data )
+                {
+                    auto arr_info = arr_data.request();
+                    if ( arr_info.size != ( width * height ) )
+                        throw std::runtime_error( "Texture::resize >>> given buffer and dimensions don't match" );
+                    self.resize( width, height, (const uint8*) arr_info.ptr );
+                } )
             .def( "data", []( CTexture& self ) -> CTextureData*
                 {
-                    return self.data().get();
+                    return self.data().get(); // @todo: remove return unique_ptr& in CTexture.h
                 }, py::return_value_policy::reference_internal )
             .def_property_readonly( "name", &CTexture::name )
             .def_property_readonly( "width", &CTexture::width )
