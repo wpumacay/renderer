@@ -47,7 +47,7 @@ namespace engine
                 ssize_t response = avcodec_send_packet( codec_ctx, packet_av );
                 if( response < 0 )
                 {
-                    ENGINE_CORE_ERROR( "DecodeOneFrame >>> Couldn't send a packet to the decoder: {0}", response );
+                    ENGINE_CORE_ERROR( "DecodeOneFrame >>> Couldn't send a packet to the decoder for decoding: {0}", response );
                     break; // no need to unref, as packet will be freed during out of scope (unique_ptr)
                 }
 
@@ -223,6 +223,7 @@ namespace engine
             return;
         }
 
+        // Software-scale context (to handle conversion from YUVxyz(from codec) to RGB888)
         m_swsContext = std::unique_ptr<SwsContext, SwsContextDeleter>( sws_getContext( m_codecContext->width,
                                                                                        m_codecContext->height,
                                                                                        m_codecContext->pix_fmt,

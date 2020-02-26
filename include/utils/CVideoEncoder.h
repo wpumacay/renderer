@@ -28,7 +28,9 @@ namespace engine
                          AVStream* stream,
                          AVFrame* frame_av,
                          AVPacket* packet_av,
-                         const uint8_t* frame_data );
+                         SwsContext* sws_ctx,
+                         const uint8_t* frame_data,
+                         size_t frame_index );
 
     class CVideoEncoder
     {
@@ -68,6 +70,8 @@ namespace engine
 
         std::unique_ptr<AVPacket, AVPacketDeleter> m_packet_av;
 
+        std::unique_ptr<SwsContext, SwsContextDeleter> m_swsContext;
+
         AVStream* m_streamRef;
 
         eEncodingMode m_mode;
@@ -79,6 +83,8 @@ namespace engine
         ssize_t m_width;
 
         ssize_t m_height;
+
+        ssize_t m_frame_index;
     };
 
 }
