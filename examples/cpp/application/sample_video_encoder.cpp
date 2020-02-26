@@ -169,7 +169,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        theta += 0.2f * engine::CTime::GetAvgTimeStep();
+        theta += 5.0f * engine::CTime::GetAvgTimeStep();
         float _sphi = std::sin( phi );
         float _cphi = std::cos( phi );
         float _stheta = std::sin( theta );

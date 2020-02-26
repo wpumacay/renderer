@@ -60,13 +60,13 @@ namespace engine
             else if ( response < 0 )
             {
                 ENGINE_CORE_ERROR( "EncodeOneFrame >>> couldn't send a packet to the encoder for encoding: {0}", response );
-                break; // @todo: no need to unref packet?
+                return; // @todo: no need to unref packet?
             }
 
             packet_av->pts = frame_index;
             packet_av->stream_index = 0; // first stream is video stream
             packet_av->duration = stream->time_base.den / stream->time_base.num / stream->avg_frame_rate.num * stream->avg_frame_rate.den;
-            av_packet_rescale_ts( packet_av, stream->time_base, stream->time_base );
+            av_packet_rescale_ts( packet_av, codec_ctx->time_base, stream->time_base );
             response = av_interleaved_write_frame( format_ctx, packet_av );
             if ( response != 0 )
             {
