@@ -175,6 +175,7 @@ namespace engine
             .def_static( "Init", &CTextureManager::Init )
             .def_static( "Release", &CTextureManager::Release )
             .def_static( "LoadTexture", []( const std::string& filepath,
+                                            const std::string& scope,
                                             const eTextureFilter& filterMin,
                                             const eTextureFilter& filterMag,
                                             const eTextureWrap& wrapU,
@@ -185,6 +186,7 @@ namespace engine
                                             bool flipVertically ) -> CTexture*
                 {
                     return CTextureManager::LoadTexture( filepath,
+                                                         scope,
                                                          filterMin, filterMag,
                                                          wrapU, wrapV,
                                                          tinymath::nparray_to_vector<engine::float32,4>( borderColorU ),
