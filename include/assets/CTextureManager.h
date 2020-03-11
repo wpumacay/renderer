@@ -21,6 +21,7 @@ namespace engine
         ~CTextureManager();
 
         static CTexture* LoadTexture( const std::string& filepath,
+                                      const std::string& scope = "",
                                       const eTextureFilter& filterMin = eTextureFilter::NEAREST,
                                       const eTextureFilter& filterMag = eTextureFilter::NEAREST,
                                       const eTextureWrap& wrapU = eTextureWrap::REPEAT,
@@ -32,20 +33,21 @@ namespace engine
 
         static CTexture* LoadTexture( const std::string& filepath,
                                       const CTextureOptions& texOptions,
-                                      bool flipVertically = true );
+                                      bool flipVertically = true,
+                                      const std::string& scope = "" );
 
         static CTextureCube* LoadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically = false );
 
-        static CTextureData* GetCachedTextureData( const std::string& texDataId );
+        static CTextureData* GetCachedTextureData( const std::string& texDataId, const std::string& scope = "" );
         static CTextureCubeData* GetCachedTextureCubeData( const std::string& texCubeDataId );
 
-        static CTexture* GetCachedTexture( const std::string& texId );
+        static CTexture* GetCachedTexture( const std::string& texId, const std::string& scope = "" );
         static CTextureCube* GetCachedTextureCube( const std::string& texCubeId );
 
-        static bool HasCachedTextureData( const std::string& texDataId );
+        static bool HasCachedTextureData( const std::string& texDataId, const std::string& scope = "" );
         static bool HasCachedTextureCubeData( const std::string& texCubeDataId );
 
-        static bool HasCachedTexture( const std::string& texId );
+        static bool HasCachedTexture( const std::string& texId, const std::string& scope = "" );
         static bool HasCachedTextureCube( const std::string& texCubeId );
 
         static std::vector< CTextureData* > GetAllCachedTexturesData();
@@ -64,22 +66,22 @@ namespace engine
         void _createBuiltInTextures();
         void _createChessboardTexture();
 
-        std::unique_ptr<CTextureData> _loadTextureData( const std::string& filepath, bool flipVertically );
+        std::unique_ptr<CTextureData> _loadTextureData( const std::string& filepath, bool flipVertically, const std::string& scope = "" );
         std::unique_ptr<CTextureCubeData> _loadTextureCubeData( const std::array< std::string, 6 >& filepaths, bool flipVertically );
 
-        CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions, bool flipVertically );
+        CTexture* _loadTexture( const std::string& filepath, const CTextureOptions& texOptions, bool flipVertically, const std::string& scope = "" );
         CTextureCube* _loadTextureCube( const std::array< std::string, 6 >& filepaths, bool flipVertically );
 
-        CTextureData* _getCachedTextureData( const std::string& texDataId );
+        CTextureData* _getCachedTextureData( const std::string& texDataId, const std::string& scope = "" );
         CTextureCubeData* _getCachedTextureCubeData( const std::string& texCubeDataId );
 
-        CTexture* _getCachedTexture( const std::string& texId );
+        CTexture* _getCachedTexture( const std::string& texId, const std::string& scope = "" );
         CTextureCube* _getCachedTextureCube( const std::string& texCubeId );
 
-        bool _hasCachedTextureData( const std::string& texDataId );
+        bool _hasCachedTextureData( const std::string& texDataId, const std::string& scope = "" );
         bool _hasCachedTextureCubeData( const std::string& texCubeDataId );
 
-        bool _hasCachedTexture( const std::string& texId );
+        bool _hasCachedTexture( const std::string& texId, const std::string& scope );
         bool _hasCachedTextureCube( const std::string& texCubeId );
 
         std::vector< CTextureData* > const _getAllCachedTexturesData() { return m_texturesDataListRefs; }

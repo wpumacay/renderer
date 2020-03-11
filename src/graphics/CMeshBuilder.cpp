@@ -1206,15 +1206,16 @@ namespace engine
                 //// ENGINE_CORE_TRACE( "folder-path: {0}", folderPath );
                 //// ENGINE_CORE_TRACE( "path-to-diffuse-map: {0}", folderPath + _str.C_Str() );
 
-                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) ) )
+                const std::string mesh_scope = _name;
+                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope ) )
                 {
                     //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
-                    _albedoMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) );
+                    _albedoMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope );
                 }
                 else
                 {
                     //// ENGINE_CORE_TRACE( "NOT LOADED YET: {0}", _str.C_Str() );
-                    _albedoMap = CTextureManager::LoadTexture( folderPath + _str.C_Str() );
+                    _albedoMap = CTextureManager::LoadTexture( folderPath + _str.C_Str(), mesh_scope );
                 }
             }
             // check for specular maps
@@ -1228,18 +1229,18 @@ namespace engine
                 //// ENGINE_CORE_TRACE( "folder-path: {0}", folderPath );
                 //// ENGINE_CORE_TRACE( "path-to-specular-map: {0}", folderPath + _str.C_Str() );
 
-                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) ) )
+                const std::string mesh_scope = _name;
+                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope ) )
                 {
                     //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
-                    _specularMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ) );
+                    _specularMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope );
                 }
                 else
                 {
                     //// ENGINE_CORE_TRACE( "NOT LOADED YET: {0}", _str.C_Str() );
-                    _specularMap = CTextureManager::LoadTexture( folderPath + _str.C_Str() );
+                    _specularMap = CTextureManager::LoadTexture( folderPath + _str.C_Str(), mesh_scope );
                 }
             }
-
         }
 
         // compute bounding box
