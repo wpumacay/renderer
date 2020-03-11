@@ -22,6 +22,7 @@ namespace engine
             _io.IniFilename = ( props.fileLayout == "" ) ? "imgui.ini" : props.fileLayout.c_str();
         else
             _io.IniFilename = nullptr;
+        _io.ConfigWindowsMoveFromTitleBarOnly = true;
 
         if ( !props.useAutosaveLayout && props.fileLayout != "" )
             ImGui::LoadIniSettingsFromDisk( props.fileLayout.c_str() );

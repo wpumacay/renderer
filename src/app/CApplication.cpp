@@ -244,11 +244,32 @@ namespace engine
                     layer->render();
     #endif /* ENGINE_HEADLESS_EGL */
 
+        int32 _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight;
+        if ( m_useRenderTarget && m_renderTarget )
+        {
+            int32 _currentViewport[4];
+            glGetIntegerv( GL_VIEWPORT, _currentViewport );
+            _prevViewportX = _currentViewport[0];
+            _prevViewportY = _currentViewport[1];
+            _prevViewportWidth  = _currentViewport[2];
+            _prevViewportHeight = _currentViewport[3];
+
+            glViewport( 0, 0, m_renderOptions.viewportWidth, m_renderOptions.viewportHeight );
+            m_renderTarget->bind();
+        }
+
         // render all commands requested to the debug drawer
         if ( m_scene->HasCurrentCamera() && m_scene->HasCurrentLight() )
             CDebugDrawer::Render( m_scene->GetCurrentCamera(), m_scene->GetCurrentLight() );
         else if ( m_scene->HasCurrentCamera() )
             CDebugDrawer::Render( m_scene->GetCurrentCamera() );
+
+        if ( m_useRenderTarget && m_renderTarget )
+        {
+            glViewport( _prevViewportX, _prevViewportY, _prevViewportWidth, _prevViewportHeight );
+            m_renderTarget->unbind();
+        }
+
     #ifndef ENGINE_HEADLESS_EGL
         // render all commands requested to imgui so far
         m_imguiManager->render();
