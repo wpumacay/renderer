@@ -173,6 +173,9 @@ namespace engine
 
         if ( m_texDataPtr->width > 0 && m_texDataPtr->height > 0 )
         {
+            // @fix: no rows-alignment as expected from OpenGL (fixes issue with images loaded using stbi_load)
+            // @source: https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
+            glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
             // Send our data to the texture buffer
             glTexImage2D( GL_TEXTURE_2D, 0, 
                           toOpenGLEnum( m_texDataPtr->internalFormat ), m_texDataPtr->width, m_texDataPtr->height, 0,
