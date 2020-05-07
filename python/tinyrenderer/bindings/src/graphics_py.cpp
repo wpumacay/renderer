@@ -49,7 +49,7 @@ namespace engine
             .def( "__repr__", []( const CFog* self )
                 {
                     auto _strrep = std::string( "Fog(\n" );
-                    _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += self->toString() + ")";
                     return _strrep;
                 } );
@@ -74,7 +74,7 @@ namespace engine
                 {
                     auto _cubemapRef = self->cubemap();
                     auto _strrep = std::string( "Skybox(\n" );
-                    _strrep += "cpp-address     : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address     : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += "cubemap-name    : " + std::string( _cubemapRef ? _cubemapRef->name() : "None" ) + ")";
                     return _strrep;
                 } );
@@ -168,7 +168,7 @@ namespace engine
                     auto _dirLightRef = self->dirLightPtr;
                     auto _cameraRef = self->cameraPtr;
                     auto _strrep = std::string( "ShadowMapRangeConfig(\n" );
-                    _strrep += "cpp-address     : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address     : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += "type            : " + engine::toString( self->type ) + "\n";
                     _strrep += "worldUp         : " + engine::toString( self->worldUp ) + "\n";
                     _strrep += "pointLight      : " + std::string( _pointLightRef ? _pointLightRef->name() : "None" ) + "\n";
@@ -216,7 +216,7 @@ namespace engine
             .def( "__repr__", []( const CShadowMap* self )
                 {
                     auto _strrep = std::string( "ShadowMap(\n" );
-                    _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += "width       : " + std::to_string( self->width() ) + "\n";
                     _strrep += "height      : " + std::to_string( self->height() ) + "\n";
                     _strrep += "lspaceView  :\n" + engine::toString( self->lightSpaceMatView() ) + "\n";

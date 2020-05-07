@@ -1076,10 +1076,10 @@ namespace engine
         }
 
         // Create a temporary holder to place the processes data from assimp
-        auto _name = std::string( "aim:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ ) + "//" + engine::getFilenameNoExtensionFromFilePath( filename );
+        auto _name = std::string( "aim:" ) + std::to_string( CMeshBuilder::s_numAssimpModels++ ) + "//" + tinyutils::GetFilenameNoExtension( filename );
         auto _model = std::make_unique<CModel>( _name );
         // recursively copy the data from assimp to our data structure
-        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr, engine::getFolderpathFromFilePath( filename ) );
+        _processAssimpNode( _model, _assimpScenePtr->mRootNode, _assimpScenePtr, tinyutils::GetFolderpath( filename ) );
 
         // make sure we release the assimp resources
         // @TODO: Should do this in a assetsModelManager (to avoid repetitions)
@@ -1207,10 +1207,10 @@ namespace engine
                 //// ENGINE_CORE_TRACE( "path-to-diffuse-map: {0}", folderPath + _str.C_Str() );
 
                 const std::string mesh_scope = _name;
-                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope ) )
+                if ( CTextureManager::HasCachedTexture( tinyutils::GetFilenameNoExtension( _str.C_Str() ), mesh_scope ) )
                 {
                     //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
-                    _albedoMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope );
+                    _albedoMap = CTextureManager::GetCachedTexture( tinyutils::GetFilenameNoExtension( _str.C_Str() ), mesh_scope );
                 }
                 else
                 {
@@ -1230,10 +1230,10 @@ namespace engine
                 //// ENGINE_CORE_TRACE( "path-to-specular-map: {0}", folderPath + _str.C_Str() );
 
                 const std::string mesh_scope = _name;
-                if ( CTextureManager::HasCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope ) )
+                if ( CTextureManager::HasCachedTexture( tinyutils::GetFilenameNoExtension( _str.C_Str() ), mesh_scope ) )
                 {
                     //// ENGINE_CORE_TRACE( "ALREADY LOADED: {0}", _str.C_Str() );
-                    _specularMap = CTextureManager::GetCachedTexture( getFilenameNoExtensionFromFilePath( _str.C_Str() ), mesh_scope );
+                    _specularMap = CTextureManager::GetCachedTexture( tinyutils::GetFilenameNoExtension( _str.C_Str() ), mesh_scope );
                 }
                 else
                 {

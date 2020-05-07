@@ -82,7 +82,7 @@ namespace engine
             .def( "__repr__", []( const CTextureData& self )
                 {
                     auto _strrep = std::string( "TextureData(\n" );
-                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
                     _strrep += engine::toString( self );
                     return _strrep;
                 } );

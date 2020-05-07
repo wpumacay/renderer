@@ -11,9 +11,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Shader @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Created Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Created Shader @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Created Shader @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -23,9 +23,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Shader @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Destroyed Shader @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Destroyed Shader @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 

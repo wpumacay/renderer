@@ -80,7 +80,7 @@ namespace engine
             .def( "__repr__", []( const CMaterial* self )
                 {
                     auto _strrep = std::string( "Material(\n" );
-                    _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += self->toString();
                     _strrep += ")";
                     return _strrep;

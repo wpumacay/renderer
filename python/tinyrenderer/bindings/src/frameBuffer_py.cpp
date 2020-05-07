@@ -44,7 +44,7 @@ namespace engine
             .def( "__repr__", []( const CAttachmentConfig* self )
                 {
                     auto _strrep = std::string( "AttachmentConfig(\n" );
-                    _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += "name        : " + self->name + "\n";
                     _strrep += "texIntFormat: " + engine::toString( self->texInternalFormat ) + "\n";
                     _strrep += "texFormat   : " + engine::toString( self->texFormat ) + "\n";
@@ -101,7 +101,7 @@ namespace engine
             .def( "__repr__", []( const CFrameBuffer* self )
                 {
                     auto _strrep = std::string( "FrameBuffer(\n" );
-                    _strrep += "cpp-address : " + engine::pointerToHexAddress( self ) + "\n";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( self ) + "\n";
                     _strrep += "width       : " + std::to_string( self->width() ) + "\n";
                     _strrep += "height      : " + std::to_string( self->height() ) + "\n";
                     _strrep += "openglId    : " + std::to_string( self->openglId() ) + "\n";

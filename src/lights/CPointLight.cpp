@@ -22,9 +22,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created PointLight @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Created PointLight @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Created PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Created PointLight @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -32,9 +32,9 @@ namespace engine
     {
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed PointLight @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Destroyed PointLight @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Destroyed PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Destroyed PointLight @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 

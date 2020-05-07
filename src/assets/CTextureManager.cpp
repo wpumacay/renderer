@@ -224,10 +224,10 @@ namespace engine
                      _fname.find( ".png" ) != std::string::npos ||
                      _fname.find( ".tga" ) != std::string::npos )
                 {
-                    std::string _filename = engine::split( _fname, '/' ).back();
-                    std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
-                    std::string _fileExtension = engine::split( _filename, '.' ).back();
-                    std::string _filenameBasename = engine::split( _filenameNoExtension, '_' ).front();
+                    std::string _filename = tinyutils::Split( _fname, '/' ).back();
+                    std::string _filenameNoExtension = tinyutils::Split( _filename, '.' ).front();
+                    std::string _fileExtension = tinyutils::Split( _filename, '.' ).back();
+                    std::string _filenameBasename = tinyutils::Split( _filenameNoExtension, '_' ).front();
 
                     _mapBasenameExtension[ _filenameBasename ] = _fileExtension;
                 }
@@ -268,8 +268,8 @@ namespace engine
             return nullptr;
         }
 
-        std::string _filename = engine::split( filepath, '/' ).back();
-        std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
+        std::string _filename = tinyutils::Split( filepath, '/' ).back();
+        std::string _filenameNoExtension = tinyutils::Split( _filename, '.' ).front();
         const std::string cache_id = ( scope != "" ) ? ( scope + "::" + _filenameNoExtension ) : ( _filenameNoExtension );
 
         if ( m_texturesDataMapRefs.find( cache_id ) != m_texturesDataMapRefs.end() )
@@ -355,9 +355,9 @@ namespace engine
 
             _format = _sideFormat;
 
-            auto _filename = engine::split( filepaths[i], '/' ).back();
-            auto _filenameNoExtension = engine::split( _filename, '.' ).front();
-            auto _filenameNoExtensionSplits = engine::split( _filenameNoExtension, '_' );
+            auto _filename = tinyutils::Split( filepaths[i], '/' ).back();
+            auto _filenameNoExtension = tinyutils::Split( _filename, '.' ).front();
+            auto _filenameNoExtensionSplits = tinyutils::Split( _filenameNoExtension, '_' );
             auto _filenameBasename = _filenameNoExtensionSplits.front();
 
             if ( _filenameNoExtensionSplits.size() != 2 )
@@ -462,8 +462,8 @@ namespace engine
             return nullptr;
         }
 
-        std::string _filename = engine::split( filepath, '/' ).back();
-        std::string _filenameNoExtension = engine::split( _filename, '.' ).front();
+        std::string _filename = tinyutils::Split( filepath, '/' ).back();
+        std::string _filenameNoExtension = tinyutils::Split( _filename, '.' ).front();
         const std::string cache_id = ( scope != "" ) ? ( scope + "::" + _filenameNoExtension ) : ( _filenameNoExtension );
 
         if ( m_texturesMap.find( cache_id ) != m_texturesMap.end() )

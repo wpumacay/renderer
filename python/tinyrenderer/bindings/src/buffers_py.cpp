@@ -98,7 +98,7 @@ namespace engine
             .def( "__repr__", []( const CVertexBuffer& self )
                 {
                     auto _strrep = std::string( "VertexBuffer(\n" );
-                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
                     _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
                     _strrep += "size: " + std::to_string( self.size() ) + "\n";
                     _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
@@ -132,7 +132,7 @@ namespace engine
             .def( "__repr__", []( const CIndexBuffer& self )
                 {
                     auto _strrep = std::string( "IndexBuffer(\n" );
-                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
                     _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
                     _strrep += "indices-count: " + std::to_string( self.count() ) + "\n";
                     _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
@@ -174,7 +174,7 @@ namespace engine
             .def( "__repr__", []( const CVertexArray& self )
                 {
                     auto _strrep = std::string( "VertexArray(\n" );
-                    _strrep += "cpp-address: " + engine::pointerToHexAddress( &self ) + "\n";
+                    _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
                     _strrep += "num-attribs: " + std::to_string( self.numAttribs() ) + "\n";
                     _strrep += "num-vbos: " + std::to_string( self.vertexBuffers().size() ) + "\n";
                     _strrep += "num-ebos: " + std::to_string( self.indexBuffer() ? 1 : 0 ) + "\n";

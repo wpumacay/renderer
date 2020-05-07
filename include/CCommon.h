@@ -45,15 +45,6 @@
 
 namespace engine
 {
-    std::vector< std::string > split( const std::string &txt, char separator = '.' );
-
-    std::string getFilenameFromFilePath( const std::string& filepath );
-    std::string getFoldernameFromFilePath( const std::string& filepath );
-    std::string getFolderpathFromFilePath( const std::string& filepath );
-    std::string getFilenameNoExtensionFromFilePath( const std::string& filepath );
-
-    std::string pointerToHexAddress( const void* ptr );
-
     typedef unsigned char uint8;
     typedef unsigned int uint32;
     typedef unsigned long uint64;

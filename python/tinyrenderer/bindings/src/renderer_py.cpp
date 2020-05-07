@@ -132,7 +132,7 @@ namespace engine
                 .def( "__repr__", []( const CRenderOptions* self )
                     {
                         auto _strrep = std::string( "RenderOptions(\n" );
-                        _strrep += "cpp-address     : " + engine::pointerToHexAddress( self ) + "\n";
+                        _strrep += "cpp-address     : " + tinyutils::PointerToHexAddress( self ) + "\n";
                         _strrep += engine::toString( *self );
                         _strrep += ")";
                         return _strrep;

@@ -39,9 +39,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Material @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Created Material @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Created Material @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Created Material @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -52,9 +52,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Material @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Material @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Destroyed Material @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Destroyed Material @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 

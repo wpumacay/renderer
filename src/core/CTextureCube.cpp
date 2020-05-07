@@ -19,9 +19,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Created TextureCubeData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Created TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Created TextureCubeData @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -32,9 +32,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCubeData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Destroyed TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Destroyed TextureCubeData @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -85,9 +85,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created TextureCube @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Created TextureCube @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Created TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Created TextureCube @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
@@ -98,9 +98,9 @@ namespace engine
 
     #ifdef ENGINE_TRACK_ALLOCS
         if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCube @ {0}", engine::pointerToHexAddress( this ) );
+            ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCube @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
-            std::cout << "Allocs: Destroyed TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
+            std::cout << "Allocs: Destroyed TextureCube @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
     #endif
     }
 
