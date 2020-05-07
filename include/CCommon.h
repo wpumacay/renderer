@@ -123,3 +123,15 @@ namespace engine
         assert((x));                \
     }
 #endif
+
+#if defined(ENGINE_USE_PROFILING)
+    #define ENGINE_PROFILE_SCOPE(name)                          PROFILE_SCOPE(name)
+    #define ENGINE_PROFILE_SCOPE_IN_SESSION(name, session_name) PROFILE_SCOPE_IN_SESSION(name, session_name)
+    #define ENGINE_PROFILE_FUNCTION()                           PROFILE_FUNCTION()
+    #define ENGINE_PROFILE_FUNCTION_IN_SESSION(session_name)    PROFILE_FUNCTION_IN_SESSION(session_name)
+#else
+    #define ENGINE_PROFILE_SCOPE(name)                          ((void)0)
+    #define ENGINE_PROFILE_SCOPE_IN_SESSION(name, session_name) ((void)0)
+    #define ENGINE_PROFILE_FUNCTION()                           ((void)0)
+    #define ENGINE_PROFILE_FUNCTION_IN_SESSION(session_name)    ((void)0)
+#endif

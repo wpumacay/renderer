@@ -36,7 +36,7 @@ namespace engine
 
         tinyutils::Profiler::Init();
         tinyutils::Profiler::BeginSession( "sess_core_init" );
-        PROFILE_FUNCTION_IN_SESSION( "sess_core_init" );
+        ENGINE_PROFILE_FUNCTION_IN_SESSION( "sess_core_init" );
         ENGINE_CORE_INFO( "GL-Application: profiling enabled" );
 
         engine::CTextureManager::Init();
@@ -218,7 +218,7 @@ namespace engine
     void CApplication::render()
     {
         ENGINE_CORE_ASSERT( m_scene, "There must be a valid scene for this application" );
-        PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
+        ENGINE_PROFILE_FUNCTION_IN_SESSION( "sess_core_render" );
 
         // submit the renderables of this scene to the renderer
         m_mainRenderer->submit( m_scene->GetRenderablesList() );
