@@ -89,7 +89,7 @@ namespace engine
         format          = eTextureFormat::NONE;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureData @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created TextureData @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -104,7 +104,7 @@ namespace engine
         data = nullptr;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureData @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed TextureData @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -190,7 +190,7 @@ namespace engine
         /******************************************************************************************/
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Texture @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created Texture @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -222,7 +222,7 @@ namespace engine
         m_openglId = 0;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Texture @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed Texture @ " << engine::pointerToHexAddress( this ) << std::endl;

@@ -25,7 +25,7 @@ namespace engine
         // create the global reference for other systems to use
         CApplication::s_instance = this;
 
-        engine::CLogger::Init();
+        tinyutils::Logger::Init();
         ENGINE_CORE_INFO( "GL-Application: starting..." );
     #ifdef ENGINE_HEADLESS_EGL
         m_window = std::make_unique< CWindowEGL >( windowProperties );
@@ -34,20 +34,18 @@ namespace engine
         ENGINE_CORE_ASSERT( dynamic_cast<CWindowGLFW*>( m_window.get() )->glfwWindow(), "There was an error while creating the opengl-window" );
     #endif /* ENGINE_HEADLESS_EGL */
 
-        //// engine::CProfilingManager::Init( eProfilerType::INTERNAL );
-        engine::CProfilingManager::Init( eProfilerType::EXTERNAL_CHROME );
-        ENGINE_CORE_INFO( "GL-Application: profiling enabled" );
-        engine::CProfilingManager::BeginSession( "sess_core_init" );
+        tinyutils::Profiler::Init();
+        tinyutils::Profiler::BeginSession( "sess_core_init" );
         PROFILE_FUNCTION_IN_SESSION( "sess_core_init" );
+        ENGINE_CORE_INFO( "GL-Application: profiling enabled" );
 
-        engine::CTime::Init();
         engine::CTextureManager::Init();
         engine::CShaderManager::Init();
         engine::CInputManager::Init();
         engine::CDebugDrawer::Init();
-        engine::CNoiseGenerator::Init();
+        tinyutils::PerlinNoise::Init();
+        tinyutils::Clock::Init();
 
-        //// PROFILE_SCOPE_IN_SESSION( "app_initialization", "sess_core_init" );
         m_scene = std::make_unique< CScene >();
         m_mainRenderer = std::make_unique< CMainRenderer >();
     #ifndef ENGINE_HEADLESS_EGL
@@ -67,8 +65,6 @@ namespace engine
         m_renderOptions.viewportHeight = m_window->height();
         m_renderOptions.renderTargetPtr = nullptr;
 
-        // start keeping track of time
-        engine::CTime::Start();
         m_timeStamp = 0.0;
     #ifndef ENGINE_HEADLESS_EGL
         // create a utils panel by default (the user can choose to use it or not)
@@ -83,6 +79,8 @@ namespace engine
         addGuiLayer( std::unique_ptr< CImGuiLayer >( m_guiUtilsLayer ) );
     #endif /* ENGINE_HEADLESS_EGL */
         ENGINE_CORE_INFO( "GL-Application started successfully!!!" );
+        // flush results from initialization
+        tinyutils::Profiler::EndSession( "sess_core_init" );
     }
 
     CApplication::CApplication()
@@ -108,13 +106,10 @@ namespace engine
         // Destroy the window (and the context as well)
         m_window = nullptr;
 
-        //// // flush results from initialization
-        //// engine::CProfilingManager::EndSession( "sess_core_init" );
-
-        engine::CTime::Release();
-        engine::CProfilingManager::Release();
-        engine::CNoiseGenerator::Release();
-        engine::CLogger::Release();
+        tinyutils::Clock::Release();
+        tinyutils::Profiler::Release();
+        tinyutils::PerlinNoise::Release();
+        tinyutils::Logger::Release();
     }
 
     CScene* CApplication::setScene( std::unique_ptr< CScene > scene )
@@ -174,13 +169,9 @@ namespace engine
 
     void CApplication::begin()
     {
-        engine::CProfilingManager::BeginSession( "sess_core_render" );
-    #ifndef ENGINE_HEADLESS_EGL
-        m_timeStamp = glfwGetTime();
-    #else
+        tinyutils::Profiler::BeginSession( "sess_core_render" );
         auto tpStart = std::chrono::high_resolution_clock::now();
         m_timeStamp = std::chrono::time_point_cast<std::chrono::microseconds>( tpStart ).time_since_epoch().count() * 0.001;
-    #endif /* ENGINE_HEADLESS_EGL */
         // prepare window for rendering, and poll events
         m_window->begin();
 
@@ -281,22 +272,30 @@ namespace engine
         // swap buffers such that we see that juicy frame (if we rendered to default target)
         m_window->end();
 
-    #ifndef ENGINE_HEADLESS_EGL
-        // tick-tock, in the main thread (might need to handle it differently in multi-threading mode)
-        float64 _timeNow = glfwGetTime();
-        float64 _timeDelta = _timeNow - m_timeStamp;
-        m_timeStamp = _timeNow;
-        // update time keeper for our other systems to use
-        engine::CTime::Update( _timeDelta );
-    #else
         auto tpEnd = std::chrono::high_resolution_clock::now();
         float64 _timeNow = std::chrono::time_point_cast<std::chrono::microseconds>( tpEnd ).time_since_epoch().count() * 0.001;
         float64 _timeDelta = _timeNow - m_timeStamp;
         m_timeStamp = _timeNow;
-        engine::CTime::Update( _timeDelta );
-    #endif /* ENGINE_HEADLESS_EGL */
 
-        engine::CProfilingManager::EndSession( "sess_core_render" );
+        tinyutils::Profiler::EndSession( "sess_core_render" );
+    }
+
+    void CApplication::Init()
+    {
+        _InitUser();
+    }
+
+    void CApplication::Run()
+    {
+        while( active() )
+        {
+            // Start tracking time (beginning of render-loop)
+            tinyutils::Clock::Tick();
+            // Let user handle its own render-loop
+            _RunUser();
+            // Stop tracking time (end of render-loop)
+            tinyutils::Clock::Tock();
+        }
     }
 
     void CApplication::CallbackKey( int key, int action )

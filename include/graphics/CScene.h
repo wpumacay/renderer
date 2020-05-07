@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
 
 #include <lights/CILight.h>
 #include <lights/CDirectionalLight.h>

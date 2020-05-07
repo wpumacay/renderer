@@ -30,7 +30,7 @@ void scrollCallback( double xOff, double yOff )
 
 int main()
 {
-    engine::CLogger::Init();
+    tinyutils::Logger::Init();
 
     auto _windowProps = engine::CWindowProps();
     _windowProps.width = 800;
@@ -46,12 +46,14 @@ int main()
 
     while( _window->active() )
     {
+        tinyutils::Clock::Tick();
         _window->begin();
 
         if ( g_terminate )
             _window->requestClose();
 
         _window->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

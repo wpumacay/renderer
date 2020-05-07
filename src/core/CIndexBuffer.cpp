@@ -1,6 +1,5 @@
 
 #include <core/CIndexBuffer.h>
-#include <utils/CLogger.h>
 
 namespace engine
 {
@@ -31,7 +30,7 @@ namespace engine
 
         if ( m_track )
         {
-            if ( CLogger::IsActive() )
+            if ( tinyutils::Logger::IsActive() )
                 ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
             else
                 std::cout << "Allocs: Destroyed Index Buffer" << std::endl;

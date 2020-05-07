@@ -104,6 +104,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
@@ -146,6 +147,7 @@ int main()
         glEnable( GL_DEPTH_TEST );
 
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

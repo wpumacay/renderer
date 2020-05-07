@@ -2,8 +2,6 @@
 
 #include <gui/CImGuiLayer.h>
 
-#include <utils/CTime.h>
-#include <utils/CLogger.h>
 #include <renderers/CMainRenderer.h>
 #include <graphics/CScene.h>
 

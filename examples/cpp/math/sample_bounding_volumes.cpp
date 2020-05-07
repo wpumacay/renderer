@@ -101,6 +101,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
@@ -131,6 +132,7 @@ int main()
 
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

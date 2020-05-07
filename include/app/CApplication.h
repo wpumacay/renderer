@@ -20,11 +20,7 @@
     #include <gl/CWindowEGL.h>
 #endif /* ENGINE_HEADLESS_EGL */
 
-#include <utils/CLogger.h>
-#include <utils/CTime.h>
 #include <utils/CDebugDrawer.h>
-#include <utils/CNoiseGenerator.h>
-#include <utils/CProfiling.h>
 
 #ifndef ENGINE_HEADLESS_EGL
 #include <gui/CImGuiManager.h>
@@ -33,10 +29,7 @@
 #include <gui/CImGuiSceneLayer.h>
 #endif /* ENGINE_HEADLESS_EGL */
 
-#ifdef ENGINE_HEADLESS_EGL
-// use chrono instead of glfw-timer (@todo: remove glfw-timer altogether)
 #include <chrono>
-#endif
 
 namespace engine
 {
@@ -67,6 +60,10 @@ namespace engine
         void render();
 
         void end();
+
+        void Init();
+
+        void Run();
 
         void addKeyboardCallback( FnPtr_keyboard_callback callback ) { m_keyboardCallbacks.push_back( callback ); }
         void addMouseButtonCallback( FnPtr_mouse_callback callback ) { m_mouseButtonCallbacks.push_back( callback ); }
@@ -111,6 +108,12 @@ namespace engine
 
         bool guiSceneViewActive() const { return false; }
     #endif /* ENGINE_HEADLESS_EGL */
+
+    protected :
+
+        virtual void _InitUser() {};
+
+        virtual void _RunUser() {};
 
     protected :
 

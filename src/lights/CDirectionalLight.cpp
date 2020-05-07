@@ -15,7 +15,7 @@ namespace engine
         direction   = lightDirection;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created DirectionalLight @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created DirectionalLight @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -25,7 +25,7 @@ namespace engine
     CDirectionalLight::~CDirectionalLight()
     {
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed DirectionalLight @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed DirectionalLight @ " << engine::pointerToHexAddress( this ) << std::endl;

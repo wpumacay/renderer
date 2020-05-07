@@ -8,7 +8,6 @@
 #include <graphics/CMesh.h>
 #include <graphics/CModel.h>
 #include <camera/CICamera.h>
-#include <utils/CLogger.h>
 
 namespace engine
 {

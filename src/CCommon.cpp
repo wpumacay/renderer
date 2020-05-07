@@ -1,6 +1,5 @@
 
 #include <CCommon.h>
-#include <utils/CLogger.h>
 
 namespace engine
 {
@@ -81,8 +80,7 @@ namespace engine
         if ( axis == eAxis::Y ) return "y";
         if ( axis == eAxis::Z ) return "z";
 
-        ENGINE_CORE_ASSERT( false, "Invalid eAxis enum given." );
-
+        LOG_CORE_CRITICAL( "Invalid eAxis enum given." );
         return "undefined";
     }
 
@@ -93,8 +91,7 @@ namespace engine
         if ( dtype == ePixelDataType::UINT_24_8 ) return "uint_24_8";
         if ( dtype == ePixelDataType::FLOAT_32 ) return "float_32";
 
-        ENGINE_CORE_ASSERT( false, "Invalid ePixelDataType given" );
-
+        LOG_CORE_CRITICAL( "Invalid ePixelDataType given" );
         return 0;
     }
 
@@ -105,8 +102,7 @@ namespace engine
         if ( dtype == ePixelDataType::UINT_24_8 ) return GL_UNSIGNED_INT_24_8;
         if ( dtype == ePixelDataType::FLOAT_32 ) return GL_FLOAT;
 
-        ENGINE_CORE_ASSERT( false, "Invalid ePixelDataType given" );
-
+        LOG_CORE_CRITICAL( "Invalid ePixelDataType given" );
         return 0;
     }
 

@@ -150,6 +150,7 @@ int main()
 
     while ( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_G ) )
@@ -161,7 +162,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        theta += 0.2f * engine::CTime::GetAvgTimeStep();
+        theta += 0.2f * tinyutils::Clock::GetAvgTimeStep();
         float _sphi = std::sin( phi );
         float _cphi = std::cos( phi );
         float _stheta = std::sin( theta );
@@ -178,6 +179,7 @@ int main()
         _app->begin();
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

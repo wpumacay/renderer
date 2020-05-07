@@ -38,7 +38,7 @@ namespace engine
         m_specularMap   = specularMap;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Material @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created Material @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -51,7 +51,7 @@ namespace engine
         m_specularMap = nullptr;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Material @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed Material @ " << engine::pointerToHexAddress( this ) << std::endl;

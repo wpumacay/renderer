@@ -55,6 +55,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         _app->begin();
 
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
@@ -73,6 +74,7 @@ int main()
         _shader->unbind();
 
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

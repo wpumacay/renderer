@@ -83,8 +83,8 @@ namespace engine
         _updateCameraVectors();
 
         // and mode a bit using this new reference frame
-        auto _dFront = m_front * ( m_camSpeedFront * engine::CTime::GetTimeStep() );
-        auto _dRight = m_right * ( m_camSpeedRight * engine::CTime::GetTimeStep() );
+        auto _dFront = m_front * ( m_camSpeedFront * tinyutils::Clock::GetTimeStep() );
+        auto _dRight = m_right * ( m_camSpeedRight * tinyutils::Clock::GetTimeStep() );
         m_position = m_position + _dFront + _dRight;
 
         // some book keeping for next calculation

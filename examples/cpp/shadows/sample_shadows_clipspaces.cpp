@@ -110,8 +110,8 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps           : %.5f", ( 1.0f / engine::CTime::GetAvgTimeStep() ) );
-        ImGui::Text( "frame-time    : %.5f", engine::CTime::GetAvgTimeStep() );
+        ImGui::Text( "fps           : %.5f", tinyutils::Clock::GetAvgFps() );
+        ImGui::Text( "frame-time    : %.5f", tinyutils::Clock::GetAvgTimeStep() );
         ImGui::End();
     }
 
@@ -412,6 +412,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
@@ -468,6 +469,7 @@ int main()
 
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

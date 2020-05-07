@@ -2,10 +2,7 @@
 
 #include <gui/CImGuiLayer.h>
 
-#include <utils/CTime.h>
-#include <utils/CLogger.h>
 #include <utils/CDebugDrawer.h>
-#include <utils/CProfiling.h>
 #include <input/CInputManager.h>
 #include <renderers/CMainRenderer.h>
 #include <graphics/CScene.h>

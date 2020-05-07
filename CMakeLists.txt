@@ -72,7 +72,8 @@ message( "ASSIMP_INCLUDE_DIRS   : ${ASSIMP_INCLUDE_DIRS}" )
 set( TINYRENDERER_INCLUDES_DIRS
      "${CMAKE_CURRENT_SOURCE_DIR}/include"
      "${CMAKE_CURRENT_SOURCE_DIR}/ext/stb"
-     "${CMAKE_SOURCE_DIR}/ext/tinymath/include"
+     "${CMAKE_SOURCE_DIR}/ext/tiny_math/include"
+     "${CMAKE_SOURCE_DIR}/ext/tiny_utils/include"
      "${CMAKE_SOURCE_DIR}/ext/imgui"
      "${CMAKE_SOURCE_DIR}/ext/imgui/examples"
      "${CMAKE_SOURCE_DIR}/ext/spdlog/include" )
@@ -231,11 +232,7 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CLogger.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CNoiseGenerator.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp" )
@@ -247,6 +244,7 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
                            ${OPENGL_LIBRARIES}
                            ${GLEW_LIBRARIES}
                            tinymath_cpp_lib
+                           tinyutils_cpp_lib
                            assimp
                            spdlog
                            imgui
@@ -300,11 +298,7 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CLogger.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CNoiseGenerator.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CProfiling.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CTime.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp"
@@ -317,6 +311,7 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
                            OpenGL::OpenGL
                            OpenGL::EGL
                            tinymath_cpp_lib
+                           tinyutils_cpp_lib
                            assimp
                            spdlog
                            dl

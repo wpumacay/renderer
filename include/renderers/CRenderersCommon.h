@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
 #include <camera/CICamera.h>
 #include <core/CFrameBuffer.h>
 #include <graphics/CFog.h>

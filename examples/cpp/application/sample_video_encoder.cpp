@@ -158,6 +158,7 @@ int main()
     _encoder->BeginEncoding();
     while ( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_G ) )
@@ -169,7 +170,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        theta += 5.0f * engine::CTime::GetAvgTimeStep();
+        theta += 5.0f * tinyutils::Clock::GetAvgTimeStep();
         float _sphi = std::sin( phi );
         float _cphi = std::cos( phi );
         float _stheta = std::sin( theta );
@@ -190,6 +191,7 @@ int main()
         auto fboref = _app->renderTarget();
         auto frame = fboref->read();
         _encoder->SubmitFrame( frame.get(), fboref->width(), fboref->height() );
+        tinyutils::Clock::Tock();
     }
     _encoder->EndEncoding();
 #endif /* ENGINE_USE_FFMPEG */

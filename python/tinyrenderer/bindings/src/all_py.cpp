@@ -1,9 +1,6 @@
 
 #include <all_py.h>
 
-// resources required for initialization
-#include <utils/CLogger.h>
-
 #ifndef ENGINE_HEADLESS_EGL
 PYBIND11_MODULE( tinyrenderer_core, m )
 #else
@@ -57,8 +54,6 @@ PYBIND11_MODULE( tinyrenderer_core_egl, m )
     engine::bindings_lightSpot( m );
     // debug bindings
     engine::bindings_debugDrawer( m );
-    // utils bindings
-    engine::bindings_utilTime( m );
     // scene bindings
     engine::bindings_scene( m );
     // renderable bindings
@@ -77,5 +72,8 @@ PYBIND11_MODULE( tinyrenderer_core_egl, m )
     m.attr( "ENGINE_RESOURCES_PATH" ) = py::cast( ENGINE_RESOURCES_PATH );
 
     // execute some required initialization steps
-    engine::CLogger::Init();
+    tinyutils::Logger::Init();
+    tinyutils::Clock::Init();
+    tinyutils::PerlinNoise::Init();
+    tinyutils::Profiler::Init();
 }

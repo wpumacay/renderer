@@ -45,6 +45,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
 
@@ -57,6 +58,7 @@ int main()
             drawGrid_noInstancing( _shaderNoInstancing2dRef, g_quadVAO_NoInstancing.get() );
 
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

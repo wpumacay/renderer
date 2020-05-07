@@ -2,15 +2,9 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <CMacros.h>
-#include <CExtensions.h>
 
-#include <utils/CTime.h>
-#include <utils/CLogger.h>
-#include <utils/CNoiseGenerator.h>
 #include <utils/CDebugDrawer.h>
 #include <utils/CObjectPicker.h>
-#include <utils/CProfiling.h>
 
 #ifndef ENGINE_HEADLESS_EGL
 #include <gui/CImGuiManager.h>

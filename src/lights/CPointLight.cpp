@@ -21,7 +21,7 @@ namespace engine
         atnQuadratic    = attenuationFactorQuadratic;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created PointLight @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -31,7 +31,7 @@ namespace engine
     CPointLight::~CPointLight()
     {
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed PointLight @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed PointLight @ " << engine::pointerToHexAddress( this ) << std::endl;

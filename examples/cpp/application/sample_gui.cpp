@@ -87,6 +87,7 @@ int main()
 
     while ( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
 
@@ -107,6 +108,7 @@ int main()
         _app->render();
 
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

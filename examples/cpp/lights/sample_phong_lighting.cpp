@@ -66,10 +66,9 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
-        {
             break;
-        }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_S ) )
         {
             _shaderLighting = ( _shaderLighting->name() == "phong_shader" ) ? _shaderGouraudRef : _shaderPhongRef;
@@ -90,7 +89,7 @@ int main()
 
         if ( _moveLight )
         {
-            _mvParam += 100.0f * engine::CTime::GetTimeStep();
+            _mvParam += tinyutils::Clock::GetTimeStep();
             // _gizmo->position.x() = 1.0f + std::sin( _mvParam ) * 2.0f;
             // _gizmo->position.y() = std::sin( _mvParam / 2.0f ) * 1.0f;
 
@@ -128,8 +127,9 @@ int main()
         engine::CDebugDrawer::Render( _camera.get() );
 
         _app->end();
+        tinyutils::Clock::Tock();
 
-        // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
+        ENGINE_TRACE( "frame-time: {0}", tinyutils::Clock::GetAvgTimeStep() );
     }
 
     return 0;

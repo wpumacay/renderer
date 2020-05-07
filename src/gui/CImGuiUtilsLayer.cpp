@@ -132,38 +132,14 @@ namespace engine
 
         if ( ImGui::CollapsingHeader( "Performance" ) )
         {
-            ImGui::Text( "Fps-avg       : %.2f", CTime::GetAvgFps() );
-            ImGui::Text( "Frametime-avg : %.5f", CTime::GetAvgTimeStep() );
+            ImGui::Text( "Fps-avg       : %.2f", tinyutils::Clock::GetAvgFps() );
+            ImGui::Text( "Frametime-avg : %.5f", tinyutils::Clock::GetAvgTimeStep() );
             ImGui::PlotLines( "Fps-avg", 
-                              engine::CTime::GetFpsAvgs().data(), 
-                              engine::CTime::GetNumFramesForAvg(), 
-                              engine::CTime::GetFrameTimeIndex(),
-                              ( std::string( "average: " ) + std::to_string( engine::CTime::GetAvgFps() ) ).c_str(),
+                              tinyutils::Clock::GetFpsBuffer().data(), 
+                              NUM_FRAMES_FOR_AVG, 
+                              tinyutils::Clock::GetTimeIndex(),
+                              ( std::string( "average: " ) + std::to_string( tinyutils::Clock::GetAvgFps() ) ).c_str(),
                               0.0f, FLT_MAX, ImVec2( 0, 100 ) );
-        }
-
-        if ( ImGui::CollapsingHeader( "Profiling" ) )
-        {
-            auto _sessions = CProfilingManager::GetSessions();
-            for ( auto session : _sessions )
-            {
-                if ( session->type() != eProfilerType::INTERNAL )
-                    continue;
-
-                auto _intSession = dynamic_cast< CProfilerSessionInternal* >( session );
-                if ( !_intSession )
-                    continue;
-
-                auto _results = _intSession->results();
-                //// if ( _results.size() < 1 )
-                ////     continue;
-
-                ImGui::TextColored( ImVec4( 0.2f, 0.4f, 0.8f, 1.0f ), "session: %s", session->name() );
-                for ( auto _result : _results )
-                    ImGui::Text( "%.3f ms %s", _result.duration, _result.name.c_str() );
-
-                ImGui::Spacing();
-            }
         }
 
         if ( m_scene && ImGui::CollapsingHeader( "Scene-summary" ) )

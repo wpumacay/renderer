@@ -147,9 +147,9 @@ private :
 
         if ( m_lightsAnimated )
         {
-            m_lightRef->ambient.x() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 2.0f );
-            m_lightRef->ambient.y() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 0.7f );
-            m_lightRef->ambient.z() = 0.1f * std::sin( 10.0f * engine::CTime::GetWallTime() * 1.3f );
+            m_lightRef->ambient.x() = 0.1f * std::sin( tinyutils::Clock::GetWallTime() * 2.0f );
+            m_lightRef->ambient.y() = 0.1f * std::sin( tinyutils::Clock::GetWallTime() * 0.7f );
+            m_lightRef->ambient.z() = 0.1f * std::sin( tinyutils::Clock::GetWallTime() * 1.3f );
             m_lightRef->diffuse = 5.0f * m_lightRef->ambient;
             m_lightRef->specular = { 1.0f, 1.0f, 1.0f };
         }
@@ -251,10 +251,9 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
-        {
             break;
-        }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
@@ -280,7 +279,7 @@ int main()
 
         if ( _moveLight )
         {
-            _mvParam += 10.0f * engine::CTime::GetTimeStep();
+            _mvParam += 10.0f * tinyutils::Clock::GetTimeStep();
             // _gizmo->position.x() = 1.0f + std::sin( _mvParam ) * 2.0f;
             // _gizmo->position.y() = std::sin( _mvParam / 2.0f ) * 1.0f;
 
@@ -325,8 +324,9 @@ int main()
         // engine::CDebugDrawer::DrawNormals( _mesh, { 0.0f, 0.0f, 1.0f } );
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
 
-        // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
+        ENGINE_TRACE( "frame-time: {0}", tinyutils::Clock::GetAvgTimeStep() );
     }
 
     return 0;

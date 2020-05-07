@@ -3,7 +3,7 @@
 from tinyrenderer.core import engine
 import tinymath as tm
 import numpy as np
-from numpngw import write_apng
+import time
 
 if __name__ == '__main__' :
     windowProps = engine.WindowProps()
@@ -114,7 +114,7 @@ if __name__ == '__main__' :
 
     #### texture = engine.TextureManager.GetCachedTexture( 'img_grid' )
     #### texture = engine.TextureManager.GetCachedTexture( 'img_smiley' )
-    texture = engine.TextureManager.GetCachedTexture( 'built_in_chessboard' )
+    texture = engine.TextureManager.GetCachedTexture( 'built_in_chessboard', '' )
     patch.material.albedoMap = texture
     floor.material.albedoMap = texture
 
@@ -146,14 +146,21 @@ if __name__ == '__main__' :
     phi = 0.6154797086703873 # fixed phi, computed from initial camera position (5,5,5)
     theta = 0.7853981633974483 # initial rho, computed from initial camera position (5,5,5)
 
+    t = 0.0
+
     while ( app.active() ) :
         if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
+
+        t_start = time.time()
 
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 5.0, 0.0, 0.0 ], [ 1.0, 0.0, 0.0 ] )
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
+        t += engine.Time.GetTimeStep()
+        print( 'timestep: {}'.format( engine.Time.GetTimeStep() ) )
+        print( 't: {}'.format( t ) )
         theta += 0.2 * engine.Time.GetAvgTimeStep()
         _sphi = np.sin( phi )
         _cphi = np.cos( phi )
@@ -171,3 +178,6 @@ if __name__ == '__main__' :
         app.begin()
         app.render()
         app.end()
+
+        delta = time.time() - t_start
+        print( 'delta: {0}'.format( delta ) )

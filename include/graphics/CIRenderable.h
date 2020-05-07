@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
 #include <materials/CMaterial.h>
 
 namespace engine

@@ -63,6 +63,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::IsKeyDown( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_I ) )
@@ -75,12 +76,13 @@ int main()
         _app->begin();
 
         if ( g_useInstancing )
-            drawGrid_Instancing( _shaderInstancing3dRef, _camera.get(), g_cubeVAO_Instancing.get(), _bufferModelMatrices );
+            drawGrid_Instancing( _shaderInstancing3dRef, _cameraRef, g_cubeVAO_Instancing.get(), _bufferModelMatrices );
         else
-            drawGrid_noInstancing( _shaderNoInstancing3dRef, _camera.get(), g_cubeVAO_NoInstancing.get() );
+            drawGrid_noInstancing( _shaderNoInstancing3dRef, _cameraRef, g_cubeVAO_NoInstancing.get() );
 
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
     }
 
     return 0;

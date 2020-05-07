@@ -348,6 +348,7 @@ private :
                 if ( _isSelected )
                     ImGui::SetItemDefaultFocus();
             }
+            ImGui::EndCombo();
         }
 
         m_anyMenuHovered |= ImGui::IsWindowHovered();
@@ -443,10 +444,9 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
-        {
             break;
-        }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
             _camera->setActiveMode( false );
@@ -599,8 +599,9 @@ int main()
 
         _app->render();
         _app->end();
+        tinyutils::Clock::Tock();
 
-        // ENGINE_TRACE( "frame-time: {0}", engine::CTime::GetRawTimeStep() );
+        ENGINE_TRACE( "frame-time: {0}", tinyutils::Clock::GetAvgTimeStep() );
     }
 
     return 0;

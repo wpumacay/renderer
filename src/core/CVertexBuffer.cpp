@@ -1,6 +1,5 @@
 
 #include <core/CVertexBuffer.h>
-#include <utils/CLogger.h>
 
 namespace engine
 {
@@ -49,7 +48,7 @@ namespace engine
 
         if ( m_track )
         {
-            if ( CLogger::IsActive() )
+            if ( tinyutils::Logger::IsActive() )
                 ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
             else
                 std::cout << "Allocs: Destroyed Vertex Buffer" << std::endl;

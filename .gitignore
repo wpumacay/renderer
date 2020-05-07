@@ -24,6 +24,7 @@ ext/imgui*
 ext/spdlog*
 ext/pybind11*
 ext/tiny_math*
+ext/tiny_utils*
 
 # compressed files
 *.zip

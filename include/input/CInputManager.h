@@ -2,7 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
 #include <input/CInputKey.h>
 #include <input/CInputMouse.h>
 #include <input/CInputCallbacks.h>

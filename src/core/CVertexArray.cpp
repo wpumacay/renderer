@@ -1,6 +1,5 @@
 
 #include <core/CVertexArray.h>
-#include <utils/CLogger.h>
 
 namespace engine
 {
@@ -29,7 +28,7 @@ namespace engine
 
         if ( m_track )
         {
-            if ( CLogger::IsActive() )
+            if ( tinyutils::Logger::IsActive() )
                 ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
             else // in python-land (when exiting script) we might have destroyed logger first
                 std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;

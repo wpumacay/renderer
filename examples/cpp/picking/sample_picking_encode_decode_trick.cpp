@@ -247,13 +247,13 @@ private :
     void _menuUiRendererStats()
     {
         ImGui::Begin( "statistics" );
-        ImGui::Text( "fps-avg       : %.2f", 1.0f / engine::CTime::GetAvgTimeStep() );
-        ImGui::Text( "frame-time-avg: %.5f", engine::CTime::GetAvgTimeStep() );
+        ImGui::Text( "fps-avg       : %.2f", tinyutils::Clock::GetAvgFps() );
+        ImGui::Text( "frame-time-avg: %.5f", tinyutils::Clock::GetAvgTimeStep() );
         ImGui::PlotLines( "fps-avg", 
-                          engine::CTime::GetFpsAvgs().data(), 
-                          engine::CTime::GetNumFramesForAvg(), 
-                          engine::CTime::GetFrameTimeIndex(),
-                          ( std::string( "average: " ) + std::to_string( 1.0f / engine::CTime::GetAvgTimeStep() ) ).c_str(),
+                          tinyutils::Clock::GetFpsBuffer().data(),
+                          tinyutils::Clock::GetFpsBuffer().size(),
+                          tinyutils::Clock::GetTimeIndex(),
+                          ( std::string( "average: " ) + std::to_string( tinyutils::Clock::GetAvgFps() ) ).c_str(),
                           0.0f, FLT_MAX, ImVec2( 0, 120 ) );
         ImGui::End();
     }
@@ -989,6 +989,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
@@ -1175,10 +1176,7 @@ int main()
                                                              engine::CApplication::GetInstance()->window()->width(),
                                                              engine::CApplication::GetInstance()->window()->height() );
         }
-
-////         ENGINE_INFO( "fps-avg : {0} || frame-time-avg : {1}", 
-////                      1.0f / engine::CTime::GetAvgTimeStep(), 
-////                      engine::CTime::GetAvgTimeStep() );
+        tinyutils::Clock::Tock();
     }
 
     return 0;

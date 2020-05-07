@@ -6,11 +6,11 @@
 #### GIT_DEPS_BRANCH=(master master docking v1.x)
 
 # using pybind11 from RobotLocomotion fork
-GIT_DEPS_REPO=(tiny_math pybind11 imgui spdlog)
-GIT_DEPS_USER=(wpumacay RobotLocomotion wpumacay gabime)
-GIT_DEPS_BRANCH=(master drake docking v1.x)
+GIT_DEPS_REPO=(tiny_math tiny_utils pybind11 imgui spdlog)
+GIT_DEPS_USER=(wpumacay wpumacay RobotLocomotion wpumacay gabime)
+GIT_DEPS_BRANCH=(master master drake docking v1.x)
 
-for i in {0..3}
+for i in {0..4}
 do
     USER=${GIT_DEPS_USER[$i]}
     REPO=${GIT_DEPS_REPO[$i]}

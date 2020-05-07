@@ -3,7 +3,6 @@
 #ifdef ENGINE_USE_FFMPEG
 
 #include <CCommon.h>
-#include <utils/CLogger.h>
 
 extern "C"
 {

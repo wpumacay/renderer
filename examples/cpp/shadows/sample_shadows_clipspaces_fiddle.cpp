@@ -666,6 +666,7 @@ int main()
 
     while( _app->active() )
     {
+        tinyutils::Clock::Tick();
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
@@ -722,10 +723,7 @@ int main()
 
         _app->render();
         _app->end();
-
-        // ENGINE_TRACE( "frame_time: {0} - fps: {1}", 
-        //               std::to_string( engine::CTime::GetTimeStep() ),
-        //               std::to_string( 1. / engine::CTime::GetRawTimeStep() ) );
+        tinyutils::Clock::Tock();
     }
 
     return 0;

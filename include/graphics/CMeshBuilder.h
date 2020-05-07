@@ -2,8 +2,6 @@
 
 #include <CCommon.h>
 #include <CMath.h>
-#include <utils/CLogger.h>
-#include <utils/CNoiseGenerator.h>
 #include <assets/CTextureManager.h>
 #include <graphics/CMesh.h>
 #include <graphics/CModel.h>

@@ -18,7 +18,7 @@ namespace engine
         format      = eTextureFormat::NONE;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -31,7 +31,7 @@ namespace engine
             delete sidesData[i];
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCubeData @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed TextureCubeData @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -84,7 +84,7 @@ namespace engine
         /***********************************************************************/
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureCube @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Created TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
@@ -97,7 +97,7 @@ namespace engine
         m_data = nullptr;
 
     #ifdef ENGINE_TRACK_ALLOCS
-        if ( CLogger::IsActive() )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCube @ {0}", engine::pointerToHexAddress( this ) );
         else
             std::cout << "Allocs: Destroyed TextureCube @ " << engine::pointerToHexAddress( this ) << std::endl;
