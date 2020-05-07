@@ -91,7 +91,7 @@ class BuildCommand( build_ext ) :
         self.windowed = 1 # By default, build using windowed mode (GLFW)
         self.headless = 0 # By default, don't build using headless mode (EGL)
         self.debug = 1 # Build in release mode by default
-        self.njobs = 8 # Use 8 jobs by default (mostly called locally, so keep it at 8 for now)
+        self.njobs = 2 # Use 2 jobs by default (mostly called locally, so keep it at 8 for now)
 
     def run( self ) :
         try :
@@ -124,7 +124,9 @@ class BuildCommand( build_ext ) :
                       '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
                       '-DTINYRENDERER_BUILD_PYTHON_BINDINGS=ON',
                       '-DTINYRENDERER_BUILD_WITH_LOGS=OFF',
-                      '-DTINYRENDERER_BUILD_WITH_TRACK_ALLOCS=OFF']
+                      '-DTINYRENDERER_BUILD_WITH_PROFILING=OFF',
+                      '-DTINYRENDERER_BUILD_WITH_TRACK_ALLOCS=OFF',
+                      '-DTINYRENDERER_BUILD_WITH_FFMPEG_UTILS=ON']
 
         _env = os.environ.copy()
         _env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format( _env.get( 'CXXFLAGS', '' ),
@@ -145,7 +147,7 @@ class InstallCommand( install ) :
         self.windowed = 1 # By default, build using windowed mode (GLFW)
         self.headless = 0 # By default, don't build using headless mode (EGL)
         self.debug = 1 # Build in release mode by default
-        self.njobs = 8 # Use 8 jobs by default (mostly called locally, so keep it at 8 for now)
+        self.njobs = 2 # Use 2 jobs by default (mostly called locally, so keep it at 8 for now)
 
     def run( self ) :
         self.reinitialize_command( 'build_ext', headless=self.headless, debug=self.debug, windowed=self.windowed, njobs=self.njobs )

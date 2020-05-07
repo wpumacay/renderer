@@ -65,7 +65,6 @@ namespace engine
         m_renderOptions.viewportHeight = m_window->height();
         m_renderOptions.renderTargetPtr = nullptr;
 
-        m_timeStamp = 0.0;
     #ifndef ENGINE_HEADLESS_EGL
         // create a utils panel by default (the user can choose to use it or not)
         m_guiUtilsLayer = new CImGuiUtilsLayer( "Utils-layer",
@@ -170,8 +169,6 @@ namespace engine
     void CApplication::begin()
     {
         tinyutils::Profiler::BeginSession( "sess_core_render" );
-        auto tpStart = std::chrono::high_resolution_clock::now();
-        m_timeStamp = std::chrono::time_point_cast<std::chrono::microseconds>( tpStart ).time_since_epoch().count() * 0.001;
         // prepare window for rendering, and poll events
         m_window->begin();
 
@@ -269,14 +266,7 @@ namespace engine
 
     void CApplication::end()
     {
-        // swap buffers such that we see that juicy frame (if we rendered to default target)
         m_window->end();
-
-        auto tpEnd = std::chrono::high_resolution_clock::now();
-        float64 _timeNow = std::chrono::time_point_cast<std::chrono::microseconds>( tpEnd ).time_since_epoch().count() * 0.001;
-        float64 _timeDelta = _timeNow - m_timeStamp;
-        m_timeStamp = _timeNow;
-
         tinyutils::Profiler::EndSession( "sess_core_render" );
     }
 

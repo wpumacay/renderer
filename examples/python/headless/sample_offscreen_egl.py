@@ -3,6 +3,7 @@
 from tinyrenderer.core_egl import engine
 from numpngw import write_png
 import tinymath as tm
+import tinyutils as tu
 import numpy as np
 import os
 
@@ -151,6 +152,7 @@ if __name__ == '__main__' :
     frames = []
     num_frames = 60
     while ( app.active() ) :
+        tu.Clock.Tick()
         if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
 
@@ -158,7 +160,7 @@ if __name__ == '__main__' :
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 5.0, 0.0 ], [ 0.0, 1.0, 0.0 ] )
         engine.DebugDrawer.DrawLine( [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 5.0 ], [ 0.0, 0.0, 1.0 ] )
 
-        theta += 0.2 * engine.Time.GetAvgTimeStep()
+        theta += 0.2 * tu.Clock.GetAvgTimeStep()
         _sphi = np.sin( phi )
         _cphi = np.cos( phi )
         _stheta = np.sin( theta )
@@ -178,6 +180,7 @@ if __name__ == '__main__' :
 
         frame = app.renderTarget().read()
         frames.append( frame )
+        tu.Clock.Tock()
 
         if ( len( frames ) > num_frames ) :
           break

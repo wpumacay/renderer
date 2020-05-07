@@ -29,8 +29,6 @@
 #include <gui/CImGuiSceneLayer.h>
 #endif /* ENGINE_HEADLESS_EGL */
 
-#include <chrono>
-
 namespace engine
 {
 
@@ -121,7 +119,6 @@ namespace engine
 
         static CApplication* s_instance;
 
-        float64                                         m_timeStamp;
         CRenderOptions                                  m_renderOptions;
         std::unique_ptr< CFrameBuffer >                 m_renderTarget;
         std::unique_ptr< CScene >                       m_scene;

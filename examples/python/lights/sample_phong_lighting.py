@@ -2,6 +2,7 @@
 
 from tinyrenderer.core import engine
 import tinymath as tm
+import tinyutils as tu
 import numpy as np
 from OpenGL.GL import *
 
@@ -68,6 +69,7 @@ if __name__ == '__main__' :
     mvParam = 0.0
 
     while( app.active() ) :
+        tu.Clock.Tick()
         if ( engine.InputManager.IsKeyDown( engine.Keys.KEY_ESCAPE ) ) :
             break
         elif ( engine.InputManager.CheckSingleKeyPress( engine.Keys.KEY_S ) ) :
@@ -85,7 +87,7 @@ if __name__ == '__main__' :
         camera.update()
 
         if ( moveLight ) :
-            mvParam += 10.0 * engine.Time.GetTimeStep()
+            mvParam += tu.Clock.GetAvgTimeStep()
             #### gizmo.position = [ 1.0 + np.sin( mvParam ) * 2.0, np.sin( mvParam / 2.0 ) * 1.0 ]
             gizmo.position = [ 10.0 * np.sin( mvParam ), 10.0 * np.cos( mvParam ), 0.0 ]
 
@@ -118,3 +120,4 @@ if __name__ == '__main__' :
         engine.DebugDrawer.Render( camera )
 
         app.end()
+        tu.Clock.Tock()
