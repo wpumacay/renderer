@@ -87,6 +87,8 @@ namespace engine
 
         bool active() const { return m_window->active(); }
 
+        bool use_render_target() const { return m_useRenderTarget; }
+
     #ifndef ENGINE_HEADLESS_EGL
         void setGuiActive( bool enabled );
 
