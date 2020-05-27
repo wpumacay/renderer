@@ -168,6 +168,36 @@ namespace engine
         */
         static std::unique_ptr<CModel> createModelFromFile( const std::string& filename );
 
+        /**
+        *   @brief Creates the vertex-data required for a heightfield-mesh renderable
+        *   @param nWidthSamples    number of points of the generated base grid in the x-direction
+        *   @param nDepthSamples    number of points of the generated base grid in the y-direction
+        *   @param widthExtent      length of the base in the x-direction
+        *   @param depthExtent      length of the base in the y-direction
+        *   @param centerX          position of the center of the field's base in the x-direction
+        *   @param centerY          position of the center of the field's base in the y-direction
+        *   @param heightData       elevation data of each point of the base grid
+        *   @param heightBase       additional offset in the (-z) direction (kind of like a pedestal)
+        *   @param axis             up axis used for this geometry (height direction)
+        *   @param dst_vertices     container where to place the computed vertices
+        *   @param dst_normals      container where to place the computed normals
+        *   @param dst_texCoords    container where to place the computed uv-coordinates
+        *   @param dst_indices      container where to place the computed indices
+        *   @param max_height       output value representing the maximum height of the heightfield
+        *   @param min_height       output value representing the minimum height of the heightfield
+        */
+        static void hfieldCreateVertexData( int nWidthSamples, int nDepthSamples, 
+                                            float widthExtent, float depthExtent, 
+                                            float centerX, float centerY,
+                                            const std::vector< float >& heightData, float heightBase,
+                                            const eAxis& axis,
+                                            std::vector<CVec3>& dst_vertices,
+                                            std::vector<CVec3>& dst_normals,
+                                            std::vector<CVec2>& dst_texCoords,
+                                            std::vector<CInd3>& dst_indices,
+                                            float& max_height,
+                                            float& min_height );
+
     private :
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

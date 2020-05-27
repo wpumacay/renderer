@@ -799,13 +799,37 @@ namespace engine
         std::vector< CVec3 > _normals;
         std::vector< CVec2 > _texCoords;
         std::vector< CInd3 > _indices;
+        float _maxHeight = -1000000.0f;
+        float _minHeight = 1000000.0f;
 
         ENGINE_CORE_ASSERT( heightData.size() == nWidthSamples * nDepthSamples, "Mismatch in number of heightmap samples" );
 
         auto _start = std::chrono::high_resolution_clock::now();
+        hfieldCreateVertexData( nWidthSamples, nDepthSamples, widthExtent, depthExtent, centerX, centerY, heightData, heightBase, axis,
+                                _vertices, _normals, _texCoords, _indices, _maxHeight, _minHeight );
+        auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
+        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices, eBufferUsage::DYNAMIC );
+        _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
+        _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
 
-        float _maxHeight = -1000000.0f;
-        float _minHeight = 1000000.0f;
+        auto _duration = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - _start );
+        ENGINE_CORE_TRACE( "time taken (ms) to create hfield: {0}", _duration.count() );
+
+        return std::move( _mesh );
+    }
+
+    void CMeshBuilder::hfieldCreateVertexData( int nWidthSamples, int nDepthSamples, 
+                                               float widthExtent, float depthExtent, 
+                                               float centerX, float centerY,
+                                               const std::vector< float >& heightData, float heightBase,
+                                               const eAxis& axis,
+                                               std::vector<CVec3>& dst_vertices,
+                                               std::vector<CVec3>& dst_normals,
+                                               std::vector<CVec2>& dst_texCoords,
+                                               std::vector<CInd3>& dst_indices,
+                                               float& max_height,
+                                               float& min_height )
+    {
         float _minNegHeight = 0.0f; // catch minimum negative heights
         float _dw = widthExtent / ( nWidthSamples - 1 );
         float _dd = depthExtent / ( nDepthSamples - 1 );
@@ -834,59 +858,59 @@ namespace engine
                                                    heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] }, 
                                                  axis );
 
-                _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
-                _indices.push_back( { (GLint) _vertices.size() + 3, (GLint) _vertices.size() + 4, (GLint) _vertices.size() + 5 } );
+                dst_indices.push_back( { (GLint) dst_vertices.size() + 0, (GLint) dst_vertices.size() + 1, (GLint) dst_vertices.size() + 2 } );
+                dst_indices.push_back( { (GLint) dst_vertices.size() + 3, (GLint) dst_vertices.size() + 4, (GLint) dst_vertices.size() + 5 } );
 
                 CVec2 _t0( 0.5f * ( j + 0 ) * _dw, 0.5f * ( i + 0 ) * _dd );
                 CVec2 _t1( 0.5f * ( j + 1 ) * _dw, 0.5f * ( i + 0 ) * _dd );
                 CVec2 _t2( 0.5f * ( j + 1 ) * _dw, 0.5f * ( i + 1 ) * _dd );
                 CVec2 _t3( 0.5f * ( j + 0 ) * _dw, 0.5f * ( i + 1 ) * _dd );
 
-                _texCoords.push_back( _t0 );
-                _texCoords.push_back( _t1 );
-                _texCoords.push_back( _t2 );
-                _texCoords.push_back( _t0 );
-                _texCoords.push_back( _t2 );
-                _texCoords.push_back( _t3 );
+                dst_texCoords.push_back( _t0 );
+                dst_texCoords.push_back( _t1 );
+                dst_texCoords.push_back( _t2 );
+                dst_texCoords.push_back( _t0 );
+                dst_texCoords.push_back( _t2 );
+                dst_texCoords.push_back( _t3 );
 
-                _vertices.push_back( _p0 );
-                _vertices.push_back( _p1 );
-                _vertices.push_back( _p2 );
-                _vertices.push_back( _p0 );
-                _vertices.push_back( _p2 );
-                _vertices.push_back( _p3 );
+                dst_vertices.push_back( _p0 );
+                dst_vertices.push_back( _p1 );
+                dst_vertices.push_back( _p2 );
+                dst_vertices.push_back( _p0 );
+                dst_vertices.push_back( _p2 );
+                dst_vertices.push_back( _p3 );
 
             #ifdef USE_HFIELD_FLAT_NORMALS
                 auto _nt1 = tinymath::cross( _p1 - _p0, _p2 - _p1 );
                 auto _nt2 = tinymath::cross( _p2 - _p0, _p3 - _p2 );
 
-                _normals.push_back( _nt1 );
-                _normals.push_back( _nt1 );
-                _normals.push_back( _nt1 );
+                dst_normals.push_back( _nt1 );
+                dst_normals.push_back( _nt1 );
+                dst_normals.push_back( _nt1 );
 
-                _normals.push_back( _nt2 );
-                _normals.push_back( _nt2 );
-                _normals.push_back( _nt2 );
+                dst_normals.push_back( _nt2 );
+                dst_normals.push_back( _nt2 );
+                dst_normals.push_back( _nt2 );
             #else
-                _normals.push_back( _hfieldComputeSmoothNormal( j, i, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
-                _normals.push_back( _hfieldComputeSmoothNormal( j + 1, i, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
-                _normals.push_back( _hfieldComputeSmoothNormal( j + 1, i + 1, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j, i, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j + 1, i, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j + 1, i + 1, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
 
-                _normals.push_back( _hfieldComputeSmoothNormal( j, i, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
-                _normals.push_back( _hfieldComputeSmoothNormal( j + 1, i + 1, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
-                _normals.push_back( _hfieldComputeSmoothNormal( j, i + 1, nWidthSamples, nDepthSamples, 
-                                                                _dw, _dd, centerX, centerY, 
-                                                                heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j, i, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j + 1, i + 1, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
+                dst_normals.push_back( _hfieldComputeSmoothNormal( j, i + 1, nWidthSamples, nDepthSamples, 
+                                                                   _dw, _dd, centerX, centerY, 
+                                                                   heightData, axis ) );
             #endif
 
                 // store the minimum height for later usage (computing base)
@@ -896,15 +920,15 @@ namespace engine
                 _minNegHeight = std::min( _minNegHeight, heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] );
 
                 // store the minimum and maximum heights for oobb computation
-                _maxHeight = std::max( _maxHeight, heightData[( i + 0 ) * nWidthSamples + ( j + 0 )] );
-                _maxHeight = std::max( _maxHeight, heightData[( i + 0 ) * nWidthSamples + ( j + 1 )] );
-                _maxHeight = std::max( _maxHeight, heightData[( i + 1 ) * nWidthSamples + ( j + 1 )] );
-                _maxHeight = std::max( _maxHeight, heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] );
+                max_height = std::max( max_height, heightData[( i + 0 ) * nWidthSamples + ( j + 0 )] );
+                max_height = std::max( max_height, heightData[( i + 0 ) * nWidthSamples + ( j + 1 )] );
+                max_height = std::max( max_height, heightData[( i + 1 ) * nWidthSamples + ( j + 1 )] );
+                max_height = std::max( max_height, heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] );
                 
-                _minHeight = std::min( _minHeight, heightData[( i + 0 ) * nWidthSamples + ( j + 0 )] );
-                _minHeight = std::min( _minHeight, heightData[( i + 0 ) * nWidthSamples + ( j + 1 )] );
-                _minHeight = std::min( _minHeight, heightData[( i + 1 ) * nWidthSamples + ( j + 1 )] );
-                _minHeight = std::min( _minHeight, heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] );
+                min_height = std::min( min_height, heightData[( i + 0 ) * nWidthSamples + ( j + 0 )] );
+                min_height = std::min( min_height, heightData[( i + 0 ) * nWidthSamples + ( j + 1 )] );
+                min_height = std::min( min_height, heightData[( i + 1 ) * nWidthSamples + ( j + 1 )] );
+                min_height = std::min( min_height, heightData[( i + 1 ) * nWidthSamples + ( j + 0 )] );
             }
         }
 
@@ -956,23 +980,23 @@ namespace engine
                     auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)jj1 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)ii1 ) / ( nDepthSamples - 1 ), _minNegHeight - heightBase }, axis );
                     auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( (float)jj0 ) / ( nWidthSamples - 1 ), -centerY + depthExtent * ( (float)ii0 ) / ( nDepthSamples - 1 ), _minNegHeight - heightBase }, axis );
 
-                    _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
-                    _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
+                    dst_indices.push_back( { (GLint) dst_vertices.size() + 0, (GLint) dst_vertices.size() + 1, (GLint) dst_vertices.size() + 2 } );
+                    dst_indices.push_back( { (GLint) dst_vertices.size() + 0, (GLint) dst_vertices.size() + 2, (GLint) dst_vertices.size() + 3 } );
 
-                    _vertices.push_back( _p0 );
-                    _vertices.push_back( _p1 );
-                    _vertices.push_back( _p2 );
-                    _vertices.push_back( _p3 );
+                    dst_vertices.push_back( _p0 );
+                    dst_vertices.push_back( _p1 );
+                    dst_vertices.push_back( _p2 );
+                    dst_vertices.push_back( _p3 );
 
-                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-                    _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+                    dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
 
-                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
-                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
-                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
-                    _normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    dst_normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    dst_normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    dst_normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
+                    dst_normals.push_back( _rotateToMatchUpAxis( _sides[s].normal, axis ) );
                 }
             }
         }
@@ -984,34 +1008,24 @@ namespace engine
             auto _p2 = _rotateToMatchUpAxis( { -centerX + widthExtent * ( 1.0f - 1.0f / ( nWidthSamples - 1 ) ) , -centerY + depthExtent * ( 1.0f - 1.0f / ( nDepthSamples - 1 ) )  , _minNegHeight - heightBase }, axis );
             auto _p3 = _rotateToMatchUpAxis( { -centerX + widthExtent * 0.0f                                    , -centerY + depthExtent * ( 1.0f - 1.0f / ( nDepthSamples - 1 ) )  , _minNegHeight - heightBase }, axis );
 
-            _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 1, (GLint) _vertices.size() + 2 } );
-            _indices.push_back( { (GLint) _vertices.size() + 0, (GLint) _vertices.size() + 2, (GLint) _vertices.size() + 3 } );
+            dst_indices.push_back( { (GLint) dst_vertices.size() + 0, (GLint) dst_vertices.size() + 1, (GLint) dst_vertices.size() + 2 } );
+            dst_indices.push_back( { (GLint) dst_vertices.size() + 0, (GLint) dst_vertices.size() + 2, (GLint) dst_vertices.size() + 3 } );
 
-            _vertices.push_back( _p0 );
-            _vertices.push_back( _p1 );
-            _vertices.push_back( _p2 );
-            _vertices.push_back( _p3 );
+            dst_vertices.push_back( _p0 );
+            dst_vertices.push_back( _p1 );
+            dst_vertices.push_back( _p2 );
+            dst_vertices.push_back( _p3 );
 
-            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
-            _texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
+            dst_texCoords.push_back( { -1.0f, -1.0f } ); // let the values be clamped to some user-specified color with GL_CLAMP_TO_BORDER
 
-            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
-            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
-            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
-            _normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            dst_normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            dst_normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            dst_normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
+            dst_normals.push_back( _rotateToMatchUpAxis( { 0.0f, 0.0f, -1.0f }, axis ) );
         }
-
-        auto _name = std::string( "heightField:" ) + std::to_string( CMeshBuilder::s_numHeightFields++ );
-        auto _mesh = std::make_unique<CMesh>( _name, _vertices, _normals, _texCoords, _indices );
-        _mesh->setBoundExtents( _rotateToMatchUpAxis( { widthExtent, depthExtent, _maxHeight - _minHeight }, axis ) );
-        _mesh->cullFaces = false; // don't cull heightfields, pretty please :(
-
-        auto _duration = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - _start );
-        ENGINE_CORE_TRACE( "time taken (ms) to create hfield: {0}", _duration.count() );
-
-        return std::move( _mesh );
     }
 
     // format is row-major, so j <> column <> x, i <> row <> y
