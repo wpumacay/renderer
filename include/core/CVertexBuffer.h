@@ -59,11 +59,21 @@ namespace engine
         CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
                        const eBufferUsage& bufferUsage, 
                        uint32 bufferSize, 
-                       float32* bufferData,
-                       bool track = false );
+                       float32* bufferData );
 
         /** @brief Destroys the current VBO and releases its resources in GPU */
         ~CVertexBuffer();
+
+        /**
+        *   @brief Resizes the GPU-buffer to the required size
+        *
+        *   @details
+        *   This methods allows to change the size of the VBO on the GPU. Use this method if the
+        *   required data to be updated is bigger than the current size of the buffer on the GPU.
+        *
+        *   @param bufferSize   New size of the buffer on the GPU
+        */
+        void resize( uint32 bufferSize );
 
         /**
         *   @brief Updated the GPU-memory data of this buffer from given CPU-data
@@ -73,10 +83,10 @@ namespace engine
         *   this transfer (it depends on the backend, currently only OpenGL), this VBO must have
         *   been given the DYNAMIC hint during creation.
         *
-        *   @param bufferSize   How much data (in bytes) will be transferred from CPU to GPU.
-        *   @param bufferData   Pointer to the memory in CPU to be transferred to GPU.
+        *   @param dataSize     How much data (in bytes) will be transferred from CPU to GPU.
+        *   @param dataPtr      Pointer to the memory in CPU to be transferred to GPU.
         */
-        void updateData( uint32 bufferSize, float32* bufferData );
+        void updateData( uint32 dataSize, float32* dataPtr );
 
         /**
         *   @brief Binds the current VBO such that subsequent draw calls are executed with its data
@@ -119,10 +129,6 @@ namespace engine
 
         /** @brief OpenGL-id of the linked VBO OpenGL-object */
         uint32 m_openglId;
-
-        /** @brief Debug flag used for tracking allocations and deallocations */
-        bool m_track;
-
     };
 
 }

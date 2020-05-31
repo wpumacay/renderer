@@ -20,25 +20,39 @@ namespace engine
                       toOpenGLEnum( m_bufferUsage) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
-        if ( m_track )
-            ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
+        ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
     }
 
     CIndexBuffer::~CIndexBuffer()
     {
         glDeleteBuffers( 1, &m_openglId );
 
-        if ( m_track )
-        {
-            if ( tinyutils::Logger::IsActive() )
-                ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
-            else
-                std::cout << "Allocs: Destroyed Index Buffer" << std::endl;
-        }
+        if ( tinyutils::Logger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
+        else
+            std::cout << "Allocs: Destroyed Index Buffer" << std::endl;
+    }
+
+    void CIndexBuffer::resize( uint32 bufferCount )
+    {
+        if ( m_bufferCount == bufferCount )
+            return; // no need to resize the buffer (same size requested)
+
+        m_bufferCount = bufferCount;
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferCount * sizeof( uint32 ), NULL, toOpenGLEnum( m_bufferUsage ) );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
 
     void CIndexBuffer::updateData( uint32 bufferCount, uint32* bufferData )
     {
+        if ( bufferCount != m_bufferCount )
+        {
+            ENGINE_CORE_WARN( "CIndexBuffer::updateData >>> tried updating data for a buffer with \
+                              different size. Resizing to avoid any conflicts" );
+            resize( bufferCount );
+        }
+
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
         glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, bufferCount * sizeof( uint32 ), bufferData );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

@@ -26,37 +26,48 @@ namespace engine
     CVertexBuffer::CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
                                   const eBufferUsage& bufferUsage, 
                                   uint32 bufferSize, 
-                                  float32* bufferData,
-                                  bool track )
+                                  float32* bufferData )
         : m_bufferLayout( bufferLayout ), m_bufferUsage( bufferUsage ), m_bufferSize( bufferSize )
     {
-        m_track = track;
-
         // create gl-vbo resource and send the initial data to it
         glGenBuffers( 1, &m_openglId );
         glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
         glBufferData( GL_ARRAY_BUFFER, m_bufferSize, bufferData, toOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-        if ( m_track )
-            ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
+        ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
     }
 
     CVertexBuffer::~CVertexBuffer()
     {
         glDeleteBuffers( 1, &m_openglId );
 
-        if ( m_track )
-        {
-            if ( tinyutils::Logger::IsActive() )
-                ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
-            else
-                std::cout << "Allocs: Destroyed Vertex Buffer" << std::endl;
-        }
+        if ( tinyutils::Logger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
+        else
+            std::cout << "Allocs: Destroyed Vertex Buffer" << std::endl;
+    }
+
+    void CVertexBuffer::resize( uint32 bufferSize )
+    {
+        if ( m_bufferSize == bufferSize )
+            return; // no need to resize the buffer (same size requested)
+
+        m_bufferSize = bufferSize;
+        glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
+        glBufferData( GL_ARRAY_BUFFER, bufferSize, NULL, toOpenGLEnum( m_bufferUsage ) );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
     void CVertexBuffer::updateData( uint32 dataSize, float32* dataPtr )
     {
+        if ( dataSize != m_bufferSize )
+        {
+            ENGINE_CORE_WARN( "CVertexBuffer::updateData >>> tried updating data for a buffer with \
+                              different size. Resizing to avoid any conflicts" );
+            resize( dataSize );
+        }
+
         glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
         glBufferSubData( GL_ARRAY_BUFFER, 0, dataSize, dataPtr );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );

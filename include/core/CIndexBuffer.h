@@ -36,6 +36,17 @@ namespace engine
         ~CIndexBuffer();
 
         /**
+        *   @brief Resizes the GPU-buffer to the required size
+        *
+        *   @details
+        *   This methods allows to change the size of the IBO on the GPU. Use this method if the
+        *   required data to be updated is bigger than the current size of the buffer on the GPU.
+        *
+        *   @param bufferCount  Number of indices that will be contained in the buffer
+        */
+        void resize( uint32 bufferCount );
+
+        /**
         *   @brief Updated the GPU-memory data of this buffer from given CPU-data
         *
         *   @details
