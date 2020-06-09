@@ -78,7 +78,7 @@ namespace engine
                         throw std::runtime_error( "VertexBuffer >>> given size argument must match size of the np-array buffer. \
                                                    Given size was " + std::to_string( size ) + " but np-array size is " + std::to_string( data.size() * sizeof( float32 ) ) );
 
-                    return std::make_unique<CVertexBuffer>( layout, usage, size, (float32*) data.request().ptr, true );
+                    return std::make_unique<CVertexBuffer>( layout, usage, size, (float32*) data.request().ptr );
                 }
             ) )
             .def( "bind", &CVertexBuffer::bind )
