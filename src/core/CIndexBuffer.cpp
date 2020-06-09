@@ -5,12 +5,9 @@ namespace engine
 {
     CIndexBuffer::CIndexBuffer( const eBufferUsage& bufferUsage,
                                 uint32 bufferCount,
-                                uint32* bufferData,
-                                bool track )
+                                uint32* bufferData )
         : m_bufferUsage( bufferUsage ), m_bufferCount( bufferCount )
     {
-        m_track = track;
-
         // create gl-ibo resource and send the initial data to it
         glGenBuffers( 1, &m_openglId );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );

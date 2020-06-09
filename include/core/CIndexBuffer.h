@@ -29,8 +29,7 @@ namespace engine
         */
         CIndexBuffer( const eBufferUsage& bufferUsage,
                       uint32 bufferCount,
-                      uint32* bufferData,
-                      bool track = false );
+                      uint32* bufferData );
 
         /** @brief Destroys the current IBO and releases its resources in GPU */
         ~CIndexBuffer();
@@ -94,9 +93,6 @@ namespace engine
 
         /** @brief OpenGL-id of the linked IBO OpenGL-object */
         uint32 m_openglId;
-
-        /** @brief Debug flag used for tracking allocations and deallocations */
-        bool m_track; // @debug (checking python-side refs)
     };
 
 }

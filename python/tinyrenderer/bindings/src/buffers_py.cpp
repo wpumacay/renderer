@@ -115,7 +115,7 @@ namespace engine
                         throw std::runtime_error( "IndexBuffer >>> given count argument must match number of elements in np-array. \
                                                    Given count was " + std::to_string( count ) + " but np-array size is " + std::to_string( data.size() ) );
 
-                    return std::make_unique<CIndexBuffer>( usage, count, (uint32*) data.request().ptr, true );
+                    return std::make_unique<CIndexBuffer>( usage, count, (uint32*) data.request().ptr );
                 }
             ) )
             .def( "bind", &CIndexBuffer::bind )
