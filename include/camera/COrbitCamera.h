@@ -34,8 +34,6 @@ namespace engine
         /// @param target_point     Point in world-space that this camera points to
         /// @param up_axis          Axis used as world-up in the scene
         /// @param proj_data        Structs containing the parameters describing projection information
-        /// @param viewport_width   Width of the viewport the user can move the mouse in
-        /// @param viewport_height  Height of the viewport the user can move the mouse in
         /// @param move_sensitivity Sensitivity to the movement by dragging with the left mouse button
         /// @param zoom_sensitivity Sentitivity of the movement by scrolling with the mouse wheel
         COrbitCamera( const std::string& name,
