@@ -47,8 +47,8 @@ namespace engine
         m_context.useBlending       = renderOptions.useBlending;
         m_context.useShadowMapping  = renderOptions.useShadowMapping;
         /* camera-information */
-        m_context.viewMatrix                = renderOptions.cameraPtr->matView();
-        m_context.projMatrix                = renderOptions.cameraPtr->matProj();
+        m_context.viewMatrix                = renderOptions.cameraPtr->mat_view();
+        m_context.projMatrix                = renderOptions.cameraPtr->mat_proj();
         m_context.viewPosition              = renderOptions.cameraPtr->position();
         /* light-information */
         if ( renderOptions.lightPtr )
@@ -91,8 +91,8 @@ namespace engine
         /* depth-view information */
         if ( renderOptions.mode == eRenderMode::DEPTH_ONLY )
         {
-            m_context.depthViewZnear        = renderOptions.cameraPtr->projData().zNear;
-            m_context.depthViewZfar         = renderOptions.cameraPtr->projData().zFar;
+            m_context.depthViewZnear        = renderOptions.cameraPtr->proj_data().zNear;
+            m_context.depthViewZfar         = renderOptions.cameraPtr->proj_data().zFar;
             m_context.depthViewZmin         = renderOptions.depthViewZmin;
             m_context.depthViewZmax         = renderOptions.depthViewZmax;
             m_context.depthViewZminColor    = renderOptions.depthViewZminColor;

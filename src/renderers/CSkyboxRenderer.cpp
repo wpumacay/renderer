@@ -35,12 +35,12 @@ namespace engine
         // setup view information
         CMat4 _camMatView, _camMatProj, _upAxisCorrectionMat;
 
-        _camMatView = renderOptions.cameraPtr->matView();
-        _camMatProj = renderOptions.cameraPtr->matProj();
+        _camMatView = renderOptions.cameraPtr->mat_view();
+        _camMatProj = renderOptions.cameraPtr->mat_proj();
 
-        if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::X ) 
+        if ( renderOptions.cameraPtr->up_axis() == engine::eAxis::X ) 
             _upAxisCorrectionMat = CMat4( tinymath::rotationZ<float32>( -ENGINE_PI / 2.0f ), CVec3( 0.0f, 0.0f, 0.0f ) );
-        else if ( renderOptions.cameraPtr->upAxis() == engine::eAxis::Z ) 
+        else if ( renderOptions.cameraPtr->up_axis() == engine::eAxis::Z ) 
             _upAxisCorrectionMat = CMat4( tinymath::rotationX<float32>( ENGINE_PI / 2.0f ), CVec3( 0.0f, 0.0f, 0.0f ) );
 
         m_context.viewMatrix = CMat4( CMat3( _camMatView ) ) * _upAxisCorrectionMat;

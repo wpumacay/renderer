@@ -69,7 +69,7 @@ namespace engine
         m_renderablesInView.clear();
 
         // configure view-proj matrix to be used
-        m_viewProjMatrix = camera->matProj() * camera->matView();
+        m_viewProjMatrix = camera->mat_proj() * camera->mat_view();
 
         // create view-frustum to be used for culling
         m_viewFrustum = std::unique_ptr< CFrustum >( new CFrustum( m_viewProjMatrix ) );

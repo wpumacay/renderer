@@ -91,7 +91,7 @@ namespace engine
             // is an OOBB to the view camera's view frustum
 
             /* compute the vertices of the view frustum */
-            auto _invViewProjMatrix = tinymath::inverse( config.cameraPtr->matProj() * config.cameraPtr->matView() );
+            auto _invViewProjMatrix = tinymath::inverse( config.cameraPtr->mat_proj() * config.cameraPtr->mat_view() );
 
             std::vector< CVec3 > _frustumPointsInWorld;
             for ( size_t q = 0; q < m_frustumPointsClipSpace.size(); q++ )

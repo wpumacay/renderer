@@ -81,7 +81,7 @@ namespace engine
                 _renderablesVisible.push_back( _renderable );
 
         // (1): frustum culling (if enabled)
-        CFrustum _frustum( m_renderOptions.cameraPtr->matProj() * m_renderOptions.cameraPtr->matView() );
+        CFrustum _frustum( m_renderOptions.cameraPtr->mat_proj() * m_renderOptions.cameraPtr->mat_view() );
         auto _renderablesInView = std::vector< CIRenderable* >();
         if ( m_renderOptions.useFrustumCulling )
             _collectRenderablesInView( _frustum, m_renderOptions.cullingGeom, _renderablesVisible, _renderablesInView );

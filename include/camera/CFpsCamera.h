@@ -15,52 +15,81 @@ namespace engine
                     const CVec3& targetPoint,
                     const eAxis& upAxis,
                     const CCameraProjData& projData,
-                    float sensitivity,
-                    float camSpeed,
-                    float camMaxDelta );
+                    float sensitivity = 0.25f,
+                    float speed = 250.0f,
+                    float max_delta = 10.0f );
 
+        void SetSensitivity( float sensitivity ) { m_Sensitivity = sensitivity; }
+
+        void SetSpeed( float speed ) { m_Speed = speed; }
+
+        void SetMaxDelta( float max_delta ) { m_MaxDelta = max_delta; }
+
+        float sensitivity() const { return m_Sensitivity; }
+
+        float speed() const { return m_Speed; }
+
+        float max_delta() const { return m_MaxDelta; }
+
+        float current_front_speed() const { return m_CurrentFrontSpeed; }
+
+        float current_right_speed() const { return m_CurrentRightSpeed; }
+
+        /// Returns the roll angle of the reference frame of the camera
+        float roll() const { return m_Roll; }
+
+        /// Returns the pitch angle of the reference frame of the camera
+        float pitch() const { return m_Pitch; }
+
+        /// Returns the yaw angle of the reference frame of the camera
+        float yaw() const { return m_Yaw; }
+
+        // Documentation inherited
         static eCameraType GetStaticType() { return eCameraType::FPS; }
-
-        void setSensitivity( float sensitivity ) { m_sensitivity = sensitivity; }
-        void setCamSpeed( float camSpeed ) { m_camSpeed = camSpeed; }
-        void setCamMaxDelta( float camMaxDelta ) { m_camMaxDelta = camMaxDelta; }
-
-        float sensitivity() const { return m_sensitivity; }
-        float camSpeed() const { return m_camSpeed; }
-        float camMaxDelta() const { return m_camMaxDelta; }
-
-        float camSpeedFront() const { return m_camSpeedFront; }
-        float camSpeedRight() const { return m_camSpeedRight; }
-        float roll() const { return m_roll; }
-        float pitch() const { return m_pitch; }
-        float yaw() const { return m_yaw; }
-
 
     protected :
 
-        void _positionChangedInternal() override;
-        void _targetPointChangedInternal() override;
-        void _updateInternal() override;
-        void _resizeInternal( int width, int height ) override;
-        std::string _toStringInternal() const override;
+        // Documentation inherited
+        void _PositionChangedInternal() override { /* Do nothing, keep same frame vectors */ }
+
+        // Documentation inherited
+        void _TargetPointChangedInternal() override { /* Do nothing, keep same frame vectors */ }
+
+        // Documentation inherited
+        void _UpdateInternal() override;
+
+        // Documentation inherited
+        void _ResizeInternal( int width, int height ) override {}
+
+        // Documentation inherited
+        std::string _ToStringInternal() const override;
 
     private :
 
-        void _updateCameraVectors();
-        void _updateCameraAngles();
+        /// Updates the unit vectors that represent the reference frame of the camera
+        void _UpdateCameraVectors();
+
+        /// Updates the angles (roll,pitch,yaw) that define the orientation of the reference frame of the camera
+        void _UpdateCameraAngles();
 
     private :
 
-        float m_roll;
-        float m_pitch;
-        float m_yaw;
+        float m_Roll = 0.0f;
 
-        float m_sensitivity;
-        float m_camSpeedFront;
-        float m_camSpeedRight;
-        float m_camSpeed;
-        float m_camMaxDelta;
+        float m_Pitch = 0.0f;
 
-        CVec2 m_lastCursorPos;
+        float m_Yaw = -90.0f;
+
+        float m_Sensitivity = 0.25f;
+
+        float m_MaxDelta = 10.0f;
+
+        float m_Speed = 250.0f;
+
+        float m_CurrentFrontSpeed = 0.0f;
+
+        float m_CurrentRightSpeed = 0.0f;
+
+        CVec2 m_LastCursorPos = { 0.0f, 0.0f };
     };
 }

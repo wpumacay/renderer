@@ -394,8 +394,8 @@ namespace engine
 
         /* setup render state */
         m_shaderLinesPtr->bind();
-        m_shaderLinesPtr->setMat4( "u_tView", camera->matView() );
-        m_shaderLinesPtr->setMat4( "u_tProj", camera->matProj() );
+        m_shaderLinesPtr->setMat4( "u_tView", camera->mat_view() );
+        m_shaderLinesPtr->setMat4( "u_tProj", camera->mat_proj() );
         glLineWidth( 2.0f );
 
         // render lines in batches *****************************************************************
@@ -448,7 +448,7 @@ namespace engine
             return;
 
         m_shaderSolidNoLightingPtr->bind();
-        m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+        m_shaderSolidNoLightingPtr->setMat4( "u_viewProjMatrix", camera->mat_proj() * camera->mat_view() );
         glEnable( GL_CULL_FACE );
 
         // render opaque primitives first
@@ -529,7 +529,7 @@ namespace engine
             return;
         
         m_shaderSolidLightingPtr->bind();
-        m_shaderSolidLightingPtr->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+        m_shaderSolidLightingPtr->setMat4( "u_viewProjMatrix", camera->mat_proj() * camera->mat_view() );
         // disable all light-types
         m_shaderSolidLightingPtr->setInt( "u_directionalLight.enabled", 0 );
         m_shaderSolidLightingPtr->setInt( "u_pointLight.enabled", 0 );

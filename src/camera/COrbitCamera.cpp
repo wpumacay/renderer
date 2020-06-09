@@ -3,230 +3,186 @@
 
 namespace engine
 {
-
-    std::string toString( const eOrbitCameraState& state )
+    std::string ToString( const eOrbitCameraState& state )
     {
-        if ( state == eOrbitCameraState::IDLE ) return "idle";
-        if ( state == eOrbitCameraState::DRAGGING ) return "dragging";
-        if ( state == eOrbitCameraState::MOVING_TARGET ) return "moving_target";
+        /**/ if ( state == eOrbitCameraState::IDLE ) return "idle";
+        else if ( state == eOrbitCameraState::DRAGGING ) return "dragging";
+        else if ( state == eOrbitCameraState::MOVING_TARGET ) return "moving_target";
 
-        ENGINE_CORE_ASSERT( false, "Invalid orbit-camera-state given" );
-
+        ENGINE_CORE_CRITICAL( "Invalid orbit-camera state" );
         return "undefined";
     }
 
     COrbitCamera::COrbitCamera( const std::string& name,
                                 const CVec3& position,
-                                const CVec3& targetPoint,
-                                const eAxis& upAxis,
-                                const CCameraProjData& projData,
-                                float viewportWidth,
-                                float viewportHeight,
-                                float moveSensitivity,
-                                float zoomSensitivity )
-        : CICamera( name, position, targetPoint, upAxis, projData )
+                                const CVec3& target_point,
+                                const eAxis& up_axis,
+                                const CCameraProjData& proj_data,
+                                float move_sensitivity,
+                                float zoom_sensitivity )
+        : CICamera( name, position, target_point, up_axis, proj_data )
     {
-        m_type = eCameraType::ORBIT;
-        m_viewportWidth = viewportWidth;
-        m_viewportHeight = viewportHeight;
+        m_Type = eCameraType::ORBIT;
 
-        m_rho = 0.0f;
-        m_rho0 = 0.0f;
-        m_theta = 0.0f;
-        m_theta0 = 0.0f;
-        m_phi = 0.0f;
-        m_phi0 = 0.0f;
+        m_TargetPoint0 = m_TargetPoint;
 
-        m_r = { 0.0f, 0.0f, 0.0f };
-        m_targetPoint0 = m_targetPoint;
+        m_MoveSensitivity = move_sensitivity;
+        m_ZoomSensitivity = zoom_sensitivity;
 
-        m_cameraState = eOrbitCameraState::IDLE;
-        m_cursor = { 0.0f, 0.0f };
-        m_cursor0 = { 0.0f, 0.0f };
-
-        m_moveSensitivity = moveSensitivity;
-        m_zoomSensitivity = zoomSensitivity;
-
-        m_baseAccumScroll = m_zoomSensitivity * CInputManager::GetScrollAccumValueY();
-
-        _computeSphericalsFromPosition();
-        _updateCameraVectors();
-        _buildViewMatrix();
+        _ComputeSphericalsFromPosition();
+        _UpdateCameraVectors();
+        _BuildViewMatrix();
     }
 
-    void COrbitCamera::_positionChangedInternal()
+    void COrbitCamera::_PositionChangedInternal()
     {
-        _computeSphericalsFromPosition();
-        _updateCameraVectors();
-        _buildViewMatrix();
+        _ComputeSphericalsFromPosition();
+        _UpdateCameraVectors();
+        _BuildViewMatrix();
     }
 
-    void COrbitCamera::_targetPointChangedInternal()
+    void COrbitCamera::_TargetPointChangedInternal()
     {
-        _computeSphericalsFromPosition();
-        _updateCameraVectors();
-        _buildViewMatrix();
+        _ComputeSphericalsFromPosition();
+        _UpdateCameraVectors();
+        _BuildViewMatrix();
     }
 
-    void COrbitCamera::setZoomSensitivity( float zoomSensitivity )
+    void COrbitCamera::_UpdateInternal()
     {
-        m_zoomSensitivity = zoomSensitivity; 
-
-        _computeSphericalsFromPosition();
-        _updateCameraVectors();
-        _buildViewMatrix();
-    }
-
-    void COrbitCamera::_updateInternal()
-    {
-        if ( !m_active )
+        if ( !m_Active )
             return;
 
-        if ( m_cameraState == eOrbitCameraState::IDLE )
+        if ( m_State == eOrbitCameraState::IDLE )
         {
             if ( CInputManager::IsMouseDown( Mouse::BUTTON_LEFT ) )
             {
-                m_cameraState = eOrbitCameraState::DRAGGING;
+                m_State = eOrbitCameraState::DRAGGING;
 
-                m_cursor0 = CInputManager::GetCursorPosition();
-                m_cursor = CInputManager::GetCursorPosition();
+                m_Cursor0 = CInputManager::GetCursorPosition();
+                m_Cursor = CInputManager::GetCursorPosition();
 
-                m_phi0 = m_phi;
-                m_theta0 = m_theta;
+                m_Phi = m_Phi;
+                m_Theta0 = m_Theta;
             }
             else if ( CInputManager::IsMouseDown( Mouse::BUTTON_RIGHT ) )
             {
-                m_cameraState = eOrbitCameraState::MOVING_TARGET;
+                m_State = eOrbitCameraState::MOVING_TARGET;
 
-                m_cursor0 = CInputManager::GetCursorPosition();
-                m_cursor = CInputManager::GetCursorPosition();
+                m_Cursor0 = CInputManager::GetCursorPosition();
+                m_Cursor = CInputManager::GetCursorPosition();
 
-                m_targetPoint0 = m_targetPoint;
+                m_TargetPoint0 = m_TargetPoint;
             }
         }
-        else if ( m_cameraState == eOrbitCameraState::DRAGGING )
+        else if ( m_State == eOrbitCameraState::DRAGGING )
         {
-            m_cursor = CInputManager::GetCursorPosition();
+            m_Cursor = CInputManager::GetCursorPosition();
 
-            float _dx = m_cursor.x() - m_cursor0.x();
-            float _dy = m_cursor.y() - m_cursor0.y();
+            float _dx = m_Cursor.x() - m_Cursor0.x();
+            float _dy = m_Cursor.y() - m_Cursor0.y();
 
-            float _dtheta = ( -_dx / m_viewportWidth ) * 2.0f * ENGINE_PI;
-            float _dphi = ( -_dy / m_viewportHeight ) * ENGINE_PI;
+            float _dtheta = ( -_dx / m_ProjData.viewportWidth ) * 2.0f * ENGINE_PI;
+            float _dphi = ( -_dy / m_ProjData.viewportHeight ) * ENGINE_PI;
 
-            m_theta = m_theta0 + _dtheta;
-            m_phi = m_phi0 + _dphi;
+            m_Theta = m_Theta0 + _dtheta;
+            m_Phi = m_Phi + _dphi;
 
             if ( !CInputManager::IsMouseDown( Mouse::BUTTON_LEFT ) )
-                m_cameraState = eOrbitCameraState::IDLE;
+                m_State = eOrbitCameraState::IDLE;
         }
-        else if ( m_cameraState == eOrbitCameraState::MOVING_TARGET )
+        else if ( m_State == eOrbitCameraState::MOVING_TARGET )
         {
-            m_cursor = CInputManager::GetCursorPosition();
+            m_Cursor = CInputManager::GetCursorPosition();
 
-            float _dx = -( m_cursor.x() - m_cursor0.x() );
-            float _dy = m_cursor.y() - m_cursor0.y();
+            float _dx = -( m_Cursor.x() - m_Cursor0.x() );
+            float _dy = m_Cursor.y() - m_Cursor0.y();
 
-            m_targetPoint.x() = m_targetPoint0.x() + ( m_right.x() * _dx + m_up.x() * _dy ) * m_moveSensitivity;
-            m_targetPoint.y() = m_targetPoint0.y() + ( m_right.y() * _dx + m_up.y() * _dy ) * m_moveSensitivity;
-            m_targetPoint.z() = m_targetPoint0.z();
+            m_TargetPoint.x() = m_TargetPoint0.x() + ( m_Right.x() * _dx + m_Up.x() * _dy ) * m_MoveSensitivity;
+            m_TargetPoint.y() = m_TargetPoint0.y() + ( m_Right.y() * _dx + m_Up.y() * _dy ) * m_MoveSensitivity;
+            m_TargetPoint.z() = m_TargetPoint0.z();
 
             if ( !CInputManager::IsMouseDown( Mouse::BUTTON_RIGHT ) )
-                m_cameraState = eOrbitCameraState::IDLE;
+                m_State = eOrbitCameraState::IDLE;
         }
 
-        m_rho = m_rho0 + ( m_baseAccumScroll - m_zoomSensitivity * CInputManager::GetScrollAccumValueY() ) * 0.25f;
+        m_Rho = m_Rho0 + ( m_ZoomSensitivity * CInputManager::GetScrollAccumValueY() ) * 0.25f;
 
-        _computePositionFromSphericals();
-        _updateCameraVectors();
-        _buildViewMatrix();
+        _ComputePositionFromSphericals();
+        _UpdateCameraVectors();
+        _BuildViewMatrix();
     }
 
-    void COrbitCamera::_resizeInternal( int width, int height )
+    std::string COrbitCamera::_ToStringInternal() const
     {
-        m_viewportWidth = width;
-        m_viewportHeight = height;
+        std::string strrep;
+        strrep += "state   : " + engine::ToString( m_State ) + "\n\r";
+        strrep += "front   : " + engine::toString( m_Front ) + "\n\r";
+        strrep += "right   : " + engine::toString( m_Right ) + "\n\r";
+        strrep += "up      : " + engine::toString( m_Up ) + "\n\r";
+        strrep += "rho     : " + std::to_string( m_Rho ) + "\n\r";
+        strrep += "rho0    : " + std::to_string( m_Rho0 ) + "\n\r";
+        strrep += "phi     : " + std::to_string( m_Phi ) + "\n\r";
+        strrep += "phi0    : " + std::to_string( m_Phi ) + "\n\r";
+        strrep += "theta   : " + std::to_string( m_Theta ) + "\n\r";
+        strrep += "theta0  : " + std::to_string( m_Theta0 ) + "\n\r";
+        strrep += "r       : " + engine::toString( m_Radial ) + "\n\r";
+        return strrep;
     }
 
-    std::string COrbitCamera::_toStringInternal() const
+    void COrbitCamera::_ComputeSphericalsFromPosition()
     {
-        std::string _strRep;
-
-        _strRep += "state   : " + engine::toString( m_cameraState ) + "\n\r";
-        _strRep += "front   : " + engine::toString( m_front ) + "\n\r";
-        _strRep += "right   : " + engine::toString( m_right ) + "\n\r";
-        _strRep += "up      : " + engine::toString( m_up ) + "\n\r";
-        _strRep += "rho     : " + std::to_string( m_rho ) + "\n\r";
-        _strRep += "rho0    : " + std::to_string( m_rho0 ) + "\n\r";
-        _strRep += "phi     : " + std::to_string( m_phi ) + "\n\r";
-        _strRep += "phi0    : " + std::to_string( m_phi0 ) + "\n\r";
-        _strRep += "theta   : " + std::to_string( m_theta ) + "\n\r";
-        _strRep += "theta0  : " + std::to_string( m_theta0 ) + "\n\r";
-        _strRep += "r       : " + engine::toString( m_r ) + "\n\r";
-        _strRep += "vpwidth : " + std::to_string( m_viewportWidth ) + "\n\r";
-        _strRep += "vpheight: " + std::to_string( m_viewportHeight ) + "\n\r";
-
-        return _strRep;
+        m_Radial = m_Position - m_TargetPoint;
+        m_Rho0 = m_Rho = m_Radial.length();
+        if ( m_UpAxis == eAxis::X )
+        {
+            m_Phi = m_Phi = std::acos( m_Radial.x() / m_Rho0 );
+            m_Theta0 = m_Theta = std::atan2( m_Radial.z(), m_Radial.y() );
+        }
+        else if ( m_UpAxis == eAxis::Y )
+        {
+            m_Phi = m_Phi = std::acos( m_Radial.y() / m_Rho0 );
+            m_Theta0 = m_Theta = std::atan2( m_Radial.x(), m_Radial.z() );
+        }
+        else if ( m_UpAxis == eAxis::Z )
+        {
+            m_Phi = m_Phi = std::acos( m_Radial.z() / m_Rho0 );
+            m_Theta0 = m_Theta = std::atan2( m_Radial.y(), m_Radial.x() );
+        }
     }
 
-    void COrbitCamera::_computeSphericalsFromPosition()
+    void COrbitCamera::_ComputePositionFromSphericals()
     {
-        m_r = m_position - m_targetPoint;
+        const float _sphi = std::sin( m_Phi );
+        const float _cphi = std::cos( m_Phi );
+        const float _stheta = std::sin( m_Theta );
+        const float _ctheta = std::cos( m_Theta );
 
-        m_rho0 = m_rho = m_r.length();
-        if ( m_upAxis == eAxis::X )
+        if ( m_UpAxis == eAxis::X )
         {
-            m_phi0 = m_phi = std::acos( m_r.x() / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.z(), m_r.y() );
+            m_Radial.x() = m_Rho * _cphi;
+            m_Radial.y() = m_Rho * _sphi * _ctheta;
+            m_Radial.z() = m_Rho * _sphi * _stheta;
         }
-        else if ( m_upAxis == eAxis::Y )
+        else if ( m_UpAxis == eAxis::Y )
         {
-            m_phi0 = m_phi = std::acos( m_r.y() / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.x(), m_r.z() );
+            m_Radial.x() = m_Rho * _sphi * _stheta;
+            m_Radial.y() = m_Rho * _cphi;
+            m_Radial.z() = m_Rho * _sphi * _ctheta;
         }
-        else if ( m_upAxis == eAxis::Z )
+        else if ( m_UpAxis == eAxis::Z )
         {
-            m_phi0 = m_phi = std::acos( m_r.z() / m_rho0 );
-            m_theta0 = m_theta = std::atan2( m_r.y(), m_r.x() );
+            m_Radial.x() = m_Rho * _sphi * _ctheta;
+            m_Radial.y() = m_Rho * _sphi * _stheta;
+            m_Radial.z() = m_Rho * _cphi;
         }
-
-        m_baseAccumScroll = m_zoomSensitivity * CInputManager::GetScrollAccumValueY();
+        m_Position = m_TargetPoint + m_Radial;
     }
 
-    void COrbitCamera::_computePositionFromSphericals()
+    void COrbitCamera::_UpdateCameraVectors()
     {
-        float _sphi = std::sin( m_phi );
-        float _cphi = std::cos( m_phi );
-        float _stheta = std::sin( m_theta );
-        float _ctheta = std::cos( m_theta );
-
-        if ( m_upAxis == eAxis::X )
-        {
-            m_r.x() = m_rho * _cphi;
-            m_r.y() = m_rho * _sphi * _ctheta;
-            m_r.z() = m_rho * _sphi * _stheta;
-        }
-        else if ( m_upAxis == eAxis::Y )
-        {
-            m_r.x() = m_rho * _sphi * _stheta;
-            m_r.y() = m_rho * _cphi;
-            m_r.z() = m_rho * _sphi * _ctheta;
-        }
-        else if ( m_upAxis == eAxis::Z )
-        {
-            m_r.x() = m_rho * _sphi * _ctheta;
-            m_r.y() = m_rho * _sphi * _stheta;
-            m_r.z() = m_rho * _cphi;
-        }
-
-        m_position = m_targetPoint + m_r;
+        m_Front = ( m_TargetPoint - m_Position ).normalized();
+        m_Right = tinymath::cross( m_Front, m_WorldUp ).normalized();
+        m_Up    = tinymath::cross( m_Right, m_Front ).normalized();
     }
-
-    void COrbitCamera::_updateCameraVectors()
-    {
-        m_front = ( m_targetPoint - m_position ).normalized();
-        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
-        m_up    = tinymath::cross( m_right, m_front ).normalized();
-    }
-
 }

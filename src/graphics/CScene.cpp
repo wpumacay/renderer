@@ -102,13 +102,13 @@ namespace engine
     void CScene::Update()
     {
         if ( m_currentCameraIndex > -1 )
-            m_cameras[m_currentCameraIndex]->update();
+            m_cameras[m_currentCameraIndex]->Update();
     }
 
     void CScene::Resize( int32 width, int32 height )
     {
         for ( auto& camera : m_cameras )
-            camera->resize( width, height );
+            camera->Resize( width, height );
     }
 
     void CScene::RemoveAllRenderables()

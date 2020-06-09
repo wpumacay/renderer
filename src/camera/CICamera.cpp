@@ -3,138 +3,127 @@
 
 namespace engine
 {
-
-    std::string toString( const eCameraType& type )
+    std::string ToString( const eCameraType& type )
     {
-        if ( type == eCameraType::BASE ) return "base";
-        if ( type == eCameraType::FIXED ) return "fixed";
-        if ( type == eCameraType::FPS ) return "fps";
-        if ( type == eCameraType::ORBIT ) return "orbit";
+        /**/ if ( type == eCameraType::FIXED )  return "fixed";
+        else if ( type == eCameraType::FPS )    return "fps";
+        else if ( type == eCameraType::ORBIT )  return "orbit";
 
-        ENGINE_CORE_ASSERT( false, "Unknown camera type given" );
-
+        ENGINE_CORE_CRITICAL( "Undefined camera type-enum" );
         return "undefined";
     }
 
-    std::string toString( const eCameraProjection& proj )
+    std::string ToString( const eCameraProjection& proj )
     {
-        if ( proj == eCameraProjection::PERSPECTIVE ) return "perspective";
-        if ( proj == eCameraProjection::ORTHOGRAPHIC ) return "orthographic";
+        /**/ if ( proj == eCameraProjection::PERSPECTIVE )  return "perspective";
+        else if ( proj == eCameraProjection::ORTHOGRAPHIC ) return "orthographic";
 
-        ENGINE_CORE_ASSERT( false, "Unknown projection type given" );
-
+        ENGINE_CORE_CRITICAL( "Undefined camera projection type-enum" );
         return "undefined";
     }
 
-    std::string toString( const CCameraProjData& projData )
+    std::string ToString( const CCameraProjData& proj_data )
     {
-        std::string _strRep;
-
-        _strRep += engine::toString( projData.projection ) + "\n\r";
-
-        if ( projData.projection == eCameraProjection::PERSPECTIVE )
+        std::string strrep;
+        strrep += engine::ToString( proj_data.projection ) + "\n\r";
+        if ( proj_data.projection == eCameraProjection::PERSPECTIVE )
         {
-            _strRep += "fov     : " + std::to_string( projData.fov ) + "\n\r";
-            _strRep += "aspect  : " + std::to_string( projData.aspect ) + "\n\r";
+            strrep += "fov     : " + std::to_string( proj_data.fov ) + "\n\r";
+            strrep += "aspect  : " + std::to_string( proj_data.aspect ) + "\n\r";
         }
-        else if ( projData.projection == eCameraProjection::ORTHOGRAPHIC )
+        else if ( proj_data.projection == eCameraProjection::ORTHOGRAPHIC )
         {
-            _strRep += "width   : " + std::to_string( projData.width ) + "\n\r";
-            _strRep += "height  : " + std::to_string( projData.height ) + "\n\r";
+            strrep += "width   : " + std::to_string( proj_data.width ) + "\n\r";
+            strrep += "height  : " + std::to_string( proj_data.height ) + "\n\r";
         }
-
-        _strRep += "zNear   : " + std::to_string( projData.zNear ) + "\n\r";
-        _strRep += "zFar    : " + std::to_string( projData.zFar ) + "\n\r";
-
-        return _strRep;
+        strrep += "zNear   : " + std::to_string( proj_data.zNear ) + "\n\r";
+        strrep += "zFar    : " + std::to_string( proj_data.zFar ) + "\n\r";
+        strrep += "vpwidth : " + std::to_string( proj_data.viewportWidth ) + "\n\r";
+        strrep += "vpheight: " + std::to_string( proj_data.viewportHeight ) + "\n\r";
+        return strrep;
     }
 
     CICamera::CICamera( const std::string& name,
                         const CVec3& position,
-                        const CVec3& targetPoint,
-                        const eAxis& upAxis,
-                        const CCameraProjData& projData )
+                        const CVec3& target_point,
+                        const eAxis& up_axis,
+                        const CCameraProjData& proj_data )
     {
-        m_name          = name;
-        m_position      = position;
-        m_targetPoint   = targetPoint;
-        m_targetDir     = ( m_targetPoint - m_position ).normalized();
-        m_upAxis        = upAxis;
-        m_projData      = projData;
-        m_active        = true;
-        m_worldUp       = { 0.0f, 0.0f, 1.0f };
-        m_type          = eCameraType::BASE;
+        m_Name          = name;
+        m_Position      = position;
+        m_TargetPoint   = target_point;
+        m_TargetDir     = ( m_TargetPoint - m_Position ).normalized();
+        m_UpAxis        = up_axis;
+        m_ProjData      = proj_data;
+        m_Active        = true;
+        m_WorldUp       = { 0.0f, 0.0f, 1.0f };
 
-        if ( m_upAxis == eAxis::X ) m_worldUp = { 1.0f, 0.0f, 0.0f };
-        if ( m_upAxis == eAxis::Y ) m_worldUp = { 0.0f, 1.0f, 0.0f };
-        if ( m_upAxis == eAxis::Z ) m_worldUp = { 0.0f, 0.0f, 1.0f };
-
-        _buildProjMatrix();
+        /**/ if ( m_UpAxis == eAxis::X ) m_WorldUp = { 1.0f, 0.0f, 0.0f };
+        else if ( m_UpAxis == eAxis::Y ) m_WorldUp = { 0.0f, 1.0f, 0.0f };
+        else if ( m_UpAxis == eAxis::Z ) m_WorldUp = { 0.0f, 0.0f, 1.0f };
+        _BuildProjMatrix();
     }
 
     CICamera::~CICamera()
     {
-        // nothing to delete for now
+        // Nothing to delete for now
     }
 
-    void CICamera::setPosition( const CVec3& position )
+    void CICamera::SetPosition( const CVec3& position )
     {
-        m_position = position;
-
-        _positionChangedInternal();
-        _buildViewMatrix();
+        m_Position = position;
+        _PositionChangedInternal();
+        _BuildViewMatrix();
     }
 
-    void CICamera::setTargetPoint( const CVec3& targetPoint )
+    void CICamera::SetTargetPoint( const CVec3& target_point )
     {
-        m_targetPoint = targetPoint;
+        m_TargetPoint = target_point;
 
-        _targetPointChangedInternal();
-        _buildViewMatrix();
+        _TargetPointChangedInternal();
+        _BuildViewMatrix();
     }
 
-    void CICamera::setActiveMode( bool activeMode )
+    void CICamera::SetActiveMode( bool activeMode )
     {
-        m_active = activeMode;
+        m_Active = activeMode;
     }
 
-    void CICamera::setProjectionData( const CCameraProjData& projData )
+    void CICamera::SetProjectionData( const CCameraProjData& proj_data )
     {
-        m_projData = projData;
-        _buildProjMatrix();
+        m_ProjData = proj_data;
+        _BuildProjMatrix();
     }
 
-    void CICamera::update()
+    void CICamera::Update()
     {
-        _updateInternal();
+        _UpdateInternal();
     }
 
-    void CICamera::resize( int width, int height )
+    void CICamera::Resize( int width, int height )
     {
-        m_projData.aspect = ( (float)width ) / height;
-        m_projData.width = 10.0f * ( (float)width ) / height;
-        m_projData.height = 10.0f;
-
-        _resizeInternal( width, height );
-
-        _buildProjMatrix();
+        m_ProjData.aspect = ( (float)width ) / height;
+        m_ProjData.width = 10.0f * ( (float)width ) / height;
+        m_ProjData.height = 10.0f;
+        m_ProjData.viewportWidth = (float)width;
+        m_ProjData.viewportHeight = (float)height;
+        _ResizeInternal( width, height );
+        _BuildProjMatrix();
     }
 
-    std::string CICamera::toString() const
+    std::string CICamera::ToString() const
     {
-        std::string _strRep;
-        _strRep += "name        : " + m_name + "\n\r";
-        _strRep += "position    : " + engine::toString( m_position ) + "\n\r";
-        _strRep += "targetDir   : " + engine::toString( m_targetDir ) + "\n\r";
-        _strRep += "worldUp     : " + engine::toString( m_worldUp ) + "\n\r";
-        _strRep += engine::toString( m_projData );
-
-        _strRep += _toStringInternal();
-
-        return _strRep;
+        std::string strrep;
+        strrep += "name        : " + m_Name + "\n\r";
+        strrep += "position    : " + engine::toString( m_Position ) + "\n\r";
+        strrep += "targetDir   : " + engine::toString( m_TargetDir ) + "\n\r";
+        strrep += "worldUp     : " + engine::toString( m_WorldUp ) + "\n\r";
+        strrep += engine::ToString( m_ProjData );
+        strrep += _ToStringInternal();
+        return strrep;
     }
 
-    void CICamera::_buildViewMatrix()
+    void CICamera::_BuildViewMatrix()
     {
         // View matrix is
         /*
@@ -145,43 +134,32 @@ namespace engine
         */
         // Also, it's column major, so must keep layout ...
         // [ c1x c1y c1z c1w, c2x c2y c2z c2w, ... ]
-        m_matView( 0, 0 ) = m_right.x();
-        m_matView( 1, 0 ) = m_up.x();
-        m_matView( 2, 0 ) = -m_front.x();
-        m_matView( 3, 0 ) = 0;
+        m_MatView( 0, 0 ) = m_Right.x();
+        m_MatView( 1, 0 ) = m_Up.x();
+        m_MatView( 2, 0 ) = -m_Front.x();
+        m_MatView( 3, 0 ) = 0;
 
-        m_matView( 0, 1 ) = m_right.y();
-        m_matView( 1, 1 ) = m_up.y();
-        m_matView( 2, 1 ) = -m_front.y();
-        m_matView( 3, 1 ) = 0;
+        m_MatView( 0, 1 ) = m_Right.y();
+        m_MatView( 1, 1 ) = m_Up.y();
+        m_MatView( 2, 1 ) = -m_Front.y();
+        m_MatView( 3, 1 ) = 0;
 
-        m_matView( 0, 2 ) = m_right.z();
-        m_matView( 1, 2 ) = m_up.z();
-        m_matView( 2, 2 ) = -m_front.z();
-        m_matView( 3, 2 ) = 0;
+        m_MatView( 0, 2 ) = m_Right.z();
+        m_MatView( 1, 2 ) = m_Up.z();
+        m_MatView( 2, 2 ) = -m_Front.z();
+        m_MatView( 3, 2 ) = 0;
 
-        m_matView( 0, 3 ) = -m_right.dot( m_position );
-        m_matView( 1, 3 ) = -m_up.dot( m_position );
-        m_matView( 2, 3 ) = m_front.dot( m_position );
-        m_matView( 3, 3 ) = 1;
+        m_MatView( 0, 3 ) = -m_Right.dot( m_Position );
+        m_MatView( 1, 3 ) = -m_Up.dot( m_Position );
+        m_MatView( 2, 3 ) = m_Front.dot( m_Position );
+        m_MatView( 3, 3 ) = 1;
     }
 
-    void CICamera::_buildProjMatrix()
+    void CICamera::_BuildProjMatrix()
     {
-        if ( m_projData.projection == eCameraProjection::PERSPECTIVE )
-        {
-            m_matProj = engine::perspective( m_projData.fov, 
-                                             m_projData.aspect,
-                                             m_projData.zNear, 
-                                             m_projData.zFar );
-        }
-        else if ( m_projData.projection == eCameraProjection::ORTHOGRAPHIC )
-        {
-            m_matProj = engine::ortho( m_projData.width,
-                                       m_projData.height,
-                                       m_projData.zNear,
-                                       m_projData.zFar );
-        }
+        if ( m_ProjData.projection == eCameraProjection::PERSPECTIVE )
+            m_MatProj = engine::perspective( m_ProjData.fov, m_ProjData.aspect, m_ProjData.zNear, m_ProjData.zFar );
+        else if ( m_ProjData.projection == eCameraProjection::ORTHOGRAPHIC )
+            m_MatProj = engine::ortho( m_ProjData.width, m_ProjData.height, m_ProjData.zNear, m_ProjData.zFar );
     }
-
 }

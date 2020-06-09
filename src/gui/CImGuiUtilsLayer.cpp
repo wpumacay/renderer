@@ -49,7 +49,7 @@ namespace engine
             {
                 m_window->enableCursor();
                 m_cursorDisabledByFpsCamera = false;
-                _currentCamera->setActiveMode( false );
+                _currentCamera->SetActiveMode( false );
             }
         }
 
@@ -63,14 +63,14 @@ namespace engine
         auto _cameras = m_scene->GetCamerasList();
         for ( auto _camera : _cameras )
         {
-            auto _projData = _camera->projData();
+            auto _projData = _camera->proj_data();
             if ( _camera->name() == m_scene->GetCurrentCamera()->name() )
                 continue;
 
-            if ( _camera->projData().projection == eCameraProjection::PERSPECTIVE )
-                CDebugDrawer::DrawClipVolume( engine::perspective( _projData.fov, _projData.aspect, 0.01f, 0.2f ) * _camera->matView(), CVec3( 0.0f, 1.0f, 1.0f ) );
+            if ( _camera->proj_data().projection == eCameraProjection::PERSPECTIVE )
+                CDebugDrawer::DrawClipVolume( engine::perspective( _projData.fov, _projData.aspect, 0.01f, 0.2f ) * _camera->mat_view(), CVec3( 0.0f, 1.0f, 1.0f ) );
             else
-                CDebugDrawer::DrawBox( CVec3( 0.1f, 0.1f, 0.1f ), tinymath::inverse( _camera->matView() ), CVec3( 0.0f, 1.0f, 1.0f ) );
+                CDebugDrawer::DrawBox( CVec3( 0.1f, 0.1f, 0.1f ), tinymath::inverse( _camera->mat_view() ), CVec3( 0.0f, 1.0f, 1.0f ) );
         }
     }
 
@@ -523,7 +523,7 @@ namespace engine
                 if ( m_scene->GetCurrentCamera()->type() == eCameraType::FPS )
                 {
                     m_cursorDisabledByFpsCamera = true;
-                    _camera->setActiveMode( true );
+                    _camera->SetActiveMode( true );
                     m_window->disableCursor();
                 }
             }
@@ -540,19 +540,19 @@ namespace engine
         float32 _vposition[3] = { camera->position().x(), camera->position().y(), camera->position().z() };
         if ( ImGui::DragFloat3( "Position", _vposition, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
         {
-            camera->setActiveMode( false );
-            camera->setPosition( CVec3( _vposition[0], _vposition[1], _vposition[2] ) );
+            camera->SetActiveMode( false );
+            camera->SetPosition( CVec3( _vposition[0], _vposition[1], _vposition[2] ) );
         }
         else
         {
             if ( camera->type() == eCameraType::FPS )
-                camera->setActiveMode( m_cursorDisabledByFpsCamera );
+                camera->SetActiveMode( m_cursorDisabledByFpsCamera );
             else
-                camera->setActiveMode( true );
+                camera->SetActiveMode( true );
         }
 
         // projection-data (fov, ...)
-        auto _projData = camera->projData();
+        auto _projData = camera->proj_data();
         int _projType = ( _projData.projection == eCameraProjection::PERSPECTIVE ) ? 0 : 1;
         ImGui::RadioButton( "Perspective", &_projType, 0 ); ImGui::SameLine();
         ImGui::RadioButton( "Orthographic", &_projType, 1 ); ImGui::Spacing();
@@ -569,62 +569,62 @@ namespace engine
         ImGui::SliderFloat( "znear", &_projData.zNear, 0.1f, 1.0f );
         ImGui::SliderFloat( "zfar", &_projData.zFar, 10.0f, 100.0f );
 
-        camera->setProjectionData( _projData );
+        camera->SetProjectionData( _projData );
 
         /* type-specific properties */
 
         // target-point
         if ( camera->type() == eCameraType::FIXED || camera->type() == eCameraType::ORBIT )
         {
-            float32 _vtargetPoint[3] = { camera->targetPoint().x(), camera->targetPoint().y(), camera->targetPoint().z() };
+            float32 _vtargetPoint[3] = { camera->target_point().x(), camera->target_point().y(), camera->target_point().z() };
             if ( ImGui::DragFloat3( "Target-point", _vtargetPoint, GUI_UTILS_DRAGFLOAT_POSITION_SPEED ) )
             {
-                camera->setActiveMode( false );
-                camera->setTargetPoint( { _vtargetPoint[0], _vtargetPoint[1], _vtargetPoint[2] } );
+                camera->SetActiveMode( false );
+                camera->SetTargetPoint( { _vtargetPoint[0], _vtargetPoint[1], _vtargetPoint[2] } );
             }
             else
             {
-                camera->setActiveMode( true );
+                camera->SetActiveMode( true );
             }
         }
 
         if ( camera->type() == eCameraType::ORBIT )
         {
             auto _orbitCamera = dynamic_cast< COrbitCamera* >( camera );
-            float _moveSensitivity = _orbitCamera->moveSensitivity();
-            float _zoomSensitivity = _orbitCamera->zoomSensitivity();
+            float _moveSensitivity = _orbitCamera->move_sensitivity();
+            float _zoomSensitivity = _orbitCamera->zoom_sensitivity();
             if ( ImGui::SliderFloat( "Drag-sens.", &_moveSensitivity, 0.000f, 0.100f ) )
             {
-                camera->setActiveMode( false );
-                _orbitCamera->setMoveSensitivity( _moveSensitivity );
+                camera->SetActiveMode( false );
+                _orbitCamera->SetMoveSensitivity( _moveSensitivity );
             }
             else
             {
-                camera->setActiveMode( true );
+                camera->SetActiveMode( true );
             }
             if ( ImGui::SliderFloat( "Zoom-sens.", &_zoomSensitivity, 0.000f, 4.000f ) )
             {
-                camera->setActiveMode( false );
-                _orbitCamera->setZoomSensitivity( _zoomSensitivity );
+                camera->SetActiveMode( false );
+                _orbitCamera->SetZoomSensitivity( _zoomSensitivity );
             }
             else
             {
-                camera->setActiveMode( true );
+                camera->SetActiveMode( true );
             }
         }
         else if ( camera->type() == eCameraType::FPS )
         {
             auto _fpsCamera = dynamic_cast< CFpsCamera* >( camera );
             float _mouseSensitivity = _fpsCamera->sensitivity();
-            float _camSpeed = _fpsCamera->camSpeed();
+            float _camSpeed = _fpsCamera->speed();
             ImGui::SliderFloat( "Mouse-sens.", &_mouseSensitivity, 0.000f, 1.000f );
             ImGui::SliderFloat( "Camera-speed", &_camSpeed, 0.0f, 500.0f );
-            _fpsCamera->setSensitivity( _mouseSensitivity );
-            _fpsCamera->setCamSpeed( _camSpeed );
+            _fpsCamera->SetSensitivity( _mouseSensitivity );
+            _fpsCamera->SetSpeed( _camSpeed );
         }
 
         ImGui::TextColored( ImVec4( 0.8f, 0.8f, 0.2f, 1.0f ), "Information:" );
-        ImGui::Text( camera->toString().c_str() );
+        ImGui::Text( camera->ToString().c_str() );
     }
 
 }

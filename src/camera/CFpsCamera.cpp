@@ -3,150 +3,112 @@
 
 namespace engine
 {
-
     CFpsCamera::CFpsCamera( const std::string& name,
                             const CVec3& position,
-                            const CVec3& targetPoint,
-                            const eAxis& upAxis,
-                            const CCameraProjData& projData,
+                            const CVec3& target_point,
+                            const eAxis& up_axis,
+                            const CCameraProjData& proj_data,
                             float sensitivity,
-                            float camSpeed,
-                            float camMaxDelta )
-        : CICamera( name, position, targetPoint, upAxis, projData )
+                            float speed,
+                            float max_delta )
+        : CICamera( name, position, target_point, up_axis, proj_data )
     {
-        m_type = eCameraType::FPS;
+        m_Type = eCameraType::FPS;
 
-        m_sensitivity   = sensitivity;
-        m_camSpeed      = camSpeed;
-        m_camSpeedFront = 0.0f;
-        m_camSpeedRight = 0.0f;
-        m_camMaxDelta   = camMaxDelta;
+        m_Sensitivity = sensitivity;
+        m_Speed = speed;
+        m_MaxDelta = max_delta;
 
-        m_roll  = 0.0f;
-        m_pitch = 0.0f;
-        m_yaw   = -90.0f;
-
-        m_lastCursorPos = { 0.0f, 0.0f };
-
-        // initialize looking at the target
-        m_front = ( m_targetPoint - m_position ).normalized();
-        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
-        m_up    = tinymath::cross( m_right, m_front ).normalized();
-        _updateCameraAngles();
-
-        // initialize view matrix to this orientation
-        _buildViewMatrix();
+        m_Front = ( m_TargetPoint - m_Position ).normalized();
+        m_Right = tinymath::cross( m_Front, m_WorldUp ).normalized();
+        m_Up    = tinymath::cross( m_Right, m_Front ).normalized();
+        _UpdateCameraAngles();
+        _BuildViewMatrix();
     }
 
-    void CFpsCamera::_positionChangedInternal()
+    void CFpsCamera::_UpdateInternal()
     {
-        // nothing for now, use the same front, right and up vectors
-    }
-
-    void CFpsCamera::_targetPointChangedInternal()
-    {
-        // nothing for now, as a target-point is only used during initialization
-    }
-
-    void CFpsCamera::_updateInternal()
-    {
-        if ( !m_active )
+        if ( !m_Active )
             return;
 
-        m_camSpeedFront = 0.0f;
-        m_camSpeedRight = 0.0f;
+        m_CurrentFrontSpeed = 0.0f;
+        m_CurrentRightSpeed = 0.0f;
 
-        if ( CInputManager::IsKeyDown( engine::Keys::KEY_W ) )
-            m_camSpeedFront = m_camSpeed;
-
-        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_S ) )
-            m_camSpeedFront = -m_camSpeed;
-
-        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_D ) )
-            m_camSpeedRight = m_camSpeed;
-
-        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_A ) )
-            m_camSpeedRight = -m_camSpeed;
+        /**/ if ( CInputManager::IsKeyDown( engine::Keys::KEY_W ) ) m_CurrentFrontSpeed = m_Speed;
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_S ) ) m_CurrentFrontSpeed = -m_Speed;
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_D ) ) m_CurrentRightSpeed = m_Speed;
+        else if ( CInputManager::IsKeyDown( engine::Keys::KEY_A ) ) m_CurrentRightSpeed = -m_Speed;
 
         /* compute camera angles from user cursor */
-        CVec2 _currentCursorPos = CInputManager::GetCursorPosition();
-        float _xOff = _currentCursorPos.x() - m_lastCursorPos.x();
-        float _yOff = m_lastCursorPos.y() - _currentCursorPos.y();
+        CVec2 current_cursos_pos = CInputManager::GetCursorPosition();
+        float x_off = current_cursos_pos.x() - m_LastCursorPos.x();
+        float y_off = m_LastCursorPos.y() - current_cursos_pos.y();
 
-        _xOff = m_sensitivity * std::min( m_camMaxDelta, std::max( -m_camMaxDelta, _xOff ) );
-        _yOff = m_sensitivity * std::min( m_camMaxDelta, std::max( -m_camMaxDelta, _yOff ) );
+        x_off = m_Sensitivity * std::min( m_MaxDelta, std::max( -m_MaxDelta, x_off ) );
+        y_off = m_Sensitivity * std::min( m_MaxDelta, std::max( -m_MaxDelta, y_off ) );
 
-        m_yaw = m_yaw + _xOff;
-        m_pitch = std::min( std::max( m_pitch + _yOff, -89.0f ), 89.0f );
+        m_Yaw = m_Yaw + x_off;
+        m_Pitch = std::min( std::max( m_Pitch + y_off, -89.0f ), 89.0f );
 
         // update camera frame of reference using these angles
-        _updateCameraVectors();
+        _UpdateCameraVectors();
 
-        // and mode a bit using this new reference frame
-        auto _dFront = m_front * ( m_camSpeedFront * tinyutils::Clock::GetTimeStep() );
-        auto _dRight = m_right * ( m_camSpeedRight * tinyutils::Clock::GetTimeStep() );
-        m_position = m_position + _dFront + _dRight;
+        // and move a bit using this new reference frame
+        auto dfront = m_Front * ( m_CurrentFrontSpeed * tinyutils::Clock::GetTimeStep() );
+        auto dright = m_Right * ( m_CurrentRightSpeed * tinyutils::Clock::GetTimeStep() );
+        m_Position = m_Position + dfront + dright;
 
         // some book keeping for next calculation
-        m_lastCursorPos = _currentCursorPos;
+        m_LastCursorPos = current_cursos_pos;
     }
 
-    void CFpsCamera::_resizeInternal( int width, int height )
+    std::string CFpsCamera::_ToStringInternal() const
     {
-        // nothing extra to do for now
+        std::string strrep;
+        strrep += "front   : " + engine::toString( m_Front ) + "\n\r";
+        strrep += "right   : " + engine::toString( m_Right ) + "\n\r";
+        strrep += "up      : " + engine::toString( m_Up ) + "\n\r";
+        strrep += "roll    : " + std::to_string( m_Roll ) + "\n\r";
+        strrep += "pitch   : " + std::to_string( m_Pitch ) + "\n\r";
+        strrep += "yaw     : " + std::to_string( m_Yaw ) + "\n\r";
+        strrep += "senst.  : " + std::to_string( m_Sensitivity ) + "\n\r";
+        strrep += "speed   : " + std::to_string( m_Speed ) + "\n\r";
+        strrep += "speed-f : " + std::to_string( m_CurrentFrontSpeed ) + "\n\r";
+        strrep += "speed-r : " + std::to_string( m_CurrentRightSpeed ) + "\n\r";
+        return strrep;
     }
 
-    std::string CFpsCamera::_toStringInternal() const
+    void CFpsCamera::_UpdateCameraVectors()
     {
-        std::string _strRep;
-
-        _strRep += "front   : " + engine::toString( m_front ) + "\n\r";
-        _strRep += "right   : " + engine::toString( m_right ) + "\n\r";
-        _strRep += "up      : " + engine::toString( m_up ) + "\n\r";
-        _strRep += "roll    : " + std::to_string( m_roll ) + "\n\r";
-        _strRep += "pitch   : " + std::to_string( m_pitch ) + "\n\r";
-        _strRep += "yaw     : " + std::to_string( m_yaw ) + "\n\r";
-        _strRep += "senst.  : " + std::to_string( m_sensitivity ) + "\n\r";
-        _strRep += "speed   : " + std::to_string( m_camSpeed ) + "\n\r";
-        _strRep += "speed-f : " + std::to_string( m_camSpeedFront ) + "\n\r";
-        _strRep += "speed-r : " + std::to_string( m_camSpeedRight ) + "\n\r";
-
-        return _strRep;
-    }
-
-    void CFpsCamera::_updateCameraVectors()
-    {
-        if ( m_upAxis == eAxis::X )
+        if ( m_UpAxis == eAxis::X )
         {
-            m_front.x() = std::sin( toRadians( m_pitch ) );
-            m_front.y() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
-            m_front.z() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
+            m_Front.x() = std::sin( toRadians( m_Pitch ) );
+            m_Front.y() = std::cos( toRadians( m_Pitch ) ) * std::sin( toRadians( m_Yaw ) );
+            m_Front.z() = std::cos( toRadians( m_Pitch ) ) * std::cos( toRadians( m_Yaw ) );
         }
-        else if ( m_upAxis == eAxis::Y )
+        else if ( m_UpAxis == eAxis::Y )
         {
-            m_front.x() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
-            m_front.y() = std::sin( toRadians( m_pitch ) );
-            m_front.z() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
+            m_Front.x() = std::cos( toRadians( m_Pitch ) ) * std::cos( toRadians( m_Yaw ) );
+            m_Front.y() = std::sin( toRadians( m_Pitch ) );
+            m_Front.z() = std::cos( toRadians( m_Pitch ) ) * std::sin( toRadians( m_Yaw ) );
         }
-        else if ( m_upAxis == eAxis::Z )
+        else if ( m_UpAxis == eAxis::Z )
         {
-            m_front.x() = std::cos( toRadians( m_pitch ) ) * std::sin( toRadians( m_yaw ) );
-            m_front.y() = std::cos( toRadians( m_pitch ) ) * std::cos( toRadians( m_yaw ) );
-            m_front.z() = std::sin( toRadians( m_pitch ) );
+            m_Front.x() = std::cos( toRadians( m_Pitch ) ) * std::sin( toRadians( m_Yaw ) );
+            m_Front.y() = std::cos( toRadians( m_Pitch ) ) * std::cos( toRadians( m_Yaw ) );
+            m_Front.z() = std::sin( toRadians( m_Pitch ) );
         }
 
-        m_front = m_front.normalized();
-        m_right = tinymath::cross( m_front, m_worldUp ).normalized();
-        m_up    = tinymath::cross( m_right, m_front ).normalized();
-
-        _buildViewMatrix();
+        m_Front = m_Front.normalized();
+        m_Right = tinymath::cross( m_Front, m_WorldUp ).normalized();
+        m_Up    = tinymath::cross( m_Right, m_Front ).normalized();
+        _BuildViewMatrix();
     }
 
-    void CFpsCamera::_updateCameraAngles()
+    void CFpsCamera::_UpdateCameraAngles()
     {
-        m_roll  = 0.0f;
-        m_pitch = toDegrees( std::asin( m_front.z() ) );
-        m_yaw   = toDegrees( std::atan2( m_front.y(), m_front.x() ) );
+        m_Roll  = 0.0f;
+        m_Pitch = toDegrees( std::asin( m_Front.z() ) );
+        m_Yaw   = toDegrees( std::atan2( m_Front.y(), m_Front.x() ) );
     }
-
 }
