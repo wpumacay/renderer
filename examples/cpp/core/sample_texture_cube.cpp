@@ -103,9 +103,7 @@ int main()
                                                            engine::CVec3( 2.0f, 2.0f, 2.0f ),
                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                            engine::eAxis::Z,
-                                                           _cameraProjData,
-                                                           _app->window()->width(),
-                                                           _app->window()->height() );
+                                                           _cameraProjData );
 
     auto _cameraRef = _scene->AddCamera( std::move( _camera ) );
     ENGINE_TRACE( "cam-info: \n\r{0}", _cameraRef->toString() );

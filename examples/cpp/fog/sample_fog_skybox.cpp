@@ -363,9 +363,7 @@ int main()
                                                            engine::CVec3( 0.0f, 0.0f, 3.0f ),
                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                            engine::eAxis::Y,
-                                                           _cameraProjData,
-                                                           _app->window()->width(),
-                                                           _app->window()->height() );
+                                                           _cameraProjData );
 
 ////     const float _cameraSensitivity  = 0.25f;
 ////     const float _cameraSpeed        = 250.0f;

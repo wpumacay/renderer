@@ -62,7 +62,7 @@ namespace engine
                 m_Cursor0 = CInputManager::GetCursorPosition();
                 m_Cursor = CInputManager::GetCursorPosition();
 
-                m_Phi = m_Phi;
+                m_Phi0 = m_Phi;
                 m_Theta0 = m_Theta;
             }
             else if ( CInputManager::IsMouseDown( Mouse::BUTTON_RIGHT ) )
@@ -86,7 +86,7 @@ namespace engine
             float _dphi = ( -_dy / m_ProjData.viewportHeight ) * ENGINE_PI;
 
             m_Theta = m_Theta0 + _dtheta;
-            m_Phi = m_Phi + _dphi;
+            m_Phi = m_Phi0 + _dphi;
 
             if ( !CInputManager::IsMouseDown( Mouse::BUTTON_LEFT ) )
                 m_State = eOrbitCameraState::IDLE;
@@ -136,17 +136,17 @@ namespace engine
         m_Rho0 = m_Rho = m_Radial.length();
         if ( m_UpAxis == eAxis::X )
         {
-            m_Phi = m_Phi = std::acos( m_Radial.x() / m_Rho0 );
+            m_Phi0 = m_Phi = std::acos( m_Radial.x() / m_Rho0 );
             m_Theta0 = m_Theta = std::atan2( m_Radial.z(), m_Radial.y() );
         }
         else if ( m_UpAxis == eAxis::Y )
         {
-            m_Phi = m_Phi = std::acos( m_Radial.y() / m_Rho0 );
+            m_Phi0 = m_Phi = std::acos( m_Radial.y() / m_Rho0 );
             m_Theta0 = m_Theta = std::atan2( m_Radial.x(), m_Radial.z() );
         }
         else if ( m_UpAxis == eAxis::Z )
         {
-            m_Phi = m_Phi = std::acos( m_Radial.z() / m_Rho0 );
+            m_Phi0 = m_Phi = std::acos( m_Radial.z() / m_Rho0 );
             m_Theta0 = m_Theta = std::atan2( m_Radial.y(), m_Radial.x() );
         }
     }

@@ -398,9 +398,7 @@ int main()
                                                            engine::CVec3( 0.0f, 0.0f, 3.0f ),
                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                            engine::eAxis::Y,
-                                                           _cameraProjData,
-                                                           _app->window()->width(),
-                                                           _app->window()->height() );
+                                                           _cameraProjData );
 
     auto _gizmo = engine::CMeshBuilder::createBox( 0.2f, 0.2f, 0.2f );
     _gizmo->position = { 0.0f, 0.0f, 2.0f };

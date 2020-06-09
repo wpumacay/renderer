@@ -753,9 +753,7 @@ int main()
                                                            engine::CVec3( 0.0f, 0.0f, 3.0f ),
                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                            engine::eAxis::Y,
-                                                           _cameraProjData,
-                                                           engine::CApplication::GetInstance()->window()->width(),
-                                                           engine::CApplication::GetInstance()->window()->height() );
+                                                           _cameraProjData );
     auto _cameraRef = _app->scene()->AddCamera( std::move( _camera ) );
 
     auto _fog = std::make_unique<engine::CFog>( engine::eFogType::EXPONENTIAL,

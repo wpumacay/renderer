@@ -204,9 +204,7 @@ int main()
                                                            engine::CVec3( 0.0f, 0.0f, 3.0f ),
                                                            engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                            engine::eAxis::Y,
-                                                           _cameraProjData,
-                                                           _app->window()->width(),
-                                                           _app->window()->height() );
+                                                           _cameraProjData );
 
     auto _box = engine::CMeshBuilder::createBox( 1.0f, 1.0f, 1.0f );
     auto _sphere = engine::CMeshBuilder::createSphere( 1.5f );

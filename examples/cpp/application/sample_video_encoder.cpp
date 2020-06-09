@@ -45,9 +45,7 @@ int main()
                                                                 engine::CVec3( 5.0f, 5.0f, 5.0f ),
                                                                 engine::CVec3( 0.0f, 0.0f, 0.0f ),
                                                                 engine::eAxis::Z,
-                                                                _cameraProjData,
-                                                                _app->window()->width(),
-                                                                _app->window()->height() );
+                                                                _cameraProjData );
     auto _orbitCameraRef = _scene->AddCamera( std::move( _orbitCamera ) );
 
     const float _cameraSensitivity  = 0.1f;
