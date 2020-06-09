@@ -101,7 +101,7 @@ namespace engine
         /// Initial value of the elevation angle
         float m_Phi0 = 0.0f;
         /// Vector from camera's origin to the target position
-        CVec3 m_Radial = { 0.0f, 0.0f };
+        CVec3 m_Radial = { 0.0f, 0.0f, 0.0f };
         /// Initial value of the target position
         CVec3 m_TargetPoint0 = { 0.0f, 0.0f, 0.0f };
         /// Current value of the cursor(mouse) position in screen coordinates

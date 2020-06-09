@@ -18,9 +18,9 @@ std::unique_ptr<engine::CVertexArray> createGeometryVer1()
                                             { "color", engine::eElementType::Float3, false } };
 
     auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC, 
-                                                             sizeof( _bufferData ), _bufferData, true );
+                                                             sizeof( _bufferData ), _bufferData );
 
-    auto _varray = std::make_unique<engine::CVertexArray>( true );
+    auto _varray = std::make_unique<engine::CVertexArray>();
     _varray->addVertexBuffer( std::move( _vbuffer ) );
 
     return std::move( _varray );
@@ -52,12 +52,12 @@ std::unique_ptr<engine::CVertexArray> createGeometryVer2()
     engine::CVertexBufferLayout _layoutCol = { { "color", engine::eElementType::Float3, false } };
 
     auto _vbufferPos = std::make_unique<engine::CVertexBuffer>( _layoutPos, engine::eBufferUsage::STATIC,
-                                                                sizeof( _bufferPosData ), _bufferPosData, true );
+                                                                sizeof( _bufferPosData ), _bufferPosData );
 
     auto _vbufferCol = std::make_unique<engine::CVertexBuffer>( _layoutCol, engine::eBufferUsage::STATIC,
-                                                                sizeof( _bufferColData ), _bufferColData, true );
+                                                                sizeof( _bufferColData ), _bufferColData );
 
-    auto _varray = std::make_unique<engine::CVertexArray>( true );
+    auto _varray = std::make_unique<engine::CVertexArray>();
     _varray->addVertexBuffer( std::move( _vbufferPos ) );
     _varray->addVertexBuffer( std::move( _vbufferCol ) );
 
@@ -83,11 +83,11 @@ std::unique_ptr<engine::CVertexArray> createGeometryVer1Indices()
                                             { "color", engine::eElementType::Float3, false } };
 
     auto _vbuffer = std::make_unique<engine::CVertexBuffer>( _layout, engine::eBufferUsage::STATIC, 
-                                                             sizeof( _bufferData ), _bufferData, true );
+                                                             sizeof( _bufferData ), _bufferData );
 
     auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _varray = std::make_unique<engine::CVertexArray>( true );
+    auto _varray = std::make_unique<engine::CVertexArray>();
     _varray->addVertexBuffer( std::move( _vbuffer ) );
     _varray->setIndexBuffer( std::move( _ibuffer ) );
 
@@ -121,14 +121,14 @@ std::unique_ptr<engine::CVertexArray> createGeometryVer2Indices()
     engine::CVertexBufferLayout _layoutCol = { { "color", engine::eElementType::Float3, false } };
 
     auto _vbufferPos = std::make_unique<engine::CVertexBuffer>( _layoutPos, engine::eBufferUsage::STATIC,
-                                                                sizeof( _bufferPosData ), _bufferPosData, true );
+                                                                sizeof( _bufferPosData ), _bufferPosData );
 
     auto _vbufferCol = std::make_unique<engine::CVertexBuffer>( _layoutCol, engine::eBufferUsage::STATIC,
-                                                                sizeof( _bufferColData ), _bufferColData, true );
+                                                                sizeof( _bufferColData ), _bufferColData );
 
     auto _ibuffer = std::make_unique<engine::CIndexBuffer>( engine::eBufferUsage::STATIC, 6, _indices );
 
-    auto _varray = std::make_unique<engine::CVertexArray>( true );
+    auto _varray = std::make_unique<engine::CVertexArray>();
     _varray->addVertexBuffer( std::move( _vbufferPos ) );
     _varray->addVertexBuffer( std::move( _vbufferCol ) );
     _varray->setIndexBuffer( std::move( _ibuffer ) );

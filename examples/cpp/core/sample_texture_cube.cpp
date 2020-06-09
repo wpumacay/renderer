@@ -114,7 +114,7 @@ int main()
     // auto _textureCubemap = _textureCubeStarfield;
     // auto _textureCubemap = _textureCubeSiege;
 
-    auto _correctionMat = computeSkyboxCorrectionMat( _cameraRef->upAxis() );
+    auto _correctionMat = computeSkyboxCorrectionMat( _cameraRef->up_axis() );
 
     while( _app->active() )
     {
@@ -134,8 +134,8 @@ int main()
         glDepthFunc( GL_LEQUAL );
 
         _shader->bind();
-        _shader->setMat4( "u_tProj", _cameraRef->matProj() );
-        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _cameraRef->matView() ) ) * _correctionMat );
+        _shader->setMat4( "u_tProj", _cameraRef->mat_proj() );
+        _shader->setMat4( "u_tView", engine::CMat4( engine::CMat3( _cameraRef->mat_view() ) ) * _correctionMat );
 
         _textureCubemap->bind();
         _varray->bind();

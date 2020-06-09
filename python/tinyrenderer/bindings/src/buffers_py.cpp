@@ -145,7 +145,7 @@ namespace engine
         py::class_< CVertexArray >( m, "VertexArray" )
             .def( py::init( []()
                 {
-                    return std::make_unique<CVertexArray>( true );
+                    return std::make_unique<CVertexArray>();
                 } 
             ) )
             .def( "addVertexBuffer", []( CVertexArray& self, std::unique_ptr< CVertexBuffer > vbuffer )

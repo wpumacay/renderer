@@ -182,7 +182,7 @@ void drawGrid_noInstancing( engine::CShader* shader,
     shader->bind();
     vao->bind();
 
-    shader->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+    shader->setMat4( "u_viewProjMatrix", camera->mat_proj() * camera->mat_view() );
 
     for ( size_t i = 0; i < g_num_rows; i++ )
     {
@@ -213,7 +213,7 @@ void drawGrid_Instancing( engine::CShader* shader,
     shader->bind();
     vao->bind();
 
-    shader->setMat4( "u_viewProjMatrix", camera->matProj() * camera->matView() );
+    shader->setMat4( "u_viewProjMatrix", camera->mat_proj() * camera->mat_view() );
 
     for ( size_t i = 0; i < g_num_rows; i++ )
     {

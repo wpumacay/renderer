@@ -197,9 +197,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
 
         if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
@@ -213,7 +213,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
-        engine::CDebugDrawer::DrawClipVolume( _cameraTest->matProj() * _cameraTest->matView(), { 1.0f, 1.0f, 0.0f } );
+        engine::CDebugDrawer::DrawClipVolume( _cameraTest->mat_proj() * _cameraTest->mat_view(), { 1.0f, 1.0f, 0.0f } );
 
         _app->update();
         _app->begin();
@@ -244,7 +244,7 @@ int main()
         }
         else
         {
-            engine::CFrustum _frustum( _cameraTest->matProj() * _cameraTest->matView() );
+            engine::CFrustum _frustum( _cameraTest->mat_proj() * _cameraTest->mat_view() );
             for ( size_t i = 0; i < _frustum.planes.size(); i++ )
                 engine::CDebugDrawer::DrawArrow( _frustum.planes[i].position, 
                                                  _frustum.planes[i].position + 0.2f * _frustum.planes[i].normal,
@@ -258,7 +258,7 @@ int main()
         }
 
         {
-            engine::CFrustum _frustum( _cameraTest->matProj() * _cameraTest->matView() );
+            engine::CFrustum _frustum( _cameraTest->mat_proj() * _cameraTest->mat_view() );
             // check if sphere is outside the frustum of the test-cam with high chance
             if ( engine::certainlyOutsideFrustum( _frustum, { g_sphere_size, g_sphere_position } ) )
                 engine::CDebugDrawer::DrawSphere( g_sphere_size, g_sphere_transform, { 0.1f, 0.8f, 0.1f } );

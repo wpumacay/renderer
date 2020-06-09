@@ -167,9 +167,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
 
         if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
@@ -185,7 +185,7 @@ int main()
 
         _app->update();
         _app->begin();
-        _cameraRef->update();
+        _cameraRef->Update();
 
         /* do our thing here ************************/
 
@@ -297,7 +297,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     }
 
     /* setup the view and proj matrices */
-    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * cameraPtr->matView() );
+    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->mat_proj() * cameraPtr->mat_view() );
     shaderPtr->setVec3( "u_viewerPosition", cameraPtr->position() );
 
     /* setup the light-clip-space transform */

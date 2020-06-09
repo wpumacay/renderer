@@ -35,7 +35,10 @@ namespace engine
         glBufferData( GL_ARRAY_BUFFER, m_bufferSize, bufferData, toOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-        ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
+        if ( tinyutils::Logger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
+        else
+            std::cout << "Allocs: Created Vertex Buffer" << std::endl;
     }
 
     CVertexBuffer::~CVertexBuffer()

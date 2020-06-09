@@ -153,9 +153,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _camera->setActiveMode( false );
+            _camera->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _camera->setActiveMode( true );
+            _camera->SetActiveMode( true );
 
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 5.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } );
@@ -271,7 +271,7 @@ void renderScene( engine::CILight* lightPtr,
     }
 
     /* setup the view and proj matrices */
-    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * cameraPtr->matView() );
+    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->mat_proj() * cameraPtr->mat_view() );
     shaderPtr->setVec3( "u_viewerPosition", cameraPtr->position() );
 
     /* render the floor */

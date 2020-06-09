@@ -17,7 +17,10 @@ namespace engine
                       toOpenGLEnum( m_bufferUsage) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
-        ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
+        if ( tinyutils::Logger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
+        else
+            std::cout << "Allocs: Created Index Buffer" << std::endl;
     }
 
     CIndexBuffer::~CIndexBuffer()

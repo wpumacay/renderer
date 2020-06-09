@@ -26,7 +26,7 @@ namespace engine
         *
         *   @param track    Whether or not to keep track of the allocations of this object
         */
-        CVertexArray( bool track = false );
+        CVertexArray();
 
         /**
         *   @brief Destroys this VAO and releases the owned OpenGL resources, as well as owned VBOs and EBOs
@@ -139,8 +139,6 @@ namespace engine
 
         /** @brief Identifier of this VAO in OpenGL */
         uint32 m_openglId;
-
-        bool m_track;
     };
 
 }

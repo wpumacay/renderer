@@ -860,9 +860,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
 
         if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {

@@ -440,9 +440,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
 
         if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
@@ -538,8 +538,8 @@ void renderSceneWithFog( engine::CILight* lightRef,
     }
 
     /* setup the view and proj matrices */
-    shaderRef->setMat4( "u_viewProjMatrix", cameraRef->matProj() * cameraRef->matView() );
-    shaderRef->setMat4( "u_viewMatrix", cameraRef->matView() );// used for pos w.r.t. camera calculations
+    shaderRef->setMat4( "u_viewProjMatrix", cameraRef->mat_proj() * cameraRef->mat_view() );
+    shaderRef->setMat4( "u_viewMatrix", cameraRef->mat_view() );// used for pos w.r.t. camera calculations
     shaderRef->setVec3( "u_viewerPosition", cameraRef->position() );
 
     /* setup the fog properties */
@@ -576,12 +576,12 @@ void renderSkyboxWithFog( engine::CICamera* cameraRef,
                           engine::CShader* shaderRef )
 {
     /* compute rotation to correct for up axis */
-    auto _correctionMat = computeSkyboxCorrectionMat( cameraRef->upAxis() );
+    auto _correctionMat = computeSkyboxCorrectionMat( cameraRef->up_axis() );
 
     /* render the skybox (as it last rendererd, we take advantage of early depth testing) */
 
     shaderRef->bind();
-    shaderRef->setMat4( "u_viewProjMatrix", cameraRef->matProj() * engine::CMat4( engine::CMat3( cameraRef->matView() ) ) * _correctionMat );
+    shaderRef->setMat4( "u_viewProjMatrix", cameraRef->mat_proj() * engine::CMat4( engine::CMat3( cameraRef->mat_view() ) ) * _correctionMat );
     shaderRef->setInt( "u_fog.enabled", ( fogRef->active() ) ? 1 : 0 );
     shaderRef->setVec3( "u_fog.color", fogRef->color );
     shaderRef->setFloat( "u_fog.lowerLimit", g_lowerLimit );

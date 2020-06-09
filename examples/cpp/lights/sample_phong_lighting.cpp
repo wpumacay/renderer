@@ -85,7 +85,7 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         _app->begin();
-        _camera->update();
+        _camera->Update();
 
         if ( _moveLight )
         {
@@ -101,7 +101,7 @@ int main()
         /* do our thing here ************************/
         _shaderLighting->bind();
         _shaderLighting->setMat4( "u_modelMat", _mesh->matModel() );
-        _shaderLighting->setMat4( "u_viewProjMat", _camera->matProj() * _camera->matView() );
+        _shaderLighting->setMat4( "u_viewProjMat", _camera->mat_proj() * _camera->mat_view() );
         _shaderLighting->setMat4( "u_normalMat", tinymath::inverse( _mesh->matModel() ).transpose() );
         _shaderLighting->setVec3( "u_objectColor", { 1.0f, 0.5f, 0.31f } );
         _shaderLighting->setVec3( "u_lightColor", { 1.0f, 1.0f, 1.0f } );
@@ -114,8 +114,8 @@ int main()
 
         _shaderGizmoRef->bind();
         _shaderGizmoRef->setMat4( "u_tModel", _gizmo->matModel() );
-        _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
-        _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+        _shaderGizmoRef->setMat4( "u_tView", _camera->mat_view() );
+        _shaderGizmoRef->setMat4( "u_tProj", _camera->mat_proj() );
         _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
         _gizmo->render();

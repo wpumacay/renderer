@@ -455,12 +455,12 @@ int main()
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
-            _camera->setActiveMode( false );
+            _camera->SetActiveMode( false );
             _uiLayerRef->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
-            _camera->setActiveMode( true );
+            _camera->SetActiveMode( true );
             _uiLayerRef->setActive( false );
         }
 
@@ -469,13 +469,13 @@ int main()
         engine::CDebugDrawer::DrawLine( { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 1.0f } );
 
         _app->begin();
-        _camera->update();
+        _camera->Update();
 
         auto _mesh = _uiLayerRef->selectedMesh();
 
         /* do our thing here ************************/
         _shaderMultipleLightsRef->bind();
-        _shaderMultipleLightsRef->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
+        _shaderMultipleLightsRef->setMat4( "u_viewProjMatrix", _camera->mat_proj() * _camera->mat_view() );
         _shaderMultipleLightsRef->setVec3( "u_viewerPosition", _camera->position() );
         _shaderMultipleLightsRef->setInt( "u_numberOfPointLights", _uiLayerRef->pointLights().size() );
         _shaderMultipleLightsRef->setInt( "u_numberOfSpotLights", 1 );
@@ -555,8 +555,8 @@ int main()
 
             _shaderGizmoRef->bind();
             _shaderGizmoRef->setMat4( "u_tModel", engine::translation( _pointLights[i]->position ) );
-            _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
-            _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+            _shaderGizmoRef->setMat4( "u_tView", _camera->mat_view() );
+            _shaderGizmoRef->setMat4( "u_tProj", _camera->mat_proj() );
             _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
             _gizmo->render();

@@ -105,9 +105,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
 
         if ( _cameraRef->type() == engine::CFpsCamera::GetStaticType() )
         {
@@ -143,8 +143,8 @@ void renderScene( engine::CICamera* cameraRef,
                   std::vector< std::unique_ptr<engine::CIRenderable> >& renderables )
 {
     shaderRef->bind();
-    shaderRef->setMat4( "u_tView", cameraRef->matView() );
-    shaderRef->setMat4( "u_tProj", cameraRef->matProj() );
+    shaderRef->setMat4( "u_tView", cameraRef->mat_view() );
+    shaderRef->setMat4( "u_tProj", cameraRef->mat_proj() );
 
     for ( auto& renderablePtr : renderables )
     {

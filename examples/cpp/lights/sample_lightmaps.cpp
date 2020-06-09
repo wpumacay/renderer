@@ -354,12 +354,12 @@ int main()
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
         {
-            _camera->setActiveMode( false );
+            _camera->SetActiveMode( false );
             _uiLayerRef->setActive( true );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
         {
-            _camera->setActiveMode( true );
+            _camera->SetActiveMode( true );
             _uiLayerRef->setActive( false );
         }
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_P ) )
@@ -374,7 +374,7 @@ int main()
 
         _app->update();
         _app->begin();
-        _camera->update();
+        _camera->Update();
 
         if ( _moveLight )
         {
@@ -394,7 +394,7 @@ int main()
         /* do our thing here ************************/
         _shaderLightingRef->bind();
         _shaderLightingRef->setMat4( "u_modelMatrix", _mesh->matModel() );
-        _shaderLightingRef->setMat4( "u_viewProjMatrix", _camera->matProj() * _camera->matView() );
+        _shaderLightingRef->setMat4( "u_viewProjMatrix", _camera->mat_proj() * _camera->mat_view() );
         _shaderLightingRef->setMat4( "u_normalMatrix", tinymath::inverse( _mesh->matModel() ).transpose() );
         _phongMaterial->bind( _shaderLightingRef );
         _shaderLightingRef->setVec3( "u_light.ambient", _pointLight->ambient );
@@ -411,8 +411,8 @@ int main()
 
         _shaderGizmoRef->bind();
         _shaderGizmoRef->setMat4( "u_tModel", _gizmo->matModel() );
-        _shaderGizmoRef->setMat4( "u_tView", _camera->matView() );
-        _shaderGizmoRef->setMat4( "u_tProj", _camera->matProj() );
+        _shaderGizmoRef->setMat4( "u_tView", _camera->mat_view() );
+        _shaderGizmoRef->setMat4( "u_tProj", _camera->mat_proj() );
         _shaderGizmoRef->setVec3( "u_color", { 1.0f, 1.0f, 1.0f } );
 
         _gizmo->render();

@@ -267,8 +267,8 @@ struct ComparatorDotDirection
 
 void computeLightSpaceViewProj( engine::CICamera* cameraPtr, 
                                 const engine::CVec3& direction,
-                                engine::CMat4& matView,
-                                engine::CMat4& matProj,
+                                engine::CMat4& mat_view,
+                                engine::CMat4& mat_proj,
                                 float ddf = 0.0f,
                                 float ddr = 0.0f,
                                 float ddu = 0.0f )
@@ -279,7 +279,7 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
     // normalize in case someone passed a vector that wasn't normalized :(
     auto _directionNorm = direction.normalized();
 
-    auto _viewProjMatrix = cameraPtr->matProj() * cameraPtr->matView();
+    auto _viewProjMatrix = cameraPtr->mat_proj() * cameraPtr->mat_view();
 
     /* get back the corners of the frustum in world space */
     engine::CMat4 _invClipMatrix = tinymath::inverse( _viewProjMatrix );
@@ -371,8 +371,8 @@ void computeLightSpaceViewProj( engine::CICamera* cameraPtr,
     auto _position = _center - ( 0.5f * _df ) * _fvec;
     auto _target = _position + _directionNorm;
 
-    matView = engine::lookAt( _position, _target, _worldUp );
-    matProj = engine::ortho( _dr + ddr, _du + ddu, -0.5f * ddf, _df + 0.5f * ddf );
+    mat_view = engine::lookAt( _position, _target, _worldUp );
+    mat_proj = engine::ortho( _dr + ddr, _du + ddu, -0.5f * ddf, _df + 0.5f * ddf );
 }
 
 void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec3& direction )
@@ -384,7 +384,7 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr, const engine::CVec
 
     computeLightSpaceViewProj( cameraPtr, direction, _lspaceMatView, _lspaceMatProj );
 
-    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->mat_proj() * cameraPtr->mat_view(), { 1.0f, 1.0f, 0.0f } );
     engine::CDebugDrawer::DrawClipVolume( _lspaceMatProj * _lspaceMatView, { 0.7f, 0.5f, 0.3f } );
 }
 
@@ -396,7 +396,7 @@ void showDirectionalLightVolumeLegacy( engine::CICamera* cameraPtr, const engine
     // normalize in case someone passed a vector that wasn't normalized :(
     auto _directionNorm = direction.normalized();
 
-    auto _viewProjMatrix = cameraPtr->matProj() * cameraPtr->matView();
+    auto _viewProjMatrix = cameraPtr->mat_proj() * cameraPtr->mat_view();
 
     engine::CDebugDrawer::DrawClipVolume( _viewProjMatrix, { 1.0f, 1.0f, 0.0f } );
 
@@ -670,9 +670,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_F ) )
             g_useAutofixToCamera = !g_useAutofixToCamera;
 
@@ -706,7 +706,7 @@ int main()
 
         _app->update();
         _app->begin();
-        _cameraRef->update();
+        _cameraRef->Update();
 
         /* do our thing here ************************/
 
@@ -841,7 +841,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     }
 
     /* setup the view and proj matrices */
-    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * cameraPtr->matView() );
+    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->mat_proj() * cameraPtr->mat_view() );
     shaderPtr->setVec3( "u_viewerPosition", cameraPtr->position() );
 
     /* setup the light-clip-space transform */
@@ -870,7 +870,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
         }
     }
 
-    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->mat_proj() * cameraPtr->mat_view(), { 1.0f, 1.0f, 0.0f } );
     engine::CDebugDrawer::DrawClipVolume( _lightProjMat * _lightViewMat, { 0.7f, 0.5f, 0.3f } );
 
     shaderPtr->setMat4( "u_viewProjLightSpaceMatrix", _lightProjMat * _lightViewMat );

@@ -416,9 +416,9 @@ int main()
         if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ESCAPE ) )
             break;
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_SPACE ) )
-            _cameraRef->setActiveMode( false );
+            _cameraRef->SetActiveMode( false );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_ENTER ) )
-            _cameraRef->setActiveMode( true );
+            _cameraRef->SetActiveMode( true );
         else if ( engine::CInputManager::CheckSingleKeyPress( engine::Keys::KEY_F ) )
             g_useAutofixToCamera = !g_useAutofixToCamera;
 
@@ -452,7 +452,7 @@ int main()
 
         _app->update();
         _app->begin();
-        _cameraRef->update();
+        _cameraRef->Update();
 
         /* do our thing here ************************/
 
@@ -534,7 +534,7 @@ void renderToShadowMap( engine::CILight* lightPtr,
     _lightViewMat = shadowMapPtr->lightSpaceMatView();
     _lightProjMat = shadowMapPtr->lightSpaceMatProj();
 
-    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->mat_proj() * cameraPtr->mat_view(), { 1.0f, 1.0f, 0.0f } );
     engine::CDebugDrawer::DrawClipVolume( _lightProjMat * _lightViewMat, { 0.7f, 0.5f, 0.3f } );
 
     shaderPtr->setMat4( "u_lightSpaceViewProjMatrix", _lightProjMat * _lightViewMat );
@@ -611,7 +611,7 @@ void renderSceneWithShadows( engine::CILight* lightPtr,
     }
 
     /* setup the view and proj matrices */
-    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->matProj() * cameraPtr->matView() );
+    shaderPtr->setMat4( "u_viewProjMatrix", cameraPtr->mat_proj() * cameraPtr->mat_view() );
     shaderPtr->setVec3( "u_viewerPosition", cameraPtr->position() );
 
     /* setup the light-clip-space transform */
@@ -742,6 +742,6 @@ void showDirectionalLightVolume( engine::CICamera* cameraPtr,
 
     shadowMapPtr->setup( _config );
 
-    engine::CDebugDrawer::DrawClipVolume( cameraPtr->matProj() * cameraPtr->matView(), { 1.0f, 1.0f, 0.0f } );
+    engine::CDebugDrawer::DrawClipVolume( cameraPtr->mat_proj() * cameraPtr->mat_view(), { 1.0f, 1.0f, 0.0f } );
     engine::CDebugDrawer::DrawClipVolume( shadowMapPtr->lightSpaceMatProj() * shadowMapPtr->lightSpaceMatView(), { 0.7f, 0.5f, 0.3f } );
 }

@@ -3,18 +3,18 @@
 
 namespace engine
 {
-
-    CVertexArray::CVertexArray( bool track )
+    CVertexArray::CVertexArray()
     {
         m_numAttribIndx = 0;
         m_openglId      = 0;
         m_indexBuffer   = nullptr;
-        m_track = track;
 
         glGenVertexArrays( 1, &m_openglId );
 
-        if ( m_track )
+        if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Vertex Array Object" );
+        else
+            std::cout << "Allocs: Created Vertex Array Object" << std::endl;
     }
 
     CVertexArray::~CVertexArray()
@@ -26,13 +26,10 @@ namespace engine
 
         glDeleteVertexArrays( 1, &m_openglId );
 
-        if ( m_track )
-        {
-            if ( tinyutils::Logger::IsActive() )
-                ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
-            else // in python-land (when exiting script) we might have destroyed logger first
-                std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;
-        }
+        if ( tinyutils::Logger::IsActive() )
+            ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
+        else
+            std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;
     }
 
     void CVertexArray::addVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced )

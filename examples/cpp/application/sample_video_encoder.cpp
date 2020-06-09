@@ -180,7 +180,7 @@ int main()
         float y = rho * _sphi * _stheta;
         float z = rho * _cphi;
 
-        _fixedCameraRef->setPosition( { x, y, z } );
+        _fixedCameraRef->SetPosition( { x, y, z } );
 
         _app->update();
 
