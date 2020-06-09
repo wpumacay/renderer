@@ -10,11 +10,12 @@ namespace engine
         m_indexBuffer   = nullptr;
 
         glGenVertexArrays( 1, &m_openglId );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Vertex Array Object" );
         else
             std::cout << "Allocs: Created Vertex Array Object" << std::endl;
+    #endif
     }
 
     CVertexArray::~CVertexArray()
@@ -25,11 +26,12 @@ namespace engine
         m_indexBuffer = nullptr;
 
         glDeleteVertexArrays( 1, &m_openglId );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
         else
             std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;
+    #endif
     }
 
     void CVertexArray::addVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced )

@@ -16,21 +16,23 @@ namespace engine
                       bufferData,
                       toOpenGLEnum( m_bufferUsage) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
         else
             std::cout << "Allocs: Created Index Buffer" << std::endl;
+    #endif
     }
 
     CIndexBuffer::~CIndexBuffer()
     {
         glDeleteBuffers( 1, &m_openglId );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
         else
             std::cout << "Allocs: Destroyed Index Buffer" << std::endl;
+    #endif
     }
 
     void CIndexBuffer::resize( uint32 bufferCount )

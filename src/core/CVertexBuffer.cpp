@@ -34,21 +34,23 @@ namespace engine
         glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
         glBufferData( GL_ARRAY_BUFFER, m_bufferSize, bufferData, toOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
         else
             std::cout << "Allocs: Created Vertex Buffer" << std::endl;
+    #endif
     }
 
     CVertexBuffer::~CVertexBuffer()
     {
         glDeleteBuffers( 1, &m_openglId );
-
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
         else
             std::cout << "Allocs: Destroyed Vertex Buffer" << std::endl;
+    #endif
     }
 
     void CVertexBuffer::resize( uint32 bufferSize )

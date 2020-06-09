@@ -88,7 +88,7 @@ namespace engine
         internalFormat  = eTextureFormat::NONE;
         format          = eTextureFormat::NONE;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -103,7 +103,7 @@ namespace engine
 
         data = nullptr;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -189,7 +189,7 @@ namespace engine
         glBindTexture( GL_TEXTURE_2D, 0 );
         /******************************************************************************************/
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Texture @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -221,7 +221,7 @@ namespace engine
             glDeleteTextures( 1, &m_openglId );
         m_openglId = 0;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Texture @ {0}", tinyutils::PointerToHexAddress( this ) );
         else

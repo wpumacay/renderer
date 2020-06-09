@@ -17,7 +17,7 @@ namespace engine
         channels    = 0;
         format      = eTextureFormat::NONE;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureCubeData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -30,7 +30,7 @@ namespace engine
         for ( size_t i = 0; i < sidesData.size(); i++ )
             delete sidesData[i];
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCubeData @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -83,7 +83,7 @@ namespace engine
         glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
         /***********************************************************************/
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created TextureCube @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -96,7 +96,7 @@ namespace engine
         glDeleteTextures( 1, &m_openglId );
         m_data = nullptr;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed TextureCube @ {0}", tinyutils::PointerToHexAddress( this ) );
         else

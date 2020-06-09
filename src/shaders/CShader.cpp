@@ -9,7 +9,7 @@ namespace engine
         m_name      = name;
         m_openglId  = openglId;
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
@@ -21,7 +21,7 @@ namespace engine
     {
         glDeleteProgram( m_openglId );
 
-    #ifdef ENGINE_TRACK_ALLOCS
+    #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
         else
