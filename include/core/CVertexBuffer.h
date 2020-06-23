@@ -6,129 +6,102 @@
 
 namespace engine
 {
-
-    /** @brief Type of usage for a buffer object */
+    /// Available modes in which a VBO can be used
     enum class eBufferUsage
     {
-        /** Buffer holds memory that won't be changed by the user after its creation. Generally this
-            type of buffer is allocated on GPU such that it can read it quickly. */
+        /// Buffer holds memory that won't be changed by the user after its creation. Generally this
+        /// type of buffer is allocated on GPU such that it can read it quickly
         STATIC = 0,
-        /** Buffer holds memory that can be changed by the user on the fly. This type of buffer is
-            allocated on GPU such that it allows write operations from the CPU, so its slower compared
-            to the STATIC type of buffer. */
+        /// Buffer holds memory that can be changed by the user on the fly. This type of buffer is
+        /// allocated on GPU such that it allows write operations from the CPU, so its slower compared
+        /// to the STATIC type of buffer
         DYNAMIC
     };
 
-    /**
-    *   @brief Returns a string representation of the given BufferUsage enum
-    *
-    *   @param usage    Usage type of a given buffer
-    *   @return         String representation of this usage type
-    */
-    std::string toString( const eBufferUsage& usage );
+    /// Returns a string representation of the given BufferUsage enum
+    ///
+    /// @param usage    Usage type of a given buffer
+    /// @return String representation of this usage type
+    std::string ToString( const eBufferUsage& usage );
 
-    /**
-    *   @brief Converts the given buffer usage enum to its related OpenGL enum
-    *
-    *   @param usage    Usage type of a given buffer
-    *   @return         OpenGL enum related to this usage
-    */
-    uint32 toOpenGLEnum( const eBufferUsage& usage );
+    /// Converts the given buffer-usage enum to its related OpenGL enum
+    ///
+    /// @param usage    Usage type of a given buffer
+    /// @return OpenGL enum related to this usage
+    uint32 ToOpenGLEnum( const eBufferUsage& usage );
 
-    /**
-    *   @brief VBO (Vertex Buffer Object) abstraction class
-    *
-    *   @details
-    *   Defines the functionality of a Vertex Buffer Object, which is used to hold vertex-data
-    *   on the GPU that can be used during render calls, such as vertex positions, colors, etc.
-    */
+    /// Vertex Buffer Object (VBO) abstraction class, used to store data on the GPU
+    ///
+    /// @details
+    /// Defines the functionality of a Vertex Buffer Object, which is used to hold vertex-data
+    /// on the GPU that can be used during render calls, such as vertex positions, colors, etc.
     class CVertexBuffer
     {
-
     public :
 
-        /**
-        *   @brief Creates a VBO from some given configuration data
-        *
-        *   @param bufferLayout     Layout of the data to be stored in GPU memory.
-        *   @param bufferUsage      Hint for the type of usage for this buffer in GPU memory.
-        *   @param bufferSize       Size of the buffer (in bytes) in GPU memory.
-        *   @param bufferData       Pointer to the data in CPU to be transferred to GPU memory.
-        *   @param track            Debug flag used to keep track of allocations and deallocations.
-        */
-        CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
-                       const eBufferUsage& bufferUsage, 
-                       uint32 bufferSize, 
-                       float32* bufferData );
+        /// Creates a VBO with a given layout, usage and initialized data
+        ///
+        /// @param layout     Layout of the data to be stored in GPU memory
+        /// @param usage      Hint for the type of usage for this buffer in GPU memory
+        /// @param size       Size of the buffer (in bytes) in GPU memory
+        /// @param data       Pointer to the data in CPU to be transferred to GPU memory
+        CVertexBuffer( const CVertexBufferLayout& layout, 
+                       const eBufferUsage& usage, 
+                       const uint32& size, 
+                       const float32* data );
 
-        /** @brief Destroys the current VBO and releases its resources in GPU */
+        /// Destroys the current VBO and releases its resources in GPU
         ~CVertexBuffer();
 
-        /**
-        *   @brief Resizes the GPU-buffer to the required size
-        *
-        *   @details
-        *   This methods allows to change the size of the VBO on the GPU. Use this method if the
-        *   required data to be updated is bigger than the current size of the buffer on the GPU.
-        *
-        *   @param bufferSize   New size of the buffer on the GPU
-        */
-        void resize( uint32 bufferSize );
+        /// Resizes the GPU-buffer to the required size
+        ///
+        /// @details
+        /// This methods allows to change the size of the VBO on the GPU. Use this method if the
+        /// required data to be updated is bigger than the current size of the buffer on the GPU.
+        ///
+        /// @param size New size of the buffer on the GPU
+        void Resize( const uint32& size );
 
-        /**
-        *   @brief Updated the GPU-memory data of this buffer from given CPU-data
-        *
-        *   @details
-        *   This method allows to transfers and update memory from CPU to GPU. To better allow
-        *   this transfer (it depends on the backend, currently only OpenGL), this VBO must have
-        *   been given the DYNAMIC hint during creation.
-        *
-        *   @param dataSize     How much data (in bytes) will be transferred from CPU to GPU.
-        *   @param dataPtr      Pointer to the memory in CPU to be transferred to GPU.
-        */
-        void updateData( uint32 dataSize, float32* dataPtr );
+        /// Updated the GPU-memory data of this buffer from given CPU-data
+        ///
+        /// @details
+        /// This method allows to transfers and update memory from CPU to GPU. To better allow
+        /// this transfer (it depends on the backend, currently only OpenGL), this VBO must have
+        /// been given the DYNAMIC hint during creation.
+        ///
+        /// @param size     How much data (in bytes) will be transferred from CPU to GPU.
+        /// @param data     Pointer to the memory in CPU to be transferred to GPU.
+        void UpdateData( const uint32& size, const float32* data );
 
-        /**
-        *   @brief Binds the current VBO such that subsequent draw calls are executed with its data
-        *
-        *   Example:
-        *   @code
-        *   // bind the VBO
-        *   vboQuad->bind();
-        *   // execute some draw-calls (vertex-data used is from the currently bound VBO)
-        *   glDrawArray( GL_TRIANGLES, 0, 6 );
-        *   @endcode
-        */
-        void bind();
+        /// Binds the current VBO such that subsequent draw calls are executed with its data
+        void Bind();
 
-        /** @brief Unbinds the current VBO such that subsequent draw calls won't use its data */
-        void unbind();
+        /// Unbinds the current VBO such that subsequent draw calls won't use its data
+        void Unbind();
 
-        /** @brief Returns the layout representation of this VBO */
-        CVertexBufferLayout layout() const { return m_bufferLayout; }
+        /// Returns the layout representation of this VBO
+        CVertexBufferLayout layout() const { return m_Layout; }
 
-        /** @brief Returns the size of memory (in bytes) of this VBO in GPU */
-        uint32 size() const { return m_bufferSize; }
+        /// Returns the size of memory (in bytes) of this VBO in GPU
+        uint32 size() const { return m_Size; }
 
-        /** @brief Returns the type of usage hint used to create this buffer */
-        eBufferUsage usage() const { return m_bufferUsage; }
+        /// Returns the type of usage hint used to create this buffer
+        eBufferUsage usage() const { return m_Usage; }
 
-        /** @brief Returns the opengl-id of this VBO */
-        uint32 openglId() const { return m_openglId; }
+        /// Returns the opengl-id of this VBO
+        uint32 opengl_id() const { return m_OpenglID; }
 
     private :
 
-        /** @brief Object representing how memory is laid out */
-        CVertexBufferLayout m_bufferLayout;
+        /// Object representing how memory is laid out
+        CVertexBufferLayout m_Layout;
+        /// Usage hint used during the creation of this VBO
+        eBufferUsage m_Usage;
+        /// Size of the buffer of memory in GPU (in bytes)
+        uint32 m_Size;
+        /// OpenGL-id of the linked VBO OpenGL-object
+        uint32 m_OpenglID;
 
-        /** @brief Usage hint used during the creation of this VBO */
-        eBufferUsage m_bufferUsage;
-
-        /** @brief Size of the buffer of memory in GPU (in bytes) */
-        uint32 m_bufferSize;
-
-        /** @brief OpenGL-id of the linked VBO OpenGL-object */
-        uint32 m_openglId;
+        ADD_CLASS_SMART_POINTERS(CVertexBuffer);
     };
-
 }

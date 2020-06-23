@@ -41,7 +41,7 @@ namespace engine
         auto _buffElements = _buffLayout.elements();
 
         bind();
-        vertexBuffer->bind();
+        vertexBuffer->Bind();
 
         for ( size_t i = 0; i < _buffElements.size(); i++ )
         {
@@ -58,7 +58,7 @@ namespace engine
             m_numAttribIndx++;
         }
 
-        vertexBuffer->unbind();
+        vertexBuffer->Unbind();
         unbind();
 
         // keep a reference only

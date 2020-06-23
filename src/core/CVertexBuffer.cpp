@@ -3,37 +3,35 @@
 
 namespace engine
 {
-
-    std::string toString( const eBufferUsage& usage )
+    std::string ToString( const eBufferUsage& usage )
     {
-        if ( usage == eBufferUsage::STATIC ) return "static";
-        if ( usage == eBufferUsage::DYNAMIC ) return "dynamic";
+        /**/ if ( usage == eBufferUsage::STATIC ) return "static";
+        else if ( usage == eBufferUsage::DYNAMIC ) return "dynamic";
 
-        ENGINE_CORE_ASSERT( false, "Invalid usage enum given" );
+        ENGINE_CORE_CRITICAL( "ToString >>> Invalid eBufferUsage enum given" );
         return "undefined";
     }
 
-    uint32 toOpenGLEnum( const eBufferUsage& usage )
+    uint32 ToOpenGLEnum( const eBufferUsage& usage )
     {
-        if ( usage == eBufferUsage::STATIC ) return GL_STATIC_DRAW;
-        if ( usage == eBufferUsage::DYNAMIC ) return GL_DYNAMIC_DRAW;
+        /**/ if ( usage == eBufferUsage::STATIC ) return GL_STATIC_DRAW;
+        else if ( usage == eBufferUsage::DYNAMIC ) return GL_DYNAMIC_DRAW;
 
-        ENGINE_CORE_ASSERT( false, "Invalid usage enum given" );
+        ENGINE_CORE_CRITICAL( "ToOpenGLEnum >>> Invalid eBufferUsage enum given" );
         return GL_STATIC_DRAW;
     }
 
-
-    CVertexBuffer::CVertexBuffer( const CVertexBufferLayout& bufferLayout, 
-                                  const eBufferUsage& bufferUsage, 
-                                  uint32 bufferSize, 
-                                  float32* bufferData )
-        : m_bufferLayout( bufferLayout ), m_bufferUsage( bufferUsage ), m_bufferSize( bufferSize )
+    CVertexBuffer::CVertexBuffer( const CVertexBufferLayout& layout,
+                                  const eBufferUsage& usage,
+                                  const uint32& size,
+                                  const float32* data )
+        : m_Layout( layout ), m_Usage( usage ), m_Size( size )
     {
-        // create gl-vbo resource and send the initial data to it
-        glGenBuffers( 1, &m_openglId );
-        glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
-        glBufferData( GL_ARRAY_BUFFER, m_bufferSize, bufferData, toOpenGLEnum( m_bufferUsage ) );
+        glGenBuffers( 1, &m_OpenglID );
+        glBindBuffer( GL_ARRAY_BUFFER, m_OpenglID );
+        glBufferData( GL_ARRAY_BUFFER, m_Size, data, ToOpenGLEnum( m_Usage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
     #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
@@ -44,7 +42,8 @@ namespace engine
 
     CVertexBuffer::~CVertexBuffer()
     {
-        glDeleteBuffers( 1, &m_openglId );
+        glDeleteBuffers( 1, &m_OpenglID );
+
     #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
             ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
@@ -53,39 +52,38 @@ namespace engine
     #endif
     }
 
-    void CVertexBuffer::resize( uint32 bufferSize )
+    void CVertexBuffer::Resize( const uint32& size )
     {
-        if ( m_bufferSize == bufferSize )
+        if ( m_Size == size )
             return; // no need to resize the buffer (same size requested)
 
-        m_bufferSize = bufferSize;
-        glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
-        glBufferData( GL_ARRAY_BUFFER, bufferSize, NULL, toOpenGLEnum( m_bufferUsage ) );
+        m_Size = size;
+        glBindBuffer( GL_ARRAY_BUFFER, m_OpenglID );
+        glBufferData( GL_ARRAY_BUFFER, m_Size, NULL, ToOpenGLEnum( m_Usage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    void CVertexBuffer::updateData( uint32 dataSize, float32* dataPtr )
+    void CVertexBuffer::UpdateData( const uint32& size, const float32* data )
     {
-        if ( dataSize != m_bufferSize )
+        if ( m_Size != size )
         {
             ENGINE_CORE_WARN( "CVertexBuffer::updateData >>> tried updating data for a buffer with \
-                              different size. Resizing to avoid any conflicts" );
-            resize( dataSize );
+                               different size. Resizing to avoid any conflicts" );
+            Resize( size );
         }
 
-        glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
-        glBufferSubData( GL_ARRAY_BUFFER, 0, dataSize, dataPtr );
+        glBindBuffer( GL_ARRAY_BUFFER, m_OpenglID );
+        glBufferSubData( GL_ARRAY_BUFFER, 0, m_Size, data );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    void CVertexBuffer::bind()
+    void CVertexBuffer::Bind()
     {
-        glBindBuffer( GL_ARRAY_BUFFER, m_openglId );
+        glBindBuffer( GL_ARRAY_BUFFER, m_OpenglID );
     }
 
-    void CVertexBuffer::unbind()
+    void CVertexBuffer::Unbind()
     {
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
-
 }

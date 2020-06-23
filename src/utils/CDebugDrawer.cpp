@@ -427,8 +427,8 @@ namespace engine
     {
         m_linesVAO->bind();
 
-        m_linesPositionsVBOref->updateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
-        m_linesColorsVBOref->updateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
+        m_linesPositionsVBOref->UpdateData( numLines * sizeof( CLinePositions ), ( float32* ) m_linesRenderBufferPositions.data() );
+        m_linesColorsVBOref->UpdateData( numLines * sizeof( CLineColors ), ( float32* ) m_linesRenderBufferColors.data() );
 
         glDrawArrays( GL_LINES, 0, numLines * 2 );
 
@@ -646,9 +646,9 @@ namespace engine
 
         m_primitivesVAO[primitive]->bind();
 
-        m_primitivesVBOinstancesColorsRefs[primitive]->updateData( numPrimitives * sizeof ( CVec4 ), (float32*) m_renderBufferPrimitivesColors[primitive].data() );
-        m_primitivesVBOinstancesModelMatsRefs[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesModelMats[primitive].data() );
-        m_primitivesVBOinstancesNormalMatsRefs[primitive]->updateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesNormalMats[primitive].data() );
+        m_primitivesVBOinstancesColorsRefs[primitive]->UpdateData( numPrimitives * sizeof ( CVec4 ), (float32*) m_renderBufferPrimitivesColors[primitive].data() );
+        m_primitivesVBOinstancesModelMatsRefs[primitive]->UpdateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesModelMats[primitive].data() );
+        m_primitivesVBOinstancesNormalMatsRefs[primitive]->UpdateData( numPrimitives * sizeof( CMat4 ), (float32*) m_renderBufferPrimitivesNormalMats[primitive].data() );
 
         glDrawElementsInstanced( GL_TRIANGLES, m_primitivesIBOrefs[primitive]->count(), GL_UNSIGNED_INT, 0, numPrimitives );
 

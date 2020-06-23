@@ -14,7 +14,7 @@ namespace engine
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, 
                       m_bufferCount * sizeof( uint32 ), 
                       bufferData,
-                      toOpenGLEnum( m_bufferUsage) );
+                      ToOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     #if defined(ENGINE_TRACK_ALLOCS)
         if ( tinyutils::Logger::IsActive() )
@@ -42,7 +42,7 @@ namespace engine
 
         m_bufferCount = bufferCount;
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferCount * sizeof( uint32 ), NULL, toOpenGLEnum( m_bufferUsage ) );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferCount * sizeof( uint32 ), NULL, ToOpenGLEnum( m_bufferUsage ) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
 
