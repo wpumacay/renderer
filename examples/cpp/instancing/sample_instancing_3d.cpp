@@ -232,7 +232,7 @@ void drawGrid_Instancing( engine::CShader* shader,
     // update our buffer data
     int _num_instances = g_num_rows * g_num_cols * g_num_floors;
     int _size_of_mat4 = 4 * engine::sizeOfElement( engine::eElementType::Float4 );
-    g_cubeVAO_modelMatricesBufferRef->updateData( _num_instances * _size_of_mat4,
+    g_cubeVAO_modelMatricesBufferRef->UpdateData( _num_instances * _size_of_mat4,
                                                (engine::float32*) bufferModelMatrices.data() );
 
     // do the render call (instanced)
