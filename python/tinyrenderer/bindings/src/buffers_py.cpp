@@ -67,41 +67,42 @@ namespace engine
 
     void bindings_vertexBuffer( py::module& m )
     {
-        py::enum_< engine::eBufferUsage >( m, "BufferUsage", py::arithmetic() )
+        py::enum_<engine::eBufferUsage>( m, "BufferUsage", py::arithmetic() )
             .value( "STATIC", engine::eBufferUsage::STATIC )
             .value( "DYNAMIC", engine::eBufferUsage::DYNAMIC );
 
-        py::class_< CVertexBuffer >( m, "VertexBuffer" )
+        py::class_<CVertexBuffer, CVertexBuffer::uptr>( m, "VertexBuffer" )
             .def( py::init( []( const CVertexBufferLayout& layout, const eBufferUsage& usage, uint32 size, py::array_t<float32> data )
                 {
                     if ( size != ( data.size() * sizeof( float32 ) ) )
                         throw std::runtime_error( "VertexBuffer >>> given size argument must match size of the np-array buffer. \
                                                    Given size was " + std::to_string( size ) + " but np-array size is " + std::to_string( data.size() * sizeof( float32 ) ) );
 
-                    return std::make_unique<CVertexBuffer>( layout, usage, size, (float32*) data.request().ptr );
+                    return std::make_unique<CVertexBuffer>( layout, usage, size, (const float32*) data.request().ptr );
                 }
-            ) )
-            .def( "bind", &CVertexBuffer::bind )
-            .def( "unbind", &CVertexBuffer::unbind )
-            .def( "updateData", []( CVertexBuffer& self, uint32 size, py::array_t<float32> data )
+            ), py::arg( "layout" ), py::arg( "usage" ), py::arg( "size" ), py::arg( "data" ) )
+            .def( "Bind", &CVertexBuffer::Bind )
+            .def( "Unbind", &CVertexBuffer::Unbind )
+            .def( "Resize", &CVertexBuffer::Resize )
+            .def( "UpdateData", []( CVertexBuffer& self, uint32 size, py::array_t<float32> data )
                 {
                     if ( size != ( data.size() * sizeof( float32 ) ) )
                         throw std::runtime_error( "VertexBuffer::updateData >>> given size argument must match size of the np-array buffer. \
                                                    Given size was " + std::to_string( size ) + " but np-array size is " + std::to_string( data.size() * sizeof( float32 ) ) );
 
-                    self.updateData( size, (float32*) data.request().ptr );
+                    self.UpdateData( size, (const float32*) data.request().ptr );
                 } )
-            .def( "layout", &CVertexBuffer::layout )
-            .def( "size", &CVertexBuffer::size )
-            .def( "usage", &CVertexBuffer::usage )
-            .def( "openglId", &CVertexBuffer::openglId )
+            .def_property_readonly( "layout", &CVertexBuffer::layout )
+            .def_property_readonly( "size", &CVertexBuffer::size )
+            .def_property_readonly( "usage", &CVertexBuffer::usage )
+            .def_property_readonly( "opengl_id", &CVertexBuffer::opengl_id )
             .def( "__repr__", []( const CVertexBuffer& self )
                 {
                     auto _strrep = std::string( "VertexBuffer(\n" );
-                    _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
-                    _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
-                    _strrep += "size: " + std::to_string( self.size() ) + "\n";
-                    _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
+                    _strrep += "cpp-address : " + tinyutils::PointerToHexAddress( &self ) + "\n";
+                    _strrep += "usage       : " + engine::ToString( self.usage() ) + "\n";
+                    _strrep += "size        : " + std::to_string( self.size() ) + "\n";
+                    _strrep += "opengl-ID   : " + std::to_string( self.opengl_id() ) + ")";
                     return _strrep;
                 } );
     }
@@ -133,7 +134,7 @@ namespace engine
                 {
                     auto _strrep = std::string( "IndexBuffer(\n" );
                     _strrep += "cpp-address: " + tinyutils::PointerToHexAddress( &self ) + "\n";
-                    _strrep += "usage: " + engine::toString( self.usage() ) + "\n";
+                    _strrep += "usage: " + engine::ToString( self.usage() ) + "\n";
                     _strrep += "indices-count: " + std::to_string( self.count() ) + "\n";
                     _strrep += "openglId: " + std::to_string( self.openglId() ) + ")";
                     return _strrep;
