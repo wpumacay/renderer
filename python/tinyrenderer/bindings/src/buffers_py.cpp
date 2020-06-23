@@ -8,7 +8,7 @@ namespace engine
 {
     void bindings_bufferLayout( py::module& m )
     {
-        py::enum_< engine::eElementType >( m, "ElementType", py::arithmetic() )
+        py::enum_<engine::eElementType>( m, "ElementType", py::arithmetic() )
             .value( "Float", engine::eElementType::Float )
             .value( "Float2", engine::eElementType::Float2 )
             .value( "Float3", engine::eElementType::Float3 )
@@ -18,7 +18,7 @@ namespace engine
             .value( "Int3", engine::eElementType::Int3 )
             .value( "Int4", engine::eElementType::Int4 );
 
-        py::class_< CVertexBufferLayout >( m, "VertexBufferLayout" )
+        py::class_<CVertexBufferLayout, CVertexBufferLayout::uptr>( m, "VertexBufferLayout" )
             .def( py::init<>() )
             .def( py::init( []( py::list py_elements )
                 {
@@ -54,7 +54,7 @@ namespace engine
                     for ( auto& element : cpp_elements )
                     {
                         _strrep += "name : " + element.name + " - ";
-                        _strrep += "type : " + engine::toString( element.type ) + " - ";
+                        _strrep += "type : " + engine::ToString( element.type ) + " - ";
                         _strrep += "count : " + std::to_string( element.count ) + " - ";
                         _strrep += "size : " + std::to_string( element.size ) + " - ";
                         _strrep += "offset : " + std::to_string( element.offset ) + " - ";

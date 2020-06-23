@@ -329,9 +329,9 @@ namespace engine
                                                                     { "normalMatrix-col2", eElementType::Float4, false },
                                                                     { "normalMatrix-col3", eElementType::Float4, false } } );
 
-        uint32 _vboInstancesColorsSize = DEBUG_DRAWER_BATCH_SIZE * engine::sizeOfElement( eElementType::Float4 );
-        uint32 _vboInstancesModelMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 );
-        uint32 _vboInstancesNormalMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::sizeOfElement( eElementType::Float4 );
+        uint32 _vboInstancesColorsSize = DEBUG_DRAWER_BATCH_SIZE * engine::SizeOfElement( eElementType::Float4 );
+        uint32 _vboInstancesModelMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::SizeOfElement( eElementType::Float4 );
+        uint32 _vboInstancesNormalMatsSize = DEBUG_DRAWER_BATCH_SIZE * 4 * engine::SizeOfElement( eElementType::Float4 );
 
         auto _vboInstancesColors = std::make_unique<CVertexBuffer>( _vboInstancesColorsLayout, eBufferUsage::DYNAMIC,
                                                                     _vboInstancesColorsSize, (float32*) NULL );

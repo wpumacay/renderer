@@ -48,7 +48,7 @@ namespace engine
             glEnableVertexAttribArray( m_numAttribIndx );
             glVertexAttribPointer( m_numAttribIndx,
                                    _buffElements[i].count,
-                                   toOpenGLType( _buffElements[i].type ),
+                                   ToOpenGLType( _buffElements[i].type ),
                                    _buffElements[i].normalized ? GL_TRUE : GL_FALSE,
                                    _buffLayout.stride(),
                                    (const void*) (intptr_t) _buffElements[i].offset );

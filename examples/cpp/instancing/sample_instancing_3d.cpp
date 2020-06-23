@@ -160,7 +160,7 @@ std::unique_ptr<engine::CVertexArray> createCube_Instancing()
                                                                      { "modelMatrix-col2", engine::eElementType::Float4, false },
                                                                      { "modelMatrix-col3", engine::eElementType::Float4, false } } );
     auto _modelMatricesBuffer = std::make_unique<engine::CVertexBuffer>( _modelMatricesBufferLayout, engine::eBufferUsage::DYNAMIC,
-                                                                         g_num_rows * g_num_cols * g_num_floors * 4 * engine::sizeOfElement( engine::eElementType::Float4 ),
+                                                                         g_num_rows * g_num_cols * g_num_floors * 4 * engine::SizeOfElement( engine::eElementType::Float4 ),
                                                                          (engine::float32*) NULL );
 
     g_cubeVAO_modelMatricesBufferRef = _modelMatricesBuffer.get(); // keep a reference to update the positions
@@ -231,7 +231,7 @@ void drawGrid_Instancing( engine::CShader* shader,
 
     // update our buffer data
     int _num_instances = g_num_rows * g_num_cols * g_num_floors;
-    int _size_of_mat4 = 4 * engine::sizeOfElement( engine::eElementType::Float4 );
+    int _size_of_mat4 = 4 * engine::SizeOfElement( engine::eElementType::Float4 );
     g_cubeVAO_modelMatricesBufferRef->UpdateData( _num_instances * _size_of_mat4,
                                                (engine::float32*) bufferModelMatrices.data() );
 

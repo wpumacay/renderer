@@ -119,7 +119,7 @@ std::unique_ptr<engine::CVertexArray> createQuad_Instancing()
 
     auto _vpositionsBufferLayout = engine::CVertexBufferLayout( { { "screenPosition", engine::eElementType::Float2, false } } );
     auto _vpositionsBuffer = std::make_unique<engine::CVertexBuffer>( _vpositionsBufferLayout, engine::eBufferUsage::DYNAMIC,
-                                                                      g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ), 
+                                                                      g_num_rows * g_num_cols * engine::SizeOfElement( engine::eElementType::Float2 ), 
                                                                       (engine::float32*) NULL );
 
     g_quadVAO_positionsBufferRef = _vpositionsBuffer.get(); // keep a reference to update the positions
@@ -175,7 +175,7 @@ void drawGrid_Instancing( engine::CShader* shader,
     }
 
     // update our buffer data
-    g_quadVAO_positionsBufferRef->UpdateData( g_num_rows * g_num_cols * engine::sizeOfElement( engine::eElementType::Float2 ),
+    g_quadVAO_positionsBufferRef->UpdateData( g_num_rows * g_num_cols * engine::SizeOfElement( engine::eElementType::Float2 ),
                                               (engine::float32*) bufferPositions );
 
     // do the render call (instanced)
