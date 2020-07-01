@@ -2,15 +2,6 @@ cmake_minimum_required( VERSION 3.0.0 )
 
 #### aka Cat1 project (=ↀωↀ=)
 project( TinyRenderer )
-message( "|---------------------------------------------------------|" )
-message( "|                  TINY RENDERING ENGINE                  |" )
-message( "|---------------------------------------------------------|" )
-message( "
-                      |\\      _,,,---,,_
-                ZZZzz /,`.-'`'    -.  ;-;;,_
-                     |,4-  ) )-,_. ,\\ (  `'-'
-                    '---''(_/--'  `-'\\_)" )
-# ASCII art from: https://www.asciiart.eu/animals/cats
 
 set( CMAKE_CXX_STANDARD 11 )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-format-security -Wno-endif-labels -fPIC" )
@@ -200,50 +191,51 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
     set( SRCS_WINDOWED_GLFW
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowGLFW.cpp" # use GLFW to create a window
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiLayer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiUtilsLayer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp" )
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowGLFW.cpp" # use GLFW to create a window
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiLayer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CImGuiUtilsLayer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp"
+          )
     set( ENGINE_WINDOWED_GLFW "YES" )
 
     add_library( tinyrenderer_cpp_lib_glfw SHARED ${SRCS_WINDOWED_GLFW} )
@@ -269,49 +261,50 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
     set( SRCS_HEADLESS_EGL
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CCommon.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/CMath.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowEGL.cpp" # use EGL to create a "window"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/app/CApplication.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/CTextureManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFixedCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CFpsCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/CICamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/COrbitCamera.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CFrameBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CIndexBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTexture.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CTextureCube.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowEGL.cpp" # use EGL to create a "window"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMeshBuilder.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CModel.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CScene.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CShadowMap.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CSkybox.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputEvent.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/input/CInputManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CDirectionalLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CILight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CPointLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/lights/CSpotLight.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/materials/CMaterial.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMainRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CMeshRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CRenderersCommon.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoDecoder.cpp"
+         #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoEncoder.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/egl.c"
-         "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c" )
+         "${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/gl.c"
+          )
     set( ENGINE_HEADLESS_EGL "YES" )
 
     add_library( tinyrenderer_cpp_lib_egl SHARED ${SRCS_HEADLESS_EGL} )
@@ -330,18 +323,26 @@ endif()
 # For docs-generation to use
 set_property( GLOBAL PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
-if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_PYTHON_BINDINGS )
-    add_subdirectory( python/tinyrenderer/bindings )
-endif()
+#### if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_PYTHON_BINDINGS )
+####     add_subdirectory( python/tinyrenderer/bindings )
+#### endif()
 
 if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_DOCS )
     add_subdirectory( docs )
 endif()
 
-if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_EXAMPLES )
-    add_subdirectory( examples )
-endif()
-
+#### if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_EXAMPLES )
+####     add_subdirectory( examples )
+#### endif()
+message( "|---------------------------------------------------------|" )
+message( "|                  TINY RENDERING ENGINE                  |" )
+message( "|---------------------------------------------------------|" )
+message( "
+                      |\\      _,,,---,,_
+                ZZZzz /,`.-'`'    -.  ;-;;,_
+                     |,4-  ) )-,_. ,\\ (  `'-'
+                    '---''(_/--'  `-'\\_)" )
+# ASCII art from: https://www.asciiart.eu/animals/cats
 message( "***************************************************************************************" )
 message( "BUILD-OPTIONS SUMMARY:" )
 message( "CMAKE_BUILD_TYPE                      : ${CMAKE_BUILD_TYPE}" )

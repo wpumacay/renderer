@@ -19,7 +19,7 @@ namespace engine
     enum class eMaterialType
     {
         NONE = 0,
-        LAMBERT, 
+        LAMBERT,
         PHONG,
         BLINN_PHONG
     };

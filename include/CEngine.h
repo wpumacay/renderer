@@ -1,7 +1,6 @@
 #pragma once
 
 #include <CCommon.h>
-#include <CMath.h>
 
 #include <utils/CDebugDrawer.h>
 #include <utils/CObjectPicker.h>

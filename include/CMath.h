@@ -1,7 +1,7 @@
 #pragma once
 
-#include <CCommon.h>
-
+#include <cstdint>
+#include <algorithm>
 // tinymath-library
 #include <vector_t.h>
 #include <matrix_t.h>
@@ -9,71 +9,98 @@
 
 namespace engine
 {
-    // redefine the vector types to use
+    typedef uint8_t uint8;
+    typedef uint32_t uint32;
+    typedef uint64_t uint64;
+    typedef int32_t int32;
+    typedef int64_t int64;
+    typedef float float32;
+    typedef double float64;
+
+    constexpr float32 PI = 3.141592653589793f;
+    constexpr float32 EPS = 1e-6f;
+
+    // Redefine the vector types to be use in the codebase
     typedef tinymath::Vector<float32, 2 > CVec2;
     typedef tinymath::Vector<float32, 3 > CVec3;
     typedef tinymath::Vector<float32, 4 > CVec4;
 
-    // redefine the matrix types to use
+    // Redefine the matrix types to use in the codebase
     typedef tinymath::Matrix<float32, 2 > CMat2;
     typedef tinymath::Matrix<float32, 3 > CMat3;
     typedef tinymath::Matrix<float32, 4 > CMat4;
 
-    // define our own to-string methods (mostly to avoid replacing current engine::toString usage)
-    std::string toString( const CVec2& v );
-    std::string toString( const CVec3& v );
-    std::string toString( const CVec4& v );
-    std::string toString( const CMat2& m );
-    std::string toString( const CMat3& m );
-    std::string toString( const CMat4& m );
+    // Define our own to-string methods (mostly to avoid replacing current engine::ToString usage)
+    std::string ToString( const CVec2& v );
+    std::string ToString( const CVec3& v );
+    std::string ToString( const CVec4& v );
+    std::string ToString( const CMat2& m );
+    std::string ToString( const CMat3& m );
+    std::string ToString( const CMat4& m );
 
-    /***********************************************************************************************
-    *                                         CLine                                                *
-    ************************************************************************************************/
-
+    /// Line object, represented as a start and end point
     struct CLine
     {
-        CVec3 start;
-        CVec3 end;
-
-        CLine();
-        CLine( const CVec3& start, const CVec3& end );
+        /// Start point of the line
+        CVec3 start = { 0.0f, 0.0f, 0.0f };
+        /// End point of the line
+        CVec3 end = { 0.0f, 0.0f, 0.0f };
+        /// Constructs a default line with both start + end set to zero
+        CLine() = default;
+        /// Constructs a line with the given start and end points
+        CLine( const CVec3& p_start, const CVec3& p_end ) : start(p_start), end(p_end) {}
     };
 
-    std::string toString( const CLine& line );
+    std::string ToString( const CLine& line );
 
-    /***********************************************************************************************
-    *                                      Matrix4x4 helpers                                       *
-    ***********************************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                     Matrix4x4 helpers                                      //
+    //--------------------------------------------------------------------------------------------//
 
-    CMat4 perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar );
-    CMat4 ortho( float32 width, float32 height, float32 zNear, float32 zFar );
-    CMat4 lookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp );
-    CMat4 scale( const CVec3& v );
-    CMat4 rotation( const CMat3& m );
-    CMat4 translation( const CVec3& v );
+    /// Returns a perspective-projection matrix constructed with the given parameters
+    ///
+    /// @param fov Field of view of for perspective matrix
+    /// @param aspect Aspect ratio of for perspective matrix
+    /// @param zNear Near value in the z-direction of the view-frustum of the perspective matrix
+    /// @param zFar Far value in the z-direction of the view-frustum of the perspective matrix
+    /// @return Perspective-projection matrix with the given configuration
+    CMat4 Perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar );
 
-    CMat4 rotationX( float32 angle );
-    CMat4 rotationY( float32 angle );
-    CMat4 rotationZ( float32 angle );
+    /// Returns an orthographic-projectino matrix constructed with the given parameters
+    ///
+    /// @param width Width of the view-frustum (view-box) for the ortographic matrix
+    /// @param height Height of the view-frustum (view-box) for the ortographic matrix
+    /// @param zNear Near value in the z-direction of the view-frustum (view-box) of the ortographic matrix
+    /// @param zFar Far value in the z-direction of the view-frustum (view-box) of the ortographic matrix
+    /// @return Ortographic-projection matrix with the given configuration
+    CMat4 Ortho( float32 width, float32 height, float32 zNear, float32 zFar );
 
-    /***********************************************************************************************
-    *                                             CInd3                                            *
-    ***********************************************************************************************/
+    CMat4 LookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp );
+    CMat4 Scale( const CVec3& v );
+    CMat4 Rotation( const CMat3& m );
+    CMat4 Translation( const CVec3& v );
+
+    CMat4 RotationX( float32 angle );
+    CMat4 RotationY( float32 angle );
+    CMat4 RotationZ( float32 angle );
+
+    //--------------------------------------------------------------------------------------------//
+    //                                            CInd3                                           //
+    //--------------------------------------------------------------------------------------------//
 
     struct CInd3
     {
-        GLint buff[3];
+        int32 buff[3];
 
         CInd3();
-        CInd3( GLint v1, GLint v2, GLint v3 );
+        CInd3( int32 v1, int32 v2, int32 v3 );
     };
 
     std::string toString( const CInd3& ind3 );
 
-    /***********************************************************************************************
-    *                                       Geometric helpers                                      *
-    ***********************************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                      Geometric helpers                                     //
+    //--------------------------------------------------------------------------------------------//
 
     void computeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp );
 
@@ -165,5 +192,4 @@ namespace engine
 
     float32 toRadians( float32 angle );
     float32 toDegrees( float32 angle );
-
 }

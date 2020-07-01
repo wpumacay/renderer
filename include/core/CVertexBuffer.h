@@ -1,36 +1,11 @@
 #pragma once
 
 #include <CCommon.h>
-#include <CMath.h>
 #include <core/CVertexBufferLayout.h>
 
 namespace engine
 {
-    /// Available modes in which a VBO can be used
-    enum class eBufferUsage
-    {
-        /// Buffer holds memory that won't be changed by the user after its creation. Generally this
-        /// type of buffer is allocated on GPU such that it can read it quickly
-        STATIC = 0,
-        /// Buffer holds memory that can be changed by the user on the fly. This type of buffer is
-        /// allocated on GPU such that it allows write operations from the CPU, so its slower compared
-        /// to the STATIC type of buffer
-        DYNAMIC
-    };
-
-    /// Returns a string representation of the given BufferUsage enum
-    ///
-    /// @param usage    Usage type of a given buffer
-    /// @return String representation of this usage type
-    std::string ToString( const eBufferUsage& usage );
-
-    /// Converts the given buffer-usage enum to its related OpenGL enum
-    ///
-    /// @param usage    Usage type of a given buffer
-    /// @return OpenGL enum related to this usage
-    uint32 ToOpenGLEnum( const eBufferUsage& usage );
-
-    /// Vertex Buffer Object (VBO) abstraction class, used to store data on the GPU
+    /// Vertex Buffer Object (VBO) abstraction class, used to store data vertex-data on the GPU
     ///
     /// @details
     /// Defines the functionality of a Vertex Buffer Object, which is used to hold vertex-data

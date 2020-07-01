@@ -3,24 +3,6 @@
 
 namespace engine
 {
-    std::string ToString( const eBufferUsage& usage )
-    {
-        /**/ if ( usage == eBufferUsage::STATIC ) return "static";
-        else if ( usage == eBufferUsage::DYNAMIC ) return "dynamic";
-
-        ENGINE_CORE_CRITICAL( "ToString >>> Invalid eBufferUsage enum given" );
-        return "undefined";
-    }
-
-    uint32 ToOpenGLEnum( const eBufferUsage& usage )
-    {
-        /**/ if ( usage == eBufferUsage::STATIC ) return GL_STATIC_DRAW;
-        else if ( usage == eBufferUsage::DYNAMIC ) return GL_DYNAMIC_DRAW;
-
-        ENGINE_CORE_CRITICAL( "ToOpenGLEnum >>> Invalid eBufferUsage enum given" );
-        return GL_STATIC_DRAW;
-    }
-
     CVertexBuffer::CVertexBuffer( const CVertexBufferLayout& layout,
                                   const eBufferUsage& usage,
                                   const uint32& size,

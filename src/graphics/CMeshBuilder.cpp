@@ -101,8 +101,8 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -ENGINE_PI / 2.0f + ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * engine::PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -engine::PI / 2.0f + engine::PI * ( ( ( float ) j ) / nDiv2 );
 
                 auto _vertex = CVec3( radius * cos( _theta ) * cos( _phi ),
                                       radius * sin( _theta ) * cos( _phi ),
@@ -162,8 +162,8 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -ENGINE_PI / 2.0f + ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * engine::PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -engine::PI / 2.0f + engine::PI * ( ( ( float ) j ) / nDiv2 );
 
                 auto _vertex = CVec3( radX * cos( _theta ) * cos( _phi ),
                                       radY * sin( _theta ) * cos( _phi ),
@@ -220,8 +220,8 @@ namespace engine
         std::vector< CVec3 > _sectionXY;
         for ( int q = 0; q <= nDiv1; q++ )
         {
-            float _x = radius * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
-            float _y = radius * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
+            float _x = radius * cos( 2.0f * engine::PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * engine::PI * ( ( (float) q ) / nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -319,8 +319,8 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = 0.5f * ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * engine::PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = 0.5f * engine::PI * ( ( ( float ) j ) / nDiv2 );
 
                 // vertex without offset to up-position
                 auto _vertex = _rotateToMatchUpAxis( CVec3( radius * cos( _theta ) * cos( _phi ),
@@ -367,8 +367,8 @@ namespace engine
         std::vector< CVec3 > _sectionXY;
         for ( int q = 0; q <= nDiv1; q++ )
         {
-            float _x = radius * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
-            float _y = radius * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / nDiv1 ) );
+            float _x = radius * cos( 2.0f * engine::PI * ( ( (float) q ) / nDiv1 ) );
+            float _y = radius * sin( 2.0f * engine::PI * ( ( (float) q ) / nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -410,8 +410,8 @@ namespace engine
         {
             for ( size_t j = 0; j <= nDiv2; j++ )
             {
-                float _theta = 2.0f * ENGINE_PI * ( ( ( float ) i ) / nDiv1 );
-                float _phi = -0.5f * ENGINE_PI * ( ( ( float ) j ) / nDiv2 );
+                float _theta = 2.0f * engine::PI * ( ( ( float ) i ) / nDiv1 );
+                float _phi = -0.5f * engine::PI * ( ( ( float ) j ) / nDiv2 );
 
                 // vertex without offset to up-position
                 auto _vertex = _rotateToMatchUpAxis( CVec3( radius * cos( _theta ) * cos( _phi ),
@@ -479,8 +479,8 @@ namespace engine
         std::vector< CVec3 > _sectionXY;
         for ( size_t q = 0; q <= _nDiv1; q++ )
         {
-            float _x = _radiusCyl * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
-            float _y = _radiusCyl * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _x = _radiusCyl * cos( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
+            float _y = _radiusCyl * sin( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXY.push_back( { _x, _y, 0.0f } );
         }
 
@@ -547,12 +547,12 @@ namespace engine
         std::vector< CVec3 > _sectionXYConeIn;
         for ( size_t q = 0; q < _nDiv1; q++ )
         {
-            float _xOut = _radiusCone * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
-            float _yOut = _radiusCone * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _xOut = _radiusCone * cos( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yOut = _radiusCone * sin( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXYConeOut.push_back( { _xOut, _yOut, 0.0f } );
 
-            float _xIn = _radiusCyl * cos( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
-            float _yIn = _radiusCyl * sin( 2.0f * ENGINE_PI * ( ( (float) q ) / _nDiv1 ) );
+            float _xIn = _radiusCyl * cos( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
+            float _yIn = _radiusCyl * sin( 2.0f * engine::PI * ( ( (float) q ) / _nDiv1 ) );
             _sectionXYConeIn.push_back( { _xIn, _yIn, 0.0f } );
         }
 

@@ -5,154 +5,122 @@
 namespace engine
 {
 
-    std::string toString( const CVec2& v )
+    std::string ToString( const CVec2& v )
     {
-        std::string _strrep;
-
-        _strrep += "( ";  _strrep += std::to_string( v.x() );
-        _strrep += " , "; _strrep += std::to_string( v.y() );
-        _strrep += " )";
-
-        return _strrep;
+        std::string strrep;
+        strrep += "( ";  strrep += std::to_string( v.x() );
+        strrep += " , "; strrep += std::to_string( v.y() );
+        strrep += " )";
+        return strrep;
     }
 
-    std::string toString( const CVec3& v )
+    std::string ToString( const CVec3& v )
     {
-        std::string _strrep;
-
-        _strrep += "( ";  _strrep += std::to_string( v.x() );
-        _strrep += " , "; _strrep += std::to_string( v.y() );
-        _strrep += " , "; _strrep += std::to_string( v.z() );
-        _strrep += " )";
-
-        return _strrep;
+        std::string strrep;
+        strrep += "( ";  strrep += std::to_string( v.x() );
+        strrep += " , "; strrep += std::to_string( v.y() );
+        strrep += " , "; strrep += std::to_string( v.z() );
+        strrep += " )";
+        return strrep;
     }
 
-    std::string toString( const CVec4& v )
+    std::string ToString( const CVec4& v )
     {
-        std::string _strrep;
-
-        _strrep += "( ";  _strrep += std::to_string( v.x() );
-        _strrep += " , "; _strrep += std::to_string( v.y() );
-        _strrep += " , "; _strrep += std::to_string( v.z() );
-        _strrep += " , "; _strrep += std::to_string( v.w() );
-        _strrep += " )";
-
-        return _strrep;
+        std::string strrep;
+        strrep += "( ";  strrep += std::to_string( v.x() );
+        strrep += " , "; strrep += std::to_string( v.y() );
+        strrep += " , "; strrep += std::to_string( v.z() );
+        strrep += " , "; strrep += std::to_string( v.w() );
+        strrep += " )";
+        return strrep;
     }
 
-    std::string toString( const CMat2& m )
+    std::string ToString( const CMat2& m )
     {
-        std::string _strrep;
-
-        _strrep += "[ ";
+        std::string strrep;
+        strrep += "[ ";
         for ( int i = 0; i < 2; i++ )
         {
-            _strrep += "[ ";
-            _strrep += std::to_string( m( i, 0 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 1 ) );
-            _strrep += ( i != 1 ) ? " ]\n\r  " : " ]";
+            strrep += "[ ";
+            strrep += std::to_string( m( i, 0 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 1 ) );
+            strrep += ( i != 1 ) ? " ]\n\r  " : " ]";
         }
-        _strrep += " ]";
-
-        return _strrep;
+        strrep += " ]";
+        return strrep;
     }
 
-    std::string toString( const CMat3& m )
+    std::string ToString( const CMat3& m )
     {
-        std::string _strrep;
+        std::string strrep;
 
-        _strrep += "[ ";
+        strrep += "[ ";
         for ( int i = 0; i < 3; i++ )
         {
-            _strrep += "[ ";
-            _strrep += std::to_string( m( i, 0 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 1 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 2 ) );
-            _strrep += ( i != 2 ) ? " ]\n\r  " : " ]";
+            strrep += "[ ";
+            strrep += std::to_string( m( i, 0 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 1 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 2 ) );
+            strrep += ( i != 2 ) ? " ]\n\r  " : " ]";
         }
-        _strrep += " ]";
+        strrep += " ]";
 
-        return _strrep;
+        return strrep;
     }
 
-    std::string toString( const CMat4& m )
+    std::string ToString( const CMat4& m )
     {
-        std::string _strrep;
+        std::string strrep;
 
-        _strrep += "[ ";
+        strrep += "[ ";
         for ( int i = 0; i < 4; i++ )
         {
-            _strrep += "[ ";
-            _strrep += std::to_string( m( i, 0 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 1 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 2 ) ); _strrep += ", ";
-            _strrep += std::to_string( m( i, 3 ) );
-            _strrep += ( i != 3 ) ? " ]\n\r  " : " ]";
+            strrep += "[ ";
+            strrep += std::to_string( m( i, 0 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 1 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 2 ) ); strrep += ", ";
+            strrep += std::to_string( m( i, 3 ) );
+            strrep += ( i != 3 ) ? " ]\n\r  " : " ]";
         }
-        _strrep += " ]";
+        strrep += " ]";
 
-        return _strrep;
+        return strrep;
     }
 
-
-    /**************************************************************************
-    *                           CLine implementation                          *
-    ***************************************************************************/
-
-    CLine::CLine()
+    std::string ToString( const CLine& line )
     {
-        start = CVec3( 0.0f, 0.0f, 0.0f );
-        end = CVec3( 0.0f, 0.0f, 0.0f );
-    }
-
-    CLine::CLine( const CVec3& start, const CVec3& end )
-    {
-        this->start = start;
-        this->end = end;
-    }
-
-    std::string toString( const CLine& line )
-    {
-        std::string _strrep;
-
-        _strrep += "start   : " + engine::toString( line.start ) + "\n\r";
-        _strrep += "end     : " + engine::toString( line.end ) + "\n\r";
-
-        return _strrep;
+        std::string strrep;
+        strrep += "start   : " + engine::ToString( line.start ) + "\n\r";
+        strrep += "end     : " + engine::ToString( line.end ) + "\n\r";
+        return strrep;
     }
 
     /**************************************************************************
     *                            Matrix4x4 helpers                            *
     ***************************************************************************/
 
-    CMat4 perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar )
+    CMat4 Perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar )
     {
-        CMat4 _resmat;
-
-        float32 _ht = std::tan( ( fov / 2 ) * ( ENGINE_PI / 180 ) );
-
-        _resmat( 0, 0 ) = 1 / ( _ht * aspect )  ; _resmat( 0, 1 ) =    0      ; _resmat( 0, 2 ) =                   0                      ; _resmat( 0, 3 ) =  0;
-        _resmat( 1, 0 ) =          0            ; _resmat( 1, 1 ) = 1 / _ht   ; _resmat( 1, 2 ) =                   0                      ; _resmat( 1, 3 ) =  0;
-        _resmat( 2, 0 ) =          0            ; _resmat( 2, 1 ) =    0      ; _resmat( 2, 2 ) = -( zFar + zNear ) / ( zFar - zNear )     ; _resmat( 2, 3 ) = -2 * ( zFar * zNear ) / ( zFar - zNear );
-        _resmat( 3, 0 ) =          0            ; _resmat( 3, 1 ) =    0      ; _resmat( 3, 2 ) =                  -1                      ; _resmat( 3, 3 ) =  0;
-
-        return _resmat;
+        CMat4 resmat;
+        float32 _ht = std::tan( ( fov / 2 ) * ( engine::PI / 180 ) );
+        resmat( 0, 0 ) = 1 / ( _ht * aspect )  ; resmat( 0, 1 ) =    0      ; resmat( 0, 2 ) =                   0                      ; resmat( 0, 3 ) =  0;
+        resmat( 1, 0 ) =          0            ; resmat( 1, 1 ) = 1 / _ht   ; resmat( 1, 2 ) =                   0                      ; resmat( 1, 3 ) =  0;
+        resmat( 2, 0 ) =          0            ; resmat( 2, 1 ) =    0      ; resmat( 2, 2 ) = -( zFar + zNear ) / ( zFar - zNear )     ; resmat( 2, 3 ) = -2 * ( zFar * zNear ) / ( zFar - zNear );
+        resmat( 3, 0 ) =          0            ; resmat( 3, 1 ) =    0      ; resmat( 3, 2 ) =                  -1                      ; resmat( 3, 3 ) =  0;
+        return resmat;
     }
 
-    CMat4 ortho( float32 width, float32 height, float32 zNear, float32 zFar )
+    CMat4 Ortho( float32 width, float32 height, float32 zNear, float32 zFar )
     {
-        CMat4 _resmat;
-
-        _resmat( 0, 0 ) =  1 / ( width / 2 )   ; _resmat( 0, 1 ) =       0            ; _resmat( 0, 2 ) =         0             ; _resmat( 0, 3 ) = 0;
-        _resmat( 1, 0 ) =        0             ; _resmat( 1, 1 ) = 1 / ( height / 2 ) ; _resmat( 1, 2 ) =         0             ; _resmat( 1, 3 ) = 0;
-        _resmat( 2, 0 ) =        0             ; _resmat( 2, 1 ) =       0            ; _resmat( 2, 2 ) = -2 / ( zFar - zNear ) ; _resmat( 2, 3 ) = -( zFar + zNear ) / ( zFar - zNear );
-        _resmat( 3, 0 ) =        0             ; _resmat( 3, 1 ) =       0            ; _resmat( 3, 2 ) =         0             ; _resmat( 3, 3 ) = 1;
-
-        return _resmat;
+        CMat4 resmat;
+        resmat( 0, 0 ) =  1 / ( width / 2 )   ; resmat( 0, 1 ) =       0            ; resmat( 0, 2 ) =         0             ; resmat( 0, 3 ) = 0;
+        resmat( 1, 0 ) =        0             ; resmat( 1, 1 ) = 1 / ( height / 2 ) ; resmat( 1, 2 ) =         0             ; resmat( 1, 3 ) = 0;
+        resmat( 2, 0 ) =        0             ; resmat( 2, 1 ) =       0            ; resmat( 2, 2 ) = -2 / ( zFar - zNear ) ; resmat( 2, 3 ) = -( zFar + zNear ) / ( zFar - zNear );
+        resmat( 3, 0 ) =        0             ; resmat( 3, 1 ) =       0            ; resmat( 3, 2 ) =         0             ; resmat( 3, 3 ) = 1;
+        return resmat;
     }
 
-    CMat4 lookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp )
+    CMat4 LookAt( const CVec3& position, const CVec3& target, const CVec3& worldUp )
     {
         /* axes vectors for the coordinate system represented by the resulting transform */
         CVec3 _front, _right, _up;
@@ -177,101 +145,84 @@ namespace engine
             _up    = tinymath::cross( _front, _right ).normalized();
         }
 
-        CMat4 _resmat;
+        CMat4 resmat;
+        resmat( 0, 0 ) = _right.x();
+        resmat( 1, 0 ) = _up.x();
+        resmat( 2, 0 ) = _front.x();
+        resmat( 3, 0 ) = 0;
 
-        _resmat( 0, 0 ) = _right.x();
-        _resmat( 1, 0 ) = _up.x();
-        _resmat( 2, 0 ) = _front.x();
-        _resmat( 3, 0 ) = 0;
+        resmat( 0, 1 ) = _right.y();
+        resmat( 1, 1 ) = _up.y();
+        resmat( 2, 1 ) = _front.y();
+        resmat( 3, 1 ) = 0;
 
-        _resmat( 0, 1 ) = _right.y();
-        _resmat( 1, 1 ) = _up.y();
-        _resmat( 2, 1 ) = _front.y();
-        _resmat( 3, 1 ) = 0;
+        resmat( 0, 2 ) = _right.z();
+        resmat( 1, 2 ) = _up.z();
+        resmat( 2, 2 ) = _front.z();
+        resmat( 3, 2 ) = 0;
 
-        _resmat( 0, 2 ) = _right.z();
-        _resmat( 1, 2 ) = _up.z();
-        _resmat( 2, 2 ) = _front.z();
-        _resmat( 3, 2 ) = 0;
-
-        _resmat( 0, 3 ) = -_right.dot( position );
-        _resmat( 1, 3 ) = -_up.dot( position );
-        _resmat( 2, 3 ) = -_front.dot( position );
-        _resmat( 3, 3 ) = 1;
-
-        return _resmat;
+        resmat( 0, 3 ) = -_right.dot( position );
+        resmat( 1, 3 ) = -_up.dot( position );
+        resmat( 2, 3 ) = -_front.dot( position );
+        resmat( 3, 3 ) = 1;
+        return resmat;
     }
 
-    CMat4 scale( const CVec3& v )
+    CMat4 Scale( const CVec3& v )
     {
-        CMat4 _resmat;
-
-        _resmat( 0, 0 ) = v.x();
-        _resmat( 1, 1 ) = v.y();
-        _resmat( 2, 2 ) = v.z();
-
-        return _resmat;
+        CMat4 resmat;
+        resmat( 0, 0 ) = v.x();
+        resmat( 1, 1 ) = v.y();
+        resmat( 2, 2 ) = v.z();
+        return resmat;
     }
 
-    CMat4 rotation( const CMat3& m )
+    CMat4 Rotation( const CMat3& m )
     {
-        CMat4 _resmat;
-
+        CMat4 resmat;
         for ( size_t i = 0; i < 3; i++ )
             for( size_t j = 0; j < 3; j++ )
-                _resmat( i, j ) = m( i, j );
-
-        return _resmat;
+                resmat( i, j ) = m( i, j );
+        return resmat;
     }
 
-    CMat4 translation( const CVec3& v )
+    CMat4 Translation( const CVec3& v )
     {
-        CMat4 _resmat;
-
-        _resmat( 0, 3 ) = v.x();
-        _resmat( 1, 3 ) = v.y();
-        _resmat( 2, 3 ) = v.z();
-
-        return _resmat;
+        CMat4 resmat;
+        resmat( 0, 3 ) = v.x();
+        resmat( 1, 3 ) = v.y();
+        resmat( 2, 3 ) = v.z();
+        return resmat;
     }
 
-    CMat4 rotationX( float32 angle )
+    CMat4 RotationX( float32 angle )
     {
-        CMat4 _resRotMatrix;
-
-        auto cs = std::cos( angle );
-        auto sn = std::sin( angle );
-
-        _resRotMatrix( 1, 1 ) = cs; _resRotMatrix( 1, 2 ) = -sn;
-        _resRotMatrix( 2, 1 ) = sn; _resRotMatrix( 2, 2 ) = cs;
-
-        return _resRotMatrix;
+        CMat4 resmat;
+        const auto cs = std::cos( angle );
+        const auto sn = std::sin( angle );
+        resmat( 1, 1 ) = cs; resmat( 1, 2 ) = -sn;
+        resmat( 2, 1 ) = sn; resmat( 2, 2 ) = cs;
+        return resmat;
     }
 
-    CMat4 rotationY( float32 angle )
+    CMat4 RotationY( float32 angle )
     {
-        CMat4 _resRotMatrix;
-
-        auto cs = std::cos( angle );
-        auto sn = std::sin( angle );
-
-        _resRotMatrix( 0, 0 ) = cs; _resRotMatrix( 0, 2 ) = sn;
-        _resRotMatrix( 2, 0 ) = -sn; _resRotMatrix( 2, 2 ) = cs;
-
-        return _resRotMatrix;
+        CMat4 resmat;
+        const auto cs = std::cos( angle );
+        const auto sn = std::sin( angle );
+        resmat( 0, 0 ) = cs; resmat( 0, 2 ) = sn;
+        resmat( 2, 0 ) = -sn; resmat( 2, 2 ) = cs;
+        return resmat;
     }
 
-    CMat4 rotationZ( float32 angle )
+    CMat4 RotationZ( float32 angle )
     {
-        CMat4 _resRotMatrix;
-
-        auto cs = std::cos( angle );
-        auto sn = std::sin( angle );
-
-        _resRotMatrix( 0, 0 ) = cs; _resRotMatrix( 0, 1 ) = -sn;
-        _resRotMatrix( 1, 0 ) = sn; _resRotMatrix( 1, 1 ) = cs;
-
-        return _resRotMatrix;
+        CMat4 resmat;
+        const auto cs = std::cos( angle );
+        const auto sn = std::sin( angle );
+        resmat( 0, 0 ) = cs; resmat( 0, 1 ) = -sn;
+        resmat( 1, 0 ) = sn; resmat( 1, 1 ) = cs;
+        return resmat;
     }
 
     /**************************************************************************
@@ -285,26 +236,24 @@ namespace engine
         buff[2] = 0;
     }
 
-    CInd3::CInd3( GLint v1, GLint v2, GLint v3 )
+    CInd3::CInd3( int32 v1, int32 v2, int32 v3 )
     {
         buff[0] = v1;
         buff[1] = v2;
         buff[2] = v3;
     }
 
-    std::string toString( const CInd3& ind3 )
+    std::string ToString( const CInd3& ind3 )
     {
-        std::string _strrep;
-
-        _strrep += "[ ";
-        _strrep += std::to_string( ind3.buff[0] );
-        _strrep += ", ";
-        _strrep += std::to_string( ind3.buff[1] );
-        _strrep += ", ";
-        _strrep += std::to_string( ind3.buff[2] );
-        _strrep += " ]";
-
-        return _strrep;
+        std::string strrep;
+        strrep += "[ ";
+        strrep += std::to_string( ind3.buff[0] );
+        strrep += ", ";
+        strrep += std::to_string( ind3.buff[1] );
+        strrep += ", ";
+        strrep += std::to_string( ind3.buff[2] );
+        strrep += " ]";
+        return strrep;
     }
 
     /**************************************************************************
@@ -471,11 +420,11 @@ namespace engine
 
     float32 toRadians( float32 angle )
     {
-        return angle * ENGINE_PI / 180;
+        return angle * engine::PI / 180;
     }
 
     float32 toDegrees( float32 angle )
     {
-        return angle * 180 / ENGINE_PI;
+        return angle * 180 / engine::PI;
     }
 }

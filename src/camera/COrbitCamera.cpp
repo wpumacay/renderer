@@ -82,8 +82,8 @@ namespace engine
             float _dx = m_Cursor.x() - m_Cursor0.x();
             float _dy = m_Cursor.y() - m_Cursor0.y();
 
-            float _dtheta = ( -_dx / m_ProjData.viewportWidth ) * 2.0f * ENGINE_PI;
-            float _dphi = ( -_dy / m_ProjData.viewportHeight ) * ENGINE_PI;
+            float _dtheta = ( -_dx / m_ProjData.viewportWidth ) * 2.0f * engine::PI;
+            float _dphi = ( -_dy / m_ProjData.viewportHeight ) * engine::PI;
 
             m_Theta = m_Theta0 + _dtheta;
             m_Phi = m_Phi0 + _dphi;

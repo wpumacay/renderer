@@ -218,9 +218,9 @@ namespace engine
             position = { _vposition[0], _vposition[1], _vposition[2] };
 
             auto _euler = tinymath::euler( rotation );
-            ImGui::SliderFloat( "euler-x", &_euler.x(), -ENGINE_PI, ENGINE_PI );
-            ImGui::SliderFloat( "euler-y", &_euler.y(), -ENGINE_PI / 2 + 0.001f, ENGINE_PI / 2 - 0.001f );
-            ImGui::SliderFloat( "euler-z", &_euler.z(), -ENGINE_PI, ENGINE_PI );
+            ImGui::SliderFloat( "euler-x", &_euler.x(), -engine::PI, engine::PI );
+            ImGui::SliderFloat( "euler-y", &_euler.y(), -engine::PI / 2 + 0.001f, engine::PI / 2 - 0.001f );
+            ImGui::SliderFloat( "euler-z", &_euler.z(), -engine::PI, engine::PI );
             rotation = tinymath::rotation( _euler );
 
             float32 _vscale[3] = { scale.x(), scale.y(), scale.z() };
@@ -477,8 +477,8 @@ namespace engine
             ImGui::SliderFloat( "Attn-constant", &light->atnConstant, 1.0f, 2.0f );
             ImGui::SliderFloat( "Attn-linear", &light->atnLinear, 0.0f, 0.5f );
             ImGui::SliderFloat( "Attn-quadratic", &light->atnQuadratic, 0.0f, 0.25f );
-            ImGui::SliderFloat( "Inner-cutoff", &light->innerCutoff, ENGINE_PI / 10.0f, ENGINE_PI / 2 );
-            ImGui::SliderFloat( "Outer-cutoff", &light->outerCutoff, ENGINE_PI / 10.0f, ENGINE_PI / 2 );
+            ImGui::SliderFloat( "Inner-cutoff", &light->innerCutoff, engine::PI / 10.0f, engine::PI / 2 );
+            ImGui::SliderFloat( "Outer-cutoff", &light->outerCutoff, engine::PI / 10.0f, engine::PI / 2 );
         }
     }
 

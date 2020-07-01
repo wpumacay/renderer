@@ -6,27 +6,21 @@
 
 namespace engine
 {
-
-    /**
-    *   @brief IBO|EBO (Index|Element Buffer Object) abstraction class
-    *
-    *   @details
-    *   Defines the functionality of an Index Buffer Object, which is used to hold index-data
-    *   (indices of faces) on the GPU that can be used during render calls.
-    */
+    /// Index Buffer Object (IBO|EBO) abstraction class, used to store index-data on the GPU
+    ///
+    /// @details
+    /// Defines the functionality of an Index Buffer Object, which is used to hold index-data
+    /// (face indices) on the GPU that can be used during render calls
     class CIndexBuffer
     {
-
     public :
 
-        /**
-        *   @brief Creates an IBO from some given configuration data
-        *
-        *   @param bufferUsage  Hint for the type of usage for this buffer in GPU memory
-        *   @param bufferCount  Number of indices stored in the buffer
-        *   @param bufferData   Pointer to the data in CPU to be transferred to GPU memory
-        *   @param track        Debug flag used to keep track of allocations and deallocations.
-        */
+        ///   @brief Creates an IBO from some given configuration data
+        ///
+        ///   @param bufferUsage  Hint for the type of usage for this buffer in GPU memory
+        ///   @param bufferCount  Number of indices stored in the buffer
+        ///   @param bufferData   Pointer to the data in CPU to be transferred to GPU memory
+        ///   @param track        Debug flag used to keep track of allocations and deallocations.
         CIndexBuffer( const eBufferUsage& bufferUsage,
                       uint32 bufferCount,
                       uint32* bufferData );

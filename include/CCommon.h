@@ -31,9 +31,7 @@
 #include <tinyutils/path_handling.hpp>
 #include <tinyutils/perlin_noise.hpp>
 #include <tinyutils/profiling.hpp>
-
-#define ENGINE_PI 3.141592653589793f
-#define ENGINE_EPS 0.000001f
+#include <CMath.h>
 
 #ifndef ENGINE_RESOURCES_PATH
     #define ENGINE_RESOURCES_PATH "../res/"
@@ -45,32 +43,78 @@
 
 namespace engine
 {
-    typedef unsigned char uint8;
-    typedef unsigned int uint32;
-    typedef unsigned long uint64;
-    typedef int int32;
-    typedef long int64;
-    typedef float float32;
-    typedef double float64;
+    /// Path to where the engine resources are located (mesh-files, textures, etc.)
+    const std::string RESOURCES_PATH = ENGINE_RESOURCES_PATH;
+    /// Path to where the engine examples are stored
+    const std::string EXAMPLES_PATH = ENGINE_EXAMPLES_PATH;
 
+    //----------------------------------------------------------------------------------------------
+
+    /// Available axis used for world-up vectors and other references in the codebase
     enum class eAxis
     {
-        X = 0, Y, Z
+        X, ///< X-axis
+        Y, ///< Y-axis
+        Z  ///< Z-axis
     };
 
-    std::string toString( const eAxis& axis );
+    /// Returns the string representation of the given axis enum
+    ///
+    /// @param axis Axis enumerator value
+    /// @return String representation of the given axis enum
+    std::string ToString( const eAxis& axis );
+    //----------------------------------------------------------------------------------------------
 
+    //----------------------------------------------------------------------------------------------
+
+    /// Available data types for pixel values
     enum class ePixelDataType
     {
-        NONE = 0,
-        UINT_8,
-        UINT_32,
-        UINT_24_8,
-        FLOAT_32
+        UINT_8,     ///< Pixel value with 1-byte of storage
+        UINT_32,    ///< Pixel value with 4-bytes of storage
+        UINT_24_8,  ///< Pixel value with 3-bytes + 1-bytes of (separated) storage
+        FLOAT_32,   ///< Pixel value with 4-bytes of  storage as a 32-bit floating-point numbet
     };
 
-    std::string toString( const ePixelDataType& dtype );
-    uint32 toOpenGLEnum( const ePixelDataType& dtype );
+    /// Returns the string representation of a ePixelDataType enum
+    ///
+    /// @param dtype Pixel data type storage representation
+    /// @return String representation of the data-type representation
+    std::string ToString( const ePixelDataType& dtype );
+
+    /// Converts the given pixel data-type representation into its related OpenGL enum
+    ///
+    /// @param dtype Pixel data type storage representation
+    /// @return 
+    uint32 ToOpenGLEnum( const ePixelDataType& dtype );
+    //----------------------------------------------------------------------------------------------
+
+    //----------------------------------------------------------------------------------------------
+
+    /// Available modes in which a VBO can be used
+    enum class eBufferUsage
+    {
+        /// Buffer holds memory that won't be changed by the user after its creation. Generally this
+        /// type of buffer is allocated on GPU such that it can read it quickly
+        STATIC = 0,
+        /// Buffer holds memory that can be changed by the user on the fly. This type of buffer is
+        /// allocated on GPU such that it allows write operations from the CPU, so its slower compared
+        /// to the STATIC type of buffer
+        DYNAMIC
+    };
+
+    /// Returns a string representation of the given BufferUsage enum
+    ///
+    /// @param usage    Usage type of a given buffer
+    /// @return String representation of this usage type
+    std::string ToString( const eBufferUsage& usage );
+
+    /// Converts the given buffer-usage enum to its related OpenGL enum
+    ///
+    /// @param usage    Usage type of a given buffer
+    /// @return OpenGL enum related to this usage
+    uint32 ToOpenGLEnum( const eBufferUsage& usage );
+    //----------------------------------------------------------------------------------------------
 }
 
 #if defined(ENGINE_USE_LOGS)

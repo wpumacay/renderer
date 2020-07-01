@@ -727,7 +727,7 @@ namespace engine
     {
         for ( size_t i = 0; i < DEBUG_DRAWER_SPHERE_DIVISIONS; i++ )
         {
-            float32 _dtheta = ( 2.0f * ENGINE_PI / DEBUG_DRAWER_SPHERE_DIVISIONS );
+            float32 _dtheta = ( 2.0f * engine::PI / DEBUG_DRAWER_SPHERE_DIVISIONS );
             // x-y plane
             CVec3 _pxy0 = CVec3( radius * std::cos( i * _dtheta ), radius * std::sin( i * _dtheta ), 0.0f );
             CVec3 _pxy1 = CVec3( radius * std::cos( ( i + 1 ) * _dtheta ), radius * std::sin( ( i + 1 ) * _dtheta ), 0.0f );
