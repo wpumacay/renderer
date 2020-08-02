@@ -1,25 +1,22 @@
-/**
-*   @file CVertexBufferLayout.h
-*   @brief Vertex Buffer layout implementation and helper methods|enums
-*/
+/// @file CVertexBufferLayout.h
+/// @brief Vertex Buffer layout implementation and helper methods|enums
 #pragma once
 
 #include <CCommon.h>
-#include <CMath.h>
 
 namespace engine
 {
     /// Type of element used for part (of all) elements in a Vertex Buffer
     enum class eElementType
     {
-        Float,      ///< Single float, size 4-bytes
-        Float2,     ///< Two float compound (vec2), size 8-bytes
-        Float3,     ///< Three float compound (vec3), size 12-bytes
-        Float4,     ///< Four float compound (vec4), size 16-bytes
-        Int,        ///< Single integer, size 4-bytes (=int32)
-        Int2,       ///< Two integer compound (int2), size 8-bytes
-        Int3,       ///< Three integer compound (int3), size 12-bytes
-        Int4,       ///< Four integer compound (int4), size 16-bytes
+        Float,  ///< Single float, size 4-bytes
+        Float2, ///< Two float compound (vec2), size 8-bytes
+        Float3, ///< Three float compound (vec3), size 12-bytes
+        Float4, ///< Four float compound (vec4), size 16-bytes
+        Int,    ///< Single integer, size 4-bytes (=int32)
+        Int2,   ///< Two integer compound (int2), size 8-bytes
+        Int3,   ///< Three integer compound (int3), size 12-bytes
+        Int4,   ///< Four integer compound (int4), size 16-bytes
     };
 
     /// Returns the string representation of the given element-type enum
@@ -27,8 +24,8 @@ namespace engine
 
     /// Converts the given element-type to its corresponding OpenGL enum
     ///
-    /// @param type     Element-type enum of a given element in a buffer
-    /// @return         OpenGL enum related to this element-type
+    /// @param type Element-type enum of a given element in a buffer
+    /// @return OpenGL enum related to this element-type
     uint32 ToOpenGLType( const eElementType& type );
 
     /// Returns the number of bytes used by a given Element-type
@@ -36,8 +33,8 @@ namespace engine
 
     /// Returns the number of single-components in a given Element-type
     ///
-    /// @param type     Element-type enum of a vien element in a buffer
-    /// @return         Number of single-components in the given element-type, e.g. Float2 has 2-components
+    /// @param type Element-type enum of a vien element in a buffer
+    /// @return Number of single-components in the given element-type, e.g. Float2 has 2-components
     uint32 CountOfElement( const eElementType& type );
 
     /// Data structure describing a given element in the a Vertex Buffer
@@ -61,9 +58,9 @@ namespace engine
 
         /// Creates a description object of a given element in the buffer
         ///
-        /// @param name         Name of the element in the buffer (for debugging mainly)
-        /// @param type         Type of the element, e.g. eElementType::Float3
-        /// @param normalized   Whether or not the elements should be normalized before being used by a shader
+        /// @param name Name of the element in the buffer (for debugging mainly)
+        /// @param type Type of the element, e.g. eElementType::Float3
+        /// @param normalized Whether or not the elements should be normalized before being used by a shader
         CVertexBufferElement( const std::string& name,
                               const eElementType& type,
                               bool normalized );
@@ -101,23 +98,24 @@ namespace engine
         /// @endcode
         CVertexBufferLayout( const std::vector<CVertexBufferElement>& elements );
 
-        /**
-        *   Returns the stride (offset) of the group of elements in the VBO
-        *
-        *   @details
-        *   The stride consists of an offset in bytes required to go to the next element. This quantity
-        *   is computed from how large (in bytes) is a group of elements in the layout. For example,
-        *   if a layout consists of 1 Float2 for Position (xy) and 1 Float3 for Color (rgb), then
-        *   the stride would be 5 floats (or 20 bytes), which is the step required in bytes to get
-        *   from one element to the next associated element (e.g. have to jump 20 bytes to get from
-        *   one position element to the next position element).
-        */
-        uint32 stride() { return m_Stride; }
+        /// Returns the string representation of this buffer-layout
+        std::string ToString() const;
+
+        /// Returns the stride (offset) of the group of elements in the VBO
+        ///
+        /// @details
+        /// The stride consists of an offset in bytes required to go to the next element. This quantity
+        /// is computed from how large (in bytes) is a group of elements in the layout. For example,
+        /// if a layout consists of 1 Float2 for Position (xy) and 1 Float3 for Color (rgb), then
+        /// the stride would be 5 floats (or 20 bytes), which is the step required in bytes to get
+        /// from one element to the next associated element (e.g. have to jump 20 bytes to get from
+        /// one position element to the next position element).
+        uint32 stride() const { return m_Stride; }
 
         /// Returns a mutable reference to the container of the elements in the layout
         std::vector<CVertexBufferElement>& elements() { return m_Elements; }
 
-        /// Returns a immutable reference to the container of the elements in the layout
+        /// Returns an immutable reference to the container of the elements in the layout
         const std::vector<CVertexBufferElement>& elements() const { return m_Elements; }
 
     private :

@@ -1,11 +1,12 @@
+/// @file CVertexBuffer.h
+/// @brief Vertex Buffer implementation
 #pragma once
 
-#include <CCommon.h>
 #include <core/CVertexBufferLayout.h>
 
 namespace engine
 {
-    /// Vertex Buffer Object (VBO) abstraction class, used to store data vertex-data on the GPU
+    /// Vertex Buffer Object (VBO) abstraction class, used to store vertex-data on the GPU
     ///
     /// @details
     /// Defines the functionality of a Vertex Buffer Object, which is used to hold vertex-data
@@ -14,18 +15,18 @@ namespace engine
     {
     public :
 
-        /// Creates a VBO with a given layout, usage and initialized data
+        /// Creates a VBO with a given layout, usage, size and vertex-data
         ///
-        /// @param layout     Layout of the data to be stored in GPU memory
-        /// @param usage      Hint for the type of usage for this buffer in GPU memory
-        /// @param size       Size of the buffer (in bytes) in GPU memory
-        /// @param data       Pointer to the data in CPU to be transferred to GPU memory
+        /// @param layout Layout of the data to be stored in GPU memory
+        /// @param usage Hint for the type of usage for this buffer in GPU memory
+        /// @param size Size of the buffer (in bytes) in GPU memory
+        /// @param data Pointer to the data in CPU to be transferred to GPU memory
         CVertexBuffer( const CVertexBufferLayout& layout, 
                        const eBufferUsage& usage, 
                        const uint32& size, 
                        const float32* data );
 
-        /// Destroys the current VBO and releases its resources in GPU
+        /// Destroys the current VBO and releases its resources on GPU
         ~CVertexBuffer();
 
         /// Resizes the GPU-buffer to the required size
@@ -44,8 +45,8 @@ namespace engine
         /// this transfer (it depends on the backend, currently only OpenGL), this VBO must have
         /// been given the DYNAMIC hint during creation.
         ///
-        /// @param size     How much data (in bytes) will be transferred from CPU to GPU.
-        /// @param data     Pointer to the memory in CPU to be transferred to GPU.
+        /// @param size How much data (in bytes) will be transferred from CPU to GPU.
+        /// @param data Pointer to the memory in CPU to be transferred to GPU.
         void UpdateData( const uint32& size, const float32* data );
 
         /// Binds the current VBO such that subsequent draw calls are executed with its data
@@ -53,6 +54,9 @@ namespace engine
 
         /// Unbinds the current VBO such that subsequent draw calls won't use its data
         void Unbind();
+
+        /// Returns the string representation of this vertex-buffer
+        std::string ToString() const;
 
         /// Returns the layout representation of this VBO
         CVertexBufferLayout layout() const { return m_Layout; }

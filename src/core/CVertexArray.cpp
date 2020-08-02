@@ -5,87 +5,63 @@ namespace engine
 {
     CVertexArray::CVertexArray()
     {
-        m_numAttribIndx = 0;
-        m_openglId      = 0;
-        m_indexBuffer   = nullptr;
-
-        glGenVertexArrays( 1, &m_openglId );
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Vertex Array Object" );
-        else
-            std::cout << "Allocs: Created Vertex Array Object" << std::endl;
-    #endif
+        glGenVertexArrays( 1, &m_OpenglID );
     }
 
     CVertexArray::~CVertexArray()
     {
-        // released owned VBOs
-        m_vertexBuffers.clear();
-        // release owned EBO
-        m_indexBuffer = nullptr;
+        m_VertexBuffers.clear();
+        m_IndexBuffer = nullptr;
 
-        glDeleteVertexArrays( 1, &m_openglId );
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Array Object" );
-        else
-            std::cout << "Allocs: Destroyed Vertex Array Object" << std::endl;
-    #endif
+        glDeleteVertexArrays( 1, &m_OpenglID );
     }
 
-    void CVertexArray::addVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced )
+    void CVertexArray::AddVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced )
     {
-        // setup the VBO within our VAO according to its layout
-        auto _buffLayout = vertexBuffer->layout();
-        auto _buffElements = _buffLayout.elements();
+        auto buffer_layout = vertexBuffer->layout();
+        auto buffer_elements = buffer_layout.elements();
 
-        bind();
+        Bind();
         vertexBuffer->Bind();
 
-        for ( size_t i = 0; i < _buffElements.size(); i++ )
+        for ( const auto& buffer_element : buffer_elements )
         {
-            glEnableVertexAttribArray( m_numAttribIndx );
-            glVertexAttribPointer( m_numAttribIndx,
-                                   _buffElements[i].count,
-                                   ToOpenGLType( _buffElements[i].type ),
-                                   _buffElements[i].normalized ? GL_TRUE : GL_FALSE,
-                                   _buffLayout.stride(),
-                                   (const void*) (intptr_t) _buffElements[i].offset );
+            glEnableVertexAttribArray( m_NumAttribIndx );
+            glVertexAttribPointer( m_NumAttribIndx,
+                                   buffer_element.count,
+                                   ToOpenGLType( buffer_element.type ),
+                                   buffer_element.normalized ? GL_TRUE : GL_FALSE,
+                                   buffer_layout.stride(),
+                                   (const void*) (intptr_t) buffer_element.offset );
             if ( isInstanced )
-                glVertexAttribDivisor( m_numAttribIndx, 1 );
+                glVertexAttribDivisor( m_NumAttribIndx, 1 );
 
-            m_numAttribIndx++;
+            m_NumAttribIndx++;
         }
 
         vertexBuffer->Unbind();
-        unbind();
+        Unbind();
 
-        // keep a reference only
-        // keep a reference only
-        m_vertexBuffers.push_back( std::move( vertexBuffer ) );
+        m_VertexBuffers.push_back( std::move( vertexBuffer ) );
     }
 
-    void CVertexArray::setIndexBuffer( std::unique_ptr<CIndexBuffer> indexBuffer )
+    void CVertexArray::SetIndexBuffer( std::unique_ptr<CIndexBuffer> indexBuffer )
     {
-        // setup the IBO within our VAO
-        glBindVertexArray( m_openglId );
-        indexBuffer->bind();
+        glBindVertexArray( m_OpenglID );
+        indexBuffer->Bind();
         glBindVertexArray( 0 );
-        indexBuffer->unbind();
+        indexBuffer->Unbind();
 
-        // keep a reference only
-        m_indexBuffer = std::move( indexBuffer );
+        m_IndexBuffer = std::move( indexBuffer );
     }
 
-    void CVertexArray::bind()
+    void CVertexArray::Bind()
     {
-        glBindVertexArray( m_openglId );
+        glBindVertexArray( m_OpenglID );
     }
 
-    void CVertexArray::unbind()
+    void CVertexArray::Unbind()
     {
         glBindVertexArray( 0 );
     }
-
 }

@@ -13,25 +13,11 @@ namespace engine
         glBindBuffer( GL_ARRAY_BUFFER, m_OpenglID );
         glBufferData( GL_ARRAY_BUFFER, m_Size, data, ToOpenGLEnum( m_Usage ) );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Vertex Buffer" );
-        else
-            std::cout << "Allocs: Created Vertex Buffer" << std::endl;
-    #endif
     }
 
     CVertexBuffer::~CVertexBuffer()
     {
         glDeleteBuffers( 1, &m_OpenglID );
-
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Vertex Buffer" );
-        else
-            std::cout << "Allocs: Destroyed Vertex Buffer" << std::endl;
-    #endif
     }
 
     void CVertexBuffer::Resize( const uint32& size )
@@ -49,8 +35,8 @@ namespace engine
     {
         if ( m_Size != size )
         {
-            ENGINE_CORE_WARN( "CVertexBuffer::updateData >>> tried updating data for a buffer with \
-                               different size. Resizing to avoid any conflicts" );
+            ENGINE_CORE_WARN( "CVertexBuffer::updateData >>> tried updating data for a buffer with "
+                              "different size. Resizing to avoid any conflicts" );
             Resize( size );
         }
 
@@ -67,5 +53,16 @@ namespace engine
     void CVertexBuffer::Unbind()
     {
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
+
+    std::string CVertexBuffer::ToString() const
+    {
+        std::string strrep = "VertexBuffer(\n";
+        strrep += "cpp-address  : " + tinyutils::PointerToHexAddress( this ) + "\n";
+        strrep += "size         : " + std::to_string( m_Size ) + "\n";
+        strrep += "usage        : " + engine::ToString( m_Usage ) + "\n";
+        strrep += "opengl-id    : " + std::to_string( m_OpenglID ) + "\n";
+        strrep += ")";
+        return strrep;
     }
 }

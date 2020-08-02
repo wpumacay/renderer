@@ -3,70 +3,66 @@
 
 namespace engine
 {
-    CIndexBuffer::CIndexBuffer( const eBufferUsage& bufferUsage,
-                                uint32 bufferCount,
-                                uint32* bufferData )
-        : m_bufferUsage( bufferUsage ), m_bufferCount( bufferCount )
+    CIndexBuffer::CIndexBuffer( const eBufferUsage& usage,
+                                const uint32& count,
+                                const uint32* data )
+        : m_Usage( usage ), m_Count( count )
     {
         // create gl-ibo resource and send the initial data to it
-        glGenBuffers( 1, &m_openglId );
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, 
-                      m_bufferCount * sizeof( uint32 ), 
-                      bufferData,
-                      ToOpenGLEnum( m_bufferUsage ) );
+        glGenBuffers( 1, &m_OpenglID );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_OpenglID );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_Count * sizeof(uint32), data, ToOpenGLEnum( m_Usage ) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Index Buffer" );
-        else
-            std::cout << "Allocs: Created Index Buffer" << std::endl;
-    #endif
     }
 
     CIndexBuffer::~CIndexBuffer()
     {
-        glDeleteBuffers( 1, &m_openglId );
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Index Buffer" );
-        else
-            std::cout << "Allocs: Destroyed Index Buffer" << std::endl;
-    #endif
+        glDeleteBuffers( 1, &m_OpenglID );
     }
 
-    void CIndexBuffer::resize( uint32 bufferCount )
+    void CIndexBuffer::Resize( const uint32& count )
     {
-        if ( m_bufferCount == bufferCount )
+        if ( m_Count == count )
             return; // no need to resize the buffer (same size requested)
 
-        m_bufferCount = bufferCount;
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferCount * sizeof( uint32 ), NULL, ToOpenGLEnum( m_bufferUsage ) );
+        m_Count = count;
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_OpenglID );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, count * sizeof( uint32 ), NULL, ToOpenGLEnum( m_Usage ) );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
 
-    void CIndexBuffer::updateData( uint32 bufferCount, uint32* bufferData )
+    void CIndexBuffer::UpdateData( const uint32& count, const uint32* data )
     {
-        if ( bufferCount != m_bufferCount )
+        if ( m_Count != count )
         {
-            ENGINE_CORE_WARN( "CIndexBuffer::updateData >>> tried updating data for a buffer with \
-                              different size. Resizing to avoid any conflicts" );
-            resize( bufferCount );
+            ENGINE_CORE_WARN( "CIndexBuffer::updateData >>> tried updating data for a buffer with "
+                              "different size. Resizing to avoid any conflicts" );
+            Resize( count );
         }
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
-        glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, bufferCount * sizeof( uint32 ), bufferData );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_OpenglID );
+        glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, count * sizeof(uint32), data );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
 
-    void CIndexBuffer::bind()
+    void CIndexBuffer::Bind()
     {
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_openglId );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_OpenglID );
     }
 
-    void CIndexBuffer::unbind()
+    void CIndexBuffer::Unbind()
     {
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    }
+
+    std::string CIndexBuffer::ToString() const
+    {
+        std::string strrep = "IndexBuffer(\n";
+        strrep += "cpp-address  : " + tinyutils::PointerToHexAddress( this ) + "\n";
+        strrep += "count        : " + std::to_string( m_Count ) + "\n";
+        strrep += "usage        : " + engine::ToString( m_Usage ) + "\n";
+        strrep += "opengl-id    : " + std::to_string( m_OpenglID ) + "\n";
+        strrep += ")";
+        return strrep;
     }
 }

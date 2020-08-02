@@ -63,9 +63,9 @@ namespace engine
         return 0;
     }
 
-    /**************************************************************************
-    *                         CVertexBufferElement impl.                      *
-    ***************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                 CVertexBufferElement impl.                                 //
+    //--------------------------------------------------------------------------------------------//
 
     CVertexBufferElement::CVertexBufferElement()
     {
@@ -89,9 +89,9 @@ namespace engine
         this->normalized    = normalized;
     }
 
-    /**************************************************************************
-    *                         CVertexBufferLayout impl.                       *
-    ***************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                  CVertexBufferLayout impl.                                 //
+    //--------------------------------------------------------------------------------------------//
 
     CVertexBufferLayout::CVertexBufferLayout()
     {
@@ -110,6 +110,19 @@ namespace engine
         m_Stride = 0;
         m_Elements = elements;
         _Initialize();
+    }
+
+    std::string CVertexBufferLayout::ToString() const
+    {
+        std::string strrep = "VertexBufferLayout(\n";
+        strrep += "cpp-address  : " + tinyutils::PointerToHexAddress( this ) + "\n";
+        strrep += "num_elements : " + std::to_string( m_Elements.size() ) + "\n";
+        strrep += "layout       : \n";
+            for ( ssize_t i = 0; i < m_Elements.size(); i++ )
+                strrep += "\t{ " + m_Elements[i].name + ", " + engine::ToString( m_Elements[i].type ) + 
+                          ", " + std::string( m_Elements[i].normalized ? "true" : "false" ) + " }\n";
+        strrep += ")";
+        return strrep;
     }
 
     void CVertexBufferLayout::_Initialize()

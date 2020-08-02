@@ -1,3 +1,5 @@
+/// @file CVertexArray.h
+/// @brief Vertex Array implementation
 #pragma once
 
 #include <core/CVertexBuffer.h>
@@ -5,140 +7,71 @@
 
 namespace engine
 {
-
-    /**
-    *   @brief VAO (Vertex Array Object) abstraction class
-    *
-    *   @details
-    *   Defines the functionality of a Vertex Array Object, which can hold the
-    *   information from VBOs and EBOs in a group that can be either bind or
-    *   unbind with just one single call. Ownership of the related VBOs and EBOs
-    *   belongs to this object once these transferred to this VAO.
-    *
-    */
+    /// Vertex Array Object (VAO) abstraction class, used to handle VBOs and IBOs
+    ///
+    /// @details
+    /// Defines the functionality of a Vertex Array Object, which can hold the
+    /// information of VBOs and IBOs in a group that can be either bound or
+    /// unbound with just one single call. Ownership of the related VBOs and IBOs
+    /// belongs to this object once these are transferred to this VAO.
     class CVertexArray
     {
 
     public :
 
-        /**
-        *   @brief Creates a Vertex Array Object and initializes its OpenGL resources.
-        *
-        *   @param track    Whether or not to keep track of the allocations of this object
-        */
+        /// Creates a Vertex Array Object and initializes its OpenGL resources
         CVertexArray();
 
-        /**
-        *   @brief Destroys this VAO and releases the owned OpenGL resources, as well as owned VBOs and EBOs
-        */
+        /// Destroys this VAO and releases the owned OpenGL resources, as well as owned VBOs and IBOs
         ~CVertexArray();
 
-        /**
-        *   @brief Adds the given VBO to the group defined by this VAO, and transfers its ownership
-        *
-        *   @param vertexBuffer VBO being transferred to this group
-        *   @param isInstanced  Whether or not to create instancing divisors
-        *
-        *   Example:
-        *   @code
-        *       // create some VBOs
-        *       auto vboPosition = ...;
-        *       auto vboColor = ...;
-        *       // move these VBOs to this VAO
-        *       vao->addVertexBuffer( std::move( vboPosition ) );
-        *       vao->addVertexBuffer( std::move( vboColor ) );
-        *   @endcode
-        */
-        void addVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced = false );
+        /// Adds the given VBO to the group defined by this VAO, and transfers its ownership
+        ///
+        /// @param vertexBuffer VBO being transferred to this group
+        /// @param isInstanced Whether or not to create instancing divisors
+        void AddVertexBuffer( std::unique_ptr<CVertexBuffer> vertexBuffer, bool isInstanced = false );
 
-        /**
-        *   @brief Adds the given EBO to the group defined by this VAO, and transfers its ownership
-        *
-        *   @param indexBuffer  EBO being transferred to this group
-        */
-        void setIndexBuffer( std::unique_ptr<CIndexBuffer> indexBuffer );
+        /// Adds the given IBO to the group defined by this VAO, and transfers its ownership
+        ///
+        /// @param indexBuffer  IBO being transferred to this group
+        void SetIndexBuffer( std::unique_ptr<CIndexBuffer> indexBuffer );
 
-        /**
-        *   @brief Binds the current VAO, setting the gl-fsm to the appropriate state
-        *
-        *   Example:
-        *   @code
-        *       // bind current VAO (binds current VBOs, EBO to the gl state machine)
-        *       vao->bind();
-        *       // draw something using the current buffer bound to the gl-fsm
-        *       glDrawElements( GL_TRIANGLES, vao->indexBuffer()->count(), GL_UNSIGNED_INT, NULL );
-        *   @endcode
-        */
-        void bind();
+        /// Binds the current VAO, setting the gl-fsm to the appropriate state
+        void Bind();
 
-        /**
-        *   @brief Unbinds the current VAO, setting the gl-fsm to the 0 state
-        *
-        *   Example:
-        *   @code
-        *       // draw something using the current buffer bound to the gl-fsm
-        *       glDrawElements( GL_TRIANGLES, vao->indexBuffer()->count(), GL_UNSIGNED_INT, NULL );
-        *       // unbind the VBOs and EBO from the fsm (to let other VAOs work afterwards)
-        *       vao->unbind();
-        *   @endcode
-        */
-        void unbind();
+        /// Unbinds the current VAO, setting the gl-fsm to the 0 state
+        void Unbind();
 
-        /**
-        *   @brief Returns a mutable reference to the currently owned VBOs
-        *
-        *   @return     Mutable-reference to the container (std::vector) storing the owned VBOs
-        */
-        std::vector< std::unique_ptr<CVertexBuffer> >& vertexBuffers() { return m_vertexBuffers; }
+        /// Returns mutable references to the owned VBOs in this vertex array
+        std::vector<CVertexBuffer*> vertex_buffers();
 
-        /**
-        *   @brief Returns a immutable (const) reference to the currently owned VBOs
-        *
-        *   @return     Const-reference to the container (std::vector) storing the owned VBOs
-        */
-        const std::vector< std::unique_ptr<CVertexBuffer> >& vertexBuffers() const { return m_vertexBuffers; }
+        /// Returns immutable (const) references to the owned VBOs in this vertex array
+        std::vector<const CVertexBuffer*> vertex_buffers() const;
 
-        /**
-        *   @brief Returns a mutable reference to the currently owned EBO
-        *
-        *   @return     Mutable-reference to the owned EBO
-        */
-        std::unique_ptr<CIndexBuffer>& indexBuffer() { return m_indexBuffer; }
+        
+        /// Returns a mutable reference to the currently owned IBO
+        CIndexBuffer* index_buffer() { return m_IndexBuffer.get(); }
 
-        /**
-        *   @brief Returns a immutable (const) reference to the currently owned EBO
-        *
-        *   @return     Const-reference to the owned EBO
-        */
-        const std::unique_ptr<CIndexBuffer>& indexBuffer() const { return m_indexBuffer; }
+        /// Returns an immutable (const) reference to the currently owned IBO
+        const CIndexBuffer* index_buffer() const { return m_IndexBuffer.get(); }
 
-        /**
-        *   @brief Returns the uint32 identifier of the OpenGL object related to this VAO
-        *
-        *   @return     Identifier of this VAO inside OpenGL
-        */
-        uint32 openglId() const { return m_openglId; }
+        /// Returns the uint32 identifier of the OpenGL object related to this VAO
+        uint32 opengl_id() const { return m_OpenglID; }
 
-        /**
-        *   @brief Returns the current number of attributes in the VAO
-        *
-        *   @return     Integer representing the current number of attribs in the VAO
-        */
-        uint32 numAttribs() const { return m_numAttribIndx; }
+        /// Returns the current number of attributes in the VAO
+        uint32 num_attribs() const { return m_NumAttribIndx; }
 
     private :
 
-        /** @brief Container for the owner Vertex Buffer Objects */
-        std::vector< std::unique_ptr<CVertexBuffer> > m_vertexBuffers;
+        /// Container for the owner Vertex Buffer Objects
+        std::vector<std::unique_ptr<CVertexBuffer>> m_VertexBuffers;
+        /// Owned Element Buffer Object
+        std::unique_ptr<CIndexBuffer> m_IndexBuffer = nullptr;
+        /// Index of the current available slot in the attributePointer list of the VAO
+        uint32 m_NumAttribIndx = 0;
+        /// Identifier of this VAO in OpenGL
+        uint32 m_OpenglID = 0;
 
-        /** @brief Owned Element Buffer Object */
-        std::unique_ptr<CIndexBuffer> m_indexBuffer;
-
-        /** @brief Index of the current available slot in the attributePointer list of the VAO */
-        uint32 m_numAttribIndx;
-
-        /** @brief Identifier of this VAO in OpenGL */
-        uint32 m_openglId;
+        ADD_CLASS_SMART_POINTERS(CVertexArray);
     };
-
 }

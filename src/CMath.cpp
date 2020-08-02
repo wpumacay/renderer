@@ -87,17 +87,9 @@ namespace engine
         return strrep;
     }
 
-    std::string ToString( const CLine& line )
-    {
-        std::string strrep;
-        strrep += "start   : " + engine::ToString( line.start ) + "\n\r";
-        strrep += "end     : " + engine::ToString( line.end ) + "\n\r";
-        return strrep;
-    }
-
-    /**************************************************************************
-    *                            Matrix4x4 helpers                            *
-    ***************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                   Matrix4x4 helpers                                        //
+    //--------------------------------------------------------------------------------------------//
 
     CMat4 Perspective( float32 fov, float32 aspect, float32 zNear, float32 zFar )
     {
@@ -225,9 +217,9 @@ namespace engine
         return resmat;
     }
 
-    /**************************************************************************
-    *                           CInd3 implementation                          *
-    ***************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                   CInd3 implementation                                     //
+    //--------------------------------------------------------------------------------------------//
 
     CInd3::CInd3()
     {
@@ -256,11 +248,19 @@ namespace engine
         return strrep;
     }
 
-    /**************************************************************************
-    *                           Geometric helpers                             *
-    ***************************************************************************/
+    //--------------------------------------------------------------------------------------------//
+    //                                   Geometric helpers                                        //
+    //--------------------------------------------------------------------------------------------//
 
-    void computeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp )
+    std::string ToString( const CLine& line )
+    {
+        std::string strrep;
+        strrep += "start   : " + engine::ToString( line.start ) + "\n\r";
+        strrep += "end     : " + engine::ToString( line.end ) + "\n\r";
+        return strrep;
+    }
+
+    void ComputeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp )
     {
         auto _front = axis1.normalized();
 
@@ -285,22 +285,22 @@ namespace engine
         }
     }
 
-    float32 signedDistToPlane( const CVec3& point, const CPlane& plane )
+    float32 SignedDistToPlane( const CVec3& point, const CPlane& plane )
     {
         return ( point - plane.position ).dot( plane.normal.normalized() );
     }
 
-    float32 distToPlane( const CVec3& point, const CPlane& plane )
+    float32 DistToPlane( const CVec3& point, const CPlane& plane )
     {
-        return std::abs( signedDistToPlane( point, plane ) );
+        return std::abs( SignedDistToPlane( point, plane ) );
     }
 
-    CVec3 projInPlane( const CVec3& point, const CPlane& plane )
+    CVec3 ProjInPlane( const CVec3& point, const CPlane& plane )
     {
-        return point - distToPlane( point, plane ) * plane.normal.normalized();
+        return point - DistToPlane( point, plane ) * plane.normal.normalized();
     }
 
-    std::array< CVec3, 8 > computeBoxCorners( const CBoundingBox& bbox )
+    std::array< CVec3, 8 > ComputeBoxCorners( const CBoundingBox& bbox )
     {
         std::array< CVec3, 8 > _cornersInModel = { CVec3( -0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
                                                    CVec3(  0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
@@ -371,10 +371,10 @@ namespace engine
         planes[5].normal = tinymath::cross( corners[5] - corners[4], corners[0] - corners[4] ).normalized();
     }
 
-    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingBox& bbox )
+    bool CertainlyOutsideFrustum( const CFrustum& frustum, const CBoundingBox& bbox )
     {
         CComparatorSignedDistancePlane _comparator;
-        auto _corners = computeBoxCorners( bbox );
+        auto _corners = ComputeBoxCorners( bbox );
 
         // Do the check with min-vertex only to discard most-outsiders. For cases in which ...
         // false is returned, the bbox might be inside, intersecting, or even outside in weird cases, ...
@@ -385,45 +385,41 @@ namespace engine
         {
             _comparator.plane = frustum.planes[i];
             auto _minVertex = *std::min_element( _corners.begin(), _corners.end(), _comparator );
-            if ( signedDistToPlane( _minVertex, frustum.planes[i] ) > 0.0f )
+            if ( SignedDistToPlane( _minVertex, frustum.planes[i] ) > 0.0f )
                 return true;
         }
 
         return false;
     }
 
-    bool certainlyOutsideFrustum( const CFrustum& frustum, const CBoundingSphere& bsphere )
+    bool CertainlyOutsideFrustum( const CFrustum& frustum, const CBoundingSphere& bsphere )
     {
         // Similarly to the previous case, discard most outsiders
         for ( size_t i = 0; i < frustum.planes.size(); i++ )
-            if ( signedDistToPlane( bsphere.worldPosition, frustum.planes[i] ) > bsphere.radius )
+            if ( SignedDistToPlane( bsphere.worldPosition, frustum.planes[i] ) > bsphere.radius )
                 return true;
 
         return false;
     }
 
-    void computeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex )
+    void ComputeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex )
     {
         CComparatorSignedDistancePlane _comparator;
         _comparator.plane = plane;
 
-        auto _corners = computeBoxCorners( bbox );
+        auto _corners = ComputeBoxCorners( bbox );
         std::sort( _corners.begin(), _corners.end(), _comparator );
 
         minVertex = _corners.front();
         maxVertex = _corners.back();
     }
 
-    /**************************************************************************
-    *                             Extra helpers                               *
-    ***************************************************************************/
-
-    float32 toRadians( float32 angle )
+    float32 ToRadians( float32 angle )
     {
         return angle * engine::PI / 180;
     }
 
-    float32 toDegrees( float32 angle )
+    float32 ToDegrees( float32 angle )
     {
         return angle * 180 / engine::PI;
     }
