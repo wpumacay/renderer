@@ -5,74 +5,73 @@ using namespace std;
 
 namespace engine
 {
-    std::string toString( const eWindowType& type )
+    std::string ToString( const eWindowType& type )
     {
-        if ( type == eWindowType::NONE ) return "none";
-        else if ( type == eWindowType::GLFW ) return "glfw";
+        /**/ if ( type == eWindowType::WINDOWED_GLFW ) return "windowed_glfw";
         else if ( type == eWindowType::HEADLESS_EGL ) return "headless_egl";
 
         return "undefined";
     }
 
-    void CIWindow::enableCursor()
+    void CIWindow::RegisterKeyCallback( FnPtr_keyboard_callback callback )
     {
-        _enableCursorInternal();
+        m_Properties.callbackKey = callback;
     }
 
-    void CIWindow::disableCursor()
+    void CIWindow::RegisterMouseCallback( FnPtr_mouse_callback callback )
     {
-        _disableCursorInternal();
+        m_Properties.callbackMouse = callback;
     }
 
-    void CIWindow::begin()
+    void CIWindow::RegisterMouseMoveCallback( FnPtr_mousemove_callback callback )
     {
-        glClearColor( m_properties.clearColor.x(), 
-                      m_properties.clearColor.y(),
-                      m_properties.clearColor.z(),
-                      m_properties.clearColor.w() );
+        m_Properties.callbackMouseMove = callback;
+    }
+
+    void CIWindow::RegisterScrollCallback( FnPtr_scroll_callback callback )
+    {
+        m_Properties.callbackScroll = callback;
+    }
+
+    void CIWindow::RegisterResizeCallback( FnPtr_resize_callback callback )
+    {
+        m_Properties.callbackResize = callback;
+    }
+
+    void CIWindow::EnableCursor()
+    {
+        _EnableCursorInternal();
+    }
+
+    void CIWindow::DisableCursor()
+    {
+        _DisableCursorInternal();
+    }
+
+    void CIWindow::Begin()
+    {
+        glClearColor( m_Properties.clearColor.x(), 
+                      m_Properties.clearColor.y(),
+                      m_Properties.clearColor.z(),
+                      m_Properties.clearColor.w() );
 
         glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
         
-        _beginInternal();
+        _BeginInternal();
     }
 
-    void CIWindow::end()
+    void CIWindow::End()
     {
-        _endInternal();
+        _EndInternal();
     }
 
-    bool CIWindow::active()
+    bool CIWindow::Active()
     { 
-        return _activeInternal();
+        return _ActiveInternal();
     }
 
-    void CIWindow::requestClose() 
+    void CIWindow::RequestClose() 
     { 
-        _requestCloseInternal();
-    }
-
-    void CIWindow::registerKeyCallback( FnPtr_keyboard_callback callback )
-    {
-        m_properties.callbackKey = callback;
-    }
-
-    void CIWindow::registerMouseCallback( FnPtr_mouse_callback callback )
-    {
-        m_properties.callbackMouse = callback;
-    }
-
-    void CIWindow::registerMouseMoveCallback( FnPtr_mousemove_callback callback )
-    {
-        m_properties.callbackMouseMove = callback;
-    }
-
-    void CIWindow::registerScrollCallback( FnPtr_scroll_callback callback )
-    {
-        m_properties.callbackScroll = callback;
-    }
-
-    void CIWindow::registerResizeCallback( FnPtr_resize_callback callback )
-    {
-        m_properties.callbackResize = callback;
+        _RequestCloseInternal();
     }
 }

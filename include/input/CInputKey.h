@@ -1,27 +1,32 @@
+/// @file CInputKey.h
+/// @brief Keyboard-related definitions
 #pragma once
 
-// Copied from cherno's hazel engine: 
+// Adapted from Cherno's hazel engine:
 //      https://github.com/TheCherno/Hazel/blob/55fc4392f4bb44d94a54f09522d5545a86dfc48a/Hazel/src/Hazel/KeyCodes.h
 
 namespace engine
 {
-    const int MAX_KEYS = 512;
+    /// Maximum number of key-codes possible
+    constexpr ssize_t MAX_KEYS = 512;
 
+    /// States in which the keys of the keyboard can be
     enum KeyAction
     {
-        KEY_RELEASED = 0,
-        KEY_PRESSED = 1,
-        KEY_REPEAT = 2
+        KEY_RELEASED = 0, ///< Key has just been released
+        KEY_PRESSED = 1,  ///< Key has just been pressed
+        KEY_REPEAT = 2    ///< Key is still pressed
     };
 
+    /// Available key-codes associated to the keys in the keyboard
     enum Keys
     {
         KEY_SPACE           = 32,
-        KEY_APOSTROPHE      = 39,  /* ' */
-        KEY_COMMA           = 44,  /* , */
-        KEY_MINUS           = 45,  /* - */
-        KEY_PERIOD          = 46,  /* . */
-        KEY_SLASH           = 47,  /* / */
+        KEY_APOSTROPHE      = 39,  // ' //
+        KEY_COMMA           = 44,  // , //
+        KEY_MINUS           = 45,  // - //
+        KEY_PERIOD          = 46,  // . //
+        KEY_SLASH           = 47,  // / //
         KEY_0               = 48,
         KEY_1               = 49,
         KEY_2               = 50,
@@ -32,8 +37,8 @@ namespace engine
         KEY_7               = 55,
         KEY_8               = 56,
         KEY_9               = 57,
-        KEY_SEMICOLON       = 59,  /* ; */
-        KEY_EQUAL           = 61,  /* = */
+        KEY_SEMICOLON       = 59,  // ; //
+        KEY_EQUAL           = 61,  // = //
         KEY_A               = 65,
         KEY_B               = 66,
         KEY_C               = 67,
@@ -60,13 +65,13 @@ namespace engine
         KEY_X               = 88,
         KEY_Y               = 89,
         KEY_Z               = 90,
-        KEY_LEFT_BRACKET    = 91,  /* [ */
-        KEY_BACKSLASH       = 92,  /* \ */
-        KEY_RIGHT_BRACKET   = 93,  /* ] */
-        KEY_GRAVE_ACCENT    = 96,  /* ` */
-        KEY_WORLD_1         = 161, /* non-US #1 */
-        KEY_WORLD_2         = 162, /* non-US #2 */
-        /* Function keys */
+        KEY_LEFT_BRACKET    = 91,  // [ //
+        KEY_BACKSLASH       = 92,  // \ //
+        KEY_RIGHT_BRACKET   = 93,  // ] //
+        KEY_GRAVE_ACCENT    = 96,  // ` //
+        KEY_WORLD_1         = 161, // non-US #1 //
+        KEY_WORLD_2         = 162, // non-US #2 //
+        // Function keys //
         KEY_ESCAPE          = 256,
         KEY_ENTER           = 257,
         KEY_TAB             = 258,
