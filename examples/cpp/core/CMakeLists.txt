@@ -2,6 +2,10 @@
 message( "ENGINE> Configuring samples: CORE" )
 
 file( GLOB SampleFilesCore *.cpp )
+set( SampleFilesCore
+     #### "sample_buffers.cpp"
+     #### "sample_texture.cpp"
+     "sample_window.cpp" )
 
 foreach( sampleFile ${SampleFilesCore} )
     # remove extension from sample file

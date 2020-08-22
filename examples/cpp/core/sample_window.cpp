@@ -1,5 +1,5 @@
 
-#include <CEngine.h>
+#include <gl/CWindowGLFW.h>
 
 bool g_terminate = false;
 int g_numClicks = 0;
@@ -28,33 +28,35 @@ void scrollCallback( double xOff, double yOff )
     ENGINE_TRACE( "xOff: {0}, y: {1}", xOff, yOff );
 }
 
+void resizeCallback( int newWidth, int newHeight )
+{
+    ENGINE_TRACE( "window-width: {0}, window-height: {1}", newWidth, newHeight );
+}
+
 int main()
 {
     tinyutils::Logger::Init();
 
-    auto _windowProps = engine::CWindowProps();
-    _windowProps.width = 800;
-    _windowProps.height = 600;
-    _windowProps.title = "sample-window-c++";
-    _windowProps.clearColor = { 0.2f, 0.4f, 0.8f, 1.0f };
+    auto window_props = engine::CWindowProps();
+    window_props.width = 800;
+    window_props.height = 600;
+    window_props.title = "sample-window-c++";
+    window_props.resizable = true;
+    window_props.clearColor = { 0.2f, 0.4f, 0.8f, 1.0f };
 
-    auto _window = std::make_unique<engine::CWindowGLFW>( _windowProps );
-    _window->registerKeyCallback( keyCallback );
-    _window->registerMouseCallback( mouseCallback );
-    _window->registerMouseMoveCallback( mouseMoveCallback );
-    _window->registerScrollCallback( scrollCallback );
+    auto window = engine::CWindowGLFW::Create( window_props );
+    window->RegisterKeyCallback( keyCallback );
+    window->RegisterMouseCallback( mouseCallback );
+    window->RegisterMouseMoveCallback( mouseMoveCallback );
+    window->RegisterScrollCallback( scrollCallback );
+    window->RegisterResizeCallback( resizeCallback );
 
-    while( _window->active() )
+    while( window->Active() )
     {
-        tinyutils::Clock::Tick();
-        _window->begin();
-
+        window->Begin();
         if ( g_terminate )
-            _window->requestClose();
-
-        _window->end();
-        tinyutils::Clock::Tock();
+            window->RequestClose();
+        window->End();
     }
-
     return 0;
 }
