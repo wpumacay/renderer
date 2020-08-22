@@ -1,3 +1,5 @@
+/// @file CWindowEGL.h
+/// @brief Implementation of the window-class with EGL backend
 #pragma once
 
 #include <glad/egl.h>
@@ -5,37 +7,73 @@
 
 namespace engine
 {
+    /// \class CWindowEGL
+    /// \brief Window class definition that uses EGL as windowing-backend
     class CWindowEGL : public CIWindow
     {
     public :
 
+        /// \brief Constructs an EGL-backed window given user properties
         CWindowEGL( const CWindowProps& properties );
+
+        /// \brief Releases the resources of this window
         ~CWindowEGL();
 
-        EGLConfig& eglConfig() { return m_eglConfig; }
-        EGLDisplay& eglDisplay() { return m_eglDisplay; }
-        EGLSurface& eglSurface() { return m_eglSurface; }
-        EGLContext& eglContext() { return m_eglContext; }
+        /// \brief Returns a reference to the egl-config struct
+        EGLConfig& eglConfig() { return m_EGLConfig; }
 
-        const EGLConfig& eglConfig() const { return m_eglConfig; }
-        const EGLDisplay& eglDisplay() const { return m_eglDisplay; }
-        const EGLSurface& eglSurface() const { return m_eglSurface; }
-        const EGLContext& eglContext() const { return m_eglContext; }
+        /// \brief Returns an unmutable reference to the egl-config struct
+        const EGLConfig& eglConfig() const { return m_EGLConfig; }
+
+        /// \brief Returns a reference to the egl-display struct
+        EGLDisplay& eglDisplay() { return m_EGLDisplay; }
+
+        /// \brief Returns an unmutable reference to the egl-display struct
+        const EGLDisplay& eglDisplay() const { return m_EGLDisplay; }
+
+        /// \brief Returns a reference to the egl-surface struct
+        EGLSurface& eglSurface() { return m_EGLSurface; }
+
+        /// \brief Returns an unmutable reference to the egl-surface struct
+        const EGLSurface& eglSurface() const { return m_EGLSurface; }
+
+        /// \brief Returns a reference to the egl-context struct
+        EGLContext& eglContext() { return m_EGLContext; }
+
+        /// \brief Returns an unmutable reference to the egl-context struct
+        const EGLContext& eglContext() const { return m_EGLContext; }
 
     protected :
 
-        void _enableCursorInternal() override;
-        void _disableCursorInternal() override;
-        void _beginInternal() override;
-        void _endInternal() override;
-        bool _activeInternal() override;
-        void _requestCloseInternal() override;
+        // Documentation inherited
+        void _EnableCursorInternal() override;
+
+        // Documentation inherited
+        void _DisableCursorInternal() override;
+
+        // Documentation inherited
+        void _BeginInternal() override;
+
+        // Documentation inherited
+        void _EndInternal() override;
+
+        // Documentation inherited
+        bool _ActiveInternal() override;
+
+        // Documentation inherited
+        void _RequestCloseInternal() override;
 
     private :
 
-        EGLConfig  m_eglConfig;
-        EGLDisplay m_eglDisplay;
-        EGLSurface m_eglSurface;
-        EGLContext m_eglContext;
+        /// EGL-configuration struct
+        EGLConfig m_EGLConfig;
+        /// EGL-display struct
+        EGLDisplay m_EGLDisplay;
+        /// EGL-surface struct
+        EGLSurface m_EGLSurface;
+        /// EGL-context struct
+        EGLContext m_EGLContext;
+
+        ADD_CLASS_SMART_POINTERS(CWindowEGL);
     };
 }

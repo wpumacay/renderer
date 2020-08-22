@@ -1,3 +1,5 @@
+/// @file CWindowGLFW.h
+/// @brief Implementation of the window-class with GLFW backend
 #pragma once
 
 #include <gl/CIWindow.h>
@@ -5,27 +7,59 @@
 
 namespace engine
 {
+    /// Custom deleter for unique_ptr types of GLFWWindow
+    struct GLFWWindowDestructor
+    {
+        void operator() ( GLFWwindow* glfw_window_ptr )
+        {
+            if ( glfw_window_ptr )
+                glfwDestroyWindow( glfw_window_ptr );
+        }
+    };
+
+    /// \class CWindowGLFW
+    /// \brief Window-class definition that uses GLFW as windowing-backend
     class CWindowGLFW : public CIWindow
     {
     public :
 
+        /// \brief Constructs a GLFW-backed window given user-properties
         CWindowGLFW( const CWindowProps& properties );
+
+        /// \brief Releases the resources of this window
         ~CWindowGLFW();
 
-        GLFWwindow* glfwWindow() { return m_glfwWindow; }
+        /// Returns a reference to the internal glfw-window resource
+        GLFWwindow* glfw_window() { return m_GlfwWindow.get(); }
+
+        /// Returns an unmutable reference to the internal glfw-window resource
+        const GLFWwindow* glfw_window() const { return m_GlfwWindow.get(); }
 
     protected :
 
-        void _enableCursorInternal() override;
-        void _disableCursorInternal() override;
-        void _beginInternal() override;
-        void _endInternal() override;
-        bool _activeInternal() override;
-        void _requestCloseInternal() override;
+        // Documentation inherited
+        void _EnableCursorInternal() override;
+
+        // Documentation inherited
+        void _DisableCursorInternal() override;
+
+        // Documentation inherited
+        void _BeginInternal() override;
+
+        // Documentation inherited
+        void _EndInternal() override;
+
+        // Documentation inherited
+        bool _ActiveInternal() override;
+
+        // Documentation inherited
+        void _RequestCloseInternal() override;
 
     private :
 
-        GLFWwindow* m_glfwWindow;
+        /// Handle to glfw-window resource
+        std::unique_ptr<GLFWwindow, GLFWWindowDestructor> m_GlfwWindow;
 
+        ADD_CLASS_SMART_POINTERS(CWindowGLFW);
     };
 }

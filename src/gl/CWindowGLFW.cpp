@@ -7,23 +7,24 @@ namespace engine
         : CIWindow( properties )
 
     {
-        m_type = eWindowType::GLFW;
+        m_Type = eWindowType::WINDOWED_GLFW;
 
         glfwInit();
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, properties.gl_api_version_major );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, properties.gl_api_version_minor );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
     #ifdef __APPLE__
-        glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+        glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE );
     #endif
-        glfwWindowHint( GLFW_RESIZABLE, ( properties.resizable ) ? GL_TRUE : GL_FALSE );
+        glfwWindowHint( GLFW_RESIZABLE, ( properties.resizable ) ? GLFW_TRUE : GLFW_FALSE );
 
-        m_glfwWindow = glfwCreateWindow( m_properties.width,
-                                         m_properties.height,
-                                         m_properties.title.c_str(),
-                                         NULL, NULL );
+        m_GlfwWindow = std::unique_ptr<GLFWwindow, GLFWWindowDestructor>( 
+                                                        glfwCreateWindow( m_Properties.width,
+                                                                          m_Properties.height,
+                                                                          m_Properties.title.c_str(),
+                                                                          NULL, NULL ) );
 
-        if ( !m_glfwWindow )
+        if ( !m_GlfwWindow )
         {
             ENGINE_CORE_ERROR( "CWindowGLFW >>> couldn't create glfw window" );
             glfwTerminate();
@@ -31,108 +32,113 @@ namespace engine
         }
 
         // Initialize modern-gl context using glew (@todo: should replace for glad?)
-        glfwMakeContextCurrent( m_glfwWindow );
+        glfwMakeContextCurrent( m_GlfwWindow.get() );
         glewExperimental = GL_TRUE;
-        ENGINE_CORE_ASSERT( glewInit() == GLEW_OK, "CWindowGLFW >>> Failed to initialize GLEW" );
+        ENGINE_CORE_ASSERT( glewInit() == GLEW_OK, "CWindowGLFW >>> failed to initialize GLEW" );
         ENGINE_CORE_INFO( "OpenGL Info:" );
         ENGINE_CORE_INFO( "\tVendor     : {0}", glGetString( GL_VENDOR ) );
         ENGINE_CORE_INFO( "\tRenderer   : {0}", glGetString( GL_RENDERER ) );
         ENGINE_CORE_INFO( "\tVersion    : {0}", glGetString( GL_VERSION ) );
 
-        glfwSetWindowUserPointer( m_glfwWindow, &m_properties );
+        glfwSetWindowUserPointer( m_GlfwWindow.get(), &m_Properties );
 
-        glfwSetKeyCallback( m_glfwWindow, []( GLFWwindow* pWindow, int key, int scancode, int action, int mode )
+        glfwSetKeyCallback( m_GlfwWindow.get(), []( GLFWwindow* glfw_window_ptr, int key, int scancode, int action, int mode )
             {
-                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto window_props = static_cast<CWindowProps*>( glfwGetWindowUserPointer( glfw_window_ptr ) );
 
-                if ( _wprops->callbackKey )
-                    _wprops->callbackKey( key, action );
+                if ( window_props->callbackKey )
+                    window_props->callbackKey( key, action );
             } );
 
-        glfwSetMouseButtonCallback( m_glfwWindow, []( GLFWwindow* pWindow, int button, int action, int mode )
+        glfwSetMouseButtonCallback( m_GlfwWindow.get(), []( GLFWwindow* glfw_window_ptr, int button, int action, int mode )
             {
-                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto window_props = static_cast<CWindowProps*>( glfwGetWindowUserPointer( glfw_window_ptr ) );
 
                 double _x,_y;
-                glfwGetCursorPos( pWindow, &_x, &_y );
+                glfwGetCursorPos( glfw_window_ptr, &_x, &_y );
 
-                if ( _wprops->callbackMouse )
-                    _wprops->callbackMouse( button, action, _x, _y );
+                if ( window_props->callbackMouse )
+                    window_props->callbackMouse( button, action, _x, _y );
             } );
 
-        glfwSetCursorPosCallback( m_glfwWindow, []( GLFWwindow* pWindow, double x, double y )
+        glfwSetCursorPosCallback( m_GlfwWindow.get(), []( GLFWwindow* glfw_window_ptr, double x, double y )
             {
-                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto window_props = static_cast<CWindowProps*>( glfwGetWindowUserPointer( glfw_window_ptr ) );
 
-                if ( _wprops->callbackMouseMove )
-                    _wprops->callbackMouseMove( x, y );
+                if ( window_props->callbackMouseMove )
+                    window_props->callbackMouseMove( x, y );
             } );
 
-        glfwSetScrollCallback( m_glfwWindow, []( GLFWwindow* pWindow, double xOff, double yOff )
+        glfwSetScrollCallback( m_GlfwWindow.get(), []( GLFWwindow* glfw_window_ptr, double xOff, double yOff )
             {
-                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
+                auto window_props = static_cast<CWindowProps*>( glfwGetWindowUserPointer( glfw_window_ptr ) );
 
-                if ( _wprops->callbackScroll )
-                    _wprops->callbackScroll( xOff, yOff );
+                if ( window_props->callbackScroll )
+                    window_props->callbackScroll( xOff, yOff );
             } );
 
-        glfwSetWindowSizeCallback( m_glfwWindow, []( GLFWwindow* pWindow, int width, int height )
+        glfwSetWindowSizeCallback( m_GlfwWindow.get(), []( GLFWwindow* glfw_window_ptr, int width, int height )
             {
-                auto _wprops = ( CWindowProps* ) glfwGetWindowUserPointer( pWindow );
-                _wprops->width = width;
-                _wprops->height = height;
+                auto window_props = static_cast<CWindowProps*>( glfwGetWindowUserPointer( glfw_window_ptr ) );
+                window_props->width = width;
+                window_props->height = height;
 
-                if ( _wprops->callbackResize )
-                    _wprops->callbackResize( width, height );
+                if ( window_props->callbackResize )
+                    window_props->callbackResize( width, height );
             } );
 
-        glfwSetInputMode( m_glfwWindow, GLFW_STICKY_KEYS, 1 );
-        glfwGetFramebufferSize( m_glfwWindow, &m_properties.width, &m_properties.height );
+        glfwSetInputMode( m_GlfwWindow.get(), GLFW_STICKY_KEYS, 1 );
+        int fbuffer_width, fbuffer_height;
+        glfwGetFramebufferSize( m_GlfwWindow.get(), &fbuffer_width, &fbuffer_height );
+        m_Properties.width = fbuffer_width;
+        m_Properties.height = fbuffer_height;
 
-        glViewport( 0, 0, m_properties.width, m_properties.height );
+        glViewport( 0, 0, m_Properties.width, m_Properties.height );
         glEnable( GL_DEPTH_TEST );
-        glClearColor( m_properties.clearColor.x(), 
-                      m_properties.clearColor.y(),
-                      m_properties.clearColor.z(),
-                      m_properties.clearColor.w() );
+        glClearColor( m_Properties.clearColor.x(), 
+                      m_Properties.clearColor.y(),
+                      m_Properties.clearColor.z(),
+                      m_Properties.clearColor.w() );
     }
 
     CWindowGLFW::~CWindowGLFW()
     {
-        glfwDestroyWindow( m_glfwWindow );
+        m_GlfwWindow = nullptr;
         glfwTerminate();
-
-        m_glfwWindow = nullptr;
     }
 
-    void CWindowGLFW::_enableCursorInternal()
+    void CWindowGLFW::_EnableCursorInternal()
     {
-        glfwSetInputMode( m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+        glfwSetInputMode( m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_NORMAL );
     }
 
-    void CWindowGLFW::_disableCursorInternal()
+    void CWindowGLFW::_DisableCursorInternal()
     {
-        glfwSetInputMode( m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+        glfwSetInputMode( m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED );
     }
 
-    void CWindowGLFW::_beginInternal()
+    void CWindowGLFW::_BeginInternal()
     {
+        glClearColor( m_Properties.clearColor.x(), 
+                      m_Properties.clearColor.y(),
+                      m_Properties.clearColor.z(),
+                      m_Properties.clearColor.w() );
+        glClear( GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT );
         glfwPollEvents();
     }
 
-    void CWindowGLFW::_endInternal()
+    void CWindowGLFW::_EndInternal()
     {
-        glfwSwapBuffers( m_glfwWindow );
+        glfwSwapBuffers( m_GlfwWindow.get() );
     }
 
-    bool CWindowGLFW::_activeInternal()
+    bool CWindowGLFW::_ActiveInternal()
     {
-        return glfwWindowShouldClose( m_glfwWindow ) == 0;
+        return glfwWindowShouldClose( m_GlfwWindow.get() ) == GLFW_FALSE;
     }
 
-    void CWindowGLFW::_requestCloseInternal()
+    void CWindowGLFW::_RequestCloseInternal()
     {
-        glfwSetWindowShouldClose( m_glfwWindow, 1 ); 
+        glfwSetWindowShouldClose( m_GlfwWindow.get(), GLFW_TRUE ); 
     }
-
 }

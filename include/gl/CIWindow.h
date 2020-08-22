@@ -17,7 +17,7 @@ namespace engine
         /// Height of the window
         ssize_t height = 768;
         /// Title of the window
-        std::string title = "OpenGL-window";
+        std::string title = "Application Window";
         /// Color of the background of the window
         CVec4 clearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
         /// Whether or not the window is resizable
