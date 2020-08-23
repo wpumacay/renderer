@@ -204,8 +204,8 @@ if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowGLFW.cpp" # use GLFW to create a window
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/window/CIWindow.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/window/CWindowGLFW.cpp" # use GLFW to create a window
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"
@@ -274,8 +274,8 @@ if ( TINYRENDERER_BUILD_HEADLESS_EGL )
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBuffer.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexBufferLayout.cpp"
          "${CMAKE_CURRENT_SOURCE_DIR}/src/core/CVertexArray.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CIWindow.cpp"
-         "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/CWindowEGL.cpp" # use EGL to create a "window"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/window/CIWindow.cpp"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/window/CWindowEGL.cpp" # use EGL to create a "window"
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CFog.cpp"
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CIRenderable.cpp"
          #### "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/CMesh.cpp"

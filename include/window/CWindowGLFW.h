@@ -2,7 +2,7 @@
 /// @brief Implementation of the window-class with GLFW backend
 #pragma once
 
-#include <gl/CIWindow.h>
+#include <window/CIWindow.h>
 #include <GLFW/glfw3.h>
 
 namespace engine

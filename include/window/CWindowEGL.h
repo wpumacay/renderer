@@ -3,7 +3,7 @@
 #pragma once
 
 #include <glad/egl.h>
-#include <gl/CIWindow.h>
+#include <window/CIWindow.h>
 
 namespace engine
 {

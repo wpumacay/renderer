@@ -1,5 +1,5 @@
 
-#include <gl/CWindowGLFW.h>
+#include <window/CWindowGLFW.h>
 
 namespace engine
 {
@@ -14,9 +14,9 @@ namespace engine
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, properties.gl_api_version_minor );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
     #ifdef __APPLE__
-        glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE );
+        glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     #endif
-        glfwWindowHint( GLFW_RESIZABLE, ( properties.resizable ) ? GLFW_TRUE : GLFW_FALSE );
+        glfwWindowHint( GLFW_RESIZABLE, ( properties.resizable ) ? GL_TRUE : GL_FALSE );
 
         m_GlfwWindow = std::unique_ptr<GLFWwindow, GLFWWindowDestructor>( 
                                                         glfwCreateWindow( m_Properties.width,
@@ -134,11 +134,11 @@ namespace engine
 
     bool CWindowGLFW::_ActiveInternal()
     {
-        return glfwWindowShouldClose( m_GlfwWindow.get() ) == GLFW_FALSE;
+        return glfwWindowShouldClose( m_GlfwWindow.get() ) == GL_FALSE;
     }
 
     void CWindowGLFW::_RequestCloseInternal()
     {
-        glfwSetWindowShouldClose( m_GlfwWindow.get(), GLFW_TRUE ); 
+        glfwSetWindowShouldClose( m_GlfwWindow.get(), GL_TRUE ); 
     }
 }

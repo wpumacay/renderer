@@ -1,5 +1,5 @@
 
-#include <gl/CIWindow.h>
+#include <window/CIWindow.h>
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 
-#include <gl/CWindowGLFW.h>
+#include <window/CWindowGLFW.h>
 
 bool g_terminate = false;
 int g_numClicks = 0;

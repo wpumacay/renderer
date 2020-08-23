@@ -1,5 +1,5 @@
 
-#include <gl/CWindowEGL.h>
+#include <window/CWindowEGL.h>
 
 namespace engine
 {
