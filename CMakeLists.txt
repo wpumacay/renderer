@@ -323,9 +323,9 @@ endif()
 # For docs-generation to use
 set_property( GLOBAL PROPERTY TINYRENDERER_INCS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
-#### if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_PYTHON_BINDINGS )
-####     add_subdirectory( python/tinyrenderer/bindings )
-#### endif()
+if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_PYTHON_BINDINGS )
+    add_subdirectory( python/tinyrenderer/bindings )
+endif()
 
 if ( TINYRENDERER_IS_MASTER_PROJECT AND TINYRENDERER_BUILD_DOCS )
     add_subdirectory( docs )
