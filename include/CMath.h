@@ -142,92 +142,155 @@ namespace engine
         CLine( const CVec3& p_start, const CVec3& p_end ) : start(p_start), end(p_end) {}
     };
 
+    /// Returns the string representation of the given line object
     std::string ToString( const CLine& line );
 
+    /// \brief Computes the remaining two axis of a reference frame, given the first axis and a world-up vector
+    ///
+    /// \param[in] axis1 First axis of the reference frame
+    /// \param[out] axis2 Second (computed) axis of the reference frame
+    /// \param[out] axis3 Third (computed) axis of the reference frame
+    /// \param[in] worldUp World-up vector used for computing the reference frame
     void ComputeFrameAxes( const CVec3& axis1, CVec3& axis2, CVec3& axis3, const CVec3& worldUp );
 
+    /// \brief Planer object, represented by a normal and a position vector
     struct CPlane
     {
+        /// Normal of the plane
         CVec3 normal;
+        /// A point on the plane
         CVec3 position;
     };
 
+    /// \brief Returns the signed distance from the given point to the given plane
+    ///
+    /// \param[in] point Point from which we want to compute the distance
+    /// \param[in] plane Plane to which we want to compute the distance from
+    /// \return The signed distance from the point to the plane
     float32 SignedDistToPlane( const CVec3& point, const CPlane& plane );
+
+    /// \brief Returns the distance from the given point to the given plane
+    ///
+    /// \param[in] point Point from which we want to compute the distance
+    /// \param[in] plane Plane to which we watn to compute the distance from
+    /// \return The distance from the point to the plane
     float32 DistToPlane( const CVec3& point, const CPlane& plane );
+
+    /// \brief Returns the projection of a given point onto a given plane
+    /// \param[in] point Point to be projected onto the plane
+    /// \param[in] plane Plane on which the point is to be projected
+    /// \return Vector representing the projection point
     CVec3 ProjInPlane( const CVec3& point, const CPlane& plane );
 
+    /// \brief Axis-aligned bounding box object
     struct CBoundingBox
     {
+        /// Size of the bounding box
         CVec3 size;
-        CMat4 worldTransform;
+        /// World-transform of the reference frame attached to the center of the bounding box
+        CMat4 tf;
     };
 
+    /// \brief Returns the corners (8 vertices) of a given bounding box
+    ///
+    /// \param[in] bbox Bounding box from which to extract its corners
+    /// \return An array containing the 8 corners of the bounding box
     std::array< CVec3, 8 > ComputeBoxCorners( const CBoundingBox& bbox );
 
+    /// \brief Bounding sphere object
     struct CBoundingSphere
     {
+        /// Radius of the bounding sphere
         float32 radius;
-        CVec3 worldPosition;
+        /// Center in world-space of the bouding sphere
+        CVec3 center;
     };
 
+    /// \brief Frustum object, representing a view-frustum volume
     struct CFrustum
     {
+        /// Corners of the view-frustum object
         std::array< CVec3, 8 > corners;
+        /// Planes of the view-frustum object
         std::array< CPlane, 6 > planes;
 
+        /// \brief Creates a frustum object from a given view-projection matrix
+        ///
+        /// \param[in] viewProjMat View-projection matrix used to construct the frustum object
         CFrustum( const CMat4& viewProjMat );
     };
 
+    /// \brief Returns whether or not the given bounding box is "certainly" inside the frustum
+    ///
+    /// \param[in] frustum Frustum object with whom to check if the given box is certainly inside
+    /// \param[in] bbox Bounding box object from which to check if it's certainly inside the frustum
+    /// \return True if the bounding box is inside the frustum. False values don't necessarily mean outside of frustum
     bool CertainlyOutsideFrustum( const CFrustum& frustum, const CBoundingBox& bbox );
+
+    /// \brief Returns whether or not the given bounding sphere is "certainly" inside the frustum
+    ///
+    /// \param[in] frustum Frustum object with whom to check if the given sphere is certainly inside
+    /// \param[in] bbox Bounding sphere object from which to check if it's certainly inside the frustum
+    /// \return True if the bounding sphere is inside the frustum. False values don't necessarily mean outside of frustum
     bool CertainlyOutsideFrustum( const CFrustum& frustum, const CBoundingSphere& bsphere );
 
+    /// \brief Comparator class used for checking with the signed distance of points to a given plane
     struct CComparatorSignedDistancePlane
     {
+        /// Plane from which to compare distances to
         CPlane plane;
 
-        bool operator() ( const CVec3& p1, const CVec3& p2 ) 
-        { 
-            return SignedDistToPlane( p1, plane ) < SignedDistToPlane( p2, plane );
-        }
+        /// \brief Returns whether or not the first point's signed distance to the plane is the smallest
+        bool operator() ( const CVec3& p1, const CVec3& p2 );
     };
 
+    /// \brief Comparator class used for checking with the points x coordinate
     struct CComparatorX 
     { 
-        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.x() < v2.x(); }
+        /// \brief Returns whether or not the first point's x coordinate is the smallest
+        bool operator() ( const CVec3& v1, const CVec3& v2 );
     };
 
+    /// \brief Comparator class used for checking with the points y coordinate
     struct CComparatorY
     { 
-        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.y() < v2.y(); }
+        /// \brief Returns whether or not the first point's y coordinate is the smallest
+        bool operator() ( const CVec3& v1, const CVec3& v2 );
     };
 
+    /// \brief Comparator class used for checking with the points z coordinate
     struct CComparatorZ
     { 
-        bool operator() ( const CVec3& v1, const CVec3& v2 ) { return v1.z() < v2.z(); }
+        /// \brief Returns whether or not the first point's z coordinate is the smallest
+        bool operator() ( const CVec3& v1, const CVec3& v2 );
     };
 
+    /// \brief Comparator class used for checking which point is closest to a base given point
     struct CComparatorClosestToPoint
     {
+        /// Point from which the distances are computed
         CVec3 point;
 
-        bool operator() ( const CVec3& p1, const CVec3& p2 )
-        {
-            return ( p1 - point ).length() < ( p2 - point ).length();
-        }
+        /// \brief Returns whether or not the first point is closest to the base point
+        bool operator() ( const CVec3& p1, const CVec3& p2 );
     };
 
+    /// \brief Comparator class used for checking which point is farthest to a base given point
     struct CComparatorFarthestFromPoint
     {
+        /// Point from which the distances are computed
         CVec3 point;
 
-        bool operator() ( const CVec3& p1, const CVec3& p2 )
-        {
-            return ( p1 - point ).length() > ( p2 - point ).length();
-        }
+        /// \brief Returns whether or not the first point is farthest to the base point
+        bool operator() ( const CVec3& p1, const CVec3& p2 );
     };
 
+    /// \brief Gets the closest and farthest corner of a bounding box with respect to a plane
     void ComputeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex );
 
+    /// \brief Converts the given angle from degrees to radians
     float32 ToRadians( float32 angle );
+
+    /// \brief Converts the given angle from radians to degrees
     float32 ToDegrees( float32 angle );
 }

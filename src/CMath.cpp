@@ -302,27 +302,27 @@ namespace engine
 
     std::array< CVec3, 8 > ComputeBoxCorners( const CBoundingBox& bbox )
     {
-        std::array< CVec3, 8 > _cornersInModel = { CVec3( -0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
-                                                   CVec3(  0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
-                                                   CVec3(  0.5f * bbox.size.x(),  0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
-                                                   CVec3( -0.5f * bbox.size.x(),  0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
-                                                   CVec3( -0.5f * bbox.size.x(), -0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
-                                                   CVec3(  0.5f * bbox.size.x(), -0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
-                                                   CVec3(  0.5f * bbox.size.x(),  0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
-                                                   CVec3( -0.5f * bbox.size.x(),  0.5f * bbox.size.y(),  0.5f * bbox.size.z() ) };
+        std::array< CVec3, 8 > cornersInModel = { CVec3( -0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
+                                                  CVec3(  0.5f * bbox.size.x(), -0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
+                                                  CVec3(  0.5f * bbox.size.x(),  0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
+                                                  CVec3( -0.5f * bbox.size.x(),  0.5f * bbox.size.y(), -0.5f * bbox.size.z() ),
+                                                  CVec3( -0.5f * bbox.size.x(), -0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
+                                                  CVec3(  0.5f * bbox.size.x(), -0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
+                                                  CVec3(  0.5f * bbox.size.x(),  0.5f * bbox.size.y(),  0.5f * bbox.size.z() ),
+                                                  CVec3( -0.5f * bbox.size.x(),  0.5f * bbox.size.y(),  0.5f * bbox.size.z() ) };
 
-        std::array< CVec3, 8 > _cornersInWorld;
-        for ( size_t i = 0; i < _cornersInModel.size(); i++ )
-            _cornersInWorld[i] = CVec3( bbox.worldTransform * CVec4( _cornersInModel[i], 1.0f ) );
+        std::array< CVec3, 8 > cornersInWorld;
+        for ( size_t i = 0; i < cornersInModel.size(); i++ )
+            cornersInWorld[i] = CVec3( bbox.tf * CVec4( cornersInModel[i], 1.0f ) );
 
-        return _cornersInWorld;
+        return cornersInWorld;
     }
 
     CFrustum::CFrustum( const CMat4& viewProjMat )
     {
-        CMat4 _invViewProjMat = tinymath::inverse( viewProjMat );
+        CMat4 invViewProjMat = tinymath::inverse( viewProjMat );
 
-        std::array< CVec3, 8 > _frustumPointsClipSpace = {
+        std::array< CVec3, 8 > frustumPointsClipSpace = {
             /*      near plane      */
             CVec3( -1.0f, -1.0f, -1.0f ), 
             CVec3( 1.0f, -1.0f, -1.0f ),
@@ -338,10 +338,10 @@ namespace engine
         // compute corners of the frustum
         for ( size_t q = 0; q < corners.size(); q++ )
         {
-            CVec4 _pointFrustum = _invViewProjMat * CVec4( _frustumPointsClipSpace[q], 1.0f );
-            corners[q] = CVec3( _pointFrustum.x() / _pointFrustum.w(),
-                                _pointFrustum.y() / _pointFrustum.w(),
-                                _pointFrustum.z() / _pointFrustum.w() );
+            CVec4 pointFrustum = invViewProjMat * CVec4( frustumPointsClipSpace[q], 1.0f );
+            corners[q] = CVec3( pointFrustum.x() / pointFrustum.w(),
+                                pointFrustum.y() / pointFrustum.w(),
+                                pointFrustum.z() / pointFrustum.w() );
         }
 
         // compute planes of the frustum
@@ -396,10 +396,40 @@ namespace engine
     {
         // Similarly to the previous case, discard most outsiders
         for ( size_t i = 0; i < frustum.planes.size(); i++ )
-            if ( SignedDistToPlane( bsphere.worldPosition, frustum.planes[i] ) > bsphere.radius )
+            if ( SignedDistToPlane( bsphere.center, frustum.planes[i] ) > bsphere.radius )
                 return true;
 
         return false;
+    }
+
+    bool CComparatorSignedDistancePlane::operator() ( const CVec3& p1, const CVec3& p2 )
+    {
+        return SignedDistToPlane( p1, plane ) < SignedDistToPlane( p2, plane );
+    }
+
+    bool CComparatorX::operator() ( const CVec3& v1, const CVec3& v2 )
+    {
+        return v1.x() < v2.x();
+    }
+
+    bool CComparatorY::operator() ( const CVec3& v1, const CVec3& v2 )
+    {
+        return v1.y() < v2.y();
+    }
+
+    bool CComparatorZ::operator() ( const CVec3& v1, const CVec3& v2 )
+    {
+        return v1.z() < v2.z();
+    }
+
+    bool CComparatorClosestToPoint::operator() ( const CVec3& p1, const CVec3& p2 )
+    {
+        return ( p1 - point ).length() < ( p2 - point ).length();
+    }
+
+    bool CComparatorFarthestFromPoint::operator() ( const CVec3& p1, const CVec3& p2 )
+    {
+        return ( p1 - point ).length() > ( p2 - point ).length();
     }
 
     void ComputeMinMaxVertexToPlane( const CPlane& plane, const CBoundingBox& bbox, CVec3& minVertex, CVec3& maxVertex )
