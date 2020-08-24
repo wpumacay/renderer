@@ -1,3 +1,4 @@
+#ifdef ENGINE_EGL_ENABLED
 
 #include <window/CWindowEGL.h>
 
@@ -34,8 +35,8 @@ namespace engine
                     EGL_NONE
         };
         const EGLint pbufferAttributes[] = {
-            EGL_WIDTH, m_Properties.width,
-            EGL_HEIGHT, m_Properties.height,
+            EGL_WIDTH, (int)m_Properties.width,
+            EGL_HEIGHT, (int)m_Properties.height,
             EGL_NONE
         };
 
@@ -114,3 +115,5 @@ namespace engine
         // nothing extra to setup here (will close when application closes)
     }
 }
+
+#endif /* ENGINE_EGL_ENABLED */

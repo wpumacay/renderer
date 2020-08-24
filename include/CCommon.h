@@ -1,10 +1,7 @@
 #pragma once
 
-#ifdef ENGINE_HEADLESS_EGL
-    #include <glad/gl.h>
-#else
-    #include <GL/glew.h>
-#endif
+#include <glad/gl.h>
+
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -117,7 +114,7 @@ namespace engine
     //----------------------------------------------------------------------------------------------
 }
 
-#if defined(ENGINE_USE_LOGS)
+#if defined(ENGINE_LOGS_ENABLED)
     #define ENGINE_CORE_TRACE(...)     LOG_CORE_TRACE(__VA_ARGS__)
     #define ENGINE_CORE_INFO(...)      LOG_CORE_INFO(__VA_ARGS__)
     #define ENGINE_CORE_WARN(...)      LOG_CORE_WARN(__VA_ARGS__)
@@ -159,7 +156,7 @@ namespace engine
     }
 #endif
 
-#if defined(ENGINE_USE_PROFILING)
+#if defined(ENGINE_PROFILING_ENABLED)
     #define ENGINE_PROFILE_SCOPE(name)                          PROFILE_SCOPE(name)
     #define ENGINE_PROFILE_SCOPE_IN_SESSION(name, session_name) PROFILE_SCOPE_IN_SESSION(name, session_name)
     #define ENGINE_PROFILE_FUNCTION()                           PROFILE_FUNCTION()

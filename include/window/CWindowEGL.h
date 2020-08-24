@@ -2,6 +2,9 @@
 /// @brief Implementation of the window-class with EGL backend
 #pragma once
 
+#ifdef ENGINE_EGL_ENABLED
+
+#include <glad/gl.h>
 #include <glad/egl.h>
 #include <window/CIWindow.h>
 
@@ -77,3 +80,5 @@ namespace engine
         ADD_CLASS_SMART_POINTERS(CWindowEGL);
     };
 }
+
+#endif /* ENGINE_EGL_ENABLED */

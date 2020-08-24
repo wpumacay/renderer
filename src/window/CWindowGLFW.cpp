@@ -1,3 +1,4 @@
+#ifdef ENGINE_GLFW_ENABLED
 
 #include <window/CWindowGLFW.h>
 
@@ -31,10 +32,8 @@ namespace engine
             return;
         }
 
-        // Initialize modern-gl context using glew (@todo: should replace for glad?)
         glfwMakeContextCurrent( m_GlfwWindow.get() );
-        glewExperimental = GL_TRUE;
-        ENGINE_CORE_ASSERT( glewInit() == GLEW_OK, "CWindowGLFW >>> failed to initialize GLEW" );
+        ENGINE_CORE_ASSERT( gladLoadGL(glfwGetProcAddress), "CWindowGLFW >>> failed to load GL using GLAD on the current GL context" );
         ENGINE_CORE_INFO( "OpenGL Info:" );
         ENGINE_CORE_INFO( "\tVendor     : {0}", glGetString( GL_VENDOR ) );
         ENGINE_CORE_INFO( "\tRenderer   : {0}", glGetString( GL_RENDERER ) );
@@ -142,3 +141,5 @@ namespace engine
         glfwSetWindowShouldClose( m_GlfwWindow.get(), GL_TRUE ); 
     }
 }
+
+#endif /* ENGINE_GLFW_ENABLED */

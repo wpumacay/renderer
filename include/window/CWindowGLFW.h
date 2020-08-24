@@ -2,6 +2,8 @@
 /// @brief Implementation of the window-class with GLFW backend
 #pragma once
 
+#ifdef ENGINE_GLFW_ENABLED
+
 #include <window/CIWindow.h>
 #include <GLFW/glfw3.h>
 
@@ -63,3 +65,5 @@ namespace engine
         ADD_CLASS_SMART_POINTERS(CWindowGLFW);
     };
 }
+
+#endif /* ENGINE_GLFW_ENABLED */

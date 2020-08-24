@@ -13,6 +13,6 @@ foreach( sampleFile ${SampleFilesCore} )
     # remove other path components from file
     get_filename_component( executableName ${executableLongName} NAME )
 
-    FcnBuildExampleWindowed( ${sampleFile} ${executableName} )
+    FcnBuildExample( ${sampleFile} ${executableName} )
 
 endforeach( sampleFile )

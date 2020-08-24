@@ -47,13 +47,14 @@ namespace engine
                     return self.properties();
                 } );
 
-    // @todo: refactor to handle windows without requiring a different library (one for glfw, one for egl, one for osmesa, etc.)
-    #ifndef ENGINE_HEADLESS_EGL
+    #ifdef ENGINE_GLFW_ENABLED
         py::class_<CWindowGLFW, CIWindow>( m, "WindowGLFW" )
             .def( py::init< const CWindowProps& >() );
-    #else
+    #endif /* ENGINE_GLFW_ENABLED */
+
+    #ifdef ENGINE_EGL_ENABLED
         py::class_<CWindowEGL, CIWindow>( m, "WindowEGL" )
             .def( py::init< const CWindowProps& >() );
-    #endif
+    #endif /* ENGINE_EGL_ENABLED */
     }
 }

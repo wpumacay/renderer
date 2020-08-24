@@ -20,9 +20,7 @@ set( TINYUTILS_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Build tinyutils' python-bind
 # Configure build-options for ImGui
 set( IMGUI_BUILD_EXAMPLES CACHE BOOL "Don't build ImGui examples" )
 
-if ( TINYRENDERER_BUILD_WINDOWED_GLFW )
 add_subdirectory( imgui )
-endif()
 add_subdirectory( spdlog )
 add_subdirectory( pybind11 )
 add_subdirectory( tiny_math )
