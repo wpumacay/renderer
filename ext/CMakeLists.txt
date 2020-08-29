@@ -18,7 +18,8 @@ set( TINYUTILS_BUILD_EXAMPLES OFF CACHE BOOL "Don't build tinyutils' examples" )
 set( TINYUTILS_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Build tinyutils' python-bindings" )
 
 # Configure build-options for ImGui
-set( IMGUI_BUILD_EXAMPLES CACHE BOOL "Don't build ImGui examples" )
+set( IMGUI_BUILD_EXAMPLES OFF CACHE BOOL "Don't build ImGui examples" )
+set( IMGUI_BUILD_WITH_GLAD_LOADER ON CACHE BOOL "Build ImGui with GLAD as gl-loader" )
 
 add_subdirectory( imgui )
 add_subdirectory( spdlog )
