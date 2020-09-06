@@ -233,7 +233,7 @@ set( TINYRENDERER_SRCS
      #### "${CMAKE_CURRENT_SOURCE_DIR}/src/renderers/CSkyboxRenderer.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShader.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CProgram.cpp"
-     #### "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/CShaderManager.cpp"
      #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CDebugDrawer.cpp"
      #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CObjectPicker.cpp"
      #### "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/CVideoCommon.cpp"

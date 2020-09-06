@@ -3,101 +3,90 @@
 
 namespace engine
 {
-
-    std::string toString( const eShaderType& type )
-    {
-        if ( type == eShaderType::VERTEX ) return "vertex-shader";
-        if ( type == eShaderType::FRAGMENT ) return "fragment-shader";
-
-        ENGINE_CORE_ASSERT( false, "Invalid eShaderType enum given" );
-
-        return "undefined";
-    }
-
-    uint32 toOpenGLEnum( const eShaderType& type )
-    {
-        if ( type == eShaderType::VERTEX ) return GL_VERTEX_SHADER;
-        if ( type == eShaderType::FRAGMENT ) return GL_FRAGMENT_SHADER;
-
-        ENGINE_CORE_ASSERT( false, "Invalid eShaderType enum given" );
-
-        return 0;
-    }
-
-    CShaderManager* CShaderManager::s_instance = nullptr;
+    std::unique_ptr<CShaderManager> CShaderManager::s_Instance = nullptr;
 
     void CShaderManager::Init()
     {
-        if ( CShaderManager::s_instance )
+        if ( CShaderManager::s_Instance )
         {
-            ENGINE_CORE_WARN( "Tried to initialize an already intialized shader-manager" );
+            ENGINE_CORE_WARN( "CShaderManager::Init >>> Tried to initialize an already intialized shader-manager" );
             return;
         }
-
-        CShaderManager::s_instance = new CShaderManager();
+        CShaderManager::s_Instance = std::unique_ptr<CShaderManager>( new CShaderManager() );
     }
 
     void CShaderManager::Release()
     {
-        ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Tried to release an already deleted shader-manager" );
-
-        delete CShaderManager::s_instance;
-        CShaderManager::s_instance = nullptr;
+        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::Release >>> Tried to release an already deleted shader-manager" );
+        CShaderManager::s_Instance = nullptr;
     }
 
     CShaderManager::~CShaderManager()
     {
-        // nothing to release directly
+        // Nothing to release directly
     }
 
-    CShader* CShaderManager::CreateShaderFromFiles( const std::string& name,
-                                                    const std::string& vrtFile,
-                                                    const std::string& frgFile )
+    CProgram::ptr CShaderManager::CreateProgramFromFiles( const std::string& name,
+                                                          const std::string& vrtFile,
+                                                          const std::string& frgFile )
     {
-        ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
-
-        return CShaderManager::s_instance->_createShaderFromFiles( name, vrtFile, frgFile );
+        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::CreateProgramFromFiles >>> Must initialize shader-manager before using it" );
+        return CShaderManager::s_Instance->_CreateProgramFromFiles( name, vrtFile, frgFile );
     }
 
-    CShader* CShaderManager::CreateShaderFromSources( const std::string& name,
-                                                      const std::string& vrtSource,
-                                                      const std::string& frgSource )
+    CProgram::ptr CShaderManager::CreateProgramFromSources( const std::string& name,
+                                                            const std::string& vrtSource,
+                                                            const std::string& frgSource )
     {
-        ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
-
-        return CShaderManager::s_instance->_createShaderFromSources( name, vrtSource, frgSource );
+        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::CreateProgramFromSources >>> Must initialize shader-manager before using it" );
+        return CShaderManager::s_Instance->_CreateProgramFromSources( name, vrtSource, frgSource );
     }
 
-    CShader* CShaderManager::GetCachedShader( const std::string& name )
+    CProgram::ptr CShaderManager::GetCachedShader( const std::string& name )
     {
-        ENGINE_CORE_ASSERT( CShaderManager::s_instance, "Must initialize shader-manager before using it" );
-
-        return CShaderManager::s_instance->_getCachedShader( name );
+        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::GetCachedShader >>> Must initialize shader-manager before using it" );
+        return CShaderManager::s_Instance->_GetCachedShader( name );
     }
 
-    CShaderManager::CShaderManager()
+    CProgram::ptr CShaderManager::_CreateProgramFromFiles( const std::string& name,
+                                                           const std::string& vrtFilepath,
+                                                           const std::string& frgFilepath )
     {
-        /* Load engine-shaders from disk (resources directory of the engine)*/
-        _loadEngineShaders();
+        auto vertShaderSource = _GetFileContents( vrtFilepath );
+        auto fragShaderSOurce = _GetFileContents( frgFilepath );
+        return _CreateProgramFromSources( name, vertShaderSource, fragShaderSOurce );
     }
 
-    CShader* CShaderManager::_getCachedShader( const std::string& name )
+    CProgram::ptr CShaderManager::_CreateProgramFromSources( const std::string& name,
+                                                             const std::string& vrtSource,
+                                                             const std::string& frgSource )
     {
-        if ( m_shaders.find( name ) == m_shaders.end() )
+        auto shader_program = std::make_shared<CProgram>( name, vrtSource, frgSource );
+        m_Programs[name] = shader_program;
+        return shader_program;
+    }
+
+    CProgram::ptr CShaderManager::_GetCachedShader( const std::string& name )
+    {
+        if ( m_Programs.find( name ) == m_Programs.end() )
         {
             ENGINE_CORE_ERROR( "Requested shader with name {0} hasn't been loaded", name );
             return nullptr;
         }
-
-        return m_shaders[name].get();
+        return m_Programs[name];
     }
 
-    void CShaderManager::_loadEngineShaders()
+    CShaderManager::CShaderManager()
+    {
+        _LoadEngineShaders();
+    }
+
+    void CShaderManager::_LoadEngineShaders()
     {
         // Base-path where to locate our shaders
-        std::string _shadersBaseFolder = std::string( ENGINE_RESOURCES_PATH ) + "shaders/";
+        std::string shaders_base_folder = engine::RESOURCES_PATH + "shaders/";
 
-        std::vector< std::string > _engineShaderFiles = {
+        std::vector<std::string> engine_shader_files = {
             "basic2d_no_textures",
             "basic2d_textures",
             "basic3d_no_textures",
@@ -121,156 +110,37 @@ namespace engine
             "engine_debug_drawing_3d_solid_no_lighting"
         };
 
-        for ( size_t i = 0; i < _engineShaderFiles.size(); i++ )
+        for ( size_t i = 0; i < engine_shader_files.size(); i++ )
         {
-            std::string _shaderName     = _engineShaderFiles[i];
-            std::string _shaderVrtFile  = _shadersBaseFolder + _engineShaderFiles[i] + "_vs.glsl";
-            std::string _shaderFrgFile  = _shadersBaseFolder + _engineShaderFiles[i] + "_fs.glsl";
-
-            if ( m_shaders.find( _shaderName ) != m_shaders.end() )
+            std::string shader_name = engine_shader_files[i];
+            if ( m_Programs.find( shader_name ) != m_Programs.end() )
                 continue;
 
-            //// ENGINE_CORE_TRACE( "CShaderManager::_loadEngineShaders >>> loading vertex-shader : {0}", _shaderVrtFile );
-            //// ENGINE_CORE_TRACE( "CShaderManager::_loadEngineShaders >>> loading fragment-shader : {0}", _shaderFrgFile );
-            _createShaderFromFiles( _shaderName, _shaderVrtFile, _shaderFrgFile );
+            std::string shader_vert_file = shaders_base_folder + engine_shader_files[i] + "_vs.glsl";
+            std::string shader_frag_file = shaders_base_folder + engine_shader_files[i] + "_fs.glsl";
+            _CreateProgramFromFiles( shader_name, shader_vert_file, shader_frag_file );
         }
     }
 
-    CShader* CShaderManager::_createShaderFromSources( const std::string& name,
-                                                       const std::string& vrtSource,
-                                                       const std::string& frgSource )
+    std::string CShaderManager::_GetFileContents( const std::string& filepath )
     {
-        uint32 _vrtShaderOpenglId = _compileShaderFromSource( vrtSource, eShaderType::VERTEX );
-        uint32 _frgShaderOpenglId = _compileShaderFromSource( frgSource, eShaderType::FRAGMENT );
+        std::string file_contents;
+        std::stringstream file_sstream;
 
-        if ( _vrtShaderOpenglId == 0 || _frgShaderOpenglId == 0 )
+        std::ifstream file_handle;
+        file_handle.exceptions( std::ifstream::badbit );
+        try
         {
-            ENGINE_CORE_ERROR( "An error occurred while compiling shader with name: {0}", name );
-            return nullptr;
-        }
+            file_handle.open( filepath.c_str() );
+            file_sstream << file_handle.rdbuf();
+            file_handle.close();
 
-        uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
-
-        if ( _programOpenglId == 0 )
-        {
-            ENGINE_CORE_ERROR( "An error occured while linking shader with name: {0}", name );
-            return nullptr;
-        }
-
-        // keep ownership of the created shaders
-        auto _shader = std::make_unique<CShader>( name, _programOpenglId );
-        m_shaders[name] = std::move( _shader );
-        return m_shaders[name].get();
-    }
-
-    CShader* CShaderManager::_createShaderFromFiles( const std::string& name,
-                                                     const std::string& vrtFilepath,
-                                                     const std::string& frgFilepath )
-    {
-        uint32 _vrtShaderOpenglId = _compileShaderFromFile( vrtFilepath, eShaderType::VERTEX );
-        uint32 _frgShaderOpenglId = _compileShaderFromFile( frgFilepath, eShaderType::FRAGMENT );
-
-        if ( _vrtShaderOpenglId == 0 || _frgShaderOpenglId == 0 )
-        {
-            ENGINE_CORE_ERROR( "An error occurred while compiling shaders {0} and {1}", vrtFilepath, frgFilepath );
-            return nullptr;
-        }
-
-        uint32 _programOpenglId = _linkShaderProgram( _vrtShaderOpenglId, _frgShaderOpenglId );
-
-        if ( _programOpenglId == 0 )
-        {
-            ENGINE_CORE_ERROR( "An error occured while linking shader with name: {0}", name );
-            return nullptr;
-        }
-
-        // keep ownership of the created shaders
-        auto _shader = std::make_unique<CShader>( name, _programOpenglId );
-        m_shaders[name] = std::move( _shader );
-        return m_shaders[name].get();
-    }
-
-    uint32 CShaderManager::_compileShaderFromFile( const std::string& filepath, const eShaderType& type )
-    {
-        /* load file contents ***************************************************/
-        std::string _fileContents;
-        std::stringstream _fileStream;
-
-        std::ifstream _fileHandle;
-        _fileHandle.exceptions( std::ifstream::badbit );
-
-        try 
-        {
-            _fileHandle.open( filepath.c_str() );
-            _fileStream << _fileHandle.rdbuf();
-            _fileHandle.close();
-
-            _fileContents = _fileStream.str();
+            file_contents = file_sstream.str();
         }
         catch ( ... )
         {
-            ENGINE_CORE_ERROR( "Could not load contents of shader file: {0}", filepath );
-            return 0;
+            ENGINE_CORE_ERROR( "CShaderManager::_GetFileContents >>> Could not load contents of shader file: {0}", filepath );
         }
-
-        /************************************************************************/
-
-        uint32 _shaderOpenglId = _compileShaderFromSource( _fileContents, type );
-        if ( _shaderOpenglId == 0 )
-        {
-            ENGINE_CORE_ERROR( "Error while compiling shader file: {0}", filepath );
-            return 0;
-        }
-
-        return _shaderOpenglId;
+        return file_contents;
     }
-
-    uint32 CShaderManager::_compileShaderFromSource( const std::string& source, const eShaderType& type )
-    {
-        int32 _success;
-        const char* _shaderSource = source.c_str();
-
-        uint32 _shaderOpenglId = glCreateShader( engine::toOpenGLEnum( type ) );
-        glShaderSource( _shaderOpenglId, 1, &_shaderSource, NULL );
-        glCompileShader( _shaderOpenglId );
-        glGetShaderiv( _shaderOpenglId, GL_COMPILE_STATUS, &_success );
-
-        if ( !_success )
-        {
-            GLchar _errorLog[1024];
-            glGetShaderInfoLog( _shaderOpenglId, 1024, NULL, _errorLog );
-            ENGINE_CORE_ERROR( "Couldn't compile shader type {0}: {1}", 
-                               engine::toString( type ), std::string( _errorLog ) );
-            return 0;
-        }
-
-        return _shaderOpenglId;
-    }
-
-    uint32 CShaderManager::_linkShaderProgram( uint32 vrtShaderId, uint32 frgShaderId )
-    {
-        int32 _success;
-
-        uint32 _programOpenglId = glCreateProgram();
-        glAttachShader( _programOpenglId, vrtShaderId );
-        glAttachShader( _programOpenglId, frgShaderId );
-        glLinkProgram( _programOpenglId );
-
-        glDetachShader( _programOpenglId, vrtShaderId );
-        glDetachShader( _programOpenglId, frgShaderId );
-        glDeleteShader( vrtShaderId );
-        glDeleteShader( frgShaderId );
-        glGetProgramiv( _programOpenglId, GL_LINK_STATUS, &_success );
-
-        if ( !_success )
-        {
-            GLchar _errorLog[1024];
-            glGetProgramInfoLog( _programOpenglId, 1024, NULL, _errorLog );
-            ENGINE_CORE_ERROR( "Couldn't link shader program : {0}", std::string( _errorLog ) );
-            return 0;
-        }
-
-        return _programOpenglId;
-    }
-
 }
