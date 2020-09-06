@@ -3,111 +3,58 @@
 
 namespace engine
 {
-
-    CShader::CShader( const std::string& name, uint32 openglId )
+    std::string ToString( const eShaderType& type )
     {
-        m_name      = name;
-        m_openglId  = openglId;
+        /**/ if ( type == eShaderType::VERTEX ) return "vertex-shader";
+        else if ( type == eShaderType::FRAGMENT ) return "fragment-shader";
 
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Created Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
-        else
-            std::cout << "Allocs: Created Shader @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
-    #endif
+        ENGINE_CORE_ASSERT( false, "Invalid eShaderType enum given" );
+        return "undefined";
+    }
+
+    uint32 ToOpenGLEnum( const eShaderType& type )
+    {
+        /**/ if ( type == eShaderType::VERTEX ) return GL_VERTEX_SHADER;
+        else if ( type == eShaderType::FRAGMENT ) return GL_FRAGMENT_SHADER;
+
+        ENGINE_CORE_ASSERT( false, "Invalid eShaderType enum given" );
+        return 0;
+    }
+
+    CShader::CShader( const std::string& name, const eShaderType& type, const std::string& source )
+        : m_Name( name ), m_Type( type ), m_Source( source )
+    {
+        _CompileShaderFromSource();
     }
 
     CShader::~CShader()
     {
-        glDeleteProgram( m_openglId );
-
-    #if defined(ENGINE_TRACK_ALLOCS)
-        if ( tinyutils::Logger::IsActive() )
-            ENGINE_CORE_TRACE( "Allocs: Destroyed Shader @ {0}", tinyutils::PointerToHexAddress( this ) );
-        else
-            std::cout << "Allocs: Destroyed Shader @ " << tinyutils::PointerToHexAddress( this ) << std::endl;
-    #endif
+        glDeleteProgram( m_OpenglID );
+        m_OpenglID = 0;
     }
 
-    void CShader::bind()
+    void CShader::_CompileShaderFromSource()
     {
-        glUseProgram( m_openglId );
+        // Compile shader of given type
+        const char* shader_source = m_Source.c_str();
+        m_OpenglID = glCreateShader( ToOpenGLEnum( m_Type ) );
+        glShaderSource( m_OpenglID, 1, &shader_source, NULL );
+        glCompileShader( m_OpenglID );
+
+        // Check for the status of the compiling process
+        int32 compiling_success;
+        glGetShaderiv( m_OpenglID, GL_COMPILE_STATUS, &compiling_success );
+        if ( !compiling_success )
+        {
+            constexpr ssize_t ERROR_BUFFER_SIZE = 1024;
+            GLchar error_log_buffer[ERROR_BUFFER_SIZE];
+            glGetShaderInfoLog( m_OpenglID, ERROR_BUFFER_SIZE, NULL, error_log_buffer );
+            ENGINE_CORE_ERROR( "CShader::_CompileShaderFromSource >>> Couldn't compile shader of type {0}: \n{1}", 
+                               engine::ToString( m_Type ), error_log_buffer );
+            m_Compiled = false;
+            m_OpenglID = 0;
+            return;
+        }
+        m_Compiled = true;
     }
-
-    void CShader::unbind()
-    {
-        glUseProgram( 0 );
-    }
-
-    void CShader::setInt( const std::string& uName, int32 value )
-    {
-        glUniform1i( _getUniformLocation( uName ), value );
-    }
-
-    void CShader::setFloat( const std::string& uName, float32 value )
-    {
-        glUniform1f( _getUniformLocation( uName ), value );
-    }
-
-    void CShader::setVec2( const std::string& uName, const CVec2& vec )
-    {
-        glUniform2fv( _getUniformLocation( uName ), 1, vec.data() );
-    }
-
-    void CShader::setVec3( const std::string& uName, const CVec3& vec )
-    {
-        glUniform3fv( _getUniformLocation( uName ), 1, vec.data() );
-    }
-
-    void CShader::setVec4( const std::string& uName, const CVec4& vec )
-    {
-        glUniform4fv( _getUniformLocation( uName ), 1, vec.data() );
-    }
-
-    void CShader::setMat4( const std::string& uName, const CMat4& mat )
-    {
-        glUniformMatrix4fv( _getUniformLocation( uName ), 1, GL_FALSE, mat.data() );
-    }
-
-    void CShader::_setInt( uint32 uniform, int32 value )
-    {
-        glUniform1i( uniform, value );
-    }
-
-    void CShader::_setFloat( uint32 uniform, float32 value )
-    {
-        glUniform1f( uniform, value );
-    }
-
-    void CShader::_setVec2( uint32 uniform, const CVec2& vec )
-    {
-        glUniform2fv( uniform, 1, vec.data() );
-    }
-
-    void CShader::_setVec3( uint32 uniform, const CVec3& vec )
-    {
-        glUniform3fv( uniform, 1, vec.data() );
-    }
-
-    void CShader::_setVec4( uint32 uniform, const CVec4& vec )
-    {
-        glUniform4fv( uniform, 1, vec.data() );
-    }
-
-    void CShader::_setMat4( uint32 uniform, const CMat4& mat )
-    {
-        glUniformMatrix4fv( uniform, 1, GL_FALSE, mat.data() );
-    }
-
-    uint32 CShader::_getUniformLocation( const std::string& uniformName )
-    {
-        if ( m_uniformLocations.find( uniformName ) == m_uniformLocations.end() )
-            m_uniformLocations[uniformName] = glGetUniformLocation( m_openglId, uniformName.c_str() );
-
-        if ( m_uniformLocations[uniformName] == -1 )
-            ENGINE_CORE_ERROR( "Uniform location '{0}' was not found in shader '{1}'", uniformName, m_name );
-
-        return m_uniformLocations[uniformName];
-    }
-
 }
