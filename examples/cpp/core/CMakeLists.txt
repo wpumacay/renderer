@@ -5,7 +5,8 @@ file( GLOB SampleFilesCore *.cpp )
 set( SampleFilesCore
      #### "sample_buffers.cpp"
      #### "sample_texture.cpp"
-     "sample_window.cpp" )
+     "sample_window.cpp"
+     "sample_shaders.cpp" )
 
 foreach( sampleFile ${SampleFilesCore} )
     # remove extension from sample file
