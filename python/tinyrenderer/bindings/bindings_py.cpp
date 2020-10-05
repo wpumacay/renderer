@@ -10,11 +10,7 @@ namespace engine
     extern void bindings_window( py::module& m );
 }
 
-#ifndef ENGINE_HEADLESS_EGL
 PYBIND11_MODULE( tinyrenderer_core, m )
-#else
-PYBIND11_MODULE( tinyrenderer_core_egl, m )
-#endif
 {
     py::module::import( "tinymath" );
 
