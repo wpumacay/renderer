@@ -48,11 +48,13 @@ namespace engine
                     return self.properties();
                 } );
 
+    // @todo: Should move backend-implementation to internal adapter instaed of sub-classing
     #ifdef ENGINE_GLFW_ENABLED
         py::class_<CWindowGLFW, CIWindow>( m, "WindowGLFW" )
             .def( py::init< const CWindowProps& >() );
     #endif /* ENGINE_GLFW_ENABLED */
 
+    // @todo: Should move backend-implementation to internal adapter instaed of sub-classing
     #ifdef ENGINE_EGL_ENABLED
         py::class_<CWindowEGL, CIWindow>( m, "WindowEGL" )
             .def( py::init< const CWindowProps& >() );

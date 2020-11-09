@@ -42,10 +42,10 @@ namespace engine
         return CShaderManager::s_Instance->_CreateProgramFromSources( name, vrtSource, frgSource );
     }
 
-    CProgram::ptr CShaderManager::GetCachedShader( const std::string& name )
+    CProgram::ptr CShaderManager::GetCachedProgram( const std::string& name )
     {
-        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::GetCachedShader >>> Must initialize shader-manager before using it" );
-        return CShaderManager::s_Instance->_GetCachedShader( name );
+        ENGINE_CORE_ASSERT( CShaderManager::s_Instance, "CShaderManager::GetCachedProgram >>> Must initialize shader-manager before using it" );
+        return CShaderManager::s_Instance->_GetCachedProgram( name );
     }
 
     CProgram::ptr CShaderManager::_CreateProgramFromFiles( const std::string& name,
@@ -66,7 +66,7 @@ namespace engine
         return shader_program;
     }
 
-    CProgram::ptr CShaderManager::_GetCachedShader( const std::string& name )
+    CProgram::ptr CShaderManager::_GetCachedProgram( const std::string& name )
     {
         if ( m_Programs.find( name ) == m_Programs.end() )
         {

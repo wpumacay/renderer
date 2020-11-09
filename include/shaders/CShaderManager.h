@@ -44,7 +44,7 @@ namespace engine
         ///
         /// \param[in] name The unique identifier of the shader program when loaded
         /// \return A shared shader program object
-        static CProgram::ptr GetCachedShader( const std::string& name );
+        static CProgram::ptr GetCachedProgram( const std::string& name );
 
     private :
 
@@ -75,7 +75,7 @@ namespace engine
         ///
         /// \param[in] name The unique identifier of the shader program when loaded
         /// \return A shared shader program object
-        CProgram::ptr _GetCachedShader( const std::string& name );
+        CProgram::ptr _GetCachedProgram( const std::string& name );
 
         /// \brief constructs a shader-manager object
         CShaderManager();

@@ -4,6 +4,7 @@ file( GLOB_RECURSE BindingsFilesSources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" 
 set( BindingsFilesSources
      "${CMAKE_CURRENT_SOURCE_DIR}/common_py.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/math_py.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader_py.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/window/window_py.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/bindings_py.cpp" )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}" )

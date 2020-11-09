@@ -8,6 +8,7 @@ namespace engine
     extern void bindings_common( py::module& m );
     extern void bindings_math( py::module& m );
     extern void bindings_window( py::module& m );
+    extern void bindings_shaders( py::module& m );
 }
 
 PYBIND11_MODULE( tinyrenderer_core, m )
@@ -17,6 +18,7 @@ PYBIND11_MODULE( tinyrenderer_core, m )
     engine::bindings_common( m );
     engine::bindings_math( m );
     engine::bindings_window( m );
+    engine::bindings_shaders( m );
 
     // Initialize helper utilities
     tinyutils::Logger::Init();
