@@ -1,6 +1,7 @@
 
 #include <common_py.h>
 #include <window/CWindowGLFW.h>
+#include <window/CWindowEGL.h>
 
 namespace py = pybind11;
 
