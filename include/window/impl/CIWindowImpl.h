@@ -21,7 +21,7 @@ namespace engine
     std::string ToString( const eWindowType& type );
 
     /// Data struct used for building a window with given properties
-    struct CWindowProps
+    struct CWindowProperties
     {
         /// Type of windowing backend
         eWindowType type;
@@ -47,9 +47,11 @@ namespace engine
     {
     public :
 
-        CIWindowImpl( const CWindowProps& props );
+        /// \brief Constructs a backend that can be used with a window
+        CIWindowImpl( const CWindowProperties& properties );
 
-        virtual ~CIWindowImpl();
+        /// \brief Releases the resources used by this backend
+        virtual ~CIWindowImpl() = default;
 
         /// \brief Requests the backend to register a given callback for keyboard events
         void RegisterKeyCallback( FnPtr_keyboard_callback callback );
@@ -84,45 +86,44 @@ namespace engine
         /// \brief Requests the backend to the closing process of the associated window
         void RequestClose();
 
-
     protected :
 
         /// \brief Internal backend-specific implementation of the register-key-callback method
-        virtual void _RegisterKeyCallback( FnPtr_keyboard_callback callback ) = 0;
+        virtual void _RegisterKeyCallbackInternal( FnPtr_keyboard_callback callback ) = 0;
 
         /// \brief Internal backend-specific implementation of the register-mouse-callback method
-        virtual void _RegisterMouseCallback( FnPtr_mouse_callback callback ) = 0;
+        virtual void _RegisterMouseCallbackInternal( FnPtr_mouse_callback callback ) = 0;
 
         /// \brief Internal backend-specific implementation of the register-mousemove-callback method
-        virtual void _RegisterMouseMoveCallback( FnPtr_mousemove_callback callback ) = 0;
+        virtual void _RegisterMouseMoveCallbackInternal( FnPtr_mousemove_callback callback ) = 0;
 
         /// \brief Internal backend-specific implementation of the register-scroll-callback method
-        virtual void _RegisterScrollCallback( FnPtr_scroll_callback callback ) = 0;
+        virtual void _RegisterScrollCallbackInternal( FnPtr_scroll_callback callback ) = 0;
 
         /// \brief Internal backend-specific implementation of the register-resize-callback method
-        virtual void _RegisterResizeCallback( FnPtr_resize_callback callback ) = 0;
+        virtual void _RegisterResizeCallbackInternal( FnPtr_resize_callback callback ) = 0;
 
         /// \brief Internal backend-specific implementation of the enable-cursor method
-        virtual void _EnableCursor() = 0;
+        virtual void _EnableCursorInternal() = 0;
 
         /// \brief Internal backend-specific implementation of the disable-cursor method
-        virtual void _DisableCursor() = 0;
+        virtual void _DisableCursorInternal() = 0;
 
         /// \brief Internal backend-specific implementation of the begin method
-        virtual void _Begin() = 0;
+        virtual void _BeginInternal() = 0;
 
         /// \brief Internal backend-specific implementation of the end method
-        virtual void _End() = 0;
+        virtual void _EndInternal() = 0;
 
         /// \brief Internal backend-specific implementation of the is-active method
-        virtual bool _IsActive() = 0;
+        virtual bool _IsActiveInternal() = 0;
 
         /// \brief Internal backend-specific implementation of the request-close method
-        virtual void _RequestClose() = 0;
+        virtual void _RequestCloseInternal() = 0;
 
     protected :
 
         /// Struct containing all window properties
-        CWindowProps m_Properties;
+        CWindowProperties m_Properties;
     };
 }

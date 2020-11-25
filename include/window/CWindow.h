@@ -4,7 +4,15 @@
 
 #include <window/impl/CWindowImplGLFW.h>
 #include <window/impl/CWindowImplEGL.h>
-//// #include <window/CWindowImplMesa.h>
+//// #include <window/CWindowImplMESA.h>
+
+namespace engine
+{
+    class CIWindowImpl;
+    class CWindowImplGLFW;
+    class CWindowImplEGL;
+    //// class CWindowImplMESA;
+}
 
 namespace engine
 {
@@ -12,10 +20,15 @@ namespace engine
     /// \brief Window abstraction with support for multiple windowing backends
     class CWindow
     {
+        friend class CIWindowImpl;
+        friend class CWindowImplGLFW;
+        friend class CWindowImplEGL;
+        //// friend class CWindowImplMESA;
+
     public :
 
         /// \brief Constructs a window with the given properties
-        CWindow( const CWindowProps& properties )
+        CWindow( const CWindowProperties& properties )
 
         /// \brief Releases the resources of this window
         ~CWindow();
@@ -71,7 +84,7 @@ namespace engine
     protected :
 
         /// Struct containing all window properties
-        CWindowProps m_Properties;
+        CWindowProperties m_Properties;
         /// Handle to the implementation in the specific windowing backend
         std::unique_ptr<CIWindowImpl> m_Impl = nullptr;
     };
