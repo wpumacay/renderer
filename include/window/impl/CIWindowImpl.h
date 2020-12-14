@@ -47,9 +47,6 @@ namespace engine
     {
     public :
 
-        /// \brief Constructs a backend that can be used with a window
-        CIWindowImpl( const CWindowProperties& properties );
-
         /// \brief Releases the resources used by this backend
         virtual ~CIWindowImpl() = default;
 
@@ -120,10 +117,5 @@ namespace engine
 
         /// \brief Internal backend-specific implementation of the request-close method
         virtual void _RequestCloseInternal() = 0;
-
-    protected :
-
-        /// Struct containing all window properties
-        CWindowProperties m_Properties;
     };
 }
