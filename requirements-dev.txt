@@ -1,0 +1,5 @@
+numpy
+setuptools
+pytest
+cmakelang[YAML]==v0.6.13
+pre-commit==v2.14.0
