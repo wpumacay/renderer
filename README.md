@@ -1,11 +1,10 @@
-[![Build Status](https://travis-ci.com/wpumacay/tiny_renderer.svg?branch=master)](https://travis-ci.com/wpumacay/tiny_renderer)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/wpumacay/tiny_renderer/blob/master/LICENSE)
 
 # TinyRenderer: A minimal renderer for prototyping 3D applications
 
 This repo contains the implementation of a basic 3D OpenGL-based renderer. It contains basic abstractions
 of resources like VBOs, FBOs, etc., as well as a small OOP-based API to create a scene, in a similar way
-to [ThreeJs](https://github.com/mrdoob/three.js/), [BabylonJs](https://github.com/BabylonJS/Babylon.js) 
+to [ThreeJs](https://github.com/mrdoob/three.js/), [BabylonJs](https://github.com/BabylonJS/Babylon.js)
 and [Ogre3D](https://github.com/OGRECave/ogre). Some sample application that can be built with this renderer
 are shown below:
 
@@ -35,11 +34,11 @@ sudo apt install libassimp-dev libglfw3-dev libglew-dev
 # toolchain (g++, make) is very likely installed along Xcode, just install cmake and pkg-config using homebrew
 brew install cmake pkg-config
 # install remaining dependencies
-brew install glew glfw assimp 
+brew install glew glfw assimp
 ```
 
-* **Third party repositories**: These are dependencies available through github, which can be grabbed 
-  using the provided [setup_dependencies.sh](https://github.com/wpumacay/tiny_renderer/blob/master/scripts/setup_dependencies.sh) 
+* **Third party repositories**: These are dependencies available through github, which can be grabbed
+  using the provided [setup_dependencies.sh](https://github.com/wpumacay/tiny_renderer/blob/master/scripts/setup_dependencies.sh)
   script.
 
 ```bash
