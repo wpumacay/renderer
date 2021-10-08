@@ -9,7 +9,7 @@ with section("format"):
     dangle_parens = False
 
     # What style line endings to use in the output.
-    line_ending = 'unix'
+    line_ending = "unix"
 
     # How wide to allow formatted cmake files
     line_width = 80
@@ -34,7 +34,7 @@ with section("format"):
     use_tabchars = False
 
     # Format command names consistently as 'lower' or 'upper' case
-    command_case = 'unchanged'
+    command_case = "unchanged"
 
 # ------------------------------------------------
 # Options affecting comment reflow and formatting.
@@ -42,10 +42,10 @@ with section("format"):
 with section("markup"):
 
     # What character to use for bulleted lists
-    bullet_char = '*'
+    bullet_char = "*"
 
     # What character to use as punctuation after numerals in an enumerated list
-    enum_char = '.'
+    enum_char = "."
 
 # ----------------------------
 # Options affecting the linter
@@ -56,38 +56,38 @@ with section("lint"):
     disabled_codes = []
 
     # regular expression pattern describing valid function names
-    function_pattern = '[0-9a-zA-Z_]+'
+    function_pattern = "[0-9a-zA-Z_]+"
 
     # regular expression pattern describing valid macro names
-    macro_pattern = '[0-9a-zA-Z_]+'
+    macro_pattern = "[0-9a-zA-Z_]+"
 
     # regular expression pattern describing valid names for variables with global
     # (cache) scope
-    global_var_pattern = '[A-Z][0-9A-Z_]+'
+    global_var_pattern = "[A-Z][0-9A-Z_]+"
 
     # regular expression pattern describing valid names for variables with global
     # scope (but internal semantic)
-    internal_var_pattern = '_[A-Z][0-9A-Z_]+'
+    internal_var_pattern = "_[A-Z][0-9A-Z_]+"
 
     # regular expression pattern describing valid names for variables with local
     # scope
-    local_var_pattern = '[a-z][a-z0-9_]+'
+    local_var_pattern = "[a-z][a-z0-9_]+"
 
     # regular expression pattern describing valid names for privatedirectory
     # variables
-    private_var_pattern = '_[0-9a-z_]+'
+    private_var_pattern = "_[0-9a-z_]+"
 
     # regular expression pattern describing valid names for public directory
     # variables
-    public_var_pattern = '[A-Z][0-9A-Z_]+'
+    public_var_pattern = "[A-Z][0-9A-Z_]+"
 
     # regular expression pattern describing valid names for function/macro
     # arguments and loop variables.
-    argument_var_pattern = '[a-z][a-z0-9_]+'
+    argument_var_pattern = "[a-z][a-z0-9_]+"
 
     # regular expression pattern describing valid names for keywords used in
     # functions or macros
-    keyword_pattern = '[A-Z][0-9A-Z_]+'
+    keyword_pattern = "[A-Z][0-9A-Z_]+"
 
     # In the heuristic for C0201, how many conditionals to match within a loop in
     # before considering the loop a parser.
@@ -113,8 +113,8 @@ with section("encode"):
     emit_byteorder_mark = False
 
     # Specify the encoding of the input file. Defaults to utf-8
-    input_encoding = 'utf-8'
+    input_encoding = "utf-8"
 
     # Specify the encoding of the output file. Defaults to utf-8. Note that cmake
     # only claims to support utf-8 so be careful when using anything else
-    output_encoding = 'utf-8'
+    output_encoding = "utf-8"
