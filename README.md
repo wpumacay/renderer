@@ -1,62 +1,28 @@
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/wpumacay/tiny_renderer/blob/master/LICENSE)
-
 # TinyRenderer: A minimal renderer for prototyping 3D applications
 
-This repo contains the implementation of a basic 3D OpenGL-based renderer. It contains basic abstractions
-of resources like VBOs, FBOs, etc., as well as a small OOP-based API to create a scene, in a similar way
-to [ThreeJs](https://github.com/mrdoob/three.js/), [BabylonJs](https://github.com/BabylonJS/Babylon.js)
-and [Ogre3D](https://github.com/OGRECave/ogre). Some sample application that can be built with this renderer
+[![GitHub license][1]][2]
+
+This repo contains the implementation of a basic 3D OpenGL-based renderer. It
+contains basic abstractions of resources like VBOs, FBOs, etc., as well as a
+small OOP-based API to create a scene, similarly to [ThreeJs][3], [BabylonJs][4]
+and [Ogre3D][5]. Some sample applications that can be built with this renderer
 are shown below:
 
-![demo-1](https://media.giphy.com/media/SqrtZMytk0O0FnDtex/giphy.gif)
+![demo-1][6]
 
-![demo-2](https://media.giphy.com/media/ZDEAQSUraLao0fOhHi/giphy.gif)
+![demo-2][7]
 
 ## Setup
 
-### Requirements
+We're currently refactoring the whole library in the `dev` branch. Hopefully in
+some days we'll have the codebase up and running again. In the meantime, the
+`master` branch holds the latest stable version (still not refactored). I'm
+sorry in advance for any inconvenience.
 
-There are two types of requirements this package uses:
-
-* **Libraries from distribution**: We require `build-essential` or equivalent (make, gcc, g++), `cmake`
-  and `pkg-config`. These can be grabbed using your distribution's package manager.
-
-#### Ubuntu >= 16.04
-
-```bash
-sudo apt install build-essential cmake pkg-config
-sudo apt install libassimp-dev libglfw3-dev libglew-dev
-```
-
-#### MacOS
-
-```bash
-# toolchain (g++, make) is very likely installed along Xcode, just install cmake and pkg-config using homebrew
-brew install cmake pkg-config
-# install remaining dependencies
-brew install glew glfw assimp
-```
-
-* **Third party repositories**: These are dependencies available through github, which can be grabbed
-  using the provided [setup_dependencies.sh](https://github.com/wpumacay/tiny_renderer/blob/master/scripts/setup_dependencies.sh)
-  script.
-
-```bash
-./scripts/setup_dependencies.sh
-```
-
-### Building
-
-Use the provided _CMake_ rules:
-
-```bash
-mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j4
-```
-
-And that's it. Try some of the examples that were built along the library:
-
-```bash
-# make sure you're in the build directory to run the examples
-./examples/application/sample_application
-```
+[1]: <https://img.shields.io/badge/license-MIT-blue.svg> (badge-mit-license)
+[2]: <https://github.com/wpumacay/tiny_renderer/blob/master/LICENSE> (file-mit-license)
+[3]: <https://github.com/mrdoob/three.js> (three-js-github-repo)
+[4]: <https://github.com/BabylonJS/Babylon.js> (babylon-js-github-repo)
+[5]: <https://github.com/OGRECave/ogre> (ogre3d-github-repo)
+[6]: <https://media.giphy.com/media/SqrtZMytk0O0FnDtex/giphy.gif> (gif-demo-1)
+[7]: <https://media.giphy.com/media/ZDEAQSUraLao0fOhHi/giphy.gif> (gif-demo-2)
