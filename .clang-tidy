@@ -11,6 +11,7 @@ Checks: >
         performance-*,
         readability-*,
         -readability-redundant-access-specifiers,
+        -cppcoreguidelines-non-private-member-variables-in-classes
 
 WarningsAsErrors: ''
 FormatStyle: none

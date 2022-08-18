@@ -32,15 +32,24 @@ loco_initialize_project()
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(LocoRendererDependencies)
 
+set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/source/loco/renderer)
+
+# Include extra third-party dependencies
+add_subdirectory(third_party)
+
 # cmake-format: off
 # -------------------------------------
 loco_create_target(LocoRendererCpp STATIC
   SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/source/loco/renderer/common.cpp
+    ${SOURCE_DIR}/common.cpp
+    ${SOURCE_DIR}/window/window.cpp
+    ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
+    #### ${SOURCE_DIR}/window/impl/window_impl_egl.cpp
+    #### ${SOURCE_DIR}/window/impl/window_impl_osmesa.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES
-    OpenGL::OpenGL glfw::glfw assimp::assimp loco::math loco::utils
+    OpenGL::OpenGL glfw::glfw assimp::assimp loco::math loco::utils stb glad
   WARNINGS_AS_ERRORS
     FALSE)
 # cmake-format: on
