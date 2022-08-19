@@ -1,7 +1,26 @@
+#include <loco/renderer/window/impl/window_impl_glfw.hpp>
 #include <loco/renderer/window/window.hpp>
 
 namespace loco {
 namespace renderer {
+
+CWindow::CWindow(CWindowProperties properties)
+    : m_Properties(std::move(properties)) {
+    switch (m_Properties.backend) {
+        case eWindowBackend::TYPE_GLFW:
+            m_Impl = std::make_unique<WindowImplGlfw>(m_Properties);
+            break;
+        case eWindowBackend::TYPE_EGL:
+            // TODO(wilbert): use WindowImplEgl here
+            break;
+        case eWindowBackend::TYPE_OSMESA:
+            // TODO(wilbert): use WindowImplOsmesa here
+            break;
+        default:
+            // TODO(wilbert): use WindowImplNone here
+            break;
+    }
+}
 
 auto CWindow::EnableCursor() -> void {
     if (m_Impl) {

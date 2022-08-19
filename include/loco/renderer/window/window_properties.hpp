@@ -24,7 +24,7 @@ struct CWindowProperties {
     eWindowBackend backend = eWindowBackend::TYPE_NONE;
     int width = DEFAULT_WINDOW_WIDTH;
     int height = DEFAULT_WINDOW_HEIGHT;
-    bool active = false;
+    bool active = true;
     bool dirty_request_close = false;
     std::string title = "Application Window";
     CVec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};  // NOLINT

@@ -4,6 +4,7 @@
 
 #include <loco/utils/logging.hpp>
 #include <loco/renderer/window/impl/window_impl_glfw.hpp>
+#include "GLFW/glfw3.h"
 // clang-format on
 
 namespace loco {
@@ -122,6 +123,9 @@ WindowImplGlfw::WindowImplGlfw(CWindowProperties properties)
             arr_callbacks.at(i)(width, height);
         }
     });
+
+    // Keep ownership of the glfw-window
+    m_GlfwWindow = std::unique_ptr<GLFWwindow, GLFWwindowDeleter>(glfw_window);
 }
 
 auto WindowImplGlfw::RegisterKeyboardCallback(const KeyboardCallback& callback)
@@ -150,11 +154,15 @@ auto WindowImplGlfw::RegisterResizeCallback(const ResizeCallback& callback)
 }
 
 auto WindowImplGlfw::EnableCursor() -> void {
-    glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    if (m_GlfwWindow != nullptr) {
+        glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
 
 auto WindowImplGlfw::DisableCursor() -> void {
-    glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (m_GlfwWindow != nullptr) {
+        glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
 }
 
 auto WindowImplGlfw::Begin() -> void {
@@ -164,10 +172,16 @@ auto WindowImplGlfw::Begin() -> void {
     glfwPollEvents();
 }
 
-auto WindowImplGlfw::End() -> void { glfwSwapBuffers(m_GlfwWindow.get()); }
+auto WindowImplGlfw::End() -> void {
+    if (m_GlfwWindow != nullptr) {
+        glfwSwapBuffers(m_GlfwWindow.get());
+    }
+}
 
 auto WindowImplGlfw::RequestClose() -> void {
-    glfwSetWindowShouldClose(m_GlfwWindow.get(), GLFW_TRUE);
+    if (m_GlfwWindow != nullptr) {
+        glfwSetWindowShouldClose(m_GlfwWindow.get(), GLFW_TRUE);
+    }
 }
 
 }  // namespace renderer

@@ -27,7 +27,7 @@ class WindowImplGlfw : public IWindowImpl {
  public:
     explicit WindowImplGlfw(CWindowProperties properties);
 
-    ~WindowImplGlfw() override;
+    ~WindowImplGlfw() override = default;
 
     auto RegisterKeyboardCallback(const KeyboardCallback& callback)
         -> void override;

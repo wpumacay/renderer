@@ -23,7 +23,7 @@ project(
 option(LOCORENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(LOCORENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(LOCORENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
-option(LOCORENDERER_BUILD_EXAMPLES "Build C++ examples" OFF)
+option(LOCORENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(LOCORENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
 option(LOCORENDERER_BUILD_DOCS "Build documentation" OFF)
 
@@ -55,6 +55,10 @@ loco_create_target(LocoRendererCpp STATIC
 # cmake-format: on
 
 add_library(loco::renderer ALIAS LocoRendererCpp)
+
+if(LOCORENDERER_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 loco_print_target_properties(LocoRendererCpp)
 
