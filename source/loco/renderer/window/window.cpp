@@ -4,7 +4,7 @@
 namespace loco {
 namespace renderer {
 
-CWindow::CWindow(CWindowProperties properties)
+Window::Window(WindowProperties properties)
     : m_Properties(std::move(properties)) {
     switch (m_Properties.backend) {
         case eWindowBackend::TYPE_GLFW:
@@ -22,64 +22,64 @@ CWindow::CWindow(CWindowProperties properties)
     }
 }
 
-auto CWindow::EnableCursor() -> void {
+auto Window::EnableCursor() -> void {
     if (m_Impl) {
         m_Impl->EnableCursor();
     }
 }
 
-auto CWindow::DisableCursor() -> void {
+auto Window::DisableCursor() -> void {
     if (m_Impl) {
         m_Impl->DisableCursor();
     }
 }
 
-auto CWindow::Begin() -> void {
+auto Window::Begin() -> void {
     if (m_Impl) {
         m_Impl->Begin();
     }
 }
 
-auto CWindow::End() -> void {
+auto Window::End() -> void {
     if (m_Impl) {
         m_Impl->End();
     }
 }
 
-auto CWindow::RequestClose() -> void {
+auto Window::RequestClose() -> void {
     if (m_Impl) {
         m_Impl->RequestClose();
     }
 }
 
-auto CWindow::RegisterKeyboardCallback(const KeyboardCallback& callback)
+auto Window::RegisterKeyboardCallback(const KeyboardCallback& callback)
     -> void {
     if (m_Impl) {
         m_Impl->RegisterKeyboardCallback(callback);
     }
 }
 
-auto CWindow::RegisterMousePressCallback(const MousePressCallback& callback)
+auto Window::RegisterMousePressCallback(const MousePressCallback& callback)
     -> void {
     if (m_Impl) {
         m_Impl->RegisterMousePressCallback(callback);
     }
 }
 
-auto CWindow::RegisterMouseMoveCallback(const MouseMoveCallback& callback)
+auto Window::RegisterMouseMoveCallback(const MouseMoveCallback& callback)
     -> void {
     if (m_Impl) {
         m_Impl->RegisterMouseMoveCallback(callback);
     }
 }
 
-auto CWindow::RegisterScrollCallback(const ScrollCallback& callback) -> void {
+auto Window::RegisterScrollCallback(const ScrollCallback& callback) -> void {
     if (m_Impl) {
         m_Impl->RegisterScrollCallback(callback);
     }
 }
 
-auto CWindow::RegisterResizeCallback(const ResizeCallback& callback) -> void {
+auto Window::RegisterResizeCallback(const ResizeCallback& callback) -> void {
     if (m_Impl) {
         m_Impl->RegisterResizeCallback(callback);
     }

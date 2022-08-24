@@ -6,13 +6,13 @@ constexpr int DEFAULT_WIDTH = 1024;
 constexpr int DEFAULT_HEIGHT = 768;
 
 auto main() -> int {
-    loco::renderer::CWindowProperties properties;
+    loco::renderer::WindowProperties properties;
     properties.backend = loco::renderer::eWindowBackend::TYPE_GLFW;
     properties.width = DEFAULT_WIDTH;
     properties.height = DEFAULT_HEIGHT;
     properties.title = "Example 01 - Window";
 
-    auto window = std::make_unique<loco::renderer::CWindow>(properties);
+    auto window = std::make_unique<loco::renderer::Window>(properties);
     window->RegisterKeyboardCallback([](int key, int action) {
         LOG_TRACE("key: {0}, action: {1}", key, action);
     });

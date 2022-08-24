@@ -17,7 +17,7 @@ auto GLFWwindowDeleter::operator()(GLFWwindow* ptr) const -> void {
     }
 }
 
-WindowImplGlfw::WindowImplGlfw(CWindowProperties properties)
+WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
     : IWindowImpl(std::move(properties)) {
     if (glfwInit() != GLFW_TRUE) {
         LOG_CORE_ERROR("There was an issue while initializing GLFW");

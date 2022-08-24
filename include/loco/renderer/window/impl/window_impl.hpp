@@ -12,7 +12,7 @@
 namespace loco {
 namespace renderer {
 // Forward declare (we'll use the parent-child relationship)
-class CWindow;
+class Window;
 }  // namespace renderer
 }  // namespace loco
 
@@ -25,7 +25,7 @@ class IWindowImpl {
     LOCO_DEFINE_SMART_POINTERS(IWindowImpl);
 
  public:
-    explicit IWindowImpl(CWindowProperties properties)
+    explicit IWindowImpl(WindowProperties properties)
         : m_Properties(std::move(properties)) {}
 
     virtual ~IWindowImpl() = default;
@@ -56,7 +56,7 @@ class IWindowImpl {
     virtual auto RequestClose() -> void = 0;
 
  protected:
-    CWindowProperties m_Properties;
+    WindowProperties m_Properties;
 };
 
 }  // namespace renderer

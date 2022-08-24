@@ -20,7 +20,7 @@ enum class eWindowBackend {
     TYPE_OSMESA,
 };
 
-struct CWindowProperties {
+struct WindowProperties {
     eWindowBackend backend = eWindowBackend::TYPE_NONE;
     int width = DEFAULT_WINDOW_WIDTH;
     int height = DEFAULT_WINDOW_HEIGHT;

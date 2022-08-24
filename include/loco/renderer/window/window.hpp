@@ -14,13 +14,13 @@
 namespace loco {
 namespace renderer {
 
-class CWindow {
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(CWindow)
+class Window {
+    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Window)
 
  public:
-    explicit CWindow(CWindowProperties properties);
+    explicit Window(WindowProperties properties);
 
-    ~CWindow() = default;
+    ~Window() = default;
 
     auto EnableCursor() -> void;
 
@@ -53,7 +53,7 @@ class CWindow {
     auto backend() const -> eWindowBackend { return m_Properties.backend; }
 
  private:
-    CWindowProperties m_Properties;
+    WindowProperties m_Properties;
     /// Backend-specific implementation of the window API
     IWindowImpl::uptr m_Impl = nullptr;
 };

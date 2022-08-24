@@ -25,7 +25,7 @@ class WindowImplGlfw : public IWindowImpl {
     LOCO_DEFINE_SMART_POINTERS(WindowImplGlfw)
 
  public:
-    explicit WindowImplGlfw(CWindowProperties properties);
+    explicit WindowImplGlfw(WindowProperties properties);
 
     ~WindowImplGlfw() override = default;
 
