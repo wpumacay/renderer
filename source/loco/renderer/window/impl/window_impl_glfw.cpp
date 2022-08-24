@@ -63,13 +63,13 @@ WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
     glfwSetWindowUserPointer(glfw_window, this);
 
     glfwSetKeyCallback(glfw_window, [](GLFWwindow* window_ptr, int key, int,
-                                       int action, int) {
+                                       int action, int mods) {
         auto* impl =
             static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
         size_t num_callbacks = impl->m_ArrKeyboardCallbacksCount;
         auto& arr_callbacks = impl->m_ArrKeyboardCallbacks;
         for (size_t i = 0; i < num_callbacks; i++) {
-            arr_callbacks.at(i)(key, action);
+            arr_callbacks.at(i)(key, action, mods);
         }
     });
 
