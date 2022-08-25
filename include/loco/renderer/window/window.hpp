@@ -15,7 +15,10 @@ namespace loco {
 namespace renderer {
 
 class Window {
+    // cppcheck-suppress unknownMacro
     LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Window)
+
+    LOCO_DEFINE_SMART_POINTERS(Window)
 
  public:
     explicit Window(WindowProperties properties);
@@ -51,6 +54,10 @@ class Window {
     auto title() const -> std::string { return m_Properties.title; }
 
     auto backend() const -> eWindowBackend { return m_Properties.backend; }
+
+    auto properties() -> WindowProperties& { return m_Properties; }
+
+    auto properties() const -> const WindowProperties& { return m_Properties; }
 
  private:
     WindowProperties m_Properties;

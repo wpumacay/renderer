@@ -20,6 +20,8 @@ enum class eWindowBackend {
     TYPE_OSMESA,
 };
 
+auto ToString(const eWindowBackend& type) -> std::string;
+
 struct WindowProperties {
     eWindowBackend backend = eWindowBackend::TYPE_NONE;
     int width = DEFAULT_WINDOW_WIDTH;
