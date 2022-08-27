@@ -2,8 +2,6 @@
 #include <loco/renderer/window/window.hpp>
 #include <loco/utils/logging.hpp>
 
-#include "loco/renderer/input/callbacks.hpp"
-
 constexpr int DEFAULT_WIDTH = 1024;
 constexpr int DEFAULT_HEIGHT = 768;
 

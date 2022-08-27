@@ -18,6 +18,10 @@
 # -------------------------------------
 find_package(OpenGL REQUIRED)
 
+if(OpenGL_EGL_FOUND)
+  target_link_libraries(OpenGL::OpenGL INTERFACE OpenGL::EGL)
+endif()
+
 # -------------------------------------
 option(FIND_OR_FETCH_USE_SYSTEM_PACKAGE
        "Whether or not to give priority to system-wide package search" OFF)

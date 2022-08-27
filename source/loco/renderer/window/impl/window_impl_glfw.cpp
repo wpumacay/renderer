@@ -4,7 +4,6 @@
 
 #include <loco/utils/logging.hpp>
 #include <loco/renderer/window/impl/window_impl_glfw.hpp>
-#include "GLFW/glfw3.h"
 // clang-format on
 
 namespace loco {
