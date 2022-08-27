@@ -64,7 +64,7 @@ WindowImplEgl::WindowImplEgl(WindowProperties properties)
     eglMakeCurrent(m_Display, m_Surface, m_Surface, m_Context);
 
     // Load gl-functions using glad
-    LOG_CORE_ASSERT(gladLoadGL((GLADloadfunc)eglGetProcAddress),  // NOLINT
+    LOG_CORE_ASSERT(gladLoadGL(static_cast<GLADloadfunc>(eglGetProcAddress)),
                     "WindowImplEgl >>> failed to load GL using GLAD on the "
                     "current EGL context");
     LOG_CORE_INFO("WindowImplEgl >>> successfully initialized EGL window");

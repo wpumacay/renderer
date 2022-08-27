@@ -27,9 +27,6 @@ auto Window::_CreateImpl() -> void {
         case eWindowBackend::TYPE_EGL:
             m_Impl = std::make_unique<WindowImplEgl>(m_Properties);
             break;
-        case eWindowBackend::TYPE_OSMESA:
-            // TODO(wilbert): use WindowImplOsmesa here
-            break;
         default:
             // TODO(wilbert): use WindowImplNone here
             break;

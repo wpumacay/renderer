@@ -18,8 +18,7 @@ void bindings_window(py::module& m) {
         py::enum_<Enum>(m, "eWindowBackend")
             .value("TYPE_NONE", Enum::TYPE_NONE)
             .value("TYPE_GLFW", Enum::TYPE_GLFW)
-            .value("TYPE_EGL", Enum::TYPE_EGL)
-            .value("TYPE_OSMESA", Enum::TYPE_OSMESA);
+            .value("TYPE_EGL", Enum::TYPE_EGL);
     }
 
     {

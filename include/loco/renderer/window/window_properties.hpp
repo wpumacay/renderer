@@ -17,7 +17,6 @@ enum class eWindowBackend {
     TYPE_NONE,
     TYPE_GLFW,
     TYPE_EGL,
-    TYPE_OSMESA,
 };
 
 auto ToString(const eWindowBackend& type) -> std::string;

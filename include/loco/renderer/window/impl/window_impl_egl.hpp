@@ -8,6 +8,11 @@
 #include <loco/renderer/window/impl/window_impl.hpp>
 // clang-format on
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+
 namespace loco {
 namespace renderer {
 
@@ -61,3 +66,7 @@ class WindowImplEgl : public IWindowImpl {
 
 }  // namespace renderer
 }  // namespace loco
+
+#ifdef __clang__
+#pragma clang diagnostic pop  // NOLINT
+#endif

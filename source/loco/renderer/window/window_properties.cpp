@@ -15,8 +15,6 @@ auto ToString(const eWindowBackend& type) -> std::string {
             return "glfw";
         case eWindowBackend::TYPE_EGL:
             return "egl";
-        case eWindowBackend::TYPE_OSMESA:
-            return "osmesa";
         default:
             assert(false);
             return "ERROR";
