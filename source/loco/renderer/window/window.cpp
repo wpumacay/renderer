@@ -1,11 +1,24 @@
 #include <loco/renderer/window/impl/window_impl_glfw.hpp>
 #include <loco/renderer/window/window.hpp>
 
+#include "loco/renderer/window/window_properties.hpp"
+
 namespace loco {
 namespace renderer {
 
 Window::Window(WindowProperties properties)
     : m_Properties(std::move(properties)) {
+    _CreateImpl();
+}
+
+Window::Window(int width, int height, const eWindowBackend& backend) {
+    m_Properties.width = width;
+    m_Properties.height = height;
+    m_Properties.backend = backend;
+    _CreateImpl();
+}
+
+auto Window::_CreateImpl() -> void {
     switch (m_Properties.backend) {
         case eWindowBackend::TYPE_GLFW:
             m_Impl = std::make_unique<WindowImplGlfw>(m_Properties);

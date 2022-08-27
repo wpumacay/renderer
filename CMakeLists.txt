@@ -25,7 +25,7 @@ option(LOCORENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(LOCORENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(LOCORENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(LOCORENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
-option(LOCORENDERER_BUILD_DOCS "Build documentation" OFF)
+option(LOCORENDERER_BUILD_DOCS "Build documentation" ON)
 
 loco_initialize_project()
 
@@ -63,6 +63,10 @@ endif()
 
 if(LOCORENDERER_BUILD_PYTHON_BINDINGS)
   add_subdirectory(python/renderer)
+endif()
+
+if(LOCORENDERER_BUILD_DOCS)
+  include(LocoRendererDocs)
 endif()
 
 loco_print_target_properties(LocoRendererCpp)
