@@ -1,20 +1,31 @@
-#include <loco/renderer/window/impl/window_impl_glfw.hpp>
+// clang-format off
 #include <loco/renderer/window/window.hpp>
+#include <loco/renderer/window/impl/window_impl_egl.hpp>
+#include <loco/renderer/window/impl/window_impl_glfw.hpp>
+// clang-format on
 
 namespace loco {
 namespace renderer {
 
 Window::Window(WindowProperties properties)
     : m_Properties(std::move(properties)) {
+    _CreateImpl();
+}
+
+Window::Window(int width, int height, const eWindowBackend& backend) {
+    m_Properties.width = width;
+    m_Properties.height = height;
+    m_Properties.backend = backend;
+    _CreateImpl();
+}
+
+auto Window::_CreateImpl() -> void {
     switch (m_Properties.backend) {
         case eWindowBackend::TYPE_GLFW:
             m_Impl = std::make_unique<WindowImplGlfw>(m_Properties);
             break;
         case eWindowBackend::TYPE_EGL:
-            // TODO(wilbert): use WindowImplEgl here
-            break;
-        case eWindowBackend::TYPE_OSMESA:
-            // TODO(wilbert): use WindowImplOsmesa here
+            m_Impl = std::make_unique<WindowImplEgl>(m_Properties);
             break;
         default:
             // TODO(wilbert): use WindowImplNone here

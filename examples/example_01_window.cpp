@@ -13,8 +13,17 @@ auto main() -> int {
     properties.title = "Example 01 - Window";
 
     auto window = std::make_unique<loco::renderer::Window>(properties);
-    window->RegisterKeyboardCallback([](int key, int action) {
-        LOG_TRACE("key: {0}, action: {1}", key, action);
+    window->RegisterKeyboardCallback([](int key, int action, int mods) {
+        LOG_TRACE("key: {0}, action: {1}, mods: {2}", key, action, mods);
+        if ((mods & loco::renderer::MOD_SHIFT) != 0) {
+            LOG_INFO("Holding SHIFT key");
+        }
+        if ((mods & loco::renderer::MOD_CONTROL) != 0) {
+            LOG_INFO("Holding CONTROL key");
+        }
+        if ((mods & loco::renderer::MOD_ALT) != 0) {
+            LOG_INFO("Holding ALT key");
+        }
     });
 
     while (window->active()) {
