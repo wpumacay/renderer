@@ -18,3 +18,6 @@ AccessModifierOffset: -3
 
 # Keep C++11 as target
 Standard: Cpp11
+
+# Don't sort the includes
+SortIncludes: false
