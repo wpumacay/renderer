@@ -28,7 +28,7 @@ struct WindowProperties {
     bool active = true;
     bool dirty_request_close = false;
     std::string title = "Application Window";
-    CVec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};  // NOLINT
+    Vec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};  // NOLINT
     int gl_version_major = 3;
     int gl_version_minor = 3;
 };

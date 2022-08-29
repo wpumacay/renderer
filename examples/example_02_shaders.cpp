@@ -1,6 +1,7 @@
 
 #include <loco/renderer/window/window.hpp>
 #include <loco/renderer/shader/shader_t.hpp>
+#include <loco/renderer/shader/program_t.hpp>
 #include <loco/utils/logging.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
@@ -48,6 +49,15 @@ auto main() -> int {
 
     if (frag_shader->compiled()) {
         LOG_INFO("Fragment shader successfully compiled");
+    }
+
+    auto program = std::make_unique<loco::renderer::Program>("basic_2d");
+    program->AddShader(std::move(vert_shader));
+    program->AddShader(std::move(frag_shader));
+    program->LinkProgram();
+
+    if (program->linked()) {
+        LOG_INFO("Shader Program successfully linked");
     }
 
     while (window->active()) {

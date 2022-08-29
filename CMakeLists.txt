@@ -47,6 +47,7 @@ loco_create_target(LocoRendererCpp STATIC
     ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
     ${SOURCE_DIR}/window/impl/window_impl_egl.cpp
     ${SOURCE_DIR}/shader/shader_t.cpp
+    ${SOURCE_DIR}/shader/program_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES
