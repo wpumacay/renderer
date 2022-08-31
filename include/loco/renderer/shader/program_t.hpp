@@ -83,11 +83,17 @@ class Program {
     /// Returns the uniform id for the given uniform name
     auto GetUniformLocation(const char* uname) -> int32_t;
 
+    /// Returns the name of this program
+    auto name() const -> std::string { return m_Name; }
+
     /// Returns the opengl-id of this shader on the GPU
     auto opengl_id() const -> uint32_t { return m_OpenGLId; }
 
     /// Returns whether or not if this shader has been compiled
     auto linked() const -> bool { return m_Linked; }
+
+    /// Returns the number of shaders owned by this program
+    auto num_shaders() const -> uint32_t { return m_NumShaders; }
 
  private:
     /// Unique name identifier of this shader
