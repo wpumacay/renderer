@@ -135,7 +135,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME loco_math
   GIT_REPO https://github.com/wpumacay/loco_math.git
   GIT_TAG dev
-  TARGETS loco::math
+  TARGETS loco::math loco::math_py_helpers
   BUILD_ARGS
     -DLOCOMATH_BUILD_PYTHON_BINDINGS=ON
     -DLOCOMATH_BUILD_EXAMPLES=OFF
