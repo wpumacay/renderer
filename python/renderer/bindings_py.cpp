@@ -9,6 +9,7 @@ namespace loco {
 namespace renderer {
 
 extern void bindings_window(py::module& py_module);  // NOLINT
+extern void bindings_shader(py::module& py_module);  // NOLINT
 
 }  // namespace renderer
 }  // namespace loco
@@ -16,4 +17,5 @@ extern void bindings_window(py::module& py_module);  // NOLINT
 // NOLINTNEXTLINE
 PYBIND11_MODULE(renderer, py_module) {
     loco::renderer::bindings_window(py_module);
+    loco::renderer::bindings_shader(py_module);
 }

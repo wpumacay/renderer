@@ -68,6 +68,12 @@ class Window {
     /// events
     auto RegisterResizeCallback(const ResizeCallback& callback) -> void;
 
+    /// Returns an unmutable reference to the clear-color property
+    auto clear_color() const -> const Vec4& { return m_Properties.clear_color; }
+
+    /// Returns a mutable reference to the clear-color property
+    auto clear_color() -> Vec4& { return m_Properties.clear_color; }
+
     /// Returns the current width (in pixels) of this window
     auto width() const -> int { return m_Properties.width; }
 

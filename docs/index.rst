@@ -10,11 +10,11 @@ Loco-Renderer is a 3d rendering library, composed of various primitives the user
 can use in for prototyping 3d applications.
 
 .. toctree::
-   :glob:
    :maxdepth: 2
    :caption: Primitives:
 
-   primitives/*
+   primitives/window
+   primitives/shaders
 
 Indices and tables
 ==================

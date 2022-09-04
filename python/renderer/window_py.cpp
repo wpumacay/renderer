@@ -1,10 +1,13 @@
-// clang-format off
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 #include <pybind11/functional.h>
+#include <pybind11/numpy.h>
 
 #include <loco/renderer/window/window.hpp>
-// clang-format on
+
+#include <conversions_py.hpp>
+#include <loco/math/common.hpp>
+#include "loco/renderer/window/window_properties.hpp"
 
 namespace py = pybind11;
 
@@ -15,7 +18,7 @@ namespace renderer {
 void bindings_window(py::module& m) {
     {
         using Enum = loco::renderer::eWindowBackend;
-        py::enum_<Enum>(m, "eWindowBackend")
+        py::enum_<Enum>(m, "WindowBackend")
             .value("TYPE_NONE", Enum::TYPE_NONE)
             .value("TYPE_GLFW", Enum::TYPE_GLFW)
             .value("TYPE_EGL", Enum::TYPE_EGL);
@@ -25,6 +28,17 @@ void bindings_window(py::module& m) {
         using Class = loco::renderer::WindowProperties;
         py::class_<Class>(m, "WindowProperties")
             .def(py::init<>())
+            .def_property(
+                "clearColor",
+                [](const Class& self) -> py::array_t<math::float32_t> {
+                    return math::vec4_to_nparray<math::float32_t>(
+                        self.clear_color);
+                },
+                [](Class& self,
+                   const py::array_t<math::float32_t>& array_np) -> void {
+                    self.clear_color =
+                        math::nparray_to_vec4<math::float32_t>(array_np);
+                })
             .def_readwrite("backend", &Class::backend)
             .def_readwrite("width", &Class::width)
             .def_readwrite("height", &Class::height)
@@ -47,6 +61,8 @@ void bindings_window(py::module& m) {
         using Class = loco::renderer::Window;
         py::class_<Class, Class::ptr>(m, "Window")
             .def(py::init<const WindowProperties&>())
+            .def(py::init<int, int, const eWindowBackend&>(), py::arg("width"),
+                 py::arg("height"), py::arg("backend"))
             .def("EnableCursor", &Class::EnableCursor)
             .def("DisableCursor", &Class::DisableCursor)
             .def("Begin", &Class::Begin)
@@ -58,6 +74,17 @@ void bindings_window(py::module& m) {
             .def("RegisterMouseMoveCallback", &Class::RegisterMouseMoveCallback)
             .def("RegisterScrollCallback", &Class::RegisterScrollCallback)
             .def("RegisterResizeCallback", &Class::RegisterResizeCallback)
+            .def_property(
+                "clearColor",
+                [](const Class& self) -> py::array_t<math::float32_t> {
+                    return math::vec4_to_nparray<math::float32_t>(
+                        self.clear_color());
+                },
+                [](Class& self,
+                   const py::array_t<math::float32_t>& array_np) -> void {
+                    self.clear_color() =
+                        math::nparray_to_vec4<math::float32_t>(array_np);
+                })
             .def_property_readonly("width", &Class::width)
             .def_property_readonly("height", &Class::height)
             .def_property_readonly("active", &Class::active)
