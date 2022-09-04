@@ -59,7 +59,7 @@ loco_create_target(LocoRendererCpp STATIC
 add_library(loco::renderer ALIAS LocoRendererCpp)
 
 if(LOCORENDERER_BUILD_EXAMPLES)
-  add_subdirectory(examples)
+  add_subdirectory(examples/cpp)
 endif()
 
 if(LOCORENDERER_BUILD_PYTHON_BINDINGS)

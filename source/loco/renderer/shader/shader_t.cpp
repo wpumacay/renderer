@@ -64,7 +64,7 @@ auto Shader::_CompileShader(const char* source) -> void {
         glDeleteShader(m_OpenGLId);
         LOG_CORE_ERROR(
             "Shader::_CompileShader >>> coudln't compile shader: name={0}, "
-            "type={0},\nerror={2}",
+            "type={1},\nerror={2}",
             m_Name, ToString(m_Type), error_buffer.data());
         m_Compiled = false;
         m_OpenGLId = 0;

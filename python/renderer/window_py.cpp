@@ -7,6 +7,7 @@
 
 #include <conversions_py.hpp>
 #include <loco/math/common.hpp>
+#include "loco/renderer/window/window_properties.hpp"
 
 namespace py = pybind11;
 
@@ -17,7 +18,7 @@ namespace renderer {
 void bindings_window(py::module& m) {
     {
         using Enum = loco::renderer::eWindowBackend;
-        py::enum_<Enum>(m, "eWindowBackend")
+        py::enum_<Enum>(m, "WindowBackend")
             .value("TYPE_NONE", Enum::TYPE_NONE)
             .value("TYPE_GLFW", Enum::TYPE_GLFW)
             .value("TYPE_EGL", Enum::TYPE_EGL);
@@ -60,6 +61,8 @@ void bindings_window(py::module& m) {
         using Class = loco::renderer::Window;
         py::class_<Class, Class::ptr>(m, "Window")
             .def(py::init<const WindowProperties&>())
+            .def(py::init<int, int, const eWindowBackend&>(), py::arg("width"),
+                 py::arg("height"), py::arg("backend"))
             .def("EnableCursor", &Class::EnableCursor)
             .def("DisableCursor", &Class::DisableCursor)
             .def("Begin", &Class::Begin)
