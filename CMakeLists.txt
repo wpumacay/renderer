@@ -25,7 +25,7 @@ option(LOCORENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(LOCORENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(LOCORENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(LOCORENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
-option(LOCORENDERER_BUILD_DOCS "Build documentation" ON)
+option(LOCORENDERER_BUILD_DOCS "Build documentation" OFF)
 
 loco_initialize_project()
 
@@ -42,7 +42,7 @@ add_subdirectory(third_party)
 loco_create_target(LocoRendererCpp STATIC
   SOURCES
     ${SOURCE_DIR}/common.cpp
-    ${SOURCE_DIR}/window/window.cpp
+    ${SOURCE_DIR}/window/window_t.cpp
     ${SOURCE_DIR}/window/window_properties.cpp
     ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
     ${SOURCE_DIR}/window/impl/window_impl_egl.cpp

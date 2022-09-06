@@ -1,8 +1,7 @@
-// clang-format off
-#include <loco/renderer/window/window.hpp>
+
+#include <loco/renderer/window/window_t.hpp>
 #include <loco/renderer/window/impl/window_impl_egl.hpp>
 #include <loco/renderer/window/impl/window_impl_glfw.hpp>
-// clang-format on
 
 namespace loco {
 namespace renderer {
@@ -61,6 +60,7 @@ auto Window::RequestClose() -> void {
     if (m_Impl) {
         m_Impl->RequestClose();
     }
+    m_Properties.active = false;
 }
 
 auto Window::RegisterKeyboardCallback(const KeyboardCallback& callback)

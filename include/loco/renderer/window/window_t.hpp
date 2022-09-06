@@ -1,15 +1,14 @@
 #pragma once
 
-// clang-format off
 #include <array>
 #include <string>
 #include <loco/utils/common.hpp>
 
 #include <loco/renderer/common.hpp>
 #include <loco/renderer/input/callbacks.hpp>
+#include <loco/renderer/input/keycodes.hpp>
 #include <loco/renderer/window/window_properties.hpp>
 #include <loco/renderer/window/impl/window_impl.hpp>
-// clang-format on
 
 namespace loco {
 namespace renderer {

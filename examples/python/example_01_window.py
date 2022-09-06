@@ -13,8 +13,12 @@ def main():
     properties.title = "Example 01 - Window"
 
     window = rdr.Window(properties)
-    window.RegisterKeyboardCallback(lambda key, action, mods:
-        print("key: {}, action: {}. mods: {}".format(key, action, mods)))
+    def keycallback(key, action, mods):
+        print("key: {}, action: {}. mods: {}".format(key, action, mods))
+        if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.PRESSED:
+            window.RequestClose()
+
+    window.RegisterKeyboardCallback(keycallback)
 
     while window.active:
         window.Begin()

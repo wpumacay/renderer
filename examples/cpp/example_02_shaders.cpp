@@ -1,5 +1,5 @@
 
-#include <loco/renderer/window/window.hpp>
+#include <loco/renderer/window/window_t.hpp>
 #include <loco/renderer/shader/shader_t.hpp>
 #include <loco/renderer/shader/program_t.hpp>
 #include <loco/utils/logging.hpp>
