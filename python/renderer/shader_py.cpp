@@ -1,8 +1,13 @@
+#include <utility>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
+#include <pybind11/numpy.h>
 
 #include <loco/renderer/shader/shader_t.hpp>
 #include <loco/renderer/shader/program_t.hpp>
+
+#include <conversions_py.hpp>
 
 namespace py = pybind11;
 
@@ -24,7 +29,7 @@ void bindings_shader(py::module& m) {
 
     {
         using Class = loco::renderer::Shader;
-        py::class_<Class, Class::ptr>(m, "Shader")
+        py::class_<Class, Class::uptr>(m, "Shader")
             .def(py::init<const char*, const eShaderType&, const char*>())
             .def_property_readonly("name", &Class::name)
             .def_property_readonly("type", &Class::type)
@@ -42,12 +47,37 @@ void bindings_shader(py::module& m) {
     {
         using Class = loco::renderer::Program;
         py::class_<Class, Class::ptr>(m, "Program")
+            .def(py::init<const char*>())
             .def(py::init<const char*, const char*, const char*>())
+            .def(
+                "AddShader",
+                [](Class& self, Shader::uptr shader) -> void {
+                    self.AddShader(std::move(shader));
+                },
+                py::keep_alive<1, 2>())
             .def("LinkProgram", &Class::LinkProgram)
             .def("Bind", &Class::Bind)
             .def("Unbind", &Class::Unbind)
             .def("SetInt", &Class::SetInt)
             .def("SetFloat", &Class::SetFloat)
+            .def("SetVec2",
+                 [](Class& self, const char* uname,
+                    const py::array_t<math::float32_t>& uvalue) {
+                     self.SetVec2(
+                         uname, math::nparray_to_vec2<math::float32_t>(uvalue));
+                 })
+            .def("SetVec3",
+                 [](Class& self, const char* uname,
+                    const py::array_t<math::float32_t>& uvalue) {
+                     self.SetVec3(
+                         uname, math::nparray_to_vec3<math::float32_t>(uvalue));
+                 })
+            .def("SetVec4",
+                 [](Class& self, const char* uname,
+                    const py::array_t<math::float32_t>& uvalue) {
+                     self.SetVec4(
+                         uname, math::nparray_to_vec4<math::float32_t>(uvalue));
+                 })
             .def_property_readonly("opengl_id", &Class::opengl_id)
             .def_property_readonly("linked", &Class::linked)
             .def("__repr__", [](const Class& self) -> py::str {

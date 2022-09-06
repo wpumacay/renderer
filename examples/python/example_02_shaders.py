@@ -43,6 +43,14 @@ def main():
     if frag_shader.compiled:
         print("Fragment Shader successfully compiled")
 
+    program = rdr.Program("basic_2d")
+    program.AddShader(vert_shader)
+    program.AddShader(frag_shader)
+    program.LinkProgram()
+
+    if program.linked:
+        print("Shader Program successfully linked")
+
     while window.active:
         window.Begin()
 

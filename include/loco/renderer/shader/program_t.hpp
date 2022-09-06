@@ -11,6 +11,7 @@
 namespace loco {
 namespace renderer {
 
+/// Max number of programmable stages
 constexpr int MAX_SHADERS_IN_PROGRAM = 7;
 
 /// Shader-Program class, used to handle a shader-program on the GPU
