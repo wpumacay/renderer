@@ -28,20 +28,29 @@ option(FIND_OR_FETCH_USE_SYSTEM_PACKAGE
 
 # cmake-format: off
 # ------------------------------------------------------------------------------
-# Pybind11 is used for generating Python bindings for this project's C++ API
+# Pybind11 is used for generating Python bindings for this project's C++ API.
+# Notice that we're using a forked version in which usage of unique-ptr is
+# allowed, as we use this functionality in some other parent projects
 # ------------------------------------------------------------------------------
-# Hint to Pybind11 that we want to use the newer FindPython module from CMake
-set(PYBIND11_FINDPYTHON ON CACHE BOOL "Use newer FindPython (CMake 3.15+)")
 
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
   PACKAGE_NAME pybind11
   LIBRARY_NAME pybind11
-  GIT_REPO https://github.com/pybind/pybind11.git
-  GIT_TAG v2.10.0
+  GIT_REPO https://github.com/RobotLocomotion/pybind11.git
+  GIT_TAG drake
   TARGETS pybind11::headers
   BUILD_ARGS
     -DPYBIND11_TEST=OFF
+  PATCH_COMMAND
+    "${GIT_EXECUTABLE}"
+    "apply"
+    "-q"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pybind11-fix-vs2022.patch"
+    "||"
+    "${CMAKE_COMMAND}"
+    "-E"
+    "true"
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------

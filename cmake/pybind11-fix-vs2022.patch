@@ -1,0 +1,86 @@
+From a224d0cca5f1752acfcdad8e37369e4cda42259e Mon Sep 17 00:00:00 2001
+From: Boris Rasin <Boris-Rasin@users.noreply.github.com>
+Date: Fri, 3 Dec 2021 21:10:36 +0200
+Subject: [PATCH] fix: vs2022 compilation, issue #3477 (#3497)
+
+* fix: vs2022 compilation, issue #3477
+
+* silence warning for python 2.7
+
+* disable warning around mbstowcs call
+
+* move disable warning code closer to call site
+
+* turn on vs2022 ci test
+
+* ci: don't run helpers on Windows 2022 & Python 3.5
+
+* limit workaround for stdlib shipped with vs2022 or later
+
+* fix for: limit workaround for stdlib shipped with vs2022 or later
+
+* fix 2 for: limit workaround for stdlib shipped with vs2022 or later
+
+* comment
+
+* ci: add a Windows 2019 run
+
+* ci: add Python 2.7 check too
+
+Co-authored-by: Henry Schreiner <HenrySchreinerIII@gmail.com>
+---
+ include/pybind11/detail/common.h |  8 ++++++++
+ include/pybind11/embed.h         | 12 ++++++++++++
+ 2 files changed, 20 insertions(+), 0 deletions(-)
+
+diff --git a/include/pybind11/detail/common.h b/include/pybind11/detail/common.h
+index eb5fb086..2d57367d 100644
+--- a/include/pybind11/detail/common.h
++++ b/include/pybind11/detail/common.h
+@@ -154,6 +154,14 @@
+ // C4505: 'PySlice_GetIndicesEx': unreferenced local function has been removed (PyPy only)
+ #  pragma warning(disable: 4505)
+ #  if defined(_DEBUG) && !defined(Py_DEBUG)
++// Workaround for a VS 2022 issue.
++// NOTE: This workaround knowingly violates the Python.h include order requirement:
++// https://docs.python.org/3/c-api/intro.html#include-files
++// See https://github.com/pybind/pybind11/pull/3497 for full context.
++#    include <yvals.h>
++#    if _MSVC_STL_VERSION >= 143
++#      include <crtdefs.h>
++#    endif
+ #    define PYBIND11_DEBUG_MARKER
+ #    undef _DEBUG
+ #  endif
+diff --git a/include/pybind11/embed.h b/include/pybind11/embed.h
+index 9843f0f9..af36340f 100644
+--- a/include/pybind11/embed.h
++++ b/include/pybind11/embed.h
+@@ -102,6 +102,13 @@ inline wchar_t *widen_chars(const char *safe_arg) {
+     wchar_t *widened_arg = Py_DecodeLocale(safe_arg, nullptr);
+ #else
+     wchar_t *widened_arg = nullptr;
++
++// warning C4996: 'mbstowcs': This function or variable may be unsafe.
++#if defined(_MSC_VER)
++#pragma warning(push)
++#pragma warning(disable:4996)
++#endif
++
+ #    if defined(HAVE_BROKEN_MBSTOWCS) && HAVE_BROKEN_MBSTOWCS
+     size_t count = strlen(safe_arg);
+ #    else
+@@ -111,6 +118,11 @@ inline wchar_t *widen_chars(const char *safe_arg) {
+         widened_arg = new wchar_t[count + 1];
+         mbstowcs(widened_arg, safe_arg, count + 1);
+     }
++
++#if defined(_MSC_VER)
++#pragma warning(pop)
++#endif
++
+ #endif
+     return widened_arg;
+ }
+--
+2.37.2
