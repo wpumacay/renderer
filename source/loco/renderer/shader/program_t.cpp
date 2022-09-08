@@ -59,7 +59,7 @@ auto Program::LinkProgram() -> void {
     for (uint32_t i = 0; i < m_NumShaders; ++i) {
         uint32_t shader_opengl_id = m_Shaders.at(i)->opengl_id();
         glDetachShader(m_OpenGLId, shader_opengl_id);
-        glDeleteShader(shader_opengl_id);
+        m_Shaders.at(i)->Release();
     }
 
     int32_t linking_success = 0;

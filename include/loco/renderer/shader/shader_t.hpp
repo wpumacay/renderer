@@ -42,6 +42,8 @@ class Shader {
     /// Releases the resources allocated by this shader on the GPU
     ~Shader();
 
+    auto Release() -> void;
+
     /// Returns the name of this shader
     auto name() const -> std::string { return m_Name; }
 

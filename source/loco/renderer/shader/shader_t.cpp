@@ -73,10 +73,13 @@ auto Shader::_CompileShader(const char* source) -> void {
     m_Compiled = true;
 }
 
-Shader::~Shader() {
-    glDeleteProgram(m_OpenGLId);
-    m_OpenGLId = 0;
-    m_Compiled = false;
+Shader::~Shader() { Release(); }
+
+auto Shader::Release() -> void {
+    if (m_OpenGLId != 0) {
+        glDeleteShader(m_OpenGLId);
+        m_OpenGLId = 0;
+    }
 }
 
 }  // namespace renderer
