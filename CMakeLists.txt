@@ -49,6 +49,7 @@ loco_create_target(LocoRendererCpp STATIC
     ${SOURCE_DIR}/shader/shader_t.cpp
     ${SOURCE_DIR}/shader/program_t.cpp
     ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
+    ${SOURCE_DIR}/core/vertex_buffer_object_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES

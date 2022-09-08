@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#include <loco/utils/common.hpp>
+
 #include <loco/math/vec2_t_impl.hpp>
 #include <loco/math/vec3_t_impl.hpp>
 #include <loco/math/vec4_t_impl.hpp>
