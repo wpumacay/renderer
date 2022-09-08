@@ -6,6 +6,7 @@
 #include <loco/renderer/window/window_t.hpp>
 #include <loco/renderer/shader/program_t.hpp>
 #include <loco/renderer/core/vertex_buffer_object_t.hpp>
+#include <loco/renderer/core/vertex_array_object_t.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -61,21 +62,27 @@ auto main() -> int {
         -0.5F,  0.5F, 1.0F, 1.0F, 1.0F // NOLINT
     };
     // clang-format on
+    constexpr int NUM_VERTICES = 6;
 
     loco::renderer::BufferLayout layout = {
         {"position", loco::renderer::eElementType::FLOAT_2, false},
         {"color", loco::renderer::eElementType::FLOAT_3, false}};
 
-    auto gpu_buffer = std::make_unique<loco::renderer::VertexBuffer>(
+    auto vbo = std::make_unique<loco::renderer::VertexBuffer>(
         layout, loco::renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
+
+    auto vao = std::make_unique<loco::renderer::VertexArray>();
+    vao->AddBuffer(std::move(vbo));
 
     while (window->active()) {
         window->Begin();
         program->Bind();
-        gpu_buffer->Bind();
+        vao->Bind();
 
-        gpu_buffer->Unbind();
+        glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+
+        vao->Unbind();
         program->Unbind();
         window->End();
     }

@@ -73,10 +73,12 @@ class BufferLayout {
     auto stride() const -> uint32_t { return m_Stride; }
 
     /// Returns a mutable reference to the elements in the layout
-    auto elements() -> std::vector<BufferElement>;
+    auto elements() -> std::vector<BufferElement>& { return m_BufferElements; }
 
     /// Returns an unmutable reference to the elements in the layout
-    auto elements() const -> const std::vector<BufferElement>;
+    auto elements() const -> const std::vector<BufferElement>& {
+        return m_BufferElements;
+    }
 
     /// Returns a string representation of this layout
     auto ToString() const -> std::string;

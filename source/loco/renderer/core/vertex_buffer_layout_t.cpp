@@ -1,6 +1,7 @@
 
 #include <glad/gl.h>
 
+#include <iostream>
 #include <cstdint>
 #include <loco/renderer/core/vertex_buffer_layout_t.hpp>
 #include <spdlog/fmt/bundled/format.h>
@@ -97,7 +98,6 @@ BufferElement::BufferElement(const char* name, const eElementType& etype,
 BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
     : m_BufferElements(elements) {
     for (auto& element : m_BufferElements) {
-        // Compute the offset of each element in the layout
         element.offset = m_Stride;
         m_Stride += element.size;
     }
