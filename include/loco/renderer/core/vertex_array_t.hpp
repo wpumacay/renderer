@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <loco/renderer/common.hpp>
-#include <loco/renderer/core/vertex_buffer_object_t.hpp>
-#include <loco/renderer/core/index_buffer_object_t.hpp>
+#include <loco/renderer/core/vertex_buffer_t.hpp>
+#include <loco/renderer/core/index_buffer_t.hpp>
 
 namespace loco {
 namespace renderer {

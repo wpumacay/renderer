@@ -1,7 +1,7 @@
 
 #include <glad/gl.h>
 
-#include <loco/renderer/core/index_buffer_object_t.hpp>
+#include <loco/renderer/core/index_buffer_t.hpp>
 #include <spdlog/fmt/bundled/format.h>
 
 namespace loco {

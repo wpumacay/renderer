@@ -4,7 +4,7 @@
 
 #include <glad/gl.h>
 
-#include <loco/renderer/core/vertex_array_object_t.hpp>
+#include <loco/renderer/core/vertex_array_t.hpp>
 #include <spdlog/fmt/bundled/format.h>
 
 #if defined(__clang__)
