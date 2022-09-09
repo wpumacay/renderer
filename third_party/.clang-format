@@ -1,0 +1,4 @@
+# -*- yaml -*-
+
+# Disable all formatting here to avoid huge diffs
+DisableFormat : true

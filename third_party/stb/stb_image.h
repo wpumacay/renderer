@@ -108,6 +108,16 @@ RECENT REVISION HISTORY:
     Blazej Dariusz Roszkowski                                     github:Michaelangel007
 */
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
 #ifndef STBI_INCLUDE_STB_IMAGE_H
 #define STBI_INCLUDE_STB_IMAGE_H
 
@@ -7331,6 +7341,10 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
 }
 
 #endif // STB_IMAGE_IMPLEMENTATION
+
+#if defined(__clang__)
+#pragma clang diagnostic pop // NOLINT
+#endif
 
 /*
    revision history:
