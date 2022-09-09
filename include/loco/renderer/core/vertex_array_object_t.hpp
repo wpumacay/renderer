@@ -6,6 +6,7 @@
 
 #include <loco/renderer/common.hpp>
 #include <loco/renderer/core/vertex_buffer_object_t.hpp>
+#include <loco/renderer/core/index_buffer_object_t.hpp>
 
 namespace loco {
 namespace renderer {
@@ -24,8 +25,11 @@ class VertexArray {
     ~VertexArray();
 
     /// Adds the given VBO to the group managed by this VAO
-    auto AddBuffer(VertexBuffer::uptr buffer, bool is_instanced = false)
+    auto AddVertexBuffer(VertexBuffer::uptr buffer, bool is_instanced = false)
         -> void;
+
+    /// Sets the given IBO to the group managed by this VAO
+    auto SetIndexBuffer(IndexBuffer::uptr buffer) -> void;
 
     /// Binds this VAO, setting the OpenGL-FSM to the appropriate state
     auto Bind() const -> void;
@@ -57,6 +61,8 @@ class VertexArray {
     uint32_t m_NumAttribIndx = 0;
     /// Container for the owned VBOs
     std::vector<VertexBuffer::uptr> m_Buffers;
+    /// Index Buffer associated with this VAO (if applicable)
+    IndexBuffer::uptr m_IndexBuffer;
 };
 
 }  // namespace renderer

@@ -19,13 +19,14 @@ VertexArray::VertexArray() { glGenVertexArrays(1, &m_OpenGLId); }
 
 VertexArray::~VertexArray() {
     m_Buffers.clear();
+    m_IndexBuffer = nullptr;
     if (m_OpenGLId != 0) {
         glDeleteVertexArrays(1, &m_OpenGLId);
         m_OpenGLId = 0;
     }
 }
 
-auto VertexArray::AddBuffer(VertexBuffer::uptr buffer, bool is_instanced)
+auto VertexArray::AddVertexBuffer(VertexBuffer::uptr buffer, bool is_instanced)
     -> void {
     const auto& buffer_layout = buffer->layout();
     const auto& buffer_elements = buffer_layout.elements();
@@ -54,6 +55,15 @@ auto VertexArray::AddBuffer(VertexBuffer::uptr buffer, bool is_instanced)
     glBindVertexArray(0);
 
     m_Buffers.push_back(std::move(buffer));
+}
+
+auto VertexArray::SetIndexBuffer(IndexBuffer::uptr buffer) -> void {
+    glBindVertexArray(m_OpenGLId);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->opengl_id());
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    m_IndexBuffer = std::move(buffer);
 }
 
 auto VertexArray::Bind() const -> void { glBindVertexArray(m_OpenGLId); }

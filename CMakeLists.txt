@@ -51,6 +51,7 @@ loco_create_target(LocoRendererCpp STATIC
     ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
     ${SOURCE_DIR}/core/vertex_buffer_object_t.cpp
     ${SOURCE_DIR}/core/vertex_array_object_t.cpp
+    ${SOURCE_DIR}/core/index_buffer_object_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES

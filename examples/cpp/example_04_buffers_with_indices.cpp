@@ -7,6 +7,7 @@
 #include <loco/renderer/shader/program_t.hpp>
 #include <loco/renderer/core/vertex_buffer_object_t.hpp>
 #include <loco/renderer/core/vertex_array_object_t.hpp>
+#include <loco/renderer/core/index_buffer_object_t.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -53,16 +54,16 @@ auto main() -> int {
     // NOLINTNEXTLINE
     float buffer_data[] = {
     /*|      pos     |     color      |*/
-        -0.5F, -0.5F, 1.0F, 0.0F, 0.0F,// NOLINT
-         0.5F, -0.5F, 0.0F, 1.0F, 0.0F,// NOLINT
-         0.5F,  0.5F, 0.0F, 0.0F, 1.0F,// NOLINT
-
         -0.5F, -0.5F, 1.0F, 0.0F, 0.0F, // NOLINT
+         0.5F, -0.5F, 0.0F, 1.0F, 0.0F, // NOLINT
          0.5F,  0.5F, 0.0F, 0.0F, 1.0F, // NOLINT
         -0.5F,  0.5F, 1.0F, 1.0F, 1.0F // NOLINT
     };
     // clang-format on
-    constexpr int NUM_VERTICES = 6;
+    constexpr uint32_t NUM_VERTICES = 6;
+
+    // NOLINTNEXTLINE
+    uint32_t buffer_indices[] = {0, 1, 2, 0, 2, 3};
 
     loco::renderer::BufferLayout layout = {
         {"position", loco::renderer::eElementType::FLOAT_2, false},
@@ -72,15 +73,19 @@ auto main() -> int {
         layout, loco::renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
+    auto ibo = std::make_unique<loco::renderer::IndexBuffer>(
+        loco::renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
+
     auto vao = std::make_unique<loco::renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
+    vao->SetIndexBuffer(std::move(ibo));
 
     while (window->active()) {
         window->Begin();
         program->Bind();
         vao->Bind();
 
-        glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+        glDrawElements(GL_TRIANGLES, NUM_VERTICES, GL_UNSIGNED_INT, nullptr);
 
         vao->Unbind();
         program->Unbind();
