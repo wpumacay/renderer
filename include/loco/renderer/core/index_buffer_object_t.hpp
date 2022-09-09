@@ -16,20 +16,27 @@ class IndexBuffer {
     LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(IndexBuffer);
 
  public:
+    /// Creates  an Index Buffer  given some indices data
     explicit IndexBuffer(eBufferUsage usage, uint32_t count,
                          const uint32_t* data);
 
+    /// Releases the resources allocated by this IBO
     ~IndexBuffer();
 
+    /// Binds this buffer for its usage in the graphics pipeline
     auto Bind() const -> void;
 
+    /// Unbinds this buffer from the graphics pipeline
     auto Unbind() const -> void;
 
-    auto ToString() const -> std::string;
-
+    /// Returns the number of indices contained in this buffer
     auto count() const -> uint32_t { return m_Count; }
 
+    /// Returns the id of the OpenGL resource allocated for this buffer
     auto opengl_id() const -> uint32_t { return m_OpenGLId; }
+
+    /// Returns a string representation of this index buffer
+    auto ToString() const -> std::string;
 
  private:
     /// Type of intended usage for this buffer
