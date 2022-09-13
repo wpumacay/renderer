@@ -1,10 +1,9 @@
-
 #include <glad/gl.h>
 
 #include <spdlog/fmt/bundled/format.h>
 
+#include <loco/utils/logging.hpp>
 #include <loco/renderer/core/texture_data_t.hpp>
-#include "spdlog/fmt/bundled/core.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -18,12 +17,12 @@ auto ToString(const eTextureFormat& format) -> std::string {
             return "rgb";
         case eTextureFormat::RGBA:
             return "rgba";
+        case eTextureFormat::BGRA:
+            return "bgra";
         case eTextureFormat::DEPTH:
             return "depth";
         case eTextureFormat::STENCIL:
             return "stencil";
-        case eTextureFormat::DEPTH24_STENCIL8:
-            return "depth24_stencil8";
     }
 }
 
@@ -33,12 +32,34 @@ auto ToOpenGLEnum(const eTextureFormat& format) -> uint32_t {
             return GL_RGB;
         case eTextureFormat::RGBA:
             return GL_RGBA;
+        case eTextureFormat::BGRA:
+            return GL_BGRA;
         case eTextureFormat::DEPTH:
             return GL_DEPTH_COMPONENT;
         case eTextureFormat::STENCIL:
             return GL_STENCIL_INDEX;
-        case eTextureFormat::DEPTH24_STENCIL8:
-            return GL_DEPTH24_STENCIL8;
+    }
+}
+
+auto ToString(const eStorageType& dtype) -> std::string {
+    switch (dtype) {
+        case eStorageType::UINT_8:
+            return "uint_8";
+        case eStorageType::UINT_32:
+            return "uint_32";
+        case eStorageType::FLOAT_32:
+            return "float_32";
+    }
+}
+
+auto ToOpenGLEnum(const eStorageType& dtype) -> uint32_t {
+    switch (dtype) {
+        case eStorageType::UINT_8:
+            return GL_UNSIGNED_BYTE;
+        case eStorageType::UINT_32:
+            return GL_UNSIGNED_INT;
+        case eStorageType::FLOAT_32:
+            return GL_FLOAT;
     }
 }
 
@@ -48,9 +69,14 @@ TextureData::TextureData(const char* image_path) : m_ImagePath(image_path) {
         m_ImagePath.find(".JPG") != std::string::npos ||
         m_ImagePath.find(".JPEG") != std::string::npos) {
         m_Format = eTextureFormat::RGB;
+        m_Storage = eStorageType::UINT_8;
     } else if (m_ImagePath.find(".png") != std::string::npos ||
                m_ImagePath.find(".PNG") != std::string::npos) {
         m_Format = eTextureFormat::RGBA;
+        m_Storage = eStorageType::UINT_8;
+    } else {
+        m_Format = eTextureFormat::RGB;
+        LOG_CORE_ERROR("TextureData >>> image-format not supported yet");
     }
 
     m_Data.reset(

@@ -7,8 +7,8 @@
 #include <loco/renderer/shader/program_t.hpp>
 #include <loco/renderer/core/vertex_buffer_t.hpp>
 #include <loco/renderer/core/vertex_array_t.hpp>
-#include <loco/renderer/core/texture_data_t.hpp>
 #include "loco/renderer/core/vertex_buffer_layout_t.hpp"
+#include <loco/renderer/core/texture_t.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -37,8 +37,10 @@ constexpr const char* FRAG_SHADER_SRC = R"(
     in vec2 tex_coord;
     out vec4 output_color;
 
+    uniform sampler2D u_texture;
+
     void main() {
-        output_color = vec4(frag_color, 1.0f);
+        output_color = texture(u_texture, tex_coord) * vec4(frag_color, 1.0f);
     }
 )";
 
@@ -97,18 +99,18 @@ auto main(int argc, char* argv[]) -> int {
     vao->AddVertexBuffer(std::move(vbo));
     vao->SetIndexBuffer(std::move(ibo));
 
-    auto tex_data = std::make_unique<loco::renderer::TextureData>(IMAGE_PATH);
-
-    std::cout << tex_data->ToString() << std::endl;
+    auto texture = std::make_unique<loco::renderer::Texture>(IMAGE_PATH);
 
     while (window->active()) {
         window->Begin();
         program->Bind();
+        texture->Bind();
         vao->Bind();
 
         glDrawElements(GL_TRIANGLES, NUM_VERTICES, GL_UNSIGNED_INT, nullptr);
 
         vao->Unbind();
+        texture->Unbind();
         program->Unbind();
         window->End();
     }

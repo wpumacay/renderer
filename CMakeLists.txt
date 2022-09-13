@@ -41,7 +41,6 @@ add_subdirectory(third_party)
 # -------------------------------------
 loco_create_target(LocoRendererCpp STATIC
   SOURCES
-    ${SOURCE_DIR}/common.cpp
     ${SOURCE_DIR}/window/window_t.cpp
     ${SOURCE_DIR}/window/window_properties.cpp
     ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
@@ -53,6 +52,7 @@ loco_create_target(LocoRendererCpp STATIC
     ${SOURCE_DIR}/core/vertex_array_t.cpp
     ${SOURCE_DIR}/core/index_buffer_t.cpp
     ${SOURCE_DIR}/core/texture_data_t.cpp
+    ${SOURCE_DIR}/core/texture_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES
