@@ -121,6 +121,24 @@ loco_find_or_fetch_dependency(
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
+# ImGui is used for fast prototyping Graphical User Interfaces in Immediate mode
+# ------------------------------------------------------------------------------
+
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG master
+  GIT_PROGRESS TRUE
+  GIT_SHALLOW FALSE
+  USES_TERMINAL_DOWNLOAD TRUE)
+FetchContent_GetProperties(imgui)
+
+if (NOT imgui_POPULATED)
+  FetchContent_Populate(imgui)
+endif()
+
+
+# ------------------------------------------------------------------------------
 # LocoUtils exposes some utilities that we'll use (like logs, profiling, etc.)
 # ------------------------------------------------------------------------------
 loco_find_or_fetch_dependency(

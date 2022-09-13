@@ -70,9 +70,9 @@ auto main(int argc, char* argv[]) -> int {
     float buffer_data[] = {
     /*|      pos     |     color      |  texture  */
         -0.5F, -0.5F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, // NOLINT
-         0.5F, -0.5F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, // NOLINT
-         0.5F,  0.5F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, // NOLINT
-        -0.5F,  0.5F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F // NOLINT
+         0.5F, -0.5F, 0.0F, 1.0F, 0.0F, 2.0F, 0.0F, // NOLINT
+         0.5F,  0.5F, 0.0F, 0.0F, 1.0F, 2.0F, 2.0F, // NOLINT
+        -0.5F,  0.5F, 1.0F, 1.0F, 1.0F, 0.0F, 2.0F // NOLINT
     };
     constexpr uint32_t NUM_VERTICES = 6;
 

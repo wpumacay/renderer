@@ -15,11 +15,12 @@ include(${loco_cmake_SOURCE_DIR}/Index.cmake)
 
 project(
   LocoRenderer
-  VERSION 0.2.1
+  VERSION 0.2.2
   DESCRIPTION "A minimal renderer for prototyping 3D applications"
   HOMEPAGE_URL "https://github.com/wpumacay/loco_renderer"
   LANGUAGES C CXX)
 
+option(LOCORENDERER_BUILD_IMGUI "Build with support 4 Ocornut's Dear ImGui" ON)
 option(LOCORENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(LOCORENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(LOCORENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
@@ -59,6 +60,19 @@ loco_create_target(LocoRendererCpp STATIC
     OpenGL::OpenGL glfw::glfw assimp::assimp loco::math loco::utils stb glad
   WARNINGS_AS_ERRORS
     FALSE)
+
+if (LOCORENDERER_BUILD_IMGUI)
+  target_sources(LocoRendererCpp PRIVATE
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
+  target_include_directories(LocoRendererCpp PUBLIC ${imgui_SOURCE_DIR})
+  target_compile_definitions(LocoRendererCpp PUBLIC -DLOCORENDERER_IMGUI)
+endif()
 # cmake-format: on
 
 add_library(loco::renderer ALIAS LocoRendererCpp)
