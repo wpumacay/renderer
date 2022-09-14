@@ -75,6 +75,16 @@ if (LOCORENDERER_BUILD_IMGUI)
 endif()
 # cmake-format: on
 
+if(NOT DEFINED LOCORENDERER_RESOURCES_PATH)
+  target_compile_definitions(
+    LocoRendererCpp
+    PUBLIC -DLOCORENDERER_RESOURCES_PATH="${PROJECT_SOURCE_DIR}/resources/")
+else()
+  target_compile_definitions(
+    LocoRendererCpp
+    PUBLIC -DLOCORENDERER_RESOURCES_PATH="${LOCORENDERER_RESOURCES_PATH}")
+endif()
+
 add_library(loco::renderer ALIAS LocoRendererCpp)
 
 if(LOCORENDERER_BUILD_EXAMPLES)

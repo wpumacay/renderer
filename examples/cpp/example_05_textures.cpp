@@ -44,14 +44,10 @@ constexpr const char* FRAG_SHADER_SRC = R"(
     }
 )";
 
-auto main(int argc, char* argv[]) -> int {
-    if (argc < 2) {
-        std::cout << "Usage: ./example_05_textures PATH_TO_IMAGE" << std::endl;
-        return 1;
-    }
-
+auto main() -> int {
     // NOLINTNEXTLINE
-    const char* IMAGE_PATH = argv[1];
+    auto IMAGE_PATH =
+        std::string(loco::renderer::RESOURCES_PATH) + "images/awesomeface.png";
 
     auto window =
         std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -99,7 +95,8 @@ auto main(int argc, char* argv[]) -> int {
     vao->AddVertexBuffer(std::move(vbo));
     vao->SetIndexBuffer(std::move(ibo));
 
-    auto texture = std::make_unique<loco::renderer::Texture>(IMAGE_PATH);
+    auto texture =
+        std::make_unique<loco::renderer::Texture>(IMAGE_PATH.c_str());
 
     while (window->active()) {
         window->Begin();

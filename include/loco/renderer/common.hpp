@@ -17,3 +17,15 @@ using Mat4 = loco::math::Matrix4<float>;
 
 using float32_t = loco::math::float32_t;
 using float64_t = loco::math::float64_t;
+
+namespace loco {
+namespace renderer {
+
+#if defined(LOCORENDERER_RESOURCES_PATH)
+static constexpr const char* RESOURCES_PATH = LOCORENDERER_RESOURCES_PATH;
+#else
+static constexpr const char* RESOURCES_PATH = "../../../resources/";
+#endif
+
+}  // namespace renderer
+}  // namespace loco
