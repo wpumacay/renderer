@@ -92,7 +92,7 @@ class Texture {
 
     auto SetWrapModeU(const eTextureWrap& tex_wrap) -> void;
 
-    auto SetWrapModelV(const eTextureWrap& tex_wrap) -> void;
+    auto SetWrapModeV(const eTextureWrap& tex_wrap) -> void;
 
     auto opengl_id() const -> uint32_t { return m_OpenGLId; }
 

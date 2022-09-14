@@ -10,6 +10,10 @@
 #include "loco/renderer/core/vertex_buffer_layout_t.hpp"
 #include <loco/renderer/core/texture_t.hpp>
 
+#if defined(LOCORENDERER_IMGUI)
+#include <imgui.h>
+#endif  // LOCORENDERER_IMGUI
+
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
 
@@ -17,15 +21,12 @@ constexpr const char* VERT_SHADER_SRC = R"(
     #version 330 core
 
     layout (location = 0) in vec2 position;
-    layout (location = 1) in vec3 color;
-    layout (location = 2) in vec2 texcoord;
+    layout (location = 1) in vec2 texcoord;
 
-    out vec3 frag_color;
     out vec2 tex_coord;
 
     void main() {
         gl_Position = vec4(position, 0.0f, 1.0f);
-        frag_color = color;
         tex_coord = texcoord;
     }
 )";
@@ -33,21 +34,25 @@ constexpr const char* VERT_SHADER_SRC = R"(
 constexpr const char* FRAG_SHADER_SRC = R"(
     #version 330 core
 
-    in vec3 frag_color;
     in vec2 tex_coord;
     out vec4 output_color;
 
     uniform sampler2D u_texture;
 
     void main() {
-        output_color = texture(u_texture, tex_coord) * vec4(frag_color, 1.0f);
+        output_color = texture(u_texture, tex_coord);
     }
 )";
+
+auto get_wrapping_mode_idx(const loco::renderer::eTextureWrap& tex_wrap)
+    -> uint32_t;
+
+auto get_wrapping_mode_from_idx(uint32_t idx) -> loco::renderer::eTextureWrap;
 
 auto main() -> int {
     // NOLINTNEXTLINE
     auto IMAGE_PATH =
-        std::string(loco::renderer::RESOURCES_PATH) + "images/awesomeface.png";
+        std::string(loco::renderer::RESOURCES_PATH) + "images/container.jpg";
 
     auto window =
         std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -64,11 +69,11 @@ auto main() -> int {
     // clang-format off
     // NOLINTNEXTLINE
     float buffer_data[] = {
-    /*|      pos     |     color      |  texture  */
-        -0.5F, -0.5F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, // NOLINT
-         0.5F, -0.5F, 0.0F, 1.0F, 0.0F, 2.0F, 0.0F, // NOLINT
-         0.5F,  0.5F, 0.0F, 0.0F, 1.0F, 2.0F, 2.0F, // NOLINT
-        -0.5F,  0.5F, 1.0F, 1.0F, 1.0F, 0.0F, 2.0F // NOLINT
+    /*|      pos       texture  */
+        -0.5F, -0.5F, 0.0F, 0.0F, // NOLINT
+         0.5F, -0.5F, 2.0F, 0.0F, // NOLINT
+         0.5F,  0.5F, 2.0F, 2.0F, // NOLINT
+        -0.5F,  0.5F, 0.0F, 2.0F // NOLINT
     };
     constexpr uint32_t NUM_VERTICES = 6;
 
@@ -81,7 +86,6 @@ auto main() -> int {
 
     loco::renderer::BufferLayout layout = {
         {"position", loco::renderer::eElementType::FLOAT_2, false},
-        {"color", loco::renderer::eElementType::FLOAT_3, false},
         {"texcoord", loco::renderer::eElementType::FLOAT_2, false}};
 
     auto vbo = std::make_unique<loco::renderer::VertexBuffer>(
@@ -100,17 +104,118 @@ auto main() -> int {
 
     while (window->active()) {
         window->Begin();
-        program->Bind();
-        texture->Bind();
-        vao->Bind();
 
-        glDrawElements(GL_TRIANGLES, NUM_VERTICES, GL_UNSIGNED_INT, nullptr);
+        // Render our textured triangle
+        {
+            program->Bind();
+            texture->Bind();
+            vao->Bind();
 
-        vao->Unbind();
-        texture->Unbind();
-        program->Unbind();
+            glDrawElements(GL_TRIANGLES, NUM_VERTICES, GL_UNSIGNED_INT,
+                           nullptr);
+
+            vao->Unbind();
+            texture->Unbind();
+            program->Unbind();
+        }
+
+#if defined(LOCORENDERER_IMGUI)
+        ImGui::ShowDemoWindow();
+        ImGui::Begin("Options");
+        {
+            // Options for wrap-u
+            std::array<const char*, 4> combo_items = {
+                "repeat", "repeat_mirror", "clamp_to_edge", "clamp_to_border"};
+            static uint32_t s_CurrentIndex =
+                get_wrapping_mode_idx(texture->wrap_mode_u());
+            const char* combo_preview_value = combo_items.at(s_CurrentIndex);
+            if (ImGui::BeginCombo("Wrapping-mode-u", combo_preview_value)) {
+                for (uint32_t i = 0; i < combo_items.size(); i++) {
+                    bool is_selected = (s_CurrentIndex == i);
+                    if (ImGui::Selectable(combo_items.at(i), is_selected)) {
+                        s_CurrentIndex = i;
+                    }
+
+                    if (is_selected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+            }
+
+            auto new_wrapping_mode = get_wrapping_mode_from_idx(s_CurrentIndex);
+            if (new_wrapping_mode != texture->wrap_mode_u()) {
+                // It's a new one, so set it :)
+                texture->SetWrapModeU(new_wrapping_mode);
+            }
+        }
+        {
+            // Options for wrap-v
+            std::array<const char*, 4> combo_items = {
+                "repeat", "repeat_mirror", "clamp_to_edge", "clamp_to_border"};
+            static uint32_t s_CurrentIndex =
+                get_wrapping_mode_idx(texture->wrap_mode_v());
+            const char* combo_preview_value = combo_items.at(s_CurrentIndex);
+            if (ImGui::BeginCombo("Wrapping-mode-v", combo_preview_value)) {
+                for (uint32_t i = 0; i < combo_items.size(); i++) {
+                    bool is_selected = (s_CurrentIndex == i);
+                    if (ImGui::Selectable(combo_items.at(i), is_selected)) {
+                        s_CurrentIndex = i;
+                    }
+
+                    if (is_selected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+            }
+
+            auto new_wrapping_mode = get_wrapping_mode_from_idx(s_CurrentIndex);
+            if (new_wrapping_mode != texture->wrap_mode_v()) {
+                // It's a new one, so set it :)
+                texture->SetWrapModeV(new_wrapping_mode);
+            }
+        }
+        {
+            // Options for border color
+            static Vec4 s_Color = texture->border_color();
+            ImGui::ColorEdit3("border-color", s_Color.data());
+            if (s_Color != texture->border_color()) {
+                texture->SetBorderColor(s_Color);
+            }
+        }
+        ImGui::End();
+#endif  // LOCORENDERER_IMGUI
+
         window->End();
     }
 
     return 0;
+}
+
+auto get_wrapping_mode_idx(const loco::renderer::eTextureWrap& tex_wrap)
+    -> uint32_t {
+    switch (tex_wrap) {
+        case loco::renderer::eTextureWrap::REPEAT:
+            return 0;
+        case loco::renderer::eTextureWrap::REPEAT_MIRROR:
+            return 1;
+        case loco::renderer::eTextureWrap::CLAMP_TO_EDGE:
+            return 2;
+        case loco::renderer::eTextureWrap::CLAMP_TO_BORDER:
+            return 3;
+    }
+}
+
+auto get_wrapping_mode_from_idx(uint32_t idx) -> loco::renderer::eTextureWrap {
+    switch (idx) {
+        case 0:
+            return loco::renderer::eTextureWrap::REPEAT;
+        case 1:
+            return loco::renderer::eTextureWrap::REPEAT_MIRROR;
+        case 2:
+            return loco::renderer::eTextureWrap::CLAMP_TO_EDGE;
+        case 3:
+            return loco::renderer::eTextureWrap::CLAMP_TO_BORDER;
+        default:
+            return loco::renderer::eTextureWrap::REPEAT;
+    }
 }

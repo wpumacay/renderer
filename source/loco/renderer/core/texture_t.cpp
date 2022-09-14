@@ -222,7 +222,7 @@ auto Texture::SetWrapModeU(const eTextureWrap& tex_wrap) -> void {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-auto Texture::SetWrapModelV(const eTextureWrap& tex_wrap) -> void {
+auto Texture::SetWrapModeV(const eTextureWrap& tex_wrap) -> void {
     m_WrapV = tex_wrap;
     glBindTexture(GL_TEXTURE_2D, m_OpenGLId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ToOpenGLEnum(m_WrapV));
