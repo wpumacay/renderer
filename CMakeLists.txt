@@ -54,10 +54,12 @@ loco_create_target(LocoRendererCpp STATIC
     ${SOURCE_DIR}/core/index_buffer_t.cpp
     ${SOURCE_DIR}/core/texture_data_t.cpp
     ${SOURCE_DIR}/core/texture_t.cpp
+    ${SOURCE_DIR}/assets/shader_manager_t.cpp
+    ${SOURCE_DIR}/assets/texture_manager_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES
-    OpenGL::OpenGL glfw::glfw assimp::assimp loco::math loco::utils stb glad
+    OpenGL::OpenGL glfw::glfw loco::math loco::utils stb glad
   WARNINGS_AS_ERRORS
     FALSE)
 
@@ -75,15 +77,7 @@ if (LOCORENDERER_BUILD_IMGUI)
 endif()
 # cmake-format: on
 
-if(NOT DEFINED LOCORENDERER_RESOURCES_PATH)
-  target_compile_definitions(
-    LocoRendererCpp
-    PUBLIC -DLOCORENDERER_RESOURCES_PATH="${PROJECT_SOURCE_DIR}/resources/")
-else()
-  target_compile_definitions(
-    LocoRendererCpp
-    PUBLIC -DLOCORENDERER_RESOURCES_PATH="${LOCORENDERER_RESOURCES_PATH}")
-endif()
+include(LocoRendererDefinitions)
 
 add_library(loco::renderer ALIAS LocoRendererCpp)
 

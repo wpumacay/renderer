@@ -49,10 +49,10 @@ auto get_wrapping_mode_idx(const loco::renderer::eTextureWrap& tex_wrap)
 
 auto get_wrapping_mode_from_idx(uint32_t idx) -> loco::renderer::eTextureWrap;
 
+// NOLINTNEXTLINE
 auto main() -> int {
     // NOLINTNEXTLINE
-    auto IMAGE_PATH =
-        std::string(loco::renderer::RESOURCES_PATH) + "images/container.jpg";
+    auto IMAGE_PATH = loco::renderer::RESOURCES_PATH + "images/container.jpg";
 
     auto window =
         std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);

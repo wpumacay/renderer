@@ -97,30 +97,6 @@ loco_find_or_fetch_dependency(
 add_library(glfw::glfw ALIAS glfw)
 
 # ------------------------------------------------------------------------------
-# Use Assimp from sources (again, might not be installed in the user's system).
-# We use it for the wide support that it gives us to load models from various
-# formats (e.g. GLTF, OBJ, etc.) and to avoid to re-write our own loaders
-# ------------------------------------------------------------------------------
-loco_find_or_fetch_dependency(
-  USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
-  PACKAGE_NAME assimp
-  LIBRARY_NAME assimp
-  GIT_REPO https://github.com/assimp/assimp.git
-  GIT_TAG master
-  TARGETS assimp::assimp
-  BUILD_ARGS
-    -DBUILD_SHARED_LIBS=OFF
-    -DASSIMP_BUILD_FRAMEWORK=OFF
-    -DASSIMP_DOUBLE_PRECISION=OFF
-    -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-    -DASSIMP_BUILD_SAMPLES=OFF
-    -DASSIMP_BUILD_TESTS=OFF
-    -DASSIMP_INSTALL=OFF
-    -DASSIMP_HUNTER_ENABLED=OFF
-    -DASSIMP_INJECT_DEBUG_POSTFIX=OFF
-  EXCLUDE_FROM_ALL)
-
-# ------------------------------------------------------------------------------
 # ImGui is used for fast prototyping Graphical User Interfaces in Immediate mode
 # ------------------------------------------------------------------------------
 

@@ -22,9 +22,19 @@ namespace loco {
 namespace renderer {
 
 #if defined(LOCORENDERER_RESOURCES_PATH)
-static constexpr const char* RESOURCES_PATH = LOCORENDERER_RESOURCES_PATH;
+// NOLINTNEXTLINE
+static const std::string RESOURCES_PATH = LOCORENDERER_RESOURCES_PATH;
 #else
-static constexpr const char* RESOURCES_PATH = "../../../resources/";
+// NOLINTNEXTLINE
+static const std::string RESOURCES_PATH = "../../resources/";
+#endif
+
+#if defined(LOCORENDERER_EXAMPLES_PATH)
+// NOLINTNEXTLINE
+static const std::string EXAMPLES_PATH = LOCORENDERER_EXAMPLES_PATH;
+#else
+// NOLINTNEXTLINE
+static const std::string EXAMPLES_PATH = "../../examples/";
 #endif
 
 }  // namespace renderer
