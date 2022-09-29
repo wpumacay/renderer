@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <unordered_map>
 
@@ -7,6 +8,8 @@
 
 namespace loco {
 namespace renderer {
+
+constexpr uint32_t MAX_PROGRAMS = 128;
 
 /// Resource handler for shader programs
 class ShaderManager {
@@ -31,9 +34,22 @@ class ShaderManager {
     /// Returns a shader program with the given name (if not, returns  nullptr)
     auto GetProgram(const std::string& name) -> Program::ptr;
 
+    /// Deletes a shader program given its id
+    auto DeleteProgram(const std::string& name) -> void;
+
+    /// Returns a shader program given its index on the container
+    auto GetProgramByIndex(uint32_t prog_index) -> Program::ptr;
+
+    /// Returns the current number of shader programs being managed
+    auto GetNumPrograms() const -> uint32_t { return m_NumPrograms; }
+
  private:
-    /// Storage where to cache our loaded shader programs
-    std::unordered_map<std::string, Program::ptr> m_Programs;
+    /// Storage for our shader programs
+    std::array<Program::ptr, MAX_PROGRAMS> m_Programs;
+    /// Counter for the current number of programs being stored
+    uint32_t m_NumPrograms = 0;
+    /// Map for string-key to array-index
+    std::unordered_map<std::string, uint32_t> m_Name2Id;
 };
 
 }  // namespace renderer

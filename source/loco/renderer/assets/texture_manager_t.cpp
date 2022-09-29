@@ -34,7 +34,7 @@ auto TextureManager::CacheTexture(const std::string& tex_id,
         return;
     }
 
-    if (m_Name2Id.find(tex_id) == m_Name2Id.end()) {
+    if (m_Name2Id.find(tex_id) != m_Name2Id.end()) {
         LOG_WARN(
             "TextureManager::CacheTexture >>> a texture with the same name "
             "'{0}' already exists. Won't duplicate :)",
