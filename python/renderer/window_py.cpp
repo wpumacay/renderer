@@ -6,8 +6,7 @@
 #include <loco/renderer/window/window_t.hpp>
 
 #include <conversions_py.hpp>
-#include <loco/math/common.hpp>
-#include "loco/renderer/window/window_properties.hpp"
+#include <math/common.hpp>
 
 namespace py = pybind11;
 
