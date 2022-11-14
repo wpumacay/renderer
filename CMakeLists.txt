@@ -33,7 +33,7 @@ loco_initialize_project()
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(LocoRendererDependencies)
 
-set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/source/loco/renderer)
+set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/source/renderer)
 
 # Include extra third-party dependencies
 add_subdirectory(third_party)

@@ -1,5 +1,5 @@
 
-#include <loco/renderer/window/window_t.hpp>
+#include <renderer/window/window_t.hpp>
 #include <loco/utils/logging.hpp>
 
 constexpr int DEFAULT_WIDTH = 1024;

@@ -3,7 +3,7 @@
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 
-#include <loco/renderer/window/window_t.hpp>
+#include <renderer/window/window_t.hpp>
 
 #include <conversions_py.hpp>
 #include <math/common.hpp>

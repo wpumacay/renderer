@@ -3,10 +3,10 @@
 
 #include <glad/gl.h>
 
-#include <loco/renderer/window/window_t.hpp>
-#include <loco/renderer/shader/program_t.hpp>
-#include <loco/renderer/core/vertex_buffer_t.hpp>
-#include <loco/renderer/core/vertex_array_t.hpp>
+#include <renderer/window/window_t.hpp>
+#include <renderer/shader/program_t.hpp>
+#include <renderer/core/vertex_buffer_t.hpp>
+#include <renderer/core/vertex_array_t.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;

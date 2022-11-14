@@ -3,12 +3,11 @@
 
 #include <glad/gl.h>
 
-#include <loco/renderer/window/window_t.hpp>
-#include <loco/renderer/shader/program_t.hpp>
-#include <loco/renderer/core/vertex_buffer_t.hpp>
-#include <loco/renderer/core/vertex_array_t.hpp>
-#include "loco/renderer/core/vertex_buffer_layout_t.hpp"
-#include <loco/renderer/core/texture_t.hpp>
+#include <renderer/window/window_t.hpp>
+#include <renderer/shader/program_t.hpp>
+#include <renderer/core/vertex_buffer_t.hpp>
+#include <renderer/core/vertex_array_t.hpp>
+#include <renderer/core/texture_t.hpp>
 
 #if defined(LOCORENDERER_IMGUI)
 #include <imgui.h>

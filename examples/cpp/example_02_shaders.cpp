@@ -1,7 +1,7 @@
 
-#include <loco/renderer/window/window_t.hpp>
-#include <loco/renderer/shader/shader_t.hpp>
-#include <loco/renderer/shader/program_t.hpp>
+#include <renderer/window/window_t.hpp>
+#include <renderer/shader/shader_t.hpp>
+#include <renderer/shader/program_t.hpp>
 #include <loco/utils/logging.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;

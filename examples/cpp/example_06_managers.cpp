@@ -3,14 +3,13 @@
 #include <bits/chrono.h>
 #include <glad/gl.h>
 
-#include <loco/renderer/window/window_t.hpp>
-#include <loco/renderer/assets/shader_manager_t.hpp>
-#include <loco/renderer/assets/texture_manager_t.hpp>
-#include <loco/renderer/core/vertex_buffer_layout_t.hpp>
-#include <loco/renderer/core/vertex_buffer_t.hpp>
-#include <loco/renderer/core/index_buffer_t.hpp>
-#include <loco/renderer/core/vertex_array_t.hpp>
-#include "loco/renderer/common.hpp"
+#include <renderer/window/window_t.hpp>
+#include <renderer/assets/shader_manager_t.hpp>
+#include <renderer/assets/texture_manager_t.hpp>
+#include <renderer/core/vertex_buffer_layout_t.hpp>
+#include <renderer/core/vertex_buffer_t.hpp>
+#include <renderer/core/index_buffer_t.hpp>
+#include <renderer/core/vertex_array_t.hpp>
 
 #if defined(LOCORENDERER_IMGUI)
 #include <imgui.h>

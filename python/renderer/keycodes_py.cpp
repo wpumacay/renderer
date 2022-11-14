@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include <loco/renderer/input/keycodes.hpp>
+#include <renderer/input/keycodes.hpp>
 
 namespace py = pybind11;
 

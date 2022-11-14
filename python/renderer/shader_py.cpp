@@ -4,8 +4,8 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/numpy.h>
 
-#include <loco/renderer/shader/shader_t.hpp>
-#include <loco/renderer/shader/program_t.hpp>
+#include <renderer/shader/shader_t.hpp>
+#include <renderer/shader/program_t.hpp>
 
 #include <conversions_py.hpp>
 
