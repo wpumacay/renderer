@@ -1,4 +1,3 @@
-
 #include <array>
 
 #include <glad/gl.h>
@@ -6,7 +5,6 @@
 #include <loco/utils/logging.hpp>
 #include <renderer/shader/shader_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eShaderType& type) -> std::string {
@@ -82,4 +80,3 @@ auto Shader::Release() -> void {
 }
 
 }  // namespace renderer
-}  // namespace loco

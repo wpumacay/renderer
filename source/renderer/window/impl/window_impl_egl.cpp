@@ -1,11 +1,6 @@
-
-// clang-format off
 #include <loco/utils/logging.hpp>
 #include <renderer/window/impl/window_impl_egl.hpp>
-#include "glad/egl.h"
-// clang-format on
 
-namespace loco {
 namespace renderer {
 
 WindowImplEgl::WindowImplEgl(WindowProperties properties)
@@ -111,4 +106,3 @@ auto WindowImplEgl::RequestClose() -> void {
 }
 
 }  // namespace renderer
-}  // namespace loco

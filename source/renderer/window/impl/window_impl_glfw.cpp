@@ -1,10 +1,8 @@
 
-// clang-format off
 #include <glad/gl.h>
 
 #include <loco/utils/logging.hpp>
 #include <renderer/window/impl/window_impl_glfw.hpp>
-// clang-format on
 
 #if defined(LOCORENDERER_IMGUI)
 #include <imgui.h>
@@ -12,7 +10,6 @@
 #include <backends/imgui_impl_opengl3.h>
 #endif  // LOCORENDERER_IMGUI
 
-namespace loco {
 namespace renderer {
 
 auto GLFWwindowDeleter::operator()(GLFWwindow* ptr) const -> void {
@@ -243,4 +240,3 @@ auto WindowImplGlfw::RequestClose() -> void {
 }
 
 }  // namespace renderer
-}  // namespace loco

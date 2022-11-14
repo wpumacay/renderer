@@ -39,15 +39,15 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 
 auto main() -> int {
     auto window =
-        std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     window->RegisterKeyboardCallback([&](int key, int, int) {
-        if (key == loco::renderer::keys::KEY_ESCAPE) {
+        if (key == renderer::keys::KEY_ESCAPE) {
             window->RequestClose();
         }
     });
 
-    auto program = std::make_unique<loco::renderer::Program>(
+    auto program = std::make_unique<renderer::Program>(
         "basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC);
 
     // clang-format off
@@ -65,18 +65,18 @@ auto main() -> int {
     // NOLINTNEXTLINE
     uint32_t buffer_indices[] = {0, 1, 2, 0, 2, 3};
 
-    loco::renderer::BufferLayout layout = {
-        {"position", loco::renderer::eElementType::FLOAT_2, false},
-        {"color", loco::renderer::eElementType::FLOAT_3, false}};
+    renderer::BufferLayout layout = {
+        {"position", renderer::eElementType::FLOAT_2, false},
+        {"color", renderer::eElementType::FLOAT_3, false}};
 
-    auto vbo = std::make_unique<loco::renderer::VertexBuffer>(
-        layout, loco::renderer::eBufferUsage::STATIC,
+    auto vbo = std::make_unique<renderer::VertexBuffer>(
+        layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
-    auto ibo = std::make_unique<loco::renderer::IndexBuffer>(
-        loco::renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
+    auto ibo = std::make_unique<renderer::IndexBuffer>(
+        renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
 
-    auto vao = std::make_unique<loco::renderer::VertexArray>();
+    auto vao = std::make_unique<renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
     vao->SetIndexBuffer(std::move(ibo));
 

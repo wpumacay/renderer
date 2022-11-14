@@ -8,7 +8,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eTextureFormat& format) -> std::string {
@@ -92,4 +91,3 @@ auto TextureData::ToString() const -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco

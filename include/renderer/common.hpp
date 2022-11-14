@@ -18,7 +18,6 @@ using Mat4 = math::Matrix4<float>;
 using float32_t = math::float32_t;
 using float64_t = math::float64_t;
 
-namespace loco {
 namespace renderer {
 
 #if defined(LOCORENDERER_RESOURCES_PATH)
@@ -38,4 +37,3 @@ static const std::string EXAMPLES_PATH = "../../examples/";
 #endif
 
 }  // namespace renderer
-}  // namespace loco

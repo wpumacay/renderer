@@ -12,7 +12,6 @@
 #pragma clang diagnostic ignored "-Wold-style-cast"
 #endif
 
-namespace loco {
 namespace renderer {
 
 VertexArray::VertexArray() { glGenVertexArrays(1, &m_OpenGLId); }
@@ -79,7 +78,6 @@ auto VertexArray::ToString() const -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco
 
 #if defined(__clang__)
 #pragma clang diagnostic pop  // NOLINT

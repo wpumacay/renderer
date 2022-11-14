@@ -4,13 +4,12 @@
 
 namespace py = pybind11;
 
-namespace loco {
 namespace renderer {
 
 // NOLINTNEXTLINE
 void bindings_keycodes(py::module& m) {
     {
-        using Enum = loco::renderer::key_action::KeyAction;
+        using Enum = renderer::key_action::KeyAction;
         py::enum_<Enum>(m, "KeyAction")
             .value("RELEASED", Enum::RELEASED)
             .value("PRESSED", Enum::PRESSED)
@@ -18,7 +17,7 @@ void bindings_keycodes(py::module& m) {
     }
 
     {
-        using Enum = loco::renderer::keys::Keys;
+        using Enum = renderer::keys::Keys;
         py::enum_<Enum>(m, "Keys")
             .value("KEY_SPACE", Enum::KEY_SPACE)
             .value("KEY_APOSTROPHE", Enum::KEY_APOSTROPHE)
@@ -144,4 +143,3 @@ void bindings_keycodes(py::module& m) {
 }
 
 }  // namespace renderer
-}  // namespace loco

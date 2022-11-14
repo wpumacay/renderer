@@ -6,7 +6,6 @@
 
 #include <renderer/core/texture_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 constexpr uint32_t MAX_TEXTURES = 128;
@@ -46,4 +45,3 @@ class TextureManager {
 };
 
 }  // namespace renderer
-}  // namespace loco

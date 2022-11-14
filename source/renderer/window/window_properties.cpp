@@ -1,10 +1,6 @@
-// clang-format off
 #include <cassert>
-
 #include <renderer/window/window_properties.hpp>
-// clang-format on
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eWindowBackend& type) -> std::string {
@@ -22,4 +18,3 @@ auto ToString(const eWindowBackend& type) -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco

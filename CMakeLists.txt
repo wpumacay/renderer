@@ -79,7 +79,7 @@ endif()
 
 include(LocoRendererDefinitions)
 
-add_library(loco::renderer ALIAS LocoRendererCpp)
+add_library(renderer::renderer ALIAS LocoRendererCpp)
 
 if(LOCORENDERER_BUILD_EXAMPLES)
   add_subdirectory(examples/cpp)

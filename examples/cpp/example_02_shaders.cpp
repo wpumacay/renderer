@@ -34,14 +34,13 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 
 auto main() -> int {
     auto window =
-        std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    auto vert_shader = std::make_unique<loco::renderer::Shader>(
-        "basic_2d_vert", loco::renderer::eShaderType::VERTEX, VERT_SHADER_SRC);
+    auto vert_shader = std::make_unique<renderer::Shader>(
+        "basic_2d_vert", renderer::eShaderType::VERTEX, VERT_SHADER_SRC);
 
-    auto frag_shader = std::make_unique<loco::renderer::Shader>(
-        "basic_2d_frag", loco::renderer::eShaderType::FRAGMENT,
-        FRAG_SHADER_SRC);
+    auto frag_shader = std::make_unique<renderer::Shader>(
+        "basic_2d_frag", renderer::eShaderType::FRAGMENT, FRAG_SHADER_SRC);
 
     if (vert_shader->compiled()) {
         LOG_INFO("Vertex shader successfully compiled");
@@ -51,7 +50,7 @@ auto main() -> int {
         LOG_INFO("Fragment shader successfully compiled");
     }
 
-    auto program = std::make_unique<loco::renderer::Program>("basic_2d");
+    auto program = std::make_unique<renderer::Program>("basic_2d");
     program->AddShader(std::move(vert_shader));
     program->AddShader(std::move(frag_shader));
     program->LinkProgram();

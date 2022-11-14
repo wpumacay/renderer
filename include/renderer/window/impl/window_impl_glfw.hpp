@@ -1,6 +1,5 @@
 #pragma once
 
-// clang-format off
 #include <array>
 #include <string>
 #include <memory>
@@ -9,9 +8,7 @@
 
 #include <renderer/input/callbacks.hpp>
 #include <renderer/window/impl/window_impl.hpp>
-// clang-format on
 
-namespace loco {
 namespace renderer {
 
 struct GLFWwindowDeleter {
@@ -71,4 +68,3 @@ class WindowImplGlfw : public IWindowImpl {
 };
 
 }  // namespace renderer
-}  // namespace loco

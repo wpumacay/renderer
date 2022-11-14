@@ -43,26 +43,25 @@ constexpr const char* FRAG_SHADER_SRC = R"(
     }
 )";
 
-auto get_wrapping_mode_idx(const loco::renderer::eTextureWrap& tex_wrap)
-    -> uint32_t;
+auto get_wrapping_mode_idx(const renderer::eTextureWrap& tex_wrap) -> uint32_t;
 
-auto get_wrapping_mode_from_idx(uint32_t idx) -> loco::renderer::eTextureWrap;
+auto get_wrapping_mode_from_idx(uint32_t idx) -> renderer::eTextureWrap;
 
 // NOLINTNEXTLINE
 auto main() -> int {
     // NOLINTNEXTLINE
-    auto IMAGE_PATH = loco::renderer::RESOURCES_PATH + "images/container.jpg";
+    auto IMAGE_PATH = renderer::RESOURCES_PATH + "images/container.jpg";
 
     auto window =
-        std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     window->RegisterKeyboardCallback([&](int key, int, int) {
-        if (key == loco::renderer::keys::KEY_ESCAPE) {
+        if (key == renderer::keys::KEY_ESCAPE) {
             window->RequestClose();
         }
     });
 
-    auto program = std::make_unique<loco::renderer::Program>(
+    auto program = std::make_unique<renderer::Program>(
         "basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC);
 
     // clang-format off
@@ -83,23 +82,22 @@ auto main() -> int {
     };
     // clang-format on
 
-    loco::renderer::BufferLayout layout = {
-        {"position", loco::renderer::eElementType::FLOAT_2, false},
-        {"texcoord", loco::renderer::eElementType::FLOAT_2, false}};
+    renderer::BufferLayout layout = {
+        {"position", renderer::eElementType::FLOAT_2, false},
+        {"texcoord", renderer::eElementType::FLOAT_2, false}};
 
-    auto vbo = std::make_unique<loco::renderer::VertexBuffer>(
-        layout, loco::renderer::eBufferUsage::STATIC,
+    auto vbo = std::make_unique<renderer::VertexBuffer>(
+        layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
-    auto ibo = std::make_unique<loco::renderer::IndexBuffer>(
-        loco::renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
+    auto ibo = std::make_unique<renderer::IndexBuffer>(
+        renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
 
-    auto vao = std::make_unique<loco::renderer::VertexArray>();
+    auto vao = std::make_unique<renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
     vao->SetIndexBuffer(std::move(ibo));
 
-    auto texture =
-        std::make_unique<loco::renderer::Texture>(IMAGE_PATH.c_str());
+    auto texture = std::make_unique<renderer::Texture>(IMAGE_PATH.c_str());
 
     while (window->active()) {
         window->Begin();
@@ -190,31 +188,30 @@ auto main() -> int {
     return 0;
 }
 
-auto get_wrapping_mode_idx(const loco::renderer::eTextureWrap& tex_wrap)
-    -> uint32_t {
+auto get_wrapping_mode_idx(const renderer::eTextureWrap& tex_wrap) -> uint32_t {
     switch (tex_wrap) {
-        case loco::renderer::eTextureWrap::REPEAT:
+        case renderer::eTextureWrap::REPEAT:
             return 0;
-        case loco::renderer::eTextureWrap::REPEAT_MIRROR:
+        case renderer::eTextureWrap::REPEAT_MIRROR:
             return 1;
-        case loco::renderer::eTextureWrap::CLAMP_TO_EDGE:
+        case renderer::eTextureWrap::CLAMP_TO_EDGE:
             return 2;
-        case loco::renderer::eTextureWrap::CLAMP_TO_BORDER:
+        case renderer::eTextureWrap::CLAMP_TO_BORDER:
             return 3;
     }
 }
 
-auto get_wrapping_mode_from_idx(uint32_t idx) -> loco::renderer::eTextureWrap {
+auto get_wrapping_mode_from_idx(uint32_t idx) -> renderer::eTextureWrap {
     switch (idx) {
         case 0:
-            return loco::renderer::eTextureWrap::REPEAT;
+            return renderer::eTextureWrap::REPEAT;
         case 1:
-            return loco::renderer::eTextureWrap::REPEAT_MIRROR;
+            return renderer::eTextureWrap::REPEAT_MIRROR;
         case 2:
-            return loco::renderer::eTextureWrap::CLAMP_TO_EDGE;
+            return renderer::eTextureWrap::CLAMP_TO_EDGE;
         case 3:
-            return loco::renderer::eTextureWrap::CLAMP_TO_BORDER;
+            return renderer::eTextureWrap::CLAMP_TO_BORDER;
         default:
-            return loco::renderer::eTextureWrap::REPEAT;
+            return renderer::eTextureWrap::REPEAT;
     }
 }

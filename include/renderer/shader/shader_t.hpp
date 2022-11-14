@@ -6,7 +6,6 @@
 #include <renderer/common.hpp>
 #include <loco/utils/common.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Available shader types
@@ -77,4 +76,3 @@ class Shader {
 };
 
 }  // namespace renderer
-}  // namespace loco

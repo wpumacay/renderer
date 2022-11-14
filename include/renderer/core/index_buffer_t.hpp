@@ -5,7 +5,6 @@
 #include <renderer/common.hpp>
 #include <renderer/core/vertex_buffer_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Index Buffer Object (IBO|EBO), used to store indices for primitives
@@ -48,4 +47,3 @@ class IndexBuffer {
 };
 
 }  // namespace renderer
-}  // namespace loco

@@ -2,10 +2,8 @@
 
 #include <loco/utils/common.hpp>
 #include <loco/utils/logging.hpp>
-
 #include <renderer/assets/shader_manager_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 auto ShaderManager::LoadProgram(const std::string& name,
@@ -18,8 +16,8 @@ auto ShaderManager::LoadProgram(const std::string& name,
             "bigger?");
         return nullptr;
     }
-    auto vert_src = utils::GetFileContents(vert_filepath.c_str());
-    auto frag_src = utils::GetFileContents(frag_filepath.c_str());
+    auto vert_src = loco::utils::GetFileContents(vert_filepath.c_str());
+    auto frag_src = loco::utils::GetFileContents(frag_filepath.c_str());
 
     auto program = std::make_shared<Program>(name.c_str(), vert_src.c_str(),
                                              frag_src.c_str());
@@ -92,4 +90,3 @@ auto ShaderManager::GetProgramByIndex(uint32_t prog_index) -> Program::ptr {
 }
 
 }  // namespace renderer
-}  // namespace loco

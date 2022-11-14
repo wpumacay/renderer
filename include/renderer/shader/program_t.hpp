@@ -8,7 +8,6 @@
 #include <renderer/common.hpp>
 #include <renderer/shader/shader_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Max number of programmable stages
@@ -110,5 +109,5 @@ class Program {
     /// Map used to keep uniforms' names and their locations
     std::unordered_map<std::string, int32_t> m_UniformLocationsCache;
 };
+
 }  // namespace renderer
-}  // namespace loco

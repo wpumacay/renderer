@@ -10,7 +10,6 @@
 #include <renderer/window/window_properties.hpp>
 #include <renderer/window/impl/window_impl.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Abstraction of a window supporting multiple windowing backends
@@ -101,4 +100,3 @@ class Window {
 };
 
 }  // namespace renderer
-}  // namespace loco

@@ -1,12 +1,8 @@
 #pragma once
 
-// clang-format off
 #include <string>
-
 #include <renderer/common.hpp>
-// clang-format on
 
-namespace loco {
 namespace renderer {
 
 constexpr int DEFAULT_WINDOW_WIDTH = 1024;
@@ -34,4 +30,3 @@ struct WindowProperties {
 };
 
 }  // namespace renderer
-}  // namespace loco

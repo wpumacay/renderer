@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <functional>
 
-namespace loco {
 namespace renderer {
 
 // Whether or not the shift keys were held down
@@ -22,4 +21,3 @@ using ScrollCallback = std::function<void(double, double)>;
 using ResizeCallback = std::function<void(int, int)>;
 
 }  // namespace renderer
-}  // namespace loco

@@ -5,7 +5,6 @@
 // Adapted from Cherno's hazel engine:
 // @github -> TheCherno/Hazel/blob/master/Hazel/src/Hazel/Core/KeyCodes.h
 
-namespace loco {
 namespace renderer {
 
 /// Maximum number of possible keycodes
@@ -146,4 +145,3 @@ enum Keys {
 }  // namespace keys
 
 }  // namespace renderer
-}  // namespace loco

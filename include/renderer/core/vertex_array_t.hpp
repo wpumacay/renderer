@@ -8,7 +8,6 @@
 #include <renderer/core/vertex_buffer_t.hpp>
 #include <renderer/core/index_buffer_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 class VertexArray {
@@ -66,4 +65,3 @@ class VertexArray {
 };
 
 }  // namespace renderer
-}  // namespace loco

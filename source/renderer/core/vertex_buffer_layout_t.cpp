@@ -1,12 +1,11 @@
+#include <iostream>
+#include <cstdint>
 
 #include <glad/gl.h>
 
-#include <iostream>
-#include <cstdint>
 #include <renderer/core/vertex_buffer_layout_t.hpp>
 #include <spdlog/fmt/bundled/format.h>
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eElementType& etype) -> std::string {
@@ -120,4 +119,3 @@ auto BufferLayout::ToString() const -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco

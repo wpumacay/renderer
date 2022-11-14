@@ -4,7 +4,6 @@
 #include <renderer/core/index_buffer_t.hpp>
 #include <spdlog/fmt/bundled/format.h>
 
-namespace loco {
 namespace renderer {
 
 IndexBuffer::IndexBuffer(eBufferUsage usage, uint32_t count,
@@ -41,4 +40,3 @@ auto IndexBuffer::ToString() const -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco

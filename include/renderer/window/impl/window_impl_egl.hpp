@@ -1,19 +1,16 @@
 #pragma once
 
-// clang-format off
 #include <glad/gl.h>
 #include <glad/egl.h>
 
 #include <renderer/input/callbacks.hpp>
 #include <renderer/window/impl/window_impl.hpp>
-// clang-format on
 
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
-namespace loco {
 namespace renderer {
 
 class WindowImplEgl : public IWindowImpl {
@@ -65,7 +62,6 @@ class WindowImplEgl : public IWindowImpl {
 };
 
 }  // namespace renderer
-}  // namespace loco
 
 #ifdef __clang__
 #pragma clang diagnostic pop  // NOLINT

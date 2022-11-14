@@ -12,7 +12,6 @@
  * [1]: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
  */
 
-namespace loco {
 namespace renderer {
 
 /// Available wrapping modes for a texture
@@ -134,4 +133,3 @@ class Texture {
 };
 
 }  // namespace renderer
-}  // namespace loco

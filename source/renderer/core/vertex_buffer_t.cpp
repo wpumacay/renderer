@@ -1,11 +1,8 @@
-
 #include <glad/gl.h>
 
 #include <renderer/core/vertex_buffer_t.hpp>
-
 #include <spdlog/fmt/bundled/format.h>
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eBufferUsage& usage) -> std::string {
@@ -73,4 +70,3 @@ auto VertexBuffer::ToString() const -> std::string {
 }
 
 }  // namespace renderer
-}  // namespace loco

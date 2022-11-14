@@ -2,10 +2,8 @@
 #include <glad/gl.h>
 
 #include <loco/utils/logging.hpp>
-
 #include <renderer/shader/program_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 Program::Program(const char* name) : m_Name(name) {}
@@ -135,4 +133,3 @@ void Program::SetMat4(const char* uname, const Mat4& uvalue) {
 }
 
 }  // namespace renderer
-}  // namespace loco

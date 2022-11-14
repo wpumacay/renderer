@@ -12,5 +12,5 @@ set(LOCORENDERER_EXAMPLES_LIST
 
 foreach(example_filepath IN LISTS LOCORENDERER_EXAMPLES_LIST)
   loco_setup_single_file_example(${example_filepath} TARGET_DEPENDENCIES
-                                 loco::renderer)
+                                 renderer::renderer)
 endforeach()

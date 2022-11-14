@@ -6,7 +6,6 @@
 
 #include <renderer/shader/program_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 constexpr uint32_t MAX_PROGRAMS = 128;
@@ -53,4 +52,3 @@ class ShaderManager {
 };
 
 }  // namespace renderer
-}  // namespace loco

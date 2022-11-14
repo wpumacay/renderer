@@ -10,13 +10,12 @@
 
 namespace py = pybind11;
 
-namespace loco {
 namespace renderer {
 
 // NOLINTNEXTLINE
 void bindings_window(py::module& m) {
     {
-        using Enum = loco::renderer::eWindowBackend;
+        using Enum = renderer::eWindowBackend;
         py::enum_<Enum>(m, "WindowBackend")
             .value("TYPE_NONE", Enum::TYPE_NONE)
             .value("TYPE_GLFW", Enum::TYPE_GLFW)
@@ -24,7 +23,7 @@ void bindings_window(py::module& m) {
     }
 
     {
-        using Class = loco::renderer::WindowProperties;
+        using Class = renderer::WindowProperties;
         py::class_<Class>(m, "WindowProperties")
             .def(py::init<>())
             .def_property(
@@ -57,7 +56,7 @@ void bindings_window(py::module& m) {
     }
 
     {
-        using Class = loco::renderer::Window;
+        using Class = renderer::Window;
         py::class_<Class, Class::ptr>(m, "Window")
             .def(py::init<const WindowProperties&>())
             .def(py::init<int, int, const eWindowBackend&>(), py::arg("width"),
@@ -104,4 +103,3 @@ void bindings_window(py::module& m) {
 }
 
 }  // namespace renderer
-}  // namespace loco

@@ -4,7 +4,6 @@
 
 #include <renderer/core/vertex_buffer_layout_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Available modes in which a VBO can be used
@@ -74,4 +73,3 @@ class VertexBuffer {
 };
 
 }  // namespace renderer
-}  // namespace loco

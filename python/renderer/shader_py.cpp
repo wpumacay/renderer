@@ -11,13 +11,12 @@
 
 namespace py = pybind11;
 
-namespace loco {
 namespace renderer {
 
 // NOLINTNEXTLINE
 void bindings_shader(py::module& m) {
     {
-        using Enum = loco::renderer::eShaderType;
+        using Enum = renderer::eShaderType;
         py::enum_<Enum>(m, "ShaderType")
             .value("VERTEX", Enum::VERTEX)
             .value("FRAGMENT", Enum::FRAGMENT)
@@ -28,7 +27,7 @@ void bindings_shader(py::module& m) {
     }
 
     {
-        using Class = loco::renderer::Shader;
+        using Class = renderer::Shader;
         py::class_<Class, Class::uptr>(m, "Shader")
             .def(py::init<const char*, const eShaderType&, const char*>())
             .def_property_readonly("name", &Class::name)
@@ -45,7 +44,7 @@ void bindings_shader(py::module& m) {
     }
 
     {
-        using Class = loco::renderer::Program;
+        using Class = renderer::Program;
         py::class_<Class, Class::ptr>(m, "Program")
             .def(py::init<const char*>())
             .def(py::init<const char*, const char*, const char*>())
@@ -91,4 +90,3 @@ void bindings_shader(py::module& m) {
 }
 
 }  // namespace renderer
-}  // namespace loco

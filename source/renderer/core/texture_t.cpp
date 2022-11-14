@@ -7,7 +7,6 @@
 // [1] StackOverflow's Questions
 // 23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
 
-namespace loco {
 namespace renderer {
 
 auto ToString(const eTextureWrap& tex_wrap) -> std::string {
@@ -229,4 +228,3 @@ auto Texture::SetWrapModeV(const eTextureWrap& tex_wrap) -> void {
 }
 
 }  // namespace renderer
-}  // namespace loco

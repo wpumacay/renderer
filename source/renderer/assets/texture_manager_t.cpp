@@ -1,10 +1,8 @@
 #include <memory>
 
 #include <loco/utils/logging.hpp>
-
 #include <renderer/assets/texture_manager_t.hpp>
 
-namespace loco {
 namespace renderer {
 
 auto TextureManager::LoadTexture(const std::string& tex_id,
@@ -91,4 +89,3 @@ auto TextureManager::GetTextureByIndex(uint32_t tex_index) -> Texture::ptr {
 }
 
 }  // namespace renderer
-}  // namespace loco

@@ -1,23 +1,15 @@
 #pragma once
 
-// clang-format off
 #include <utility>
 
 #include <loco/utils/common.hpp>
 #include <renderer/common.hpp>
 #include <renderer/input/callbacks.hpp>
 #include <renderer/window/window_properties.hpp>
-// clang-format on
 
-namespace loco {
 namespace renderer {
-// Forward declare (we'll use the parent-child relationship)
+
 class Window;
-}  // namespace renderer
-}  // namespace loco
-
-namespace loco {
-namespace renderer {
 
 class IWindowImpl {
     LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(IWindowImpl);
@@ -60,4 +52,3 @@ class IWindowImpl {
 };
 
 }  // namespace renderer
-}  // namespace loco

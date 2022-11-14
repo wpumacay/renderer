@@ -3,7 +3,6 @@
 #include <renderer/window/impl/window_impl_egl.hpp>
 #include <renderer/window/impl/window_impl_glfw.hpp>
 
-namespace loco {
 namespace renderer {
 
 Window::Window(WindowProperties properties)
@@ -97,4 +96,3 @@ auto Window::RegisterResizeCallback(const ResizeCallback& callback) -> void {
 }
 
 }  // namespace renderer
-}  // namespace loco

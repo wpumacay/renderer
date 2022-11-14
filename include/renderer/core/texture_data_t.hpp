@@ -5,7 +5,6 @@
 
 #include <renderer/common.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Available format for the type of data stored in general textures
@@ -86,4 +85,3 @@ class TextureData {
 };
 
 }  // namespace renderer
-}  // namespace loco

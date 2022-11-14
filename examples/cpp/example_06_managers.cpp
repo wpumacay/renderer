@@ -18,7 +18,6 @@
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
 
-namespace loco {
 namespace renderer {
 
 struct Engine {
@@ -32,26 +31,24 @@ struct Engine {
 };
 
 }  // namespace renderer
-}  // namespace loco
 
 // NOLINTNEXTLINE
-loco::renderer::Engine g_engine;
+renderer::Engine g_engine;
 
 auto main() -> int {
     g_engine.window =
-        std::make_unique<loco::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
-    g_engine.shader_manager = std::make_unique<loco::renderer::ShaderManager>();
-    g_engine.texture_manager =
-        std::make_unique<loco::renderer::TextureManager>();
+        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+    g_engine.shader_manager = std::make_unique<renderer::ShaderManager>();
+    g_engine.texture_manager = std::make_unique<renderer::TextureManager>();
 
     auto program = g_engine.shader_manager->LoadProgram(
         "basic2d",
-        loco::renderer::EXAMPLES_PATH + "/resources/shaders/basic2d_vert.glsl",
-        loco::renderer::EXAMPLES_PATH + "/resources/shaders/basic2d_frag.glsl");
+        renderer::EXAMPLES_PATH + "/resources/shaders/basic2d_vert.glsl",
+        renderer::EXAMPLES_PATH + "/resources/shaders/basic2d_frag.glsl");
 
     auto texture = g_engine.texture_manager->LoadTexture(
         "container",
-        loco::renderer::EXAMPLES_PATH + "/resources/images/container.jpg");
+        renderer::EXAMPLES_PATH + "/resources/images/container.jpg");
 
     // -------------------------------------------------------------------------
     // Setup the primitive to be drawn
@@ -74,18 +71,18 @@ auto main() -> int {
     };
     // clang-format on
 
-    loco::renderer::BufferLayout layout = {
-        {"position", loco::renderer::eElementType::FLOAT_2, false},
-        {"texcoord", loco::renderer::eElementType::FLOAT_2, false}};
+    renderer::BufferLayout layout = {
+        {"position", renderer::eElementType::FLOAT_2, false},
+        {"texcoord", renderer::eElementType::FLOAT_2, false}};
 
-    auto vbo = std::make_unique<loco::renderer::VertexBuffer>(
-        layout, loco::renderer::eBufferUsage::STATIC,
+    auto vbo = std::make_unique<renderer::VertexBuffer>(
+        layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
-    auto ibo = std::make_unique<loco::renderer::IndexBuffer>(
-        loco::renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
+    auto ibo = std::make_unique<renderer::IndexBuffer>(
+        renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
 
-    auto vao = std::make_unique<loco::renderer::VertexArray>();
+    auto vao = std::make_unique<renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
     vao->SetIndexBuffer(std::move(ibo));
     // -------------------------------------------------------------------------

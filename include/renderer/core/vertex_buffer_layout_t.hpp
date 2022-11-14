@@ -7,7 +7,6 @@
 
 #include <renderer/common.hpp>
 
-namespace loco {
 namespace renderer {
 
 /// Type of element used for part (or all) elements in a vertex buffer
@@ -92,4 +91,3 @@ class BufferLayout {
 };
 
 }  // namespace renderer
-}  // namespace loco
