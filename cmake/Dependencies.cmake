@@ -8,8 +8,8 @@ include_guard()
 # * catch2
 # * glfw
 # * assimp
-# * loco-utils
-# * loco-math
+# * utils
+# * math
 #
 # - Based on the superbuild script by jeffamstutz for ospray
 #   https://github.com/jeffamstutz/superbuild_ospray/blob/main/macros.cmake
@@ -138,7 +138,7 @@ endif()
 
 
 # ------------------------------------------------------------------------------
-# LocoUtils exposes some utilities that we'll use (like logs, profiling, etc.)
+# "Utils" exposes some utilities that we'll use (like logs, profiling, etc.)
 # ------------------------------------------------------------------------------
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
@@ -153,7 +153,7 @@ loco_find_or_fetch_dependency(
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
-# LocoMath is used as math library (defines vectors, matrices, and operations
+# "Math" is used as math library (defines vectors, matrices, and operations
 # that could be used on these types). The API is similar to Eigen's
 # ------------------------------------------------------------------------------
 loco_find_or_fetch_dependency(
