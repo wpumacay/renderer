@@ -1,6 +1,6 @@
 #include <glad/gl.h>
 
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/core/texture_t.hpp>
 
 // References:

@@ -2,7 +2,7 @@
 #include <renderer/window/window_t.hpp>
 #include <renderer/shader/shader_t.hpp>
 #include <renderer/shader/program_t.hpp>
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;

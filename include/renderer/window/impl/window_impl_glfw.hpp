@@ -17,9 +17,9 @@ struct GLFWwindowDeleter {
 
 class WindowImplGlfw : public IWindowImpl {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplGlfw)
+    NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplGlfw)
 
-    LOCO_DEFINE_SMART_POINTERS(WindowImplGlfw)
+    DEFINE_SMART_POINTERS(WindowImplGlfw)
 
  public:
     explicit WindowImplGlfw(WindowProperties properties);

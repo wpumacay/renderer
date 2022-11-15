@@ -2,7 +2,7 @@
 
 #include <array>
 #include <string>
-#include <loco/utils/common.hpp>
+#include <utils/common.hpp>
 
 #include <renderer/common.hpp>
 #include <renderer/input/callbacks.hpp>
@@ -21,9 +21,9 @@ namespace renderer {
 /// implementation sticks to the public API exposed by this class
 class Window {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Window)
+    NO_COPY_NO_MOVE_NO_ASSIGN(Window)
 
-    LOCO_DEFINE_SMART_POINTERS(Window)
+    DEFINE_SMART_POINTERS(Window)
 
  public:
     /// Creates a window from a given set of properties

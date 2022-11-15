@@ -1,6 +1,6 @@
 #include <memory>
 
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/assets/texture_manager_t.hpp>
 
 namespace renderer {

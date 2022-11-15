@@ -21,9 +21,9 @@ auto ToOpenGLEnum(const eBufferUsage& usage) -> uint32_t;
 /// Vertex Buffer Object (VBO), used to store data on the GPU memory
 class VertexBuffer {
     // cppcheck-suppress unknownMacro
-    LOCO_DEFINE_SMART_POINTERS(VertexBuffer)
+    DEFINE_SMART_POINTERS(VertexBuffer)
 
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(VertexBuffer);
+    NO_COPY_NO_MOVE_NO_ASSIGN(VertexBuffer);
 
  public:
     explicit VertexBuffer(BufferLayout layout, const eBufferUsage& usage,

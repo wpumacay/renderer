@@ -15,9 +15,9 @@ namespace renderer {
 
 class WindowImplEgl : public IWindowImpl {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplEgl)
+    NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplEgl)
 
-    LOCO_DEFINE_SMART_POINTERS(WindowImplEgl)
+    DEFINE_SMART_POINTERS(WindowImplEgl)
 
  public:
     explicit WindowImplEgl(WindowProperties properties);

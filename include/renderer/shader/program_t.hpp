@@ -20,9 +20,9 @@ constexpr int MAX_SHADERS_IN_PROGRAM = 7;
 /// uniforms and other properties of a GPU-linked shader program
 class Program {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Program)
+    NO_COPY_NO_MOVE_NO_ASSIGN(Program)
 
-    LOCO_DEFINE_SMART_POINTERS(Program)
+    DEFINE_SMART_POINTERS(Program)
 
  public:
     /// Creates a shader-program object with given name

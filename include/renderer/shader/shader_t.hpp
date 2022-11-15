@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include <renderer/common.hpp>
-#include <loco/utils/common.hpp>
+#include <utils/common.hpp>
 
 namespace renderer {
 
@@ -27,9 +27,9 @@ auto ToOpenGLEnum(const eShaderType& type) -> uint32_t;
 /// Shader abstraction class, used to handle a shader on GPU
 class Shader {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Shader)
+    NO_COPY_NO_MOVE_NO_ASSIGN(Shader)
 
-    LOCO_DEFINE_SMART_POINTERS(Shader)
+    DEFINE_SMART_POINTERS(Shader)
 
  public:
     /// Creates a shader from a set of given parameters

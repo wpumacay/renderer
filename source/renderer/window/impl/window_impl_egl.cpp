@@ -1,4 +1,4 @@
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/window/impl/window_impl_egl.hpp>
 
 namespace renderer {

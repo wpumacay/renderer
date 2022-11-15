@@ -1,8 +1,8 @@
-if(NOT TARGET loco::renderer)
+if(NOT TARGET renderer::renderer)
   return()
 endif()
 
-set(LOCORENDERER_EXAMPLES_LIST
+set(RENDERER_EXAMPLES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/example_01_window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_02_shaders.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_03_buffers.cpp
@@ -10,7 +10,7 @@ set(LOCORENDERER_EXAMPLES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/example_05_textures.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_06_managers.cpp)
 
-foreach(example_filepath IN LISTS LOCORENDERER_EXAMPLES_LIST)
+foreach(example_filepath IN LISTS RENDERER_EXAMPLES_LIST)
   loco_setup_single_file_example(${example_filepath} TARGET_DEPENDENCIES
                                  renderer::renderer)
 endforeach()

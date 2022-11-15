@@ -9,9 +9,9 @@
 #include <renderer/core/vertex_array_t.hpp>
 #include <renderer/core/texture_t.hpp>
 
-#if defined(LOCORENDERER_IMGUI)
+#if defined(RENDERER_IMGUI)
 #include <imgui.h>
-#endif  // LOCORENDERER_IMGUI
+#endif  // RENDERER_IMGUI
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -116,7 +116,7 @@ auto main() -> int {
             program->Unbind();
         }
 
-#if defined(LOCORENDERER_IMGUI)
+#if defined(RENDERER_IMGUI)
         ImGui::ShowDemoWindow();
         ImGui::Begin("Options");
         {
@@ -180,7 +180,7 @@ auto main() -> int {
             }
         }
         ImGui::End();
-#endif  // LOCORENDERER_IMGUI
+#endif  // RENDERER_IMGUI
 
         window->End();
     }

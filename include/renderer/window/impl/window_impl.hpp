@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include <loco/utils/common.hpp>
+#include <utils/common.hpp>
 #include <renderer/common.hpp>
 #include <renderer/input/callbacks.hpp>
 #include <renderer/window/window_properties.hpp>
@@ -12,9 +12,9 @@ namespace renderer {
 class Window;
 
 class IWindowImpl {
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(IWindowImpl);
+    NO_COPY_NO_MOVE_NO_ASSIGN(IWindowImpl);
 
-    LOCO_DEFINE_SMART_POINTERS(IWindowImpl);
+    DEFINE_SMART_POINTERS(IWindowImpl);
 
  public:
     explicit IWindowImpl(WindowProperties properties)

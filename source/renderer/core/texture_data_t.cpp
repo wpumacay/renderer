@@ -2,7 +2,7 @@
 
 #include <spdlog/fmt/bundled/format.h>
 
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/core/texture_data_t.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION

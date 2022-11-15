@@ -10,9 +10,9 @@ namespace renderer {
 /// Index Buffer Object (IBO|EBO), used to store indices for primitives
 class IndexBuffer {
     // cppcheck-suppress unknownMacro
-    LOCO_DEFINE_SMART_POINTERS(IndexBuffer)
+    DEFINE_SMART_POINTERS(IndexBuffer)
 
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(IndexBuffer);
+    NO_COPY_NO_MOVE_NO_ASSIGN(IndexBuffer);
 
  public:
     /// Creates  an Index Buffer  given some indices data

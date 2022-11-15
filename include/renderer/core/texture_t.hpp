@@ -63,9 +63,9 @@ auto ToOpenGLEnum(const eTextureIntFormat& tex_iformat) -> int32_t;
 /// Texture object, representing an OpenGL texture
 class Texture {
     // cppcheck-suppress unknownMacro
-    LOCO_DEFINE_SMART_POINTERS(Texture)
+    DEFINE_SMART_POINTERS(Texture)
 
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(Texture);
+    NO_COPY_NO_MOVE_NO_ASSIGN(Texture);
 
  public:
     /// Creates a texture object from a given image

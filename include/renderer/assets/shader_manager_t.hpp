@@ -13,9 +13,9 @@ constexpr uint32_t MAX_PROGRAMS = 128;
 /// Resource handler for shader programs
 class ShaderManager {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(ShaderManager)
+    NO_COPY_NO_MOVE_NO_ASSIGN(ShaderManager)
 
-    LOCO_DEFINE_SMART_POINTERS(ShaderManager)
+    DEFINE_SMART_POINTERS(ShaderManager)
 
  public:
     ShaderManager() = default;

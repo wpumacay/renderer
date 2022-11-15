@@ -11,9 +11,9 @@
 #include <renderer/core/index_buffer_t.hpp>
 #include <renderer/core/vertex_array_t.hpp>
 
-#if defined(LOCORENDERER_IMGUI)
+#if defined(RENDERER_IMGUI)
 #include <imgui.h>
-#endif  // LOCORENDERER_IMGUI
+#endif  // RENDERER_IMGUI
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -119,7 +119,7 @@ auto main() -> int {
             texture->Unbind();
             program->Unbind();
         }
-#if defined(LOCORENDERER_IMGUI)
+#if defined(RENDERER_IMGUI)
         ImGui::Begin("Demo options");
         {
             // NOLINTNEXTLINE
@@ -128,7 +128,7 @@ auto main() -> int {
             ImGui::SliderFloat("radius", &radius, -0.2F, 0.2F);  // NOLINT
             ImGui::ColorEdit3("color", color.data());
         }
-#endif  // LOCORENDERER_IMGUI
+#endif  // RENDERER_IMGUI
 
         g_engine.window->End();
 

@@ -13,9 +13,9 @@ constexpr uint32_t MAX_TEXTURES = 128;
 /// Resource handler for textures
 class TextureManager {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(TextureManager)
+    NO_COPY_NO_MOVE_NO_ASSIGN(TextureManager)
 
-    LOCO_DEFINE_SMART_POINTERS(TextureManager)
+    DEFINE_SMART_POINTERS(TextureManager)
 
  public:
     TextureManager() = default;

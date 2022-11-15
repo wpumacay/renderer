@@ -12,9 +12,9 @@ namespace renderer {
 
 class VertexArray {
     // cppcheck-suppress unknownMacro
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(VertexArray)
+    NO_COPY_NO_MOVE_NO_ASSIGN(VertexArray)
 
-    LOCO_DEFINE_SMART_POINTERS(VertexArray)
+    DEFINE_SMART_POINTERS(VertexArray)
 
  public:
     /// Creates a VAO on the GPU

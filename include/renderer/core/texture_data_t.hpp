@@ -38,9 +38,9 @@ auto ToOpenGLEnum(const eStorageType& dtype) -> uint32_t;
 /// Texture Data object (represents generally a texture's image data)
 class TextureData {
     // cppcheck-suppress unknownMacro
-    LOCO_DEFINE_SMART_POINTERS(TextureData)
+    DEFINE_SMART_POINTERS(TextureData)
 
-    LOCO_NO_COPY_NO_MOVE_NO_ASSIGN(TextureData);
+    NO_COPY_NO_MOVE_NO_ASSIGN(TextureData);
 
  public:
     /// Creates a texture-data object from a given image

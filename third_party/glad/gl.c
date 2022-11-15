@@ -15,7 +15,7 @@
 
 #endif /* GLAD_IMPL_UTIL_C_ */
 
-#ifdef LOCORENDERER_COMPILER_CLANG
+#ifdef RENDERER_COMPILER_CLANG
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
@@ -12087,7 +12087,7 @@ void gladLoaderUnloadGL(void) {
     }
 }
 
-#ifdef LOCORENDERER_COMPILER_CLANG
+#ifdef RENDERER_COMPILER_CLANG
 #pragma clang diagnostic pop
 #endif
 

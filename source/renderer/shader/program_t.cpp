@@ -1,7 +1,7 @@
 
 #include <glad/gl.h>
 
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/shader/program_t.hpp>
 
 namespace renderer {

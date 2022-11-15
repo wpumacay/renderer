@@ -2,7 +2,7 @@
 
 #include <glad/gl.h>
 
-#include <loco/utils/logging.hpp>
+#include <utils/logging.hpp>
 #include <renderer/shader/shader_t.hpp>
 
 namespace renderer {

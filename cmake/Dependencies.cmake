@@ -1,3 +1,5 @@
+include_guard()
+
 # ~~~
 # CMake configuration for third-party dependencies.
 #
@@ -32,6 +34,8 @@ option(FIND_OR_FETCH_USE_SYSTEM_PACKAGE
 # Notice that we're using a forked version in which usage of unique-ptr is
 # allowed, as we use this functionality in some other parent projects
 # ------------------------------------------------------------------------------
+
+find_package(Git REQUIRED)
 
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
@@ -74,6 +78,25 @@ loco_find_or_fetch_dependency(
 if (catch2_POPULATED)
   list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib")
 endif()
+
+# ------------------------------------------------------------------------------
+# Spdlog is used for the logging functionality (internally uses the fmt lib)
+# ------------------------------------------------------------------------------
+loco_find_or_fetch_dependency(
+  USE_SYSTEM_PACKAGE FALSE
+  PACKAGE_NAME spdlog
+  LIBRARY_NAME spdlog
+  GIT_REPO https://github.com/gabime/spdlog.git
+  GIT_TAG v1.9.2
+  TARGETS spdlog::spdlog
+  BUILD_ARGS
+    -DSPDLOG_BUILD_SHARED=OFF
+    -DSPDLOG_BUILD_EXAMPLE=OFF
+    -DSPDLOG_BUILD_EXAMPLE_HO=OFF
+    -DSPDLOG_BUILD_TESTS=OFF
+    -DSPDLOG_BUILD_TESTS_HO=OFF
+    -DSPDLOG_BUILD_BENCH=OFF
+  EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
 # Use GLFW from sources (as it might not be installed in the system). We use
@@ -119,14 +142,14 @@ endif()
 # ------------------------------------------------------------------------------
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
-  LIBRARY_NAME loco_utils
-  GIT_REPO https://github.com/wpumacay/loco_utils.git
+  LIBRARY_NAME utils
+  GIT_REPO https://github.com/wpumacay/utils.git
   GIT_TAG dev
-  TARGETS loco::utils
+  TARGETS utils::utils
   BUILD_ARGS
-    -DLOCOUTILS_BUILD_PYTHON_BINDINGS=ON
-    -DLOCOUTILS_BUILD_EXAMPLES=OFF
-    -DLOCOUTILS_BUILD_DOCS=OFF
+    -DUTILS_BUILD_PYTHON_BINDINGS=ON
+    -DUTILS_BUILD_EXAMPLES=OFF
+    -DUTILS_BUILD_DOCS=OFF
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
@@ -135,15 +158,15 @@ loco_find_or_fetch_dependency(
 # ------------------------------------------------------------------------------
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
-  LIBRARY_NAME loco_math
-  GIT_REPO https://github.com/wpumacay/loco_math.git
+  LIBRARY_NAME math
+  GIT_REPO https://github.com/wpumacay/math.git
   GIT_TAG dev
-  TARGETS loco::math loco::math_py_helpers
+  TARGETS math::math math::math_py_helpers
   BUILD_ARGS
-    -DLOCOMATH_BUILD_PYTHON_BINDINGS=ON
-    -DLOCOMATH_BUILD_EXAMPLES=OFF
-    -DLOCOMATH_BUILD_TESTS=OFF
-    -DLOCOMATH_BUILD_DOCS=OFF
+    -DMATH_BUILD_PYTHON_BINDINGS=ON
+    -DMATH_BUILD_EXAMPLES=OFF
+    -DMATH_BUILD_TESTS=OFF
+    -DMATH_BUILD_DOCS=OFF
   EXCLUDE_FROM_ALL)
 
 # cmake-format: on

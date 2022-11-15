@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-#include <loco/utils/common.hpp>
+#include <utils/common.hpp>
 
 #include <math/vec2_t.hpp>
 #include <math/vec3_t.hpp>
@@ -20,17 +20,17 @@ using float64_t = math::float64_t;
 
 namespace renderer {
 
-#if defined(LOCORENDERER_RESOURCES_PATH)
+#if defined(RENDERER_RESOURCES_PATH)
 // NOLINTNEXTLINE
-static const std::string RESOURCES_PATH = LOCORENDERER_RESOURCES_PATH;
+static const std::string RESOURCES_PATH = RENDERER_RESOURCES_PATH;
 #else
 // NOLINTNEXTLINE
 static const std::string RESOURCES_PATH = "../../resources/";
 #endif
 
-#if defined(LOCORENDERER_EXAMPLES_PATH)
+#if defined(RENDERER_EXAMPLES_PATH)
 // NOLINTNEXTLINE
-static const std::string EXAMPLES_PATH = LOCORENDERER_EXAMPLES_PATH;
+static const std::string EXAMPLES_PATH = RENDERER_EXAMPLES_PATH;
 #else
 // NOLINTNEXTLINE
 static const std::string EXAMPLES_PATH = "../../examples/";
