@@ -9,11 +9,14 @@
 #include <math/vec3_t.hpp>
 #include <math/vec4_t.hpp>
 #include <math/mat4_t.hpp>
+#include <math/quat_t.hpp>
 
 using Vec2 = math::Vector2<float>;
 using Vec3 = math::Vector3<float>;
 using Vec4 = math::Vector4<float>;
+using Mat3 = math::Matrix3<float>;
 using Mat4 = math::Matrix4<float>;
+using Quat = math::Quaternion<float>;
 
 using float32_t = math::float32_t;
 using float64_t = math::float64_t;
