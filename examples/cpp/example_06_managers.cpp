@@ -6,10 +6,14 @@
 #include <renderer/window/window_t.hpp>
 #include <renderer/assets/shader_manager_t.hpp>
 #include <renderer/assets/texture_manager_t.hpp>
+#include <renderer/input/input_manager_t.hpp>
 #include <renderer/core/vertex_buffer_layout_t.hpp>
 #include <renderer/core/vertex_buffer_t.hpp>
 #include <renderer/core/index_buffer_t.hpp>
 #include <renderer/core/vertex_array_t.hpp>
+
+#include <utils/logging.hpp>
+#include "renderer/input/buttons.hpp"
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -24,6 +28,7 @@ struct Engine {
     Window::uptr window = nullptr;
     ShaderManager::uptr shader_manager = nullptr;
     TextureManager::uptr texture_manager = nullptr;
+    InputManager::uptr input_manager = nullptr;
     std::chrono::steady_clock::time_point stamp_now;
     std::chrono::steady_clock::time_point stamp_bef;
     double time = 0.0;
@@ -40,6 +45,23 @@ auto main() -> int {
         std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
     g_engine.shader_manager = std::make_unique<renderer::ShaderManager>();
     g_engine.texture_manager = std::make_unique<renderer::TextureManager>();
+    g_engine.input_manager = std::make_unique<renderer::InputManager>();
+    g_engine.window->RegisterKeyboardCallback([&](int key, int action, int) {
+        g_engine.input_manager->CallbackKey(key, action);
+    });
+    g_engine.window->RegisterMouseButtonCallback(
+        [&](int button, int action, double x, double y) {
+            g_engine.input_manager->CallbackMouseButton(
+                button, action, static_cast<float>(x), static_cast<float>(y));
+        });
+    g_engine.window->RegisterMouseMoveCallback([&](double x, double y) {
+        g_engine.input_manager->CallbackMouseMove(static_cast<float>(x),
+                                                  static_cast<float>(y));
+    });
+    g_engine.window->RegisterScrollCallback([&](double xOff, double yOff) {
+        g_engine.input_manager->CallbackScroll(static_cast<float>(xOff),
+                                               static_cast<float>(yOff));
+    });
 
     auto program = g_engine.shader_manager->LoadProgram(
         "basic2d",
@@ -100,6 +122,20 @@ auto main() -> int {
 
     while (g_engine.window->active()) {
         g_engine.window->Begin();
+
+        if (g_engine.input_manager->IsKeyDown(renderer::keys::KEY_ESCAPE)) {
+            g_engine.window->RequestClose();
+        }
+
+        auto cursor_position = g_engine.input_manager->GetCursorPosition();
+        LOG_INFO("Cursorposition: ({0},{1})", cursor_position.x(),
+                 cursor_position.y());
+        LOG_INFO("MouseButtonLeft: {0}", g_engine.input_manager->IsMouseDown(
+                                             renderer::mouse::BUTTON_LEFT));
+        LOG_INFO("MouseButtonMiddle: {0}", g_engine.input_manager->IsMouseDown(
+                                               renderer::mouse::BUTTON_MIDDLE));
+        LOG_INFO("MouseButtonRight: {0}", g_engine.input_manager->IsMouseDown(
+                                              renderer::mouse::BUTTON_RIGHT));
 
         // Draw the quad
         {
