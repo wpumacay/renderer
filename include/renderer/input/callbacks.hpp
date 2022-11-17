@@ -15,7 +15,7 @@ constexpr int32_t MOD_ALT = (1 << 2);
 constexpr int32_t MOD_SUPER = (1 << 3);
 
 using KeyboardCallback = std::function<void(int, int, int)>;
-using MousePressCallback = std::function<void(int, int, double, double)>;
+using MouseButtonCallback = std::function<void(int, int, double, double)>;
 using MouseMoveCallback = std::function<void(double, double)>;
 using ScrollCallback = std::function<void(double, double)>;
 using ResizeCallback = std::function<void(int, int)>;

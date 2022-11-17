@@ -25,8 +25,8 @@ class IWindowImpl {
     virtual auto RegisterKeyboardCallback(const KeyboardCallback& callback)
         -> void = 0;
 
-    virtual auto RegisterMousePressCallback(const MousePressCallback& callback)
-        -> void = 0;
+    virtual auto RegisterMouseButtonCallback(
+        const MouseButtonCallback& callback) -> void = 0;
 
     virtual auto RegisterMouseMoveCallback(const MouseMoveCallback& callback)
         -> void = 0;

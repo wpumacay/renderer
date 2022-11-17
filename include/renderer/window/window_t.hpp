@@ -54,7 +54,8 @@ class Window {
     auto RegisterKeyboardCallback(const KeyboardCallback& callback) -> void;
 
     /// Registers (if applicable) a callback to be called on mouse-down events
-    auto RegisterMousePressCallback(const MousePressCallback& callback) -> void;
+    auto RegisterMouseButtonCallback(const MouseButtonCallback& callback)
+        -> void;
 
     /// Registers (if applicable) a callback to be called on mouse-move events
     auto RegisterMouseMoveCallback(const MouseMoveCallback& callback) -> void;

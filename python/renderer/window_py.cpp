@@ -67,8 +67,8 @@ void bindings_window(py::module& m) {
             .def("End", &Class::End)
             .def("RequestClose", &Class::RequestClose)
             .def("RegisterKeyboardCallback", &Class::RegisterKeyboardCallback)
-            .def("RegisterMousePressCallback",
-                 &Class::RegisterMousePressCallback)
+            .def("RegisterMouseButtonCallback",
+                 &Class::RegisterMouseButtonCallback)
             .def("RegisterMouseMoveCallback", &Class::RegisterMouseMoveCallback)
             .def("RegisterScrollCallback", &Class::RegisterScrollCallback)
             .def("RegisterResizeCallback", &Class::RegisterResizeCallback)

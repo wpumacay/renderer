@@ -29,7 +29,7 @@ class WindowImplGlfw : public IWindowImpl {
     auto RegisterKeyboardCallback(const KeyboardCallback& callback)
         -> void override;
 
-    auto RegisterMousePressCallback(const MousePressCallback& callback)
+    auto RegisterMouseButtonCallback(const MouseButtonCallback& callback)
         -> void override;
 
     auto RegisterMouseMoveCallback(const MouseMoveCallback& callback)
@@ -55,13 +55,13 @@ class WindowImplGlfw : public IWindowImpl {
     std::unique_ptr<GLFWwindow, GLFWwindowDeleter> m_GlfwWindow = nullptr;
 
     std::array<KeyboardCallback, MAX_CALLBACKS> m_ArrKeyboardCallbacks;
-    std::array<MousePressCallback, MAX_CALLBACKS> m_ArrMousePressCallbacks;
+    std::array<MouseButtonCallback, MAX_CALLBACKS> m_ArrMouseButtonCallbacks;
     std::array<MouseMoveCallback, MAX_CALLBACKS> m_ArrMouseMoveCallbacks;
     std::array<ScrollCallback, MAX_CALLBACKS> m_ArrScrollCallbacks;
     std::array<ResizeCallback, MAX_CALLBACKS> m_ArrResizeCallbacks;
 
     size_t m_ArrKeyboardCallbacksCount = 0;
-    size_t m_ArrMousePressCallbacksCount = 0;
+    size_t m_ArrMouseButtonCallbacksCount = 0;
     size_t m_ArrMouseMoveCallbacksCount = 0;
     size_t m_ArrScrollCallbacksCount = 0;
     size_t m_ArrResizeCallbacksCount = 0;

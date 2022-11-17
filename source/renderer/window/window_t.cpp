@@ -69,10 +69,10 @@ auto Window::RegisterKeyboardCallback(const KeyboardCallback& callback)
     }
 }
 
-auto Window::RegisterMousePressCallback(const MousePressCallback& callback)
+auto Window::RegisterMouseButtonCallback(const MouseButtonCallback& callback)
     -> void {
     if (m_Impl) {
-        m_Impl->RegisterMousePressCallback(callback);
+        m_Impl->RegisterMouseButtonCallback(callback);
     }
 }
 

@@ -29,7 +29,7 @@ class WindowImplEgl : public IWindowImpl {
         -> void override{/* Do nothing here */};
 
     // NOLINTNEXTLINE
-    auto RegisterMousePressCallback(const MousePressCallback& callback)
+    auto RegisterMouseButtonCallback(const MouseButtonCallback& callback)
         -> void override{/* Do nothing here */};
 
     // NOLINTNEXTLINE

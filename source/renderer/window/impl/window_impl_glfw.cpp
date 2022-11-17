@@ -91,8 +91,8 @@ WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
 #endif  // RENDERER_IMGUI
         auto* impl =
             static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrMousePressCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrMousePressCallbacks;
+        size_t num_callbacks = impl->m_ArrMouseButtonCallbacksCount;
+        auto& arr_callbacks = impl->m_ArrMouseButtonCallbacks;
 
         double x_cursor = 0;
         double y_cursor = 0;
@@ -174,9 +174,9 @@ auto WindowImplGlfw::RegisterKeyboardCallback(const KeyboardCallback& callback)
     m_ArrKeyboardCallbacks.at(m_ArrKeyboardCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::RegisterMousePressCallback(
-    const MousePressCallback& callback) -> void {
-    m_ArrMousePressCallbacks.at(m_ArrMousePressCallbacksCount++) = callback;
+auto WindowImplGlfw::RegisterMouseButtonCallback(
+    const MouseButtonCallback& callback) -> void {
+    m_ArrMouseButtonCallbacks.at(m_ArrMouseButtonCallbacksCount++) = callback;
 }
 
 auto WindowImplGlfw::RegisterMouseMoveCallback(
