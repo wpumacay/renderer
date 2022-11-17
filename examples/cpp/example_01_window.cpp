@@ -30,6 +30,10 @@ auto main() -> int {
         }
     });
 
+    window->RegisterScrollCallback([](double xOff, double yOff) {
+        LOG_TRACE("xOff: {0}, yOff: {1}", xOff, yOff);
+    });
+
     while (window->active()) {
         window->Begin();
         // opengl-stuff can go here :)
