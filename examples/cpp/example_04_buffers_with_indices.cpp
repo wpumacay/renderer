@@ -60,7 +60,7 @@ auto main() -> int {
         -0.5F,  0.5F, 1.0F, 1.0F, 1.0F // NOLINT
     };
     // clang-format on
-    constexpr uint32_t NUM_VERTICES = 6;
+    constexpr uint32_t NUM_INDICES = 6;
 
     // NOLINTNEXTLINE
     uint32_t buffer_indices[] = {0, 1, 2, 0, 2, 3};
@@ -74,7 +74,7 @@ auto main() -> int {
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
     auto ibo = std::make_unique<renderer::IndexBuffer>(
-        renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
+        renderer::eBufferUsage::STATIC, NUM_INDICES, buffer_indices);
 
     auto vao = std::make_unique<renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
@@ -85,7 +85,7 @@ auto main() -> int {
         program->Bind();
         vao->Bind();
 
-        glDrawElements(GL_TRIANGLES, NUM_VERTICES, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, NUM_INDICES, GL_UNSIGNED_INT, nullptr);
 
         vao->Unbind();
         program->Unbind();
