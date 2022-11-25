@@ -30,6 +30,12 @@ auto CreateBox(float width, float depth, float height) -> Geometry::uptr;
 auto CreateSphere(float radius, size_t nDiv1 = 20, size_t nDiv2 = 20)
     -> Geometry::uptr;
 
+/// Creates the geometry for an ellipsoid given its size and tessellation level
+/// \param[in] radius_x The radius in the x-axis of the ellipsoid
+/// \param[in] radius_y The radius in the y-axis of the ellipsoid
+/// \param[in] radius_z The radius in the z-axis of the ellipsoid
+/// \param[in] nDiv1 The tessellation level for the second spherical dimension
+/// \param[in] nDiv2 The tessellation level for the third spherical dimensions
 auto CreateEllipsoid(float radiusX, float radiusY, float radiusZ,
                      size_t nDiv1 = 20, size_t nDiv2 = 20) -> Geometry::uptr;
 
