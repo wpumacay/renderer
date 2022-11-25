@@ -44,6 +44,12 @@ class VertexArray {
         return m_Buffers;
     }
 
+    /// Returns a mutable reference to the index buffer
+    auto index_buffer() -> IndexBuffer& { return *m_IndexBuffer; }
+
+    /// Returns an unmutable reference to the index buffer
+    auto index_buffer() const -> const IndexBuffer& { return *m_IndexBuffer; }
+
     /// Returns the id associated with this object on the GPU
     auto opengl_id() const -> uint32_t { return m_OpenGLId; }
 

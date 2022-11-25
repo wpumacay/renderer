@@ -1,5 +1,8 @@
 #include <renderer/geometry/geometry_t.hpp>
 
+#include <utils/logging.hpp>
+#include "utils/common.hpp"
+
 namespace renderer {
 
 Geometry::Geometry(const float* buff_positions, const float* buff_normals,
@@ -12,6 +15,21 @@ Geometry::Geometry(const float* buff_positions, const float* buff_normals,
                  n_vertices * 3 * sizeof(float), buff_normals, true);
     SetAttribute("uvs", eElementType::FLOAT_2, n_vertices * 2 * sizeof(float),
                  buff_uvs, false);
+}
+
+Geometry::Geometry(const std::vector<Vec3>& positions,
+                   const std::vector<Vec3>& normals,
+                   const std::vector<Vec2>& uvs,
+                   const std::vector<uint32_t>& indices) {
+    SetIndices(indices.data(), indices.size());
+    SetAttribute("position", eElementType::FLOAT_3,
+                 positions.size() * 3 * sizeof(float), positions.front().data(),
+                 false);
+    SetAttribute("normal", eElementType::FLOAT_3,
+                 normals.size() * 3 * sizeof(float), normals.front().data(),
+                 true);
+    SetAttribute("uvs", eElementType::FLOAT_2, uvs.size() * 2 * sizeof(float),
+                 uvs.front().data(), false);
 }
 
 auto Geometry::SetIndices(const uint32_t* data, size_t count,

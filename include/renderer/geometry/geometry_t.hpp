@@ -19,10 +19,16 @@ class Geometry {
     /// Creates an empty geometry without any attributes
     Geometry() = default;
 
-    /// Creates a geometry from the given vertex data
+    /// Creates a geometry from the given raw vertex data
     explicit Geometry(const float* buff_positions, const float* buff_normals,
                       const float* buff_uvs, size_t n_vertices,
                       const uint32_t* buff_indices, size_t n_indices);
+
+    /// Creates a geometry from the given vertex data (stored in containers)
+    explicit Geometry(const std::vector<Vec3>& positions,
+                      const std::vector<Vec3>& normals,
+                      const std::vector<Vec2>& uvs,
+                      const std::vector<uint32_t>& indices);
 
     /// Frees/deallocates any internal resources
     ~Geometry() = default;
