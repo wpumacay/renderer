@@ -17,12 +17,16 @@ enum class eAxis {
 /// \param[in] axis The axis for the normal to the plane
 auto CreatePlane(float width, float depth, const eAxis& axis) -> Geometry::uptr;
 
-/// Creates the geometry for a box its dimensions along the x, y, z axes
+/// Creates the geometry for a box given the dimensions along the x, y, z axes
 /// \param[in] width The width of the box (x-dimension)
 /// \param[in] depth The depth of the box (y-dimension)
 /// \param[in] height The height of the box (z-dimension)
 auto CreateBox(float width, float depth, float height) -> Geometry::uptr;
 
+/// Creates the geometry for a sphere given its radius and tessellation level
+/// \param[in] radius The radius of the sphere
+/// \param[in] nDiv1 The tessellation level for the second spherical dimension
+/// \param[in] nDiv2 The tessellation level for the third spherical dimension
 auto CreateSphere(float radius, size_t nDiv1 = 20, size_t nDiv2 = 20)
     -> Geometry::uptr;
 

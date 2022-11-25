@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 #include <renderer/geometry/geometry_factory.hpp>
+#include "math/common.hpp"
 
 namespace renderer {
 
@@ -82,6 +83,83 @@ auto CreateBox(float width, float depth, float height) -> Geometry::uptr {
         normals.push_back(n);
         normals.push_back(n);
         normals.push_back(n);
+    }
+
+    return std::make_unique<Geometry>(positions, normals, uvs, indices);
+}
+
+auto CreateSphere(float radius, size_t nDiv1, size_t nDiv2) -> Geometry::uptr {
+    std::vector<Vec3> positions;
+    std::vector<Vec3> normals;
+    std::vector<Vec2> uvs;
+    std::vector<uint32_t> indices;
+
+    const size_t N_VERTICES = (nDiv1 + 1) * (nDiv2 + 1);
+    positions.reserve(N_VERTICES);
+    normals.reserve(N_VERTICES);
+    uvs.reserve(N_VERTICES);
+
+    const size_t N_INDICES = 3 * (nDiv1 - 1) * nDiv2 + 3 * (nDiv1 - 1) * nDiv2;
+    indices.reserve(N_INDICES);
+
+    // Construct all vertices using spherical coordinates
+    const auto PI = static_cast<float>(math::PI);
+    for (size_t i = 0; i <= nDiv1; ++i) {
+        for (size_t j = 0; j <= nDiv2; ++j) {
+            // Compute the grid on the second and third spherical coordinates
+            const auto I_GRID =
+                static_cast<float>(i) / static_cast<float>(nDiv1);
+            const auto J_GRID =
+                static_cast<float>(j) / static_cast<float>(nDiv2);
+            float theta = 2.0F * PI * I_GRID;
+            float phi = PI * (J_GRID - 0.5F);
+
+            float cos_theta = std::cos(theta);
+            float sin_theta = std::sin(theta);
+            float cos_phi = std::cos(phi);
+            float sin_phi = std::sin(phi);
+
+            Vec3 vertex(radius * cos_theta * cos_phi,
+                        radius * sin_theta * cos_phi, radius * sin_phi);
+            Vec3 normal = math::normalize(vertex);
+
+            positions.push_back(vertex);
+            normals.push_back(normal);
+
+            // UV calculations adapted from ThreeJS repo [1]
+            float v_offset = 0.0F;
+            v_offset = (j == 0) ? (0.5F / static_cast<float>(nDiv1)) : v_offset;
+            v_offset =
+                (j == nDiv2) ? (-0.5F / static_cast<float>(nDiv1)) : v_offset;
+
+            uvs.emplace_back(I_GRID, J_GRID + v_offset);
+        }
+    }
+
+    // Compute the indices for this tessellation
+    for (size_t i = 0; i < nDiv1; ++i) {
+        for (size_t j = 0; j < nDiv2; ++j) {
+            const auto IDX_0 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_1 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_2 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 1));
+            const auto IDX_3 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 1));
+
+            if (j != 0) {
+                indices.push_back(IDX_0);
+                indices.push_back(IDX_1);
+                indices.push_back(IDX_2);
+            }
+
+            if (j != (nDiv2 - 1)) {
+                indices.push_back(IDX_0);
+                indices.push_back(IDX_2);
+                indices.push_back(IDX_3);
+            }
+        }
     }
 
     return std::make_unique<Geometry>(positions, normals, uvs, indices);

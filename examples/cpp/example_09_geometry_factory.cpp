@@ -28,9 +28,7 @@ auto main() -> int {
         renderer::EXAMPLES_PATH + "/resources/shaders/basic3d_vert.glsl",
         renderer::EXAMPLES_PATH + "/resources/shaders/basic3d_frag.glsl");
 
-    //// auto geometry = renderer::CreatePlane(1.0F, 1.0F,
-    /// renderer::eAxis::AXIS_Z);
-    auto geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
+    auto geometry = renderer::CreateSphere(1.0F, 15, 15);
 
     renderer::Camera camera({3.0F, 0.0F, 0.0F}, {0.0F, 0.0F, 0.0F});
     Vec3 color = {0.1F, 0.2F, 0.7F};
@@ -41,13 +39,6 @@ auto main() -> int {
         if (input_manager.IsKeyDown(renderer::keys::KEY_ESCAPE)) {
             window.RequestClose();
         }
-
-        program->Bind();
-        geometry->VAO().Bind();
-
-        program->SetMat4("u_model_matrix", Mat4::Identity());
-        program->SetMat4("u_view_matrix", camera.view_matrix());
-        program->SetMat4("u_proj_matrix", camera.proj_matrix());
 
 #if defined(RENDERER_IMGUI)
         ImGui::Begin("Options");
@@ -62,9 +53,53 @@ auto main() -> int {
         if (s_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
+        // Allow the user to select which geometry to visualize
+        std::array<const char*, 3> items_geometries = {"plane", "box",
+                                                       "sphere"};
+        static size_t s_item_current_idx = 0;
+        static bool s_change_item = false;
+        const char* combo_preview_value =
+            items_geometries.at(s_item_current_idx);
+        if (ImGui::BeginCombo("Geometries", combo_preview_value)) {
+            for (size_t i = 0; i < items_geometries.size(); ++i) {
+                const auto IS_SELECTED = (s_item_current_idx == i);
+                if (ImGui::Selectable(items_geometries.at(i), IS_SELECTED)) {
+                    s_change_item = (s_item_current_idx != i);
+                    s_item_current_idx = i;
+                }
+                if (IS_SELECTED) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        if (s_change_item) {
+            switch (s_item_current_idx) {
+                case 0:  // plane
+                    geometry = renderer::CreatePlane(1.0F, 1.0F,
+                                                     renderer::eAxis::AXIS_Z);
+                    break;
+                case 1:  // box
+                    geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
+                    break;
+                case 2:  // sphere
+                    geometry = renderer::CreateSphere(1.0F, 20, 20);
+                    break;
+                default:
+                    break;
+            }
+            s_change_item = false;
+        }
         ImGui::End();
 #endif  // RENDERER_IMGUI
+
+        program->Bind();
+        program->SetMat4("u_model_matrix", Mat4::Identity());
+        program->SetMat4("u_view_matrix", camera.view_matrix());
+        program->SetMat4("u_proj_matrix", camera.proj_matrix());
         program->SetVec3("u_color", color);
+
+        geometry->VAO().Bind();
 
         glDrawElements(
             GL_TRIANGLES,
