@@ -36,11 +36,16 @@ auto CreateSphere(float radius, size_t nDiv1 = 20, size_t nDiv2 = 20)
 /// \param[in] radius_z The radius in the z-axis of the ellipsoid
 /// \param[in] nDiv1 The tessellation level for the second spherical dimension
 /// \param[in] nDiv2 The tessellation level for the third spherical dimensions
-auto CreateEllipsoid(float radiusX, float radiusY, float radiusZ,
+auto CreateEllipsoid(float radius_x, float radius_y, float radius_z,
                      size_t nDiv1 = 20, size_t nDiv2 = 20) -> Geometry::uptr;
 
+/// Creates the geometry for a cylinder given its size and tessellation level
+/// \param[in] radius Radius of the bases of the cylinder
+/// \param[in] height Height of the cylinder
+/// \param[in] axis Direction of the principal axis of the cylinder
+/// \param[in] nDiv The tessellation level for the body of the cylinder
 auto CreateCylinder(float radius, float height,
-                    const eAxis& axis = eAxis::AXIS_Z, size_t nDiv1 = 30)
+                    const eAxis& axis = eAxis::AXIS_Z, size_t nDiv = 30)
     -> Geometry::uptr;
 
 auto CreateCapsule(float radius, float height,

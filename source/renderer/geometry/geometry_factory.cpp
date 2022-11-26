@@ -249,6 +249,116 @@ auto CreateEllipsoid(float radius_x, float radius_y, float radius_z,
     return std::make_unique<Geometry>(positions, normals, uvs, indices);
 }
 
+auto CreateCylinder(float radius, float height, const eAxis& axis, size_t nDiv)
+    -> Geometry::uptr {
+    std::vector<Vec3> positions;
+    std::vector<Vec3> normals;
+    std::vector<Vec2> uvs;
+    std::vector<uint32_t> indices;
+
+    const size_t N_VERTICES = nDiv + 4 * nDiv + nDiv;
+    positions.reserve(N_VERTICES);
+    normals.reserve(N_VERTICES);
+    uvs.reserve(N_VERTICES);
+
+    const size_t N_INDICES = 3 * (nDiv - 2) + 6 * nDiv + 3 * (nDiv - 2);
+    indices.reserve(N_INDICES);
+
+    //--------------------------------------------------------------------------
+    // Compute the points of the cross-section of the cylinder (we're assumming
+    // that the axis of the cylinder is aligned with the z-axis). We'll use
+    // these points as the basis for our geometry calculations later
+    std::vector<Vec3> section_xy;
+    section_xy.reserve(nDiv + 1);
+    for (size_t i = 0; i <= nDiv; ++i) {
+        const auto I_GRID = static_cast<float>(i) / static_cast<float>(nDiv);
+        const auto THETA = 2.0F * static_cast<float>(math::PI) * I_GRID;
+        section_xy.emplace_back(radius * std::cos(THETA),
+                                radius * std::sin(THETA), 0.0F);
+    }
+
+    //--------------------------------------------------------------------------
+    // Construct the geometry of the cylinder
+    size_t base_idx = 0;
+
+    //////// Up Base ////////
+    for (size_t i = 0; i < nDiv; ++i) {
+        positions.push_back(_RotateToMatchUpAxis(
+            section_xy[i] + Vec3(0.0F, 0.0F, 0.5F * height), axis));
+        normals.push_back(_RotateToMatchUpAxis({0.0F, 0.0F, 1.0F}, axis));
+        uvs.emplace_back(0.5F * (1.0F + section_xy[i].x() / radius),
+                         0.5F * (1.0F + section_xy[i].y() / radius));
+    }
+
+    for (size_t i = 1; i <= nDiv - 2; ++i) {
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + i));
+        indices.push_back(static_cast<uint32_t>(base_idx + i + 1));
+    }
+
+    base_idx += positions.size();
+
+    //////// Body Surface ////////
+    for (size_t i = 0; i < nDiv; i++) {
+        // Quad vertices
+        auto p0 = section_xy[i + 0] + Vec3(0.0F, 0.0F, -0.5F * height);
+        auto p1 = section_xy[i + 1] + Vec3(0.0F, 0.0F, -0.5F * height);
+        auto p2 = section_xy[i + 1] + Vec3(0.0F, 0.0F, 0.5F * height);
+        auto p3 = section_xy[i + 0] + Vec3(0.0F, 0.0F, 0.5F * height);
+
+        positions.push_back(_RotateToMatchUpAxis(p0, axis));
+        positions.push_back(_RotateToMatchUpAxis(p1, axis));
+        positions.push_back(_RotateToMatchUpAxis(p2, axis));
+        positions.push_back(_RotateToMatchUpAxis(p3, axis));
+
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(nDiv),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(nDiv),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(nDiv),
+                         1.0F);
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(nDiv),
+                         1.0F);
+
+        auto n_quad1 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 0]), axis);
+        auto n_quad2 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 1]), axis);
+
+        normals.push_back(n_quad1);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad1);
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 1));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+        indices.push_back(static_cast<uint32_t>(base_idx + 3));
+
+        base_idx += 4;
+    }
+
+    //////// Down Base ////////
+    for (size_t i = 0; i < nDiv; ++i) {
+        positions.push_back(_RotateToMatchUpAxis(
+            section_xy[i] + Vec3(0.0F, 0.0F, -0.5F * height), axis));
+        normals.push_back(_RotateToMatchUpAxis({0.0F, 0.0F, -1.0F}, axis));
+        uvs.emplace_back(0.5F * (1.0F + section_xy[i].x() / radius),
+                         0.5F * (1.0F + section_xy[i].y() / radius));
+    }
+
+    for (size_t i = 1; i <= nDiv - 2; ++i) {
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + i + 1));
+        indices.push_back(static_cast<uint32_t>(base_idx + i));
+    }
+
+    return std::make_unique<Geometry>(positions, normals, uvs, indices);
+}
+
 auto _RotateToMatchUpAxis(const Vec3& vec, const eAxis& axis) -> Vec3 {
     switch (axis) {
         case eAxis::AXIS_X:
