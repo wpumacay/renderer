@@ -1,7 +1,6 @@
 #include <renderer/geometry/geometry_t.hpp>
 
 #include <utils/logging.hpp>
-#include "utils/common.hpp"
 
 namespace renderer {
 
