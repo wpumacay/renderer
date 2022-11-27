@@ -54,8 +54,8 @@ auto main() -> int {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
         // Allow the user to select which geometry to visualize
-        std::array<const char*, 5> items_geometries = {"plane", "box", "sphere",
-                                                       "ellipsoid", "cylinder"};
+        std::array<const char*, 6> items_geometries = {
+            "plane", "box", "sphere", "ellipsoid", "cylinder", "capsule"};
         static size_t s_item_current_idx = 0;
         static bool s_change_item = false;
         const char* combo_preview_value =
@@ -91,6 +91,9 @@ auto main() -> int {
                     break;
                 case 4:  // cylinder
                     geometry = renderer::CreateCylinder(0.5F, 2.0F);
+                    break;
+                case 5:  // capsule
+                    geometry = renderer::CreateCapsule(0.5F, 2.0F);
                     break;
                 default:
                     break;

@@ -48,6 +48,12 @@ auto CreateCylinder(float radius, float height,
                     const eAxis& axis = eAxis::AXIS_Z, size_t nDiv = 30)
     -> Geometry::uptr;
 
+/// Creates the geometry for a capsule given its size and tessellation level
+/// \param[in] radius Radius of the section and both caps
+/// \param[in] height Height of the capsule (without the caps)
+/// \param[in] axis Direction of the principal axis of the capsule
+/// \param[in] nDiv1 The tessellation level of the cylindrical part
+/// \param[in] nDiv2 The tesellation level for the caps of the capsule
 auto CreateCapsule(float radius, float height,
                    const eAxis& axis = eAxis::AXIS_Z, size_t nDiv1 = 30,
                    size_t nDiv2 = 30) -> Geometry::uptr;

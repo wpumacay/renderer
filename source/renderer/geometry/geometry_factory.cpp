@@ -359,6 +359,209 @@ auto CreateCylinder(float radius, float height, const eAxis& axis, size_t nDiv)
     return std::make_unique<Geometry>(positions, normals, uvs, indices);
 }
 
+// NOLINTNEXTLINE
+auto CreateCapsule(float radius, float height, const eAxis& axis, size_t nDiv1,
+                   size_t nDiv2) -> Geometry::uptr {
+    std::vector<Vec3> positions;
+    std::vector<Vec3> normals;
+    std::vector<Vec2> uvs;
+    std::vector<uint32_t> indices;
+
+    // TODO(wilbert): both caps generation produces extra vertices (whole
+    // spheres), which shouldn't happen as these are hidden vertices
+
+    /* Capsule format
+     *
+     *   |-- radius --|-- height --|-- radius --|
+     */
+
+    //--------------------------------------------------------------------------
+    // Build the top cap of the capsule
+    size_t base_idx = 0;
+    const auto PI = static_cast<float>(math::PI);
+    for (size_t i = 0; i <= nDiv1; ++i) {
+        for (size_t j = 0; j <= nDiv2; ++j) {
+            // Compute the grid on the second and third spherical coordinates
+            const auto I_GRID =
+                static_cast<float>(i) / static_cast<float>(nDiv1);
+            const auto J_GRID =
+                static_cast<float>(j) / static_cast<float>(nDiv2);
+            float theta = 2.0F * PI * I_GRID;
+            float phi = PI * (J_GRID - 0.5F);
+
+            float cos_theta = std::cos(theta);
+            float sin_theta = std::sin(theta);
+            float cos_phi = std::cos(phi);
+            float sin_phi = std::sin(phi);
+
+            // clang-format off
+            Vec3 vertex(radius * cos_theta * cos_phi,
+                        radius * sin_theta * cos_phi,
+                        radius * sin_phi);
+            // clang-format on
+            Vec3 normal = math::normalize(vertex);
+            // apply offset to up position
+            vertex = vertex +
+                     _RotateToMatchUpAxis({0.0F, 0.0F, 0.5F * height}, axis);
+
+            positions.push_back(vertex);
+            normals.push_back(normal);
+
+            // UV calculations adapted from ThreeJS repo [1]
+            float v_offset = 0.0F;
+            v_offset = (j == 0) ? (0.5F / static_cast<float>(nDiv1)) : v_offset;
+            v_offset =
+                (j == nDiv2) ? (-0.5F / static_cast<float>(nDiv1)) : v_offset;
+
+            uvs.emplace_back(I_GRID, J_GRID + v_offset);
+        }
+    }
+
+    for (size_t i = 0; i < nDiv1; ++i) {
+        for (size_t j = 0; j < nDiv2; ++j) {
+            const auto IDX_0 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_1 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_2 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 1));
+            const auto IDX_3 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 1));
+
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_0));
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_1));
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_2));
+
+            if (j != (nDiv2 - 1)) {
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_0));
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_2));
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_3));
+            }
+        }
+    }
+    base_idx += positions.size();
+
+    //--------------------------------------------------------------------------
+    // Build the cylindrical body of the capsule
+
+    std::vector<Vec3> section_xy;
+    section_xy.reserve(nDiv1 + 1);
+    for (size_t i = 0; i <= nDiv1; ++i) {
+        const auto I_GRID = static_cast<float>(i) / static_cast<float>(nDiv1);
+        const auto THETA = 2.0F * PI * I_GRID;
+        section_xy.emplace_back(radius * std::cos(THETA),
+                                radius * std::sin(THETA), 0.0F);
+    }
+
+    for (size_t i = 0; i < nDiv1; i++) {
+        // Quad vertices
+        auto p0 = section_xy[i + 0] + Vec3(0.0F, 0.0F, -0.5F * height);
+        auto p1 = section_xy[i + 1] + Vec3(0.0F, 0.0F, -0.5F * height);
+        auto p2 = section_xy[i + 1] + Vec3(0.0F, 0.0F, 0.5F * height);
+        auto p3 = section_xy[i + 0] + Vec3(0.0F, 0.0F, 0.5F * height);
+
+        positions.push_back(_RotateToMatchUpAxis(p0, axis));
+        positions.push_back(_RotateToMatchUpAxis(p1, axis));
+        positions.push_back(_RotateToMatchUpAxis(p2, axis));
+        positions.push_back(_RotateToMatchUpAxis(p3, axis));
+
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(nDiv1),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(nDiv1),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(nDiv1),
+                         1.0F);
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(nDiv1),
+                         1.0F);
+
+        auto n_quad1 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 0]), axis);
+        auto n_quad2 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 1]), axis);
+
+        normals.push_back(n_quad1);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad1);
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 1));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+        indices.push_back(static_cast<uint32_t>(base_idx + 3));
+
+        base_idx += 4;
+    }
+
+    //--------------------------------------------------------------------------
+    // Build the bottom cap of the capsule
+
+    for (size_t i = 0; i <= nDiv1; ++i) {
+        for (size_t j = 0; j <= nDiv2; ++j) {
+            // Compute the grid on the second and third spherical coordinates
+            const auto I_GRID =
+                static_cast<float>(i) / static_cast<float>(nDiv1);
+            const auto J_GRID =
+                static_cast<float>(j) / static_cast<float>(nDiv2);
+            float theta = 2.0F * PI * I_GRID;
+            float phi = PI * (J_GRID - 0.5F);
+
+            float cos_theta = std::cos(theta);
+            float sin_theta = std::sin(theta);
+            float cos_phi = std::cos(phi);
+            float sin_phi = std::sin(phi);
+
+            // clang-format off
+            Vec3 vertex(radius * cos_theta * cos_phi,
+                        radius * sin_theta * cos_phi,
+                        radius * sin_phi);
+            // clang-format on
+            Vec3 normal = math::normalize(vertex);
+            // apply offset to up position
+            vertex = vertex -
+                     _RotateToMatchUpAxis({0.0F, 0.0F, 0.5F * height}, axis);
+
+            positions.push_back(vertex);
+            normals.push_back(normal);
+
+            // UV calculations adapted from ThreeJS repo [1]
+            float v_offset = 0.0F;
+            v_offset = (j == 0) ? (0.5F / static_cast<float>(nDiv1)) : v_offset;
+            v_offset =
+                (j == nDiv2) ? (-0.5F / static_cast<float>(nDiv1)) : v_offset;
+
+            uvs.emplace_back(I_GRID, J_GRID + v_offset);
+        }
+    }
+
+    for (size_t i = 0; i < nDiv1; ++i) {
+        for (size_t j = 0; j < nDiv2; ++j) {
+            const auto IDX_0 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_1 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 0));
+            const auto IDX_2 =
+                static_cast<uint32_t>((i + 1) * (nDiv2 + 1) + (j + 1));
+            const auto IDX_3 =
+                static_cast<uint32_t>((i + 0) * (nDiv2 + 1) + (j + 1));
+
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_0));
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_2));
+            indices.push_back(static_cast<uint32_t>(base_idx + IDX_1));
+
+            if (j != (nDiv2 - 1)) {
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_0));
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_3));
+                indices.push_back(static_cast<uint32_t>(base_idx + IDX_2));
+            }
+        }
+    }
+
+    return std::make_unique<Geometry>(positions, normals, uvs, indices);
+}
+
 auto _RotateToMatchUpAxis(const Vec3& vec, const eAxis& axis) -> Vec3 {
     switch (axis) {
         case eAxis::AXIS_X:
