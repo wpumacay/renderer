@@ -562,6 +562,220 @@ auto CreateCapsule(float radius, float height, const eAxis& axis, size_t nDiv1,
     return std::make_unique<Geometry>(positions, normals, uvs, indices);
 }
 
+auto CreateArrow(float length, const eAxis& axis) -> Geometry::uptr {
+    std::vector<Vec3> positions;
+    std::vector<Vec3> normals;
+    std::vector<Vec2> uvs;
+    std::vector<uint32_t> indices;
+
+    const size_t N_DIV = 10;
+    const float RADIUS_CYLINDER = 0.05F * length;
+    const float LENGTH_CYLINDER = 0.8F * length;
+    const float RADIUS_CONE = 0.075F * length;
+    const float LENGTH_CONE = 0.2F * length;
+
+    const size_t N_VERTICES = N_DIV + 4 * N_DIV + 3 * N_DIV + 4 * N_DIV;
+    positions.reserve(N_VERTICES);
+    normals.reserve(N_VERTICES);
+    uvs.reserve(N_VERTICES);
+
+    const size_t N_INDICES =
+        3 * (N_DIV - 2) + 6 * N_DIV + 3 * N_DIV + 6 * N_DIV;
+    indices.reserve(N_INDICES);
+
+    //--------------------------------------------------------------------------
+    // Tessellate the cylindrical part
+
+    // Compute the cross section vertices
+    std::vector<Vec3> section_xy;
+    section_xy.reserve(N_DIV + 1);
+    const auto PI = static_cast<float>(math::PI);
+    for (size_t i = 0; i <= N_DIV; ++i) {
+        const auto I_GRID = static_cast<float>(i) / static_cast<float>(N_DIV);
+        const auto THETA = 2.0F * PI * I_GRID;
+        section_xy.emplace_back(RADIUS_CYLINDER * std::cos(THETA),
+                                RADIUS_CYLINDER * std::sin(THETA), 0.0F);
+    }
+
+    // Build the down base of the cylinder
+    size_t base_idx = 0;
+    for (size_t i = 0; i < N_DIV; ++i) {
+        positions.push_back(_RotateToMatchUpAxis(section_xy[i], axis));
+        normals.push_back(_RotateToMatchUpAxis({0.0F, 0.0F, -1.0F}, axis));
+        uvs.emplace_back(0.5F * (1.0F + section_xy[i].x() / RADIUS_CYLINDER),
+                         0.5F * (1.0F + section_xy[i].y() / RADIUS_CYLINDER));
+    }
+    for (size_t i = 1; i <= N_DIV - 2; ++i) {
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + i + 1));
+        indices.push_back(static_cast<uint32_t>(base_idx + i));
+    }
+    base_idx += positions.size();
+
+    // Build the cylindrical surface
+    for (size_t i = 0; i < N_DIV; ++i) {
+        auto p0 = section_xy[i + 0] + Vec3(0.0F, 0.0F, 0.0F);
+        auto p1 = section_xy[i + 1] + Vec3(0.0F, 0.0F, 0.0F);
+        auto p2 = section_xy[i + 1] + Vec3(0.0F, 0.0F, LENGTH_CYLINDER);
+        auto p3 = section_xy[i + 0] + Vec3(0.0F, 0.0F, LENGTH_CYLINDER);
+
+        positions.push_back(_RotateToMatchUpAxis(p0, axis));
+        positions.push_back(_RotateToMatchUpAxis(p1, axis));
+        positions.push_back(_RotateToMatchUpAxis(p2, axis));
+        positions.push_back(_RotateToMatchUpAxis(p3, axis));
+
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(N_DIV),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(N_DIV),
+                         0.0F);
+        uvs.emplace_back(static_cast<float>(i + 1) / static_cast<float>(N_DIV),
+                         1.0F);
+        uvs.emplace_back(static_cast<float>(i + 0) / static_cast<float>(N_DIV),
+                         1.0F);
+
+        auto n_quad1 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 0]), axis);
+        auto n_quad2 =
+            _RotateToMatchUpAxis(math::normalize(section_xy[i + 1]), axis);
+
+        normals.push_back(n_quad1);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad2);
+        normals.push_back(n_quad1);
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 1));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+        indices.push_back(static_cast<uint32_t>(base_idx + 3));
+
+        base_idx += 4;
+    }
+
+    //--------------------------------------------------------------------------
+    // Tessellate the cone part
+
+    // Compute the base points
+    std::vector<Vec3> section_xy_cone_out;
+    std::vector<Vec3> section_xy_cone_in;
+    for (size_t i = 0; i < N_DIV; ++i) {
+        const auto I_GRID = static_cast<float>(i) / static_cast<float>(N_DIV);
+        const auto THETA = 2.0F * PI * I_GRID;
+        const auto COS_THETA = std::cos(THETA);
+        const auto SIN_THETA = std::sin(THETA);
+        section_xy_cone_out.emplace_back(RADIUS_CONE * COS_THETA,
+                                         RADIUS_CONE * SIN_THETA, 0.0F);
+        section_xy_cone_in.emplace_back(RADIUS_CYLINDER * COS_THETA,
+                                        RADIUS_CYLINDER * SIN_THETA, 0.0F);
+    }
+
+    // Build cone surface (tessellate using strips of triangles)
+    for (size_t i = 0; i < section_xy_cone_out.size(); ++i) {
+        indices.push_back(static_cast<uint32_t>(positions.size()));
+        indices.push_back(static_cast<uint32_t>(positions.size() + 1));
+        indices.push_back(static_cast<uint32_t>(positions.size() + 2));
+
+        auto p0 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 0) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+        auto p1 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 1) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+        auto p2 = _RotateToMatchUpAxis(
+            {0.0F, 0.0F, LENGTH_CYLINDER + LENGTH_CONE}, axis);
+
+        positions.push_back(p0);
+        positions.push_back(p1);
+        positions.push_back(p2);
+
+        auto n_quad0 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 0) % section_xy_cone_out.size()], axis);
+        auto n_quad1 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 1) % section_xy_cone_out.size()], axis);
+        auto n_quad2 = _RotateToMatchUpAxis({0.0F, 0.0F, 1.0F}, axis);
+
+        normals.push_back(math::normalize(n_quad0));
+        normals.push_back(math::normalize(n_quad1));
+        normals.push_back(math::normalize(n_quad2));
+
+        uvs.emplace_back((static_cast<float>(i) + 0.0F) /
+                             static_cast<float>(section_xy_cone_out.size()),
+                         1.0F);
+        uvs.emplace_back((static_cast<float>(i) + 1.0F) /
+                             static_cast<float>(section_xy_cone_out.size()),
+                         1.0F);
+        uvs.emplace_back((static_cast<float>(i) + 0.0F) /
+                             static_cast<float>(section_xy_cone_out.size()),
+                         0.0F);
+    }
+
+    // Build bottom base (tessellated using strips of rings)
+    base_idx = positions.size();
+
+    for (size_t i = 0; i < section_xy_cone_out.size(); ++i) {
+        auto p0 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 0) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+        auto p1 = _RotateToMatchUpAxis(
+            section_xy_cone_in[(i + 0) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+        auto p2 = _RotateToMatchUpAxis(
+            section_xy_cone_in[(i + 1) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+        auto p3 = _RotateToMatchUpAxis(
+            section_xy_cone_out[(i + 1) % section_xy_cone_out.size()] +
+                Vec3(0.0F, 0.0F, LENGTH_CYLINDER),
+            axis);
+
+        positions.push_back(p0);
+        positions.push_back(p1);
+        positions.push_back(p2);
+        positions.push_back(p3);
+
+        auto n = _RotateToMatchUpAxis({0.0F, 0.0F, -1.05F}, axis);
+
+        normals.push_back(n);
+        normals.push_back(n);
+        normals.push_back(n);
+        normals.push_back(n);
+
+        const auto IDX = i;
+        const auto IDX_NEXT = (i + 1) % section_xy_cone_in.size();
+
+        uvs.emplace_back(
+            0.5F * (1.0F + section_xy_cone_out[IDX].x() / RADIUS_CONE),
+            0.5F * (1.0F + section_xy_cone_out[IDX].y() / RADIUS_CONE));
+        uvs.emplace_back(
+            0.5F * (1.0F + section_xy_cone_in[IDX].x() / RADIUS_CONE),
+            0.5F * (1.0F + section_xy_cone_in[IDX].y() / RADIUS_CONE));
+        uvs.emplace_back(
+            0.5F * (1.0F + section_xy_cone_in[IDX_NEXT].x() / RADIUS_CONE),
+            0.5F * (1.0F + section_xy_cone_in[IDX_NEXT].y() / RADIUS_CONE));
+        uvs.emplace_back(
+            0.5F * (1.0F + section_xy_cone_out[IDX_NEXT].x() / RADIUS_CONE),
+            0.5F * (1.0F + section_xy_cone_out[IDX_NEXT].y() / RADIUS_CONE));
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+        indices.push_back(static_cast<uint32_t>(base_idx + 1));
+
+        indices.push_back(static_cast<uint32_t>(base_idx));
+        indices.push_back(static_cast<uint32_t>(base_idx + 3));
+        indices.push_back(static_cast<uint32_t>(base_idx + 2));
+
+        base_idx += 4;
+    }
+
+    return std::make_unique<Geometry>(positions, normals, uvs, indices);
+}
+
 auto _RotateToMatchUpAxis(const Vec3& vec, const eAxis& axis) -> Vec3 {
     switch (axis) {
         case eAxis::AXIS_X:

@@ -58,10 +58,11 @@ auto CreateCapsule(float radius, float height,
                    const eAxis& axis = eAxis::AXIS_Z, size_t nDiv1 = 30,
                    size_t nDiv2 = 30) -> Geometry::uptr;
 
+/// Creates the geometry for an arrow given its size and main axis
+/// \param[in] length The length of the arrow
+/// \param[in] axis The main axis of the arrow (direction it points to)
 auto CreateArrow(float length, const eAxis& axis = eAxis::AXIS_Z)
     -> Geometry::uptr;
-
-auto CreateAxes(float length) -> Geometry::uptr;
 
 auto _RotateToMatchUpAxis(const Vec3& vec, const eAxis& axis) -> Vec3;
 
