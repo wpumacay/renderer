@@ -21,6 +21,8 @@ using Quat = math::Quaternion<float>;
 using float32_t = math::float32_t;
 using float64_t = math::float64_t;
 
+static constexpr float PI = static_cast<float>(math::PI);
+
 namespace renderer {
 
 #if defined(RENDERER_RESOURCES_PATH)

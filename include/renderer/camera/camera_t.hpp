@@ -43,9 +43,9 @@ class Camera {
 
  public:
     /// Creates a camera with the given configuration
-    Camera(const Vec3& position, const Vec3& target,
-           const Vec3& world_up = {0.0, 0.0, 1.0},
-           const ProjectionData& proj_data = ProjectionData());
+    explicit Camera(const Vec3& position, const Vec3& target,
+                    const Vec3& world_up = {0.0, 0.0, 1.0},
+                    const ProjectionData& proj_data = ProjectionData());
 
     /// Frees the resources allocated by this camera
     ~Camera() = default;
