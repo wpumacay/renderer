@@ -31,14 +31,14 @@ auto Camera::_ComputeBasisVectors() -> void {
         // axes for the required basis vectors
         m_Front = m_WorldUp;
         m_Right = Vec3(m_WorldUp.z(), m_WorldUp.x(), m_WorldUp.y());
-        m_Up = math::cross<float>(m_Front, m_Right);
+        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
     } else if (m_Front == -m_WorldUp) {
         m_Front = -m_WorldUp;
         m_Right = Vec3(m_WorldUp.z(), m_WorldUp.x(), m_WorldUp.y());
-        m_Up = math::cross<float>(m_Front, m_Right);
+        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
     } else {
-        m_Right = math::cross<float>(m_WorldUp, m_Front);
-        m_Up = math::cross<float>(m_Front, m_Right);
+        m_Right = math::normalize(math::cross<float>(m_WorldUp, m_Front));
+        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
     }
     // Get the orientation from the basis vectors (rot-matrix)
     Mat3 rotmat(m_Right, m_Up, m_Front);
