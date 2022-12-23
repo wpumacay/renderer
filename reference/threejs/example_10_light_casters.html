@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Example-10: light casters</title>
+        <style>
+            body { margin: 0; }
+        </style>
+    </head>
+    <body>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./js/three.module.js",
+                    "three/addons/" : "./jsm/"
+                }
+            }
+        </script>
+
+        <script type="module">
+
+            import * as THREE from 'three';
+
+            import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
+
+            let camera, controls, scene, light, renderer;
+
+            init();
+            animate();
+
+            function init() {
+                renderer = new THREE.WebGLRenderer();
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+
+                const aspect = window.innerWidth / window.innerHeight;
+                const fov = 45;
+                const near = 0.1;
+                const far = 1000;
+
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x333333);
+                camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+                camera.position.set(0.5, 0.5, 3.0);
+                controls = new OrbitControls(camera, renderer.domElement);
+
+                light = new THREE.DirectionalLight(0xffffff, 1.0);
+                light.position.set(1.0, 1.0, 1.0);
+                light.target.position.set(0.0, 0.0, 0.0);
+                scene.add(light);
+
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshPhongMaterial({color: 0xFF7F4F});
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            };
+
+            animate();
+        </script>
+    </body>
+</html>
