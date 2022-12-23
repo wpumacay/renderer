@@ -25,21 +25,22 @@ Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& world_up,
 auto Camera::_ComputeBasisVectors() -> void {
     // Adapted the look-at function from [0]. Handles corners cases in which the
     // front vector aligns with the world-up vector (just use the world axes)
+
+    // Cache front vector, in case the update cant be applied
+    auto old_front = m_Front;
     m_Front = math::normalize<float>(m_Position - m_Target);
-    if (m_Front == m_WorldUp) {
-        // In case of aligning with the world-up vector, use the standard world
-        // axes for the required basis vectors
-        m_Front = m_WorldUp;
-        m_Right = Vec3(m_WorldUp.z(), m_WorldUp.x(), m_WorldUp.y());
-        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
-    } else if (m_Front == -m_WorldUp) {
-        m_Front = -m_WorldUp;
-        m_Right = Vec3(m_WorldUp.z(), m_WorldUp.x(), m_WorldUp.y());
-        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
-    } else {
-        m_Right = math::normalize(math::cross<float>(m_WorldUp, m_Front));
-        m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
+    const bool FRONT_ALIGNS_WORLDUP =
+        (m_Front == m_WorldUp) || (m_Front == -m_WorldUp);
+
+    if (FRONT_ALIGNS_WORLDUP) {
+        // Keep cached value of the front vector
+        m_Front = old_front;
+        return;
     }
+
+    m_Right = math::normalize(math::cross<float>(m_WorldUp, m_Front));
+    m_Up = math::normalize(math::cross<float>(m_Front, m_Right));
+
     // Get the orientation from the basis vectors (rot-matrix)
     Mat3 rotmat(m_Right, m_Up, m_Front);
     m_Orientation = Quat::FromRotationMatrix(rotmat);
