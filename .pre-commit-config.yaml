@@ -37,3 +37,4 @@ repos:
     -   id: clang-format
         args: [-i]
     -   id: cpplint
+    -   id: clang-tidy

@@ -30,10 +30,10 @@ auto main() -> int {
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_vert.glsl",
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_frag.glsl");
 
-    auto geometry = renderer::CreateSphere(1.0F, 15, 15);
+    auto geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
 
     renderer::Camera::uptr camera = std::make_unique<renderer::Camera>(
-        Vec3(5.0F, 0.0F, 0.0F), Vec3(0.0F, 0.0F, 0.0F));
+        Vec3(1.0F, 1.0F, 3.0F), Vec3(0.0F, 0.0F, 0.0F));
 
     renderer::Light::uptr light =
         std::make_unique<renderer::DirectionalLight>(Vec3(-1.0F, -1.0F, -1.0F));
@@ -42,7 +42,7 @@ auto main() -> int {
     Vec3 ambient_light = {0.1F, 0.1F, 0.1F};
 
     // Color of the object to be rendered
-    Vec3 object_color = {0.1F, 0.2F, 0.7F};
+    Vec3 object_color = {1.0F, 0.5F, 0.31F};
 
     while (window.active()) {
         window.Begin();
@@ -55,8 +55,8 @@ auto main() -> int {
         ImGui::Begin("Options");
         // Allow the user to control the position of the camera
         static Vec3 s_camera_position = camera->position();
-        ImGui::SliderFloat3("camera->position", s_camera_position.data(),
-                            -10.0F, 10.0F);
+        ImGui::SliderFloat3("camera->position", s_camera_position.data(), -3.0F,
+                            3.0F);
         camera->SetPosition(s_camera_position);
         // Allow the user to set wireframe mode
         static bool s_wireframe = false;
@@ -64,6 +64,9 @@ auto main() -> int {
         if (s_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
+
+        // Allow the user to set the ambient light
+        ImGui::SliderFloat3("ambient light", ambient_light.data(), 0.0F, 1.0F);
 
         // Allow the user to select which light caster to use
         std::array<const char*, 3> items_lights = {"directional", "point",
@@ -140,17 +143,17 @@ auto main() -> int {
                         geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
                         break;
                     case 2:  // sphere
-                        geometry = renderer::CreateSphere(1.0F, 20, 20);
+                        geometry = renderer::CreateSphere(1.0F, 30, 30);
                         break;
                     case 3:  // ellipsoid
                         geometry =
-                            renderer::CreateEllipsoid(0.5F, 2.5F, 4.5F, 20, 20);
+                            renderer::CreateEllipsoid(0.5F, 1.0F, 1.5F, 30, 30);
                         break;
                     case 4:  // cylinder
-                        geometry = renderer::CreateCylinder(0.5F, 2.0F);
+                        geometry = renderer::CreateCylinder(0.5F, 1.0F);
                         break;
                     case 5:  // capsule
-                        geometry = renderer::CreateCapsule(0.5F, 2.0F);
+                        geometry = renderer::CreateCapsule(0.5F, 1.0F);
                         break;
                     case 6:  // arrow
                         geometry = renderer::CreateArrow(0.5F);

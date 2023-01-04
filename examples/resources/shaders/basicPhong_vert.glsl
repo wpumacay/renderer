@@ -21,6 +21,6 @@ out vec2 f_uv;
 void main() {
     gl_Position = u_view_proj_matrix * u_model_matrix * vec4(position, 1.0f);
     f_position = vec3(u_model_matrix * vec4(position, 1.0f));
-    f_normal = mat3(u_normal_matrix) * normal;
+    f_normal = vec3(u_normal_matrix * vec4(normal, 0.0f));
     f_uv = uv;
 }
