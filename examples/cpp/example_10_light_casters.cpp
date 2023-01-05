@@ -10,6 +10,7 @@
 #include <renderer/light/light_t.hpp>
 
 #include <utils/logging.hpp>
+#include "renderer/common.hpp"
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -57,10 +58,10 @@ auto main() -> int {
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_vert.glsl",
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_frag.glsl");
 
-    auto geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
+    auto geometry = renderer::CreatePlane(5.0F, 5.0F, renderer::eAxis::AXIS_Z);
 
     renderer::Camera::ptr camera = std::make_shared<renderer::Camera>(
-        Vec3(1.0F, 1.0F, 3.0F), Vec3(0.0F, 0.0F, 0.0F));
+        Vec3(5.0F, 5.0F, 5.0F), Vec3(0.0F, 0.0F, 0.0F));
 
     renderer::Light::ptr light =
         std::make_shared<renderer::DirectionalLight>(Vec3(-1.0F, -2.0F, -3.0F));
@@ -82,41 +83,70 @@ auto main() -> int {
         ImGui::Begin("Options");
         // Allow the user to control the position of the camera
         static Vec3 s_camera_position = camera->position();
-        ImGui::SliderFloat3("camera->position", s_camera_position.data(), -3.0F,
-                            3.0F);
+        ImGui::SliderFloat3("Camera.position", s_camera_position.data(), -10.0F,
+                            10.0F);
         camera->SetPosition(s_camera_position);
         // Allow the user to set wireframe mode
         static bool s_wireframe = false;
-        ImGui::Checkbox("wireframe", &s_wireframe);
+        ImGui::Checkbox("Wireframe", &s_wireframe);
         if (s_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        // Allow the user to set the ambient light
-        ImGui::SliderFloat3("ambient light", ambient_light.data(), 0.0F, 1.0F);
+        ImGui::SliderFloat3("Ambient light", ambient_light.data(), 0.0F, 1.0F);
 
         // Allow the user to select which light caster to use
         std::array<const char*, 3> items_lights = {"directional", "point",
                                                    "spot"};
-        IMGUI_COMBO(items_lights, "Light", [&](size_t combo_index) -> void {
-            switch (combo_index) {
-                case 0:  // directional
-                    light = std::make_shared<renderer::DirectionalLight>(
-                        Vec3(-1.0F, -2.0F, -3.0F));
-                    break;
-                case 1:  // point
-                    light = std::make_shared<renderer::PointLight>(
-                        Vec3(3.0F, 4.0F, 5.0F));
-                    break;
-                case 2:  // spot
-                    light = std::make_shared<renderer::SpotLight>(
-                        Vec3(5.0F, 5.0F, 5.0F), Vec3(0.0F, 0.0F, 0.0F));
-                    break;
-                default:
-                    break;
+        IMGUI_COMBO(
+            items_lights, "Light.type", [&](size_t combo_index) -> void {
+                switch (combo_index) {
+                    case 0:  // directional
+                        light = std::make_shared<renderer::DirectionalLight>(
+                            Vec3(-1.0F, -2.0F, -3.0F));
+                        break;
+                    case 1:  // point
+                        light = std::make_shared<renderer::PointLight>(
+                            Vec3(3.0F, 4.0F, 5.0F));
+                        break;
+                    case 2:  // spot
+                        light = std::make_shared<renderer::SpotLight>(
+                            Vec3(0.0F, 0.0F, 5.0F), Vec3(0.0F, 0.0F, -1.0F));
+                        break;
+                    default:
+                        break;
+                }
+                LOG_INFO("Using light type: {0}",
+                         renderer::ToString(light->type));
+            });
+
+        // Light properties
+        ImGui::ColorEdit3("Light.color", light->color.data());
+        ImGui::SliderFloat("Light.intensity", &light->intensity, 0.0F, 1.0F);
+        switch (light->type) {
+            case renderer::eLightType::DIRECTIONAL: {
+                auto dir_light =
+                    std::dynamic_pointer_cast<renderer::DirectionalLight>(
+                        light);
+                break;
             }
-            LOG_INFO("Using light type: {0}", renderer::ToString(light->type));
-        });
+            case renderer::eLightType::POINT: {
+                auto point_light =
+                    std::dynamic_pointer_cast<renderer::PointLight>(light);
+                break;
+            }
+            case renderer::eLightType::SPOT: {
+                auto spot_light =
+                    std::dynamic_pointer_cast<renderer::SpotLight>(light);
+                ImGui::SliderFloat("Light.innerCutoff",
+                                   &light->innerCutoffAngle, PI / 9.0F,
+                                   PI / 3.0F);
+                ImGui::SliderFloat("Light.outerCutoff",
+                                   &light->outerCutoffAngle,
+                                   light->innerCutoffAngle, PI / 3.0F);
+                break;
+            }
+        }
 
         // Allow the user to select which geometry to visualize
         std::array<const char*, 7> items_geometries = {
@@ -127,7 +157,7 @@ auto main() -> int {
                 switch (combo_index) {
                     case 0:  // plane
                         geometry = renderer::CreatePlane(
-                            1.0F, 1.0F, renderer::eAxis::AXIS_Z);
+                            5.0F, 5.0F, renderer::eAxis::AXIS_Z);
                         break;
                     case 1:  // box
                         geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
@@ -176,6 +206,7 @@ auto main() -> int {
             program->SetFloat("u_dir_light.intensity", light->intensity);
             program->SetInt("u_dir_light.enabled", GL_TRUE);
             program->SetInt("u_point_light.enabled", GL_FALSE);
+            program->SetInt("u_spot_light.enabled", GL_FALSE);
         } else if (auto point_light =
                        std::dynamic_pointer_cast<renderer::PointLight>(light)) {
             // Configure point light
@@ -184,8 +215,19 @@ auto main() -> int {
             program->SetFloat("u_point_light.intensity", light->intensity);
             program->SetInt("u_point_light.enabled", GL_TRUE);
             program->SetInt("u_dir_light.enabled", GL_FALSE);
-        } else {
-            LOG_WARN("Light type not supported");
+            program->SetInt("u_spot_light.enabled", GL_FALSE);
+        } else if (auto spot_light =
+                       std::dynamic_pointer_cast<renderer::SpotLight>(light)) {
+            // Configure spot light
+            program->SetVec3("u_spot_light.position", light->position);
+            program->SetVec3("u_spot_light.direction", light->direction);
+            program->SetFloat("u_spot_light.innerCutOffCos",
+                              std::cos(light->innerCutoffAngle));
+            program->SetFloat("u_spot_light.outerCutOffCos",
+                              std::cos(light->outerCutoffAngle));
+            program->SetVec3("u_spot_light.color", light->color);
+            program->SetFloat("u_spot_light.intensity", light->intensity);
+            program->SetInt("u_spot_light.enabled", GL_TRUE);
             program->SetInt("u_dir_light.enabled", GL_FALSE);
             program->SetInt("u_point_light.enabled", GL_FALSE);
         }
