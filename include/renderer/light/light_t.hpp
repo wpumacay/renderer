@@ -53,7 +53,7 @@ class Light {
     Light() = default;
 
     /// Releases all resources allocated by this light source
-    ~Light() = default;
+    virtual ~Light() = default;
 };
 
 /// Representation of a directional light source

@@ -9,12 +9,39 @@
 #include <renderer/geometry/geometry_factory.hpp>
 #include <renderer/light/light_t.hpp>
 
+#include <utils/logging.hpp>
+
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
 #endif  // RENDERER_IMGUI
 
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
+
+// NOLINTNEXTLINE
+#define IMGUI_COMBO(combo_items, combo_title, combo_callback)                 \
+    {                                                                         \
+        static size_t s_item_current_idx = 0;                                 \
+        static bool s_change_item = false;                                    \
+        const char* combo_preview_value = combo_items.at(s_item_current_idx); \
+        if (ImGui::BeginCombo(combo_title, combo_preview_value)) {            \
+            for (size_t i = 0; i < combo_items.size(); ++i) {                 \
+                const auto IS_SELECTED = (s_item_current_idx == i);           \
+                if (ImGui::Selectable(combo_items.at(i), IS_SELECTED)) {      \
+                    s_change_item = (s_item_current_idx != i);                \
+                    s_item_current_idx = i;                                   \
+                }                                                             \
+                if (IS_SELECTED) {                                            \
+                    ImGui::SetItemDefaultFocus();                             \
+                }                                                             \
+            }                                                                 \
+            ImGui::EndCombo();                                                \
+        }                                                                     \
+        if (s_change_item) {                                                  \
+            combo_callback(s_item_current_idx);                               \
+            s_change_item = false;                                            \
+        }                                                                     \
+    }
 
 // NOLINTNEXTLINE
 auto main() -> int {
@@ -32,11 +59,11 @@ auto main() -> int {
 
     auto geometry = renderer::CreateBox(1.0F, 1.0F, 1.0F);
 
-    renderer::Camera::uptr camera = std::make_unique<renderer::Camera>(
+    renderer::Camera::ptr camera = std::make_shared<renderer::Camera>(
         Vec3(1.0F, 1.0F, 3.0F), Vec3(0.0F, 0.0F, 0.0F));
 
-    renderer::Light::uptr light =
-        std::make_unique<renderer::DirectionalLight>(Vec3(-1.0F, -1.0F, -1.0F));
+    renderer::Light::ptr light =
+        std::make_shared<renderer::DirectionalLight>(Vec3(-1.0F, -2.0F, -3.0F));
 
     // Color of the global ambient light
     Vec3 ambient_light = {0.1F, 0.1F, 0.1F};
@@ -71,70 +98,33 @@ auto main() -> int {
         // Allow the user to select which light caster to use
         std::array<const char*, 3> items_lights = {"directional", "point",
                                                    "spot"};
-        {
-            static size_t s_item_current_idx = 0;
-            static bool s_change_item = false;
-            const char* combo_preview_value =
-                items_lights.at(s_item_current_idx);
-            if (ImGui::BeginCombo("Lights", combo_preview_value)) {
-                for (size_t i = 0; i < items_lights.size(); ++i) {
-                    const auto IS_SELECTED = (s_item_current_idx == i);
-                    if (ImGui::Selectable(items_lights.at(i), IS_SELECTED)) {
-                        s_change_item = (s_item_current_idx != i);
-                        s_item_current_idx = i;
-                    }
-                    if (IS_SELECTED) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
+        IMGUI_COMBO(items_lights, "Light", [&](size_t combo_index) -> void {
+            switch (combo_index) {
+                case 0:  // directional
+                    light = std::make_shared<renderer::DirectionalLight>(
+                        Vec3(-1.0F, -2.0F, -3.0F));
+                    break;
+                case 1:  // point
+                    light = std::make_shared<renderer::PointLight>(
+                        Vec3(3.0F, 4.0F, 5.0F));
+                    break;
+                case 2:  // spot
+                    light = std::make_shared<renderer::SpotLight>(
+                        Vec3(5.0F, 5.0F, 5.0F), Vec3(0.0F, 0.0F, 0.0F));
+                    break;
+                default:
+                    break;
             }
-            if (s_change_item) {
-                switch (s_item_current_idx) {
-                    case 0:  // directional
-                        light = std::make_unique<renderer::DirectionalLight>(
-                            Vec3(-1.0F, -1.0F, -1.0F));
-                        break;
-                    case 1:  // point
-                        light = std::make_unique<renderer::PointLight>(
-                            Vec3(5.0F, 5.0F, 5.0F));
-                        break;
-                    case 2:  // spot
-                        light = std::make_unique<renderer::SpotLight>(
-                            Vec3(5.0F, 5.0F, 5.0F), Vec3(0.0F, 0.0F, 0.0F));
-                        break;
-                    default:
-                        break;
-                }
-                s_change_item = false;
-            }
-        }
+            LOG_INFO("Using light type: {0}", renderer::ToString(light->type));
+        });
 
         // Allow the user to select which geometry to visualize
         std::array<const char*, 7> items_geometries = {
             "plane",    "box",     "sphere", "ellipsoid",
             "cylinder", "capsule", "arrow"};
-        {
-            static size_t s_item_current_idx = 0;
-            static bool s_change_item = false;
-            const char* combo_preview_value =
-                items_geometries.at(s_item_current_idx);
-            if (ImGui::BeginCombo("Geometries", combo_preview_value)) {
-                for (size_t i = 0; i < items_geometries.size(); ++i) {
-                    const auto IS_SELECTED = (s_item_current_idx == i);
-                    if (ImGui::Selectable(items_geometries.at(i),
-                                          IS_SELECTED)) {
-                        s_change_item = (s_item_current_idx != i);
-                        s_item_current_idx = i;
-                    }
-                    if (IS_SELECTED) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            if (s_change_item) {
-                switch (s_item_current_idx) {
+        IMGUI_COMBO(
+            items_geometries, "Geometry", [&](size_t combo_index) -> void {
+                switch (combo_index) {
                     case 0:  // plane
                         geometry = renderer::CreatePlane(
                             1.0F, 1.0F, renderer::eAxis::AXIS_Z);
@@ -161,9 +151,8 @@ auto main() -> int {
                     default:
                         break;
                 }
-                s_change_item = false;
-            }
-        }
+            });
+
         ImGui::End();
 #endif  // RENDERER_IMGUI
 
@@ -179,10 +168,27 @@ auto main() -> int {
         program->SetVec3("u_viewer_position", camera->position());
         program->SetVec3("u_ambient_light", ambient_light);
 
-        // Configure directional light
-        program->SetVec3("u_dir_light.direction", light->direction);
-        program->SetVec3("u_dir_light.color", light->color);
-        program->SetFloat("u_dir_light.intensity", light->intensity);
+        if (auto dir_light =
+                std::dynamic_pointer_cast<renderer::DirectionalLight>(light)) {
+            // Configure directional light
+            program->SetVec3("u_dir_light.direction", light->direction);
+            program->SetVec3("u_dir_light.color", light->color);
+            program->SetFloat("u_dir_light.intensity", light->intensity);
+            program->SetInt("u_dir_light.enabled", GL_TRUE);
+            program->SetInt("u_point_light.enabled", GL_FALSE);
+        } else if (auto point_light =
+                       std::dynamic_pointer_cast<renderer::PointLight>(light)) {
+            // Configure point light
+            program->SetVec3("u_point_light.position", light->position);
+            program->SetVec3("u_point_light.color", light->color);
+            program->SetFloat("u_point_light.intensity", light->intensity);
+            program->SetInt("u_point_light.enabled", GL_TRUE);
+            program->SetInt("u_dir_light.enabled", GL_FALSE);
+        } else {
+            LOG_WARN("Light type not supported");
+            program->SetInt("u_dir_light.enabled", GL_FALSE);
+            program->SetInt("u_point_light.enabled", GL_FALSE);
+        }
 
         geometry->VAO().Bind();
 

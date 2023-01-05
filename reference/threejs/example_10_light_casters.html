@@ -45,12 +45,16 @@
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x333333);
                 camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-                camera.position.set(0.5, 0.5, 3.0);
+                camera.position.set(1.0, 1.0, 3.0);
                 controls = new OrbitControls(camera, renderer.domElement);
 
-                light = new THREE.DirectionalLight(0xffffff, 1.0);
-                light.position.set(1.0, 1.0, 1.0);
-                light.target.position.set(0.0, 0.0, 0.0);
+                //// light = new THREE.DirectionalLight(0xffffff, 1.0);
+                //// light.position.set(1.0, 1.0, 1.0);
+                //// light.target.position.set(0.0, 0.0, 0.0);
+
+                light = new THREE.PointLight(0xffffff, 1.0);
+                light.position.set(3.0, 4.0, 5.0);
+
                 scene.add(light);
 
                 const geometry = new THREE.BoxGeometry(1, 1, 1);
