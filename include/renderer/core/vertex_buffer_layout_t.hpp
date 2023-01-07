@@ -66,8 +66,11 @@ class BufferLayout {
     BufferLayout() = default;
 
     // cppcheck-suppress noExplicitConstructor
-    /// Creates a vertex buffer layout from elements in a initializer list
+    /// Creates a buffer layout from elements in a initializer list
     BufferLayout(const std::initializer_list<BufferElement>& elements);
+
+    /// Creates a buffer layout from elements in a std::vector
+    explicit BufferLayout(std::vector<BufferElement> elements);
 
     auto stride() const -> uint32_t { return m_Stride; }
 

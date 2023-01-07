@@ -102,15 +102,25 @@ BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
     }
 }
 
+BufferLayout::BufferLayout(std::vector<BufferElement> elements)
+    : m_BufferElements(std::move(elements)) {
+    for (auto& element : m_BufferElements) {
+        element.offset = m_Stride;
+        m_Stride += element.size;
+    }
+}
+
 auto BufferLayout::ToString() const -> std::string {
     uint32_t index = 0;
     auto last_index = static_cast<uint32_t>(m_BufferElements.size() - 1);
     std::string str_repr{"BufferLayout({"};
     for (const auto& element : m_BufferElements) {
-        str_repr += fmt::format("{0}[name=\"{1}\", type={2}, normalized={3}]",
-                                (index != 0 ? "              " : ""),
-                                element.name, renderer::ToString(element.type),
-                                (element.normalized ? "true" : "false"));
+        str_repr += fmt::format(
+            "{0}[name=\"{1}\", type={2}, count={3}, size={4}, offset={5}, "
+            "normalized={6}]",
+            (index != 0 ? "              " : ""), element.name,
+            renderer::ToString(element.type), element.count, element.size,
+            element.offset, (element.normalized ? "true" : "false"));
         str_repr += (index != last_index ? "\n" : "");
         index++;
     }
