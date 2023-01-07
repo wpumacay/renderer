@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 #include <pybind11/functional.h>
@@ -6,12 +8,10 @@
 
 #include <renderer/core/vertex_buffer_t.hpp>
 #include <renderer/core/index_buffer_t.hpp>
+#include <renderer/core/vertex_array_t.hpp>
 
 #include <conversions_py.hpp>
-#include <math/common.hpp>
-
-#include <stdexcept>
-#include "renderer/core/vertex_buffer_layout_t.hpp"
+#include <spdlog/fmt/bundled/format.h>
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -24,6 +24,9 @@ namespace renderer {
 
 // NOLINTNEXTLINE
 void bindings_buffers(py::module& m) {
+    using NumpyFloatArray = py::array_t<float32_t>;
+    using NumpyUint32Array = py::array_t<uint32_t>;
+
     {
         using Enum = renderer::eElementType;
         constexpr auto* EnumName = "ElementType";  // NOLINT
@@ -108,6 +111,88 @@ void bindings_buffers(py::module& m) {
                 [](const Class& self) -> std::vector<BufferElement> {
                     return self.elements();
                 })
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
+
+    {
+        using Enum = renderer::eBufferUsage;
+        constexpr auto* EnumName = "BufferUsage";  // NOLINT
+        py::enum_<Enum>(m, EnumName)
+            .value("STATIC", Enum::STATIC)
+            .value("DYNAMIC", Enum::DYNAMIC);
+    }
+
+    {
+        using Class = renderer::VertexBuffer;
+        constexpr auto* ClassName = "VertexBuffer";  // NOLINT
+        py::class_<Class>(m, ClassName)
+            // NOLINTNEXTLINE
+            .def(py::init([](BufferLayout layout, eBufferUsage usage,
+                             uint32_t size, const NumpyFloatArray& data) {
+                if (size !=
+                    (static_cast<size_t>(data.size()) * sizeof(float32_t))) {
+                    throw std::runtime_error(
+                        fmt::format("VertexBuffer >>> given size must match "
+                                    "the size of the given numpy-array. Given "
+                                    "size={0}, np-array size={1}",
+                                    size, data.size()));
+                }
+
+                return std::make_unique<VertexBuffer>(
+                    layout, usage, size,
+                    static_cast<const float32_t*>(data.request().ptr));
+            }))
+            .def("resize", &Class::Resize)
+            .def("updateData",
+                 [](Class& self, uint32_t size, const NumpyFloatArray& data) {
+                     self.UpdateData(size, static_cast<const float32_t*>(
+                                               data.request().ptr));
+                 })
+            .def("bind", &Class::Bind)
+            .def("unbind", &Class::Unbind)
+            .def_property_readonly("layout", &Class::layout)
+            .def_property_readonly("size", &Class::size)
+            .def_property_readonly("usage", &Class::usage)
+            .def_property_readonly("opengl_id", &Class::opengl_id)
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
+
+    {
+        using Class = renderer::IndexBuffer;
+        constexpr auto* ClassName = "IndexBuffer";  // NOLINT
+        py::class_<Class>(m, ClassName)
+            .def(py::init([](eBufferUsage usage, uint32_t count,  // NOLINT
+                             const NumpyUint32Array& data) {
+                return std::make_unique<Class>(
+                    usage, count,
+                    static_cast<const uint32_t*>(data.request().ptr));
+            }))
+            .def("bind", &Class::Bind)
+            .def("unbind", &Class::Unbind)
+            .def_property_readonly("count", &Class::count)
+            .def_property_readonly("opengl_id", &Class::opengl_id)
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
+
+    {
+        using Class = renderer::VertexArray;
+        constexpr auto* ClassName = "VertexArray";  // NOLINT
+        py::class_<Class>(m, ClassName)
+            .def(py::init<>())
+            .def("addVertexBuffer",
+                 [](Class& self, VertexBuffer::uptr vbo) {
+                     self.AddVertexBuffer(std::move(vbo));
+                 })
+            .def("setIndexBuffer",
+                 [](Class& self, IndexBuffer::uptr ibo) {
+                     self.SetIndexBuffer(std::move(ibo));
+                 })
+            .def("bind", &Class::Bind)
+            .def("unbind", &Class::Unbind)
+            .def_property_readonly("opengl_id", &Class::opengl_id)
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
     }
