@@ -1,194 +1,193 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Setup script used to build and install this package.
 
+Adapted from the pybind cmake_example template.
+https://github.com/pybind/cmake_example/blob/master/setup.py
+"""
 import os
-import sys
-import glob
+import re
 import subprocess
+import sys
+from pathlib import Path
 
 from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
-from setuptools.command.install import install
 
-# @todo: fix issue of not removing the shared libraries even after pip uninstall is run
+from pdb import set_trace
 
-VERSION_MAJOR = 0
-VERSION_MINOR = 0
-VERSION_MICRO = 7
-VERSION = '%d.%d.%d' % ( VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO )
-PREFIX = 'wp_tinyrenderer_%s_' % ( VERSION )
+# Convert distutils Windows platform specifiers to CMake -A arguments
+PLAT_TO_CMAKE = {
+    "win32": "Win32",
+    "win-amd64": "x64",
+    "win-arm32": "ARM",
+    "win-arm64": "ARM64",
+}
 
-def BuildBindings( sourceDir, buildDir, cmakeArgs, buildArgs, env ):
-    if not os.path.exists( buildDir ) :
-        os.makedirs( buildDir )
 
-    subprocess.call( ['cmake', sourceDir] + cmakeArgs, cwd=buildDir, env=env )
-    subprocess.call( ['cmake', '--build', '.'] + buildArgs, cwd=buildDir )
+class CMakeExtension(Extension):
+    """
+    An extended Extension-Class for CMake. We need this as we have to
+    pass a source dir instead of a file_list to get the source-code to build
 
-# @hack: get installation path: https://stackoverflow.com/questions/36187264/how-to-get-installation-directory-using-setuptools-and-pkg-ressources
-def GetInstallationDir() :
-    py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
-    install_path_candidates = ( path % (py_version) for path in (
-                        sys.prefix + '/lib/python%s/dist-packages/',
-                        sys.prefix + '/lib/python%s/site-packages/',
-                        sys.prefix + '/local/lib/python%s/dist-packages/',
-                        sys.prefix + '/local/lib/python%s/site-packages/',
-                        '/Library/Python/%s/site-packages/' ) )
-    for path_candidate in install_path_candidates :
-        if os.path.exists( path_candidate ) :
-            return path_candidate
+    The name must be _single_ output extension from the CMake build. If you need
+    multiple extensions, see scikit-build
+    """
 
-    print( 'ERROR >>> No installation path found', file=sys.stderr )
-    return None
+    def __init__(self, name: str, sourcedir: str = "") -> None:
+        super().__init__(name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
-# @hack: get resources path (should replace with proper find functionality)
-def GetResourcesDir() :
-    py_version = '%s.%s' % ( sys.version_info[0], sys.version_info[1] )
-    install_path_candidates = ( path % (py_version) for path in (
-                        sys.prefix + '/lib/python%s/dist-packages/',
-                        sys.prefix + '/lib/python%s/site-packages/',
-                        sys.prefix + '/local/lib/python%s/dist-packages/',
-                        sys.prefix + '/local/lib/python%s/site-packages/',
-                        '/Library/Python/%s/site-packages/' ) )
 
-    for path_candidate in install_path_candidates :
-        if os.path.exists( path_candidate ) :
-            if path_candidate.find( 'local' ) != -1 :
-                return sys.prefix + '/local/' + PREFIX + 'res/'
-            else :
-                return sys.prefix + '/' + PREFIX + 'res/'
+class CMakeBuild(build_ext):
+    def build_extension(self, ext: CMakeExtension) -> None:
+        set_trace()
+        # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
+        ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
+        extdir = ext_fullpath.parent.resolve()
 
-    print( 'ERROR >>> No resources path found', file=sys.stderr )
-    return None
+        # Using this requires trailing slash for auto-detection & inclusion of
+        # auxiliary "native" libs
 
-def GetFilesUnderPath( path, extension ) :
-    cwd_path = os.getcwd()
-    target_path = os.path.join( cwd_path, path )
-    if not os.path.exists( target_path ) :
-        return ( '', [] )
+        debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
+        cfg = "Debug" if debug else "Release"
 
-    os.chdir( target_path )
-    files = glob.glob( '**/*.%s' % ( extension ), recursive=True )
-    files_paths = [ os.path.join( target_path, fpath ) for fpath in files ]
-    os.chdir( cwd_path )
-    return ( PREFIX + path, files_paths )
+        # CMake lets you override the generator - we need to check this.
+        # Can be set with Conda-Build, for example.
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
-class CMakeExtension( Extension ) :
+        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
+        cmake_args = [
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",
+            # Make sure we handle RPATH correctly when installing
+            "-DCMAKE_INSTALL_RPATH=$ORIGIN",
+            "-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON",
+            "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF",
+        ]
+        build_args = []
 
-    def __init__( self, name, sourceDir ) :
-        super( CMakeExtension, self ).__init__( name, sources=[] )
-        self.sourceDir = os.path.abspath( sourceDir )
+        # Adding CMake arguments set as environment variable (needed e.g. to
+        # build for ARM OSx on conda-forge). Notice they are space separated
+        if "CMAKE_ARGS" in os.environ:
+            cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
-class BuildCommand( build_ext ) :
+        # Add additional CMake arguments required for setting up this project
+        cmake_args += [
+            "-DRENDERER_BUILD_IMGUI=ON",
+            "-DRENDERER_BUILD_LOGS=ON",
+            "-DRENDERER_BUILD_PROFILING=OFF",
+            "-DRENDERER_BUILD_PYTHON_BINDINGS=ON",
+            "-DRENDERER_BUILD_EXAMPLES=OFF",
+            "-DRENDERER_BUILD_TESTS=OFF",
+            "-DRENDERER_BUILD_DOCS=OFF"
+        ]
 
-    user_options = [ ( 'windowed=', None, 'Whether to build in windowed mode (uses GLFW) or not' ),
-                     ( 'headless=', None, 'Whether to build in headless mode (uses EGL) or not' ),
-                     ( 'debug=', None, 'Whether to build in debug-mode or not' ),
-                     ( 'njobs=', None, "Number of jobs used for building the project" ) ]
-    boolean_options = [ 'windowed', 'headless', 'debug' ]
+        ## # By default, place every generated artifact into the same install path
+        ## library_outdir = extdir
+        ## archive_outdir = extdir
+        ## runtime_outdir = extdir
 
-    def initialize_options( self ) :
-        super( BuildCommand, self ).initialize_options()
-        self.windowed = 1 # By default, build using windowed mode (GLFW)
-        self.headless = 0 # By default, don't build using headless mode (EGL)
-        self.debug = 1 # Build in release mode by default
-        self.njobs = 2 # Use 2 jobs by default (mostly called locally, so keep it at 8 for now)
+        if self.compiler.compiler_type != "msvc":
+            # Using Ninja-build since it a) is available as a wheel and b)
+            # multithreads automatically. MSVC would require all variables be
+            # exported for Ninja to pick it up, which is a little tricky to do.
+            # Users can override the generator with CMAKE_GENERATOR in CMake
+            # 3.15+.
+            if not cmake_generator:
+                try:
+                    import ninja
 
-    def run( self ) :
-        try :
-            _ = subprocess.check_output( ['cmake', '--version'] )
-        except OSError :
-            raise RuntimeError( 'CMake must be installed to build the following extensions: ' +
-                                ', '.join( e.name for e in self.extensions ) )
+                    ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
+                    cmake_args += [
+                        "-GNinja",
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}"
+                    ]
+                except ImportError:
+                    pass
 
-        for _extension in self.extensions :
-            self.build_extension( _extension )
+            ## # Send all generated artifacts to the same install location
+            ## cmake_args += [
+            ##     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={library_outdir}",
+            ##     f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={archive_outdir}",
+            ##     f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={runtime_outdir}",
+            ## ]
+        else:
+            # Single config generators are handled "normally"
+            single_config = any(x in cmake_generator for x in ["NMake", "Ninja"])
 
-    def build_extension( self, extension ) :
-        _extensionFullPath = self.get_ext_fullpath( extension.name )
-        _extensionDirName = os.path.dirname( _extensionFullPath )
-        _extensionDirPath = os.path.abspath( _extensionDirName )
+            # CMake allows an arch-in-generator style for backward compatibility
+            contains_arch = any(x in cmake_generator for x in ["ARM", "Win64"])
 
-        _cfg = 'Debug' if self.debug else 'Release'
-        _egl = 'ON' if self.headless else 'OFF'
-        _glfw = 'ON' if self.windowed else 'OFF'
-        _buildArgs = ['--config', _cfg, '--', '-j%d' % self.njobs]
-        _cmakeArgs = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + _extensionDirPath,
-                      '-DCMAKE_BUILD_RPATH=' + GetInstallationDir(),
-                      '-DCMAKE_INSTALL_RPATH=' + GetInstallationDir(),
-                      '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DCMAKE_BUILD_TYPE=' + _cfg,
-                      '-DTINYRENDERER_RESOURCES_PATH=' + GetResourcesDir(),
-                      '-DTINYRENDERER_BUILD_WINDOWED_GLFW=' + _glfw,
-                      '-DTINYRENDERER_BUILD_HEADLESS_EGL=' + _egl,
-                      '-DTINYRENDERER_BUILD_DOCS=OFF',
-                      '-DTINYRENDERER_BUILD_EXAMPLES=OFF',
-                      '-DTINYRENDERER_BUILD_PYTHON_BINDINGS=ON',
-                      '-DTINYRENDERER_BUILD_WITH_LOGS=OFF',
-                      '-DTINYRENDERER_BUILD_WITH_PROFILING=OFF',
-                      '-DTINYRENDERER_BUILD_WITH_TRACK_ALLOCS=OFF',
-                      '-DTINYRENDERER_BUILD_WITH_FFMPEG_UTILS=ON']
+            # Specify the arch if using MSVC generator, but only if it doesn't
+            # contain a backward-compatibility arch spec already in the
+            # generator name.
+            if not single_config and not contains_arch:
+                cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
 
-        _env = os.environ.copy()
-        _env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format( _env.get( 'CXXFLAGS', '' ),
-                                                                self.distribution.get_version() )
+            # Multi-config generators have a different way to specify configs
+            if not single_config:
+                cmake_args += [
+                    f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
+                    f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
+                    f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
+                ]
+                build_args += ["--config", cfg]
 
-        _sourceDir = extension.sourceDir
-        _buildDir = self.build_temp
+        if sys.platform.startswith("darwin"):
+            # Cross-compile support for macOS - respect ARCHFLAGS if set
+            archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
+            if archs:
+                cmake_args += ["-DCMAKE_OSX_ARCHITECTURE={}".format(";".join(archs))]
 
-        BuildBindings( _sourceDir, _buildDir, _cmakeArgs, _buildArgs, _env )
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
+        # across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            # self.parallel is a Python 3 only way to set parallel jobs by hand
+            # using -j in the build_ext call, not supported by pip or PyPA-build
+            if hasattr(self, "parallel") and self.parallel:
+                # CMake 3.12+ only
+                build_args += ["-j{}".format(self.parallel)]
 
-class InstallCommand( install ) :
+        build_temp = Path(self.build_temp) / ext.name
+        if not build_temp.exists():
+            build_temp.mkdir(parents=True)
 
-    user_options = install.user_options + BuildCommand.user_options
-    boolean_options = install.boolean_options + BuildCommand.boolean_options
+        subprocess.check_call(
+            ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
+        )
+        subprocess.check_call(
+            ["cmake", "--build", "."] + build_args, cwd=self.build_temp
+        )
 
-    def initialize_options( self ) :
-        super( InstallCommand, self ).initialize_options()
-        self.windowed = 1 # By default, build using windowed mode (GLFW)
-        self.headless = 0 # By default, don't build using headless mode (EGL)
-        self.debug = 1 # Build in release mode by default
-        self.njobs = 2 # Use 2 jobs by default (mostly called locally, so keep it at 8 for now)
+long_description = ""
+if os.path.exists("README.md"):
+    with open("README.md", "r", encoding="utf-8") as fh:
+        long_description = fh.read()
 
-    def run( self ) :
-        self.reinitialize_command( 'build_ext', headless=self.headless, debug=self.debug, windowed=self.windowed, njobs=self.njobs )
-        self.run_command( 'build_ext' )
-        super( InstallCommand, self ).run()
-
-with open( 'README.md', 'r' ) as fh :
-    longDescriptionData = fh.read()
-
-with open( 'requirements.txt', 'r' ) as fh :
-    requiredPackages = [ line.replace( '\n', '' ) for line in fh.readlines() ]
+required_packages = []
+if os.path.exists("requirements.txt"):
+    with open("requirements.txt", "r", encoding="utf-8") as fh:
+        required_packages = [line.replace("\n", "") for line in fh.readlines()]
 
 setup(
-    name                            = 'wp-tinyrenderer',
-    version                         = VERSION,
-    description                     = 'A minimal renderer for prototyping 3D applications',
-    long_description                = longDescriptionData,
-    long_description_content_type   = 'text/markdown',
-    author                          = 'Wilbert Santos Pumacay Huallpa',
-    license                         = 'MIT License',
-    author_email                    = 'wpumacay@gmail.com',
-    url                             = 'https://github.com/wpumacay/tiny_renderer',
-    keywords                        = 'graphics opengl',
-    classifiers                     = [ "License :: OSI Approved :: MIT License",
-                                        "Operating System :: POSIX :: Linux" ],
-    zip_safe                        = False,
-    install_requires                = requiredPackages,
-    package_dir                     = { '' : './python' },
-    packages                        = find_packages( './python' ),
-    data_files                      = [ GetFilesUnderPath( 'res/imgs', 'png' ),
-                                        GetFilesUnderPath( 'res/imgs', 'jpg' ),
-                                        GetFilesUnderPath( 'res/imgs/skyboxes', 'tga' ),
-                                        GetFilesUnderPath( 'res/imgs/skyboxes', 'jpg' ),
-                                        GetFilesUnderPath( 'res/models', 'stl' ),
-                                        GetFilesUnderPath( 'res/models/fox', 'png' ),
-                                        GetFilesUnderPath( 'res/models/fox', 'obj' ),
-                                        GetFilesUnderPath( 'res/models/fox', 'mtl' ),
-                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'png' ),
-                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'obj' ),
-                                        GetFilesUnderPath( 'res/models/pokemons/lizardon', 'mtl' ),
-                                        GetFilesUnderPath( 'res/shaders', 'glsl' ) ],
-    ext_modules                     = [ CMakeExtension( 'tr_core', '.' ) ],
-    cmdclass                        = dict( build_ext = BuildCommand, install = InstallCommand ) 
+    name='renderer',
+    version="0.1.0",
+    author='Wilbert Santos Pumacay Huallpa',
+    author_email='wpumacay@gmail.com',
+    description='A minimal renderer for prototyping 3D applications',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    license='MIT License',
+    url='https://github.com/wpumacay/loco_renderer',
+    keywords='graphics opengl',
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX :: Linux"
+    ],
+    zip_safe=False,
+    install_requires=required_packages,
+    ext_modules=[CMakeExtension('renderer')],
+    cmdclass={"built_ext": CMakeBuild}
 )
