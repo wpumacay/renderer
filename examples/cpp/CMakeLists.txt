@@ -12,7 +12,8 @@ set(RENDERER_EXAMPLES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/example_07_camera.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_08_geometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_09_geometry_factory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/example_10_light_casters.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/example_10_light_casters.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/example_11_camera_controllers.cpp)
 
 foreach(example_filepath IN LISTS RENDERER_EXAMPLES_LIST)
   loco_setup_single_file_example(${example_filepath} TARGET_DEPENDENCIES
