@@ -1,11 +1,13 @@
 #include <array>
 #include <glad/gl.h>
 
+#include <memory>
 #include <renderer/window/window_t.hpp>
 #include <renderer/input/input_manager_t.hpp>
 #include <renderer/assets/shader_manager_t.hpp>
 #include <renderer/camera/camera_t.hpp>
 #include <renderer/camera/camera_controller_t.hpp>
+#include <renderer/camera/orbit_camera_controller_t.hpp>
 #include <renderer/geometry/geometry_t.hpp>
 #include <renderer/geometry/geometry_factory.hpp>
 #include <renderer/light/light_t.hpp>
@@ -42,12 +44,19 @@ auto main() -> int {
     const Vec3 CAM_POSITION = {5.0F, 5.0F, 5.0F};
     const Vec3 CAM_TARGET = {0.0F, 0.0F, 0.0F};
     auto camera = std::make_shared<renderer::Camera>(CAM_POSITION, CAM_TARGET);
-    auto camera_controller =
-        std::make_shared<renderer::DummyCameraController>(camera);
+    renderer::ICameraController::ptr camera_controller =
+        std::make_shared<renderer::OrbitCameraController>(camera, WINDOW_WIDTH,
+                                                          WINDOW_HEIGHT);
 
     window.RegisterResizeCallback([&](int width, int height) {
         camera->SetAspectRatio(static_cast<float>(width) /
                                static_cast<float>(height));
+        if (auto orbit_controller =
+                std::dynamic_pointer_cast<renderer::OrbitCameraController>(
+                    camera_controller)) {
+            orbit_controller->UpdateViewport(static_cast<float>(width),
+                                             static_cast<float>(height));
+        }
         glViewport(0, 0, width, height);
     });
     window.RegisterKeyboardCallback([&](int key, int action, int modifier) {
