@@ -81,6 +81,11 @@ class OrbitCameraController : public ICameraController {
     /// The damping factor used for damping the rotation movement
     float dampingFactor = 0.05F;
 
+    /// Whether or not to autorotate around the focus target
+    bool enableAutoRotate = false;
+    /// The speed at which the autorotate works for this controller
+    float autoRotateSpeed = 2.0F;
+
  private:
     /// Current state of this orbit controller
     eOrbitState m_State = eOrbitState::IDLE;

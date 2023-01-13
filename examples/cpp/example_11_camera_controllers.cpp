@@ -114,6 +114,11 @@ auto main() -> int {
                 ImGui::SliderFloat("OrbitDampingFactor",
                                    &orbit_controller->dampingFactor, 0.0F,
                                    1.0F);
+                ImGui::Checkbox("OrbitAutoRotate",
+                                &orbit_controller->enableAutoRotate);
+                ImGui::SliderFloat("OrbitAutoRotateSpeed",
+                                   &orbit_controller->autoRotateSpeed, 0.0F,
+                                   4.0F);
                 ImGui::SliderFloat("MinPolar", &orbit_controller->minPolar,
                                    0.0F, PI);
                 ImGui::SliderFloat("MaxPolar", &orbit_controller->maxPolar,

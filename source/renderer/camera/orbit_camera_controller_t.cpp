@@ -32,9 +32,17 @@ auto OrbitCameraController::UpdateViewport(float width, float height) -> void {
 }
 
 auto OrbitCameraController::Update() -> void {
+    constexpr auto TWO_PI = static_cast<float>(math::PI);
+
     auto offset = m_Camera->position() - target;
 
     m_Spherical.SetFromCartesian(offset);
+
+    if (enableAutoRotate && m_State == eOrbitState::IDLE) {
+        const auto AUTO_ROTATE_ANGLE = TWO_PI / 60.0F / 60.0F * autoRotateSpeed;
+        m_SphericalDelta.theta -= AUTO_ROTATE_ANGLE;
+    }
+
     if (enableDamping) {
         m_Spherical.theta += m_SphericalDelta.theta * dampingFactor;
         m_Spherical.phi += m_SphericalDelta.phi * dampingFactor;
@@ -42,8 +50,6 @@ auto OrbitCameraController::Update() -> void {
         m_Spherical.theta += m_SphericalDelta.theta;
         m_Spherical.phi += m_SphericalDelta.phi;
     }
-
-    constexpr auto TWO_PI = static_cast<float>(math::PI);
 
     auto min = minAzimuth;
     auto max = maxAzimuth;
