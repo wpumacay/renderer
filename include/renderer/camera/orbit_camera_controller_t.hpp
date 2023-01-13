@@ -5,6 +5,7 @@
 
 #include <utility>
 #include <limits>
+#include <string>
 
 #include <renderer/common.hpp>
 #include <utils/common.hpp>
@@ -26,6 +27,9 @@ enum class eOrbitState {
     PAN,     /// The user is using the right mouse button to pan the view
     DOLLY    /// The user is using the mouse wheel to zoom in/out the view
 };
+
+/// Returns the string representation of the given orbit state enum
+auto ToString(eOrbitState state) -> std::string;
 
 class OrbitCameraController : public ICameraController {
     // cppcheck-suppress unknownMacro
@@ -52,28 +56,33 @@ class OrbitCameraController : public ICameraController {
 
     auto OnScrollCallback(double xOff, double yOff) -> void override {}
 
- private:
-    /// The location where the object orbits around
-    Vec3 m_Target;
+    auto state() const -> eOrbitState { return m_State; }
+
+ public:
     /// How far can we orbit vertically (lower limit)
-    float m_MinPhi = 0.0F;
+    float minPolar = 0.0F;
     /// How far can we orbit vertically (upper limit)
-    float m_MaxPhi = static_cast<float>(math::PI);
+    float maxPolar = static_cast<float>(math::PI);
     /// How far can we orbit horizontally (lower limit)
-    float m_MinTheta = -std::numeric_limits<float>::infinity();
+    float minAzimuth = -std::numeric_limits<float>::infinity();
     /// How far can we orbit horizontally (upper limit)
-    float m_MaxTheta = std::numeric_limits<float>::infinity();
+    float maxAzimuth = std::numeric_limits<float>::infinity();
     /// How far can we dolly out
-    float m_MinDistance = 0;
+    float minDistance = 0;
     /// How far can we dolly in
-    float m_MaxDistance = std::numeric_limits<float>::infinity();
+    float maxDistance = std::numeric_limits<float>::infinity();
+    /// The speed at which a rotation with the mouse can be achieved
+    float rotateSpeed = 1.0F;
+    /// The location where the object orbits around
+    Vec3 target;
+
+ private:
+    /// Current state of this orbit controller
+    eOrbitState m_State = eOrbitState::IDLE;
 
     /// Current position in spherical coordinates
     math::SphericalCoords<float> m_Spherical;
     math::SphericalCoords<float> m_SphericalDelta;
-
-    /// Current state of this orbit controller
-    eOrbitState m_State = eOrbitState::IDLE;
 
     /// Where the mouse cursor is when pressed at the start of a rotation
     Vec2 m_RotateStart;
@@ -81,8 +90,6 @@ class OrbitCameraController : public ICameraController {
     Vec2 m_RotateCurrent;
     /// Keeps tracks of the delta movement when doing a rotation
     Vec2 m_RotateDelta;
-    /// The speed at which a rotation with the mouse can be achieved
-    float m_RotateSpeed = 1.0F;
 
     /// The width currently being used by the screen when rendering
     float m_ViewportWidth = 800.0F;

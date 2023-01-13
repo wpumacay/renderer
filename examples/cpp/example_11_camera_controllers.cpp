@@ -87,6 +87,42 @@ auto main() -> int {
             continue;
         }
 
+#if defined(RENDERER_IMGUI)
+        ImGui::Begin("Camera Controller Options");
+        ImGui::Checkbox("Enabled", &camera_controller->enabled);
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraPosition: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(camera->position().x()),
+                    static_cast<double>(camera->position().y()),
+                    static_cast<double>(camera->position().z()));
+        if (auto orbit_controller =
+                std::dynamic_pointer_cast<renderer::OrbitCameraController>(
+                    camera_controller)) {
+            if (ImGui::CollapsingHeader("Orbit Controller Options")) {
+                // NOLINTNEXTLINE
+                ImGui::Text(
+                    "OrbitState: %s",
+                    renderer::ToString(orbit_controller->state()).c_str());
+                // NOLINTNEXTLINE
+                ImGui::Text("OrbitTarget: (%.2f, %.2f, %.2f)",
+                            static_cast<double>(orbit_controller->target.x()),
+                            static_cast<double>(orbit_controller->target.y()),
+                            static_cast<double>(orbit_controller->target.z()));
+                ImGui::Spacing();
+                ImGui::SliderFloat("MinPolar", &orbit_controller->minPolar,
+                                   0.0F, PI);
+                ImGui::SliderFloat("MaxPolar", &orbit_controller->maxPolar,
+                                   orbit_controller->minPolar, PI);
+                ImGui::SliderFloat("MinAzimuth", &orbit_controller->minAzimuth,
+                                   -2.0F * PI, 2.0F * PI);
+                ImGui::SliderFloat("MaxAzimuth", &orbit_controller->maxAzimuth,
+                                   orbit_controller->minAzimuth, 2.0F * PI);
+                ImGui::SliderFloat("RotationSpeed",
+                                   &orbit_controller->rotateSpeed, 0.0F, 2.0F);
+            }
+        }
+#endif
+
         auto model_matrix = Mat4::Identity();
         auto normal_matrix = math::inverse(math::transpose(model_matrix));
 

@@ -6,6 +6,19 @@
 
 namespace renderer {
 
+auto ToString(eOrbitState state) -> std::string {
+    switch (state) {
+        case eOrbitState::IDLE:
+            return "idle";
+        case eOrbitState::ROTATE:
+            return "rotate";
+        case eOrbitState::PAN:
+            return "pan";
+        case eOrbitState::DOLLY:
+            return "dolly";
+    }
+}
+
 OrbitCameraController::OrbitCameraController(Camera::ptr camera,
                                              float viewportWidth,
                                              float viewportHeight)
@@ -19,7 +32,7 @@ auto OrbitCameraController::UpdateViewport(float width, float height) -> void {
 }
 
 auto OrbitCameraController::Update() -> void {
-    auto offset = m_Camera->position() - m_Target;
+    auto offset = m_Camera->position() - target;
 
     m_Spherical.SetFromCartesian(offset);
     m_Spherical.theta += m_SphericalDelta.theta;
@@ -27,8 +40,8 @@ auto OrbitCameraController::Update() -> void {
 
     constexpr auto TWO_PI = static_cast<float>(math::PI);
 
-    auto min = m_MinTheta;
-    auto max = m_MaxTheta;
+    auto min = minAzimuth;
+    auto max = maxAzimuth;
     if (std::isfinite(min) || std::isfinite(max)) {
         // Make sure (min, max) are in the range [-PI, PI]
         min = (min < -PI) ? (min + TWO_PI) : min;
@@ -46,15 +59,15 @@ auto OrbitCameraController::Update() -> void {
                                     : std::min(max, m_Spherical.theta);
         }
     }
-    m_Spherical.phi = std::max(m_MinPhi, std::min(m_MaxPhi, m_Spherical.phi));
+    m_Spherical.phi = std::max(minPolar, std::min(maxPolar, m_Spherical.phi));
     m_Spherical.MakeSafe();
 
     m_Spherical.rho =
-        std::max(m_MinDistance, std::min(m_MaxDistance, m_Spherical.rho));
+        std::max(minDistance, std::min(maxDistance, m_Spherical.rho));
 
     offset = m_Spherical.GetCartesian();
 
-    m_Camera->SetPosition(m_Target + offset);
+    m_Camera->SetPosition(target + offset);
     // m_Camera->SetTarget(new_target)
 
     m_SphericalDelta.rho = 0.0F;
@@ -64,6 +77,10 @@ auto OrbitCameraController::Update() -> void {
 
 auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
                                                   double x, double y) -> void {
+    if (!enabled) {
+        return;
+    }
+
     if (action == button_action::BUTTON_RELEASED) {
         m_State = eOrbitState::IDLE;
     } else if (action == button_action::BUTTON_PRESSED) {
@@ -84,13 +101,17 @@ auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
 }
 
 auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
+    if (!enabled) {
+        return;
+    }
+
     switch (m_State) {
         case eOrbitState::ROTATE: {
             constexpr auto TWO_PI = static_cast<float>(math::PI);
             m_RotateCurrent.x() = static_cast<float>(x);
             m_RotateCurrent.y() = static_cast<float>(y);
             m_RotateDelta = (m_RotateCurrent - m_RotateStart) *
-                            static_cast<double>(m_RotateSpeed);
+                            static_cast<double>(rotateSpeed);
 
             m_SphericalDelta.theta -=
                 (TWO_PI * m_RotateDelta.x() / m_ViewportWidth);

@@ -62,6 +62,10 @@ class ICameraController {
     /// Returns the camera being handled by this controller
     auto camera() const -> Camera::ptr { return m_Camera; }
 
+ public:
+    /// Whether or not this controller is enabled
+    bool enabled = true;
+
  protected:
     /// Type of camera controller
     eCameraController m_Type = eCameraController::NONE;
