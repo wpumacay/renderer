@@ -35,8 +35,13 @@ auto OrbitCameraController::Update() -> void {
     auto offset = m_Camera->position() - target;
 
     m_Spherical.SetFromCartesian(offset);
-    m_Spherical.theta += m_SphericalDelta.theta;
-    m_Spherical.phi += m_SphericalDelta.phi;
+    if (enableDamping) {
+        m_Spherical.theta += m_SphericalDelta.theta * dampingFactor;
+        m_Spherical.phi += m_SphericalDelta.phi * dampingFactor;
+    } else {
+        m_Spherical.theta += m_SphericalDelta.theta;
+        m_Spherical.phi += m_SphericalDelta.phi;
+    }
 
     constexpr auto TWO_PI = static_cast<float>(math::PI);
 
@@ -70,9 +75,14 @@ auto OrbitCameraController::Update() -> void {
     m_Camera->SetPosition(target + offset);
     // m_Camera->SetTarget(new_target)
 
-    m_SphericalDelta.rho = 0.0F;
-    m_SphericalDelta.phi = 0.0F;
-    m_SphericalDelta.theta = 0.0F;
+    if (enableDamping) {
+        m_SphericalDelta.theta *= (1.0F - dampingFactor);
+        m_SphericalDelta.phi *= (1.0F - dampingFactor);
+    } else {
+        m_SphericalDelta.rho = 0.0F;
+        m_SphericalDelta.phi = 0.0F;
+        m_SphericalDelta.theta = 0.0F;
+    }
 }
 
 auto OrbitCameraController::OnMouseButtonCallback(int button, int action,

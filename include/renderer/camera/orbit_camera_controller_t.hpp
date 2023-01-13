@@ -76,6 +76,11 @@ class OrbitCameraController : public ICameraController {
     /// The location where the object orbits around
     Vec3 target;
 
+    /// Whether or not to enable damping to the rotation movement
+    bool enableDamping = false;
+    /// The damping factor used for damping the rotation movement
+    float dampingFactor = 0.05F;
+
  private:
     /// Current state of this orbit controller
     eOrbitState m_State = eOrbitState::IDLE;

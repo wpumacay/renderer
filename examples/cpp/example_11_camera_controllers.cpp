@@ -109,6 +109,11 @@ auto main() -> int {
                             static_cast<double>(orbit_controller->target.y()),
                             static_cast<double>(orbit_controller->target.z()));
                 ImGui::Spacing();
+                ImGui::Checkbox("OrbitDamping",
+                                &orbit_controller->enableDamping);
+                ImGui::SliderFloat("OrbitDampingFactor",
+                                   &orbit_controller->dampingFactor, 0.0F,
+                                   1.0F);
                 ImGui::SliderFloat("MinPolar", &orbit_controller->minPolar,
                                    0.0F, PI);
                 ImGui::SliderFloat("MaxPolar", &orbit_controller->maxPolar,
@@ -122,6 +127,12 @@ auto main() -> int {
             }
         }
 #endif
+
+        if (auto orbit_controller =
+                std::dynamic_pointer_cast<renderer::OrbitCameraController>(
+                    camera_controller)) {
+            orbit_controller->Update();
+        }
 
         auto model_matrix = Mat4::Identity();
         auto normal_matrix = math::inverse(math::transpose(model_matrix));
