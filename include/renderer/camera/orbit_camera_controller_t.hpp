@@ -75,6 +75,8 @@ class OrbitCameraController : public ICameraController {
     float rotateSpeed = 1.0F;
     /// The speed at which we can pan with the mouse
     float panSpeed = 1.0F;
+    /// The speed at which we can zoom with the mouse wheel
+    float zoomSpeed = 1.0F;
     /// The location where the object orbits around
     Vec3 target;
 
@@ -82,8 +84,8 @@ class OrbitCameraController : public ICameraController {
     bool enableRotate = true;
     /// Whether or not to enable panning
     bool enablePan = true;
-    /// Whether or not to enable dollying
-    bool enableDolly = true;
+    /// Whether or not to enable dollying|zoom
+    bool enableZoom = true;
 
     /// Whether or not to enable damping to the rotation movement
     bool enableDamping = false;

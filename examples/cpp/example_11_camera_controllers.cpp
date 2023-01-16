@@ -106,34 +106,51 @@ auto main() -> int {
             if (ImGui::CollapsingHeader("Orbit Controller Options")) {
                 // NOLINTNEXTLINE
                 ImGui::Text(
-                    "OrbitState: %s",
+                    "State: %s",
                     renderer::ToString(orbit_controller->state()).c_str());
-                // NOLINTNEXTLINE
-                ImGui::Text("OrbitTarget: (%.2f, %.2f, %.2f)",
-                            static_cast<double>(orbit_controller->target.x()),
-                            static_cast<double>(orbit_controller->target.y()),
-                            static_cast<double>(orbit_controller->target.z()));
-                ImGui::Spacing();
-                ImGui::Checkbox("OrbitDamping",
+                ImGui::Checkbox("EnableDamping",
                                 &orbit_controller->enableDamping);
-                ImGui::SliderFloat("OrbitDampingFactor",
+                ImGui::SliderFloat("DampingFactor",
                                    &orbit_controller->dampingFactor, 0.0F,
                                    1.0F);
-                ImGui::Checkbox("OrbitAutoRotate",
-                                &orbit_controller->enableAutoRotate);
-                ImGui::SliderFloat("OrbitAutoRotateSpeed",
-                                   &orbit_controller->autoRotateSpeed, 0.0F,
-                                   4.0F);
-                ImGui::SliderFloat("MinPolar", &orbit_controller->minPolar,
-                                   0.0F, PI);
-                ImGui::SliderFloat("MaxPolar", &orbit_controller->maxPolar,
-                                   orbit_controller->minPolar, PI);
-                ImGui::SliderFloat("MinAzimuth", &orbit_controller->minAzimuth,
-                                   -2.0F * PI, 2.0F * PI);
-                ImGui::SliderFloat("MaxAzimuth", &orbit_controller->maxAzimuth,
-                                   orbit_controller->minAzimuth, 2.0F * PI);
-                ImGui::SliderFloat("RotationSpeed",
-                                   &orbit_controller->rotateSpeed, 0.0F, 2.0F);
+                ImGui::Spacing();
+
+                ImGui::Checkbox("EnableRotate",
+                                &orbit_controller->enableRotate);
+                if (orbit_controller->enableRotate) {
+                    ImGui::SliderFloat("RotationSpeed",
+                                       &orbit_controller->rotateSpeed, 0.0F,
+                                       2.0F);
+                    ImGui::Checkbox("AutoRotate",
+                                    &orbit_controller->enableAutoRotate);
+                    ImGui::SliderFloat("AutoRotateSpeed",
+                                       &orbit_controller->autoRotateSpeed, 0.0F,
+                                       4.0F);
+                    ImGui::SliderFloat("MinPolar", &orbit_controller->minPolar,
+                                       0.0F, PI);
+                    ImGui::SliderFloat("MaxPolar", &orbit_controller->maxPolar,
+                                       orbit_controller->minPolar, PI);
+                    ImGui::SliderFloat("MinAzimuth",
+                                       &orbit_controller->minAzimuth,
+                                       -2.0F * PI, 2.0F * PI);
+                    ImGui::SliderFloat("MaxAzimuth",
+                                       &orbit_controller->maxAzimuth,
+                                       orbit_controller->minAzimuth, 2.0F * PI);
+                }
+                ImGui::Spacing();
+
+                ImGui::Checkbox("EnablePan", &orbit_controller->enablePan);
+                if (orbit_controller->enablePan) {
+                    ImGui::SliderFloat("PanSpeed", &orbit_controller->panSpeed,
+                                       0.0F, 2.0F);
+                }
+                ImGui::Spacing();
+
+                ImGui::Checkbox("EnableZoom", &orbit_controller->enableZoom);
+                if (orbit_controller->enableZoom) {
+                    ImGui::SliderFloat(
+                        "ZoomSpeed", &orbit_controller->zoomSpeed, 1.0F, 4.0F);
+                }
             }
         }
         ImGui::End();

@@ -110,18 +110,32 @@ auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
         m_State = eOrbitState::IDLE;
     } else if (action == button_action::BUTTON_PRESSED) {
         switch (button) {
-            case mouse::BUTTON_LEFT:
+            case mouse::BUTTON_LEFT: {
+                if (!enableRotate) {
+                    return;
+                }
+
                 m_RotateStart.x() = static_cast<float>(x);
                 m_RotateStart.y() = static_cast<float>(y);
                 m_State = eOrbitState::ROTATE;
                 break;
-            case mouse::BUTTON_RIGHT:
+            }
+            case mouse::BUTTON_RIGHT: {
+                if (!enablePan) {
+                    return;
+                }
+
                 m_PanStart.x() = static_cast<float>(x);
                 m_PanStart.y() = static_cast<float>(y);
                 m_State = eOrbitState::PAN;
                 break;
-            case mouse::BUTTON_MIDDLE:
+            }
+            case mouse::BUTTON_MIDDLE: {
+                if (!enableZoom) {
+                    return;
+                }
                 break;
+            }
         }
     }
 }
