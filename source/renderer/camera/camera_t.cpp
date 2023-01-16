@@ -17,12 +17,12 @@ Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& world_up,
       m_Target(target),
       m_WorldUp(world_up),
       m_ProjData(proj_data) {
-    _ComputeBasisVectors();
+    ComputeBasisVectors();
     UpdateViewMatrix();
     UpdateProjectionMatrix();
 }
 
-auto Camera::_ComputeBasisVectors() -> void {
+auto Camera::ComputeBasisVectors() -> void {
     // Adapted the look-at function from [0]. Handles corners cases in which the
     // front vector aligns with the world-up vector (just use the world axes)
 
@@ -93,14 +93,20 @@ auto Camera::UpdateProjectionMatrix() -> void {
 
 auto Camera::SetPosition(const Vec3& pos) -> void {
     m_Position = pos;
-    _ComputeBasisVectors();
+    ComputeBasisVectors();
     UpdateViewMatrix();
 }
 
+auto Camera::SetPositionNoUpdate(const Vec3& pos) -> void { m_Position = pos; }
+
 auto Camera::SetTarget(const Vec3& target) -> void {
     m_Target = target;
-    _ComputeBasisVectors();
+    ComputeBasisVectors();
     UpdateViewMatrix();
+}
+
+auto Camera::SetTargetNoUpdate(const Vec3& target) -> void {
+    m_Target = target;
 }
 
 auto Camera::SetProjectionData(const ProjectionData& proj_data) -> void {

@@ -34,9 +34,10 @@ auto OrbitCameraController::UpdateViewport(float width, float height) -> void {
 auto OrbitCameraController::Update() -> void {
     constexpr auto TWO_PI = static_cast<float>(math::PI);
 
-    auto offset = m_Camera->position() - target;
+    auto pos_offset = m_Camera->position() - target;
+    Vec3 target_offset;
 
-    m_Spherical.SetFromCartesian(offset);
+    m_Spherical.SetFromCartesian(pos_offset);
 
     if (enableAutoRotate && m_State == eOrbitState::IDLE) {
         const auto AUTO_ROTATE_ANGLE = TWO_PI / 60.0F / 60.0F * autoRotateSpeed;
@@ -76,18 +77,26 @@ auto OrbitCameraController::Update() -> void {
     m_Spherical.rho =
         std::max(minDistance, std::min(maxDistance, m_Spherical.rho));
 
-    offset = m_Spherical.GetCartesian();
+    pos_offset = m_Spherical.GetCartesian();
+    target_offset = (enableDamping)
+                        ? static_cast<double>(dampingFactor) * m_PanOffset
+                        : m_PanOffset;
 
-    m_Camera->SetPosition(target + offset);
-    // m_Camera->SetTarget(new_target)
+    this->target = this->target + target_offset;
+    m_Camera->SetTargetNoUpdate(this->target);
+    m_Camera->SetPositionNoUpdate(this->target + pos_offset);
+    m_Camera->ComputeBasisVectors();
+    m_Camera->UpdateViewMatrix();
 
     if (enableDamping) {
         m_SphericalDelta.theta *= (1.0F - dampingFactor);
         m_SphericalDelta.phi *= (1.0F - dampingFactor);
+        m_PanOffset = m_PanOffset * static_cast<double>(1.0F - dampingFactor);
     } else {
         m_SphericalDelta.rho = 0.0F;
         m_SphericalDelta.phi = 0.0F;
         m_SphericalDelta.theta = 0.0F;
+        m_PanOffset = {0.0F, 0.0F, 0.0F};
     }
 }
 
@@ -102,13 +111,14 @@ auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
     } else if (action == button_action::BUTTON_PRESSED) {
         switch (button) {
             case mouse::BUTTON_LEFT:
-                // Handle rotation
                 m_RotateStart.x() = static_cast<float>(x);
                 m_RotateStart.y() = static_cast<float>(y);
-
                 m_State = eOrbitState::ROTATE;
                 break;
             case mouse::BUTTON_RIGHT:
+                m_PanStart.x() = static_cast<float>(x);
+                m_PanStart.y() = static_cast<float>(y);
+                m_State = eOrbitState::PAN;
                 break;
             case mouse::BUTTON_MIDDLE:
                 break;
@@ -138,9 +148,42 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             Update();
             break;
         }
-        case eOrbitState::DOLLY:
+        case eOrbitState::PAN: {
+            m_PanCurrent.x() = static_cast<float>(x);
+            m_PanCurrent.y() = static_cast<float>(y);
+            m_PanDelta =
+                (m_PanCurrent - m_PanStart) * static_cast<double>(panSpeed);
+
+            switch (m_Camera->proj_data().projection) {
+                case eProjectionType::PERSPECTIVE: {
+                    auto offset = m_Camera->position() - target;
+                    auto target_distance = math::norm(offset);
+                    const auto FOV = m_Camera->proj_data().fov;
+                    target_distance *= std::tan((FOV / 2.0F) * PI / 180.0F);
+                    auto pan_horizontal_dist = 2.0F * m_PanDelta.x() *
+                                               target_distance /
+                                               m_ViewportHeight;
+                    auto pan_vertical_dist = 2.0F * m_PanDelta.y() *
+                                             target_distance / m_ViewportHeight;
+
+                    Vec3 diff_horizontal =
+                        static_cast<double>(-pan_horizontal_dist) *
+                        m_Camera->right();
+                    Vec3 diff_vertical =
+                        static_cast<double>(pan_vertical_dist) * m_Camera->up();
+
+                    m_PanOffset = m_PanOffset + diff_horizontal + diff_vertical;
+                    break;
+                }
+                case eProjectionType::ORTHOGRAPHIC:
+                    break;
+            }
+
+            m_PanStart = m_PanCurrent;
+            Update();
             break;
-        case eOrbitState::PAN:
+        }
+        case eOrbitState::DOLLY:
             break;
         default:
             break;

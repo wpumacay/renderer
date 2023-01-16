@@ -95,6 +95,11 @@ auto main() -> int {
                     static_cast<double>(camera->position().x()),
                     static_cast<double>(camera->position().y()),
                     static_cast<double>(camera->position().z()));
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraTarget: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(camera->target().x()),
+                    static_cast<double>(camera->target().y()),
+                    static_cast<double>(camera->target().z()));
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {

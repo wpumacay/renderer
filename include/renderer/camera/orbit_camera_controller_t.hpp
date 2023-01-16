@@ -73,8 +73,17 @@ class OrbitCameraController : public ICameraController {
     float maxDistance = std::numeric_limits<float>::infinity();
     /// The speed at which a rotation with the mouse can be achieved
     float rotateSpeed = 1.0F;
+    /// The speed at which we can pan with the mouse
+    float panSpeed = 1.0F;
     /// The location where the object orbits around
     Vec3 target;
+
+    /// Whether or not to enable rotation
+    bool enableRotate = true;
+    /// Whether or not to enable panning
+    bool enablePan = true;
+    /// Whether or not to enable dollying
+    bool enableDolly = true;
 
     /// Whether or not to enable damping to the rotation movement
     bool enableDamping = false;
@@ -90,16 +99,25 @@ class OrbitCameraController : public ICameraController {
     /// Current state of this orbit controller
     eOrbitState m_State = eOrbitState::IDLE;
 
-    /// Current position in spherical coordinates
-    math::SphericalCoords<float> m_Spherical;
-    math::SphericalCoords<float> m_SphericalDelta;
-
     /// Where the mouse cursor is when pressed at the start of a rotation
     Vec2 m_RotateStart;
     /// Where the mouse cursor currently is when a move move event is received
     Vec2 m_RotateCurrent;
     /// Keeps tracks of the delta movement when doing a rotation
     Vec2 m_RotateDelta;
+    /// Current position in spherical coordinates
+    math::SphericalCoords<float> m_Spherical;
+    /// Delta between two positions in spherical coordinates
+    math::SphericalCoords<float> m_SphericalDelta;
+
+    /// Where the mouse cursor is (at the start of panning)
+    Vec2 m_PanStart;
+    /// Where the mouse cursor is while the mouse moves (while panning)
+    Vec2 m_PanCurrent;
+    /// Keeps tracks of the delta movement when doing panning
+    Vec2 m_PanDelta;
+    /// The vector we use to move the target when panning
+    Vec3 m_PanOffset;
 
     /// The width currently being used by the screen when rendering
     float m_ViewportWidth = 800.0F;

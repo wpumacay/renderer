@@ -50,11 +50,17 @@ class Camera {
     /// Frees the resources allocated by this camera
     ~Camera() = default;
 
-    /// Sets the position of the camera in world space
+    /// Sets the position of the camera in world space, and update the state
     auto SetPosition(const Vec3& pos) -> void;
 
-    /// Sets the target of the camera in world space
+    /// Sets the target of the camera in world space, and update the state
     auto SetTarget(const Vec3& target) -> void;
+
+    /// Sets the camera's position, but doesn't update the internal camera state
+    auto SetPositionNoUpdate(const Vec3& pos) -> void;
+
+    /// Sets the camera's target, but doesn't update the internal camera state
+    auto SetTargetNoUpdate(const Vec3& target) -> void;
 
     /// Sets the configuration for the projection of this camera
     auto SetProjectionData(const ProjectionData& proj_data) -> void;
@@ -83,9 +89,8 @@ class Camera {
     /// Updates the projection matrix from the current state of the camera
     auto UpdateProjectionMatrix() -> void;
 
- private:
     /// Computes the basis vectors from the current camera state
-    auto _ComputeBasisVectors() -> void;
+    auto ComputeBasisVectors() -> void;
 
  public:
     /// Returns an unmutable reference to the position of this camera
@@ -105,6 +110,15 @@ class Camera {
 
     /// Returns an unmutable const reference to the internal projection matrix
     auto proj_matrix() const -> const Mat4& { return m_ProjMatrix; }
+
+    /// Returns the front vector (direction of Z+-axis of the camera frame)
+    auto front() const -> const Vec3& { return m_Front; }
+
+    /// Returns the up vector (direction of Y+ axis of the camera frame)
+    auto up() const -> const Vec3& { return m_Up; }
+
+    /// Returns the right vector (direction of X+ axis of the camera frame)
+    auto right() const -> const Vec3& { return m_Right; }
 
  private:
     /// Position of the camera w.r.t. the world frame
