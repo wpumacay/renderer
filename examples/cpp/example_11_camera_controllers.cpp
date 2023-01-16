@@ -131,6 +131,7 @@ auto main() -> int {
                                    &orbit_controller->rotateSpeed, 0.0F, 2.0F);
             }
         }
+        ImGui::End();
 #endif
 
         if (auto orbit_controller =
