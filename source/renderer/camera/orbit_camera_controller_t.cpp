@@ -3,6 +3,7 @@
 
 #include <renderer/camera/orbit_camera_controller_t.hpp>
 #include <renderer/input/buttons.hpp>
+#include "renderer/camera/camera_t.hpp"
 
 namespace renderer {
 
@@ -74,6 +75,7 @@ auto OrbitCameraController::Update() -> void {
     m_Spherical.phi = std::max(minPolar, std::min(maxPolar, m_Spherical.phi));
     m_Spherical.MakeSafe();
 
+    m_Spherical.rho *= m_Scale;
     m_Spherical.rho =
         std::max(minDistance, std::min(maxDistance, m_Spherical.rho));
 
@@ -98,6 +100,7 @@ auto OrbitCameraController::Update() -> void {
         m_SphericalDelta.theta = 0.0F;
         m_PanOffset = {0.0F, 0.0F, 0.0F};
     }
+    m_Scale = 1.0F;
 }
 
 auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
@@ -134,6 +137,10 @@ auto OrbitCameraController::OnMouseButtonCallback(int button, int action,
                 if (!enableZoom) {
                     return;
                 }
+
+                m_DollyStart.x() = static_cast<float>(x);
+                m_DollyStart.y() = static_cast<float>(y);
+                m_State = eOrbitState::DOLLY;
                 break;
             }
         }
@@ -147,6 +154,10 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
 
     switch (m_State) {
         case eOrbitState::ROTATE: {
+            if (!enableRotate) {
+                return;
+            }
+
             constexpr auto TWO_PI = static_cast<float>(math::PI);
             m_RotateCurrent.x() = static_cast<float>(x);
             m_RotateCurrent.y() = static_cast<float>(y);
@@ -163,6 +174,10 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             break;
         }
         case eOrbitState::PAN: {
+            if (!enablePan) {
+                return;
+            }
+
             m_PanCurrent.x() = static_cast<float>(x);
             m_PanCurrent.y() = static_cast<float>(y);
             m_PanDelta =
@@ -197,8 +212,46 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             Update();
             break;
         }
-        case eOrbitState::DOLLY:
+        case eOrbitState::DOLLY: {
+            if (!enableZoom) {
+                return;
+            }
+
+            m_DollyCurrent.x() = static_cast<float>(x);
+            m_DollyCurrent.y() = static_cast<float>(y);
+            m_DollyDelta = m_DollyCurrent - m_DollyStart;
+
+            const auto ZOOM_SCALE = std::pow(0.95F, zoomSpeed);
+            if (m_DollyDelta.y() > 0) {
+                // Dolly out
+                switch (m_Camera->proj_data().projection) {
+                    case eProjectionType::PERSPECTIVE: {
+                        m_Scale /= ZOOM_SCALE;
+                        break;
+                    }
+                    case eProjectionType::ORTHOGRAPHIC: {
+                        // TODO(wilbert): complete this part of the impl
+                        break;
+                    }
+                }
+            } else if (m_DollyDelta.y() < 0) {
+                // Dolly in
+                switch (m_Camera->proj_data().projection) {
+                    case eProjectionType::PERSPECTIVE: {
+                        m_Scale *= ZOOM_SCALE;
+                        break;
+                    }
+                    case eProjectionType::ORTHOGRAPHIC: {
+                        // TODO(wilbert): complete this part of the impl
+                        break;
+                    }
+                }
+            }
+
+            m_DollyStart = m_DollyCurrent;
+            Update();
             break;
+        }
         default:
             break;
     }

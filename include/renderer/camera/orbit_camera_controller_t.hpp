@@ -116,10 +116,19 @@ class OrbitCameraController : public ICameraController {
     Vec2 m_PanStart;
     /// Where the mouse cursor is while the mouse moves (while panning)
     Vec2 m_PanCurrent;
-    /// Keeps tracks of the delta movement when doing panning
+    /// Keeps tracks of the delta movement when panning
     Vec2 m_PanDelta;
     /// The vector we use to move the target when panning
     Vec3 m_PanOffset;
+
+    /// Where the mouse cursor is (at the start of dollying)
+    Vec2 m_DollyStart;
+    /// Where the mouse cursor is while the mouse moves (while dollying)
+    Vec2 m_DollyCurrent;
+    /// Keeps tracks of the delta movement when dollying
+    Vec2 m_DollyDelta;
+    /// The scale factor to apply to the radius due to dollying
+    float m_Scale = 1.0F;
 
     /// The width currently being used by the screen when rendering
     float m_ViewportWidth = 800.0F;
