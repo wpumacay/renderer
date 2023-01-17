@@ -16,6 +16,10 @@ set(RENDERER_EXAMPLES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/example_11_camera_controllers.cpp)
 
 foreach(example_filepath IN LISTS RENDERER_EXAMPLES_LIST)
-  loco_setup_single_file_example(${example_filepath} TARGET_DEPENDENCIES
-                                 renderer::renderer)
+  # cmake-format: off
+  loco_setup_single_file_example(
+      ${example_filepath}
+      TARGET_DEPENDENCIES renderer::renderer
+      INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
+  # cmake-format: on
 endforeach()

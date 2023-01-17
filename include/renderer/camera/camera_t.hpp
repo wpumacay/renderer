@@ -65,6 +65,9 @@ class Camera {
     /// Sets the configuration for the projection of this camera
     auto SetProjectionData(const ProjectionData& proj_data) -> void;
 
+    /// Changes to the given projection type, and updates internal proj. matrix
+    auto SetProjectionType(eProjectionType proj_type) -> void;
+
     /// For perspective cameras, it sets the field of view
     auto SetFOV(float fov) -> void;
 

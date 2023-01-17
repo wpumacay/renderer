@@ -10,7 +10,7 @@
 #include <renderer/light/light_t.hpp>
 
 #include <utils/logging.hpp>
-#include "renderer/common.hpp"
+#include <example_common_utils.hpp>
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -19,32 +19,7 @@
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
 
-// NOLINTNEXTLINE
-#define IMGUI_COMBO(combo_items, combo_title, combo_callback)                 \
-    {                                                                         \
-        static size_t s_item_current_idx = 0;                                 \
-        static bool s_change_item = false;                                    \
-        const char* combo_preview_value = combo_items.at(s_item_current_idx); \
-        if (ImGui::BeginCombo(combo_title, combo_preview_value)) {            \
-            for (size_t i = 0; i < combo_items.size(); ++i) {                 \
-                const auto IS_SELECTED = (s_item_current_idx == i);           \
-                if (ImGui::Selectable(combo_items.at(i), IS_SELECTED)) {      \
-                    s_change_item = (s_item_current_idx != i);                \
-                    s_item_current_idx = i;                                   \
-                }                                                             \
-                if (IS_SELECTED) {                                            \
-                    ImGui::SetItemDefaultFocus();                             \
-                }                                                             \
-            }                                                                 \
-            ImGui::EndCombo();                                                \
-        }                                                                     \
-        if (s_change_item) {                                                  \
-            combo_callback(s_item_current_idx);                               \
-            s_change_item = false;                                            \
-        }                                                                     \
-    }
-
-// NOLINTNEXTLINE
+// NOLINTNEXTLINE (avoid warning on cognitive complexity)
 auto main() -> int {
     renderer::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
     renderer::ShaderManager shader_manager;

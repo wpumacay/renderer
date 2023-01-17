@@ -13,6 +13,7 @@
 #include <renderer/light/light_t.hpp>
 
 #include <utils/logging.hpp>
+#include <example_common_utils.hpp>
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -21,6 +22,7 @@
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
 
+// NOLINTNEXTLINE (avoid warning on cognitive complexity)
 auto main() -> int {
     renderer::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
     renderer::ShaderManager shader_manager;
@@ -100,6 +102,28 @@ auto main() -> int {
                     static_cast<double>(camera->target().x()),
                     static_cast<double>(camera->target().y()),
                     static_cast<double>(camera->target().z()));
+
+        std::array<const char*, 2> items_projections = {"perspective",
+                                                        "orthographic"};
+        IMGUI_COMBO(items_projections, "CameraProjection",
+                    [&](size_t combo_index) -> void {
+                        switch (combo_index) {
+                            case 0:  // perspective
+                                camera->SetProjectionType(
+                                    renderer::eProjectionType::PERSPECTIVE);
+                                break;
+                            case 1:  // orthographic
+                                camera->SetProjectionType(
+                                    renderer::eProjectionType::ORTHOGRAPHIC);
+                                break;
+                            default:
+                                break;
+                        }
+                        LOG_INFO(
+                            "Using projection type: {0}",
+                            renderer::ToString(camera->proj_data().projection));
+                    });
+
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {

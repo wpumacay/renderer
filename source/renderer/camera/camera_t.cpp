@@ -114,6 +114,14 @@ auto Camera::SetProjectionData(const ProjectionData& proj_data) -> void {
     UpdateProjectionMatrix();
 }
 
+auto Camera::SetProjectionType(eProjectionType proj_type) -> void {
+    if (m_ProjData.projection == proj_type) {
+        return;
+    }
+    m_ProjData.projection = proj_type;
+    UpdateProjectionMatrix();
+}
+
 auto Camera::SetFOV(float fov) -> void {
     if (m_ProjData.projection == eProjectionType::PERSPECTIVE) {
         m_ProjData.fov = fov;
