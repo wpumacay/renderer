@@ -3,7 +3,11 @@
 
 #include <renderer/camera/orbit_camera_controller_t.hpp>
 #include <renderer/input/buttons.hpp>
-#include "renderer/camera/camera_t.hpp"
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
 
 namespace renderer {
 
@@ -221,32 +225,7 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             m_DollyCurrent.y() = static_cast<float>(y);
             m_DollyDelta = m_DollyCurrent - m_DollyStart;
 
-            const auto ZOOM_SCALE = std::pow(0.95F, zoomSpeed);
-            if (m_DollyDelta.y() > 0) {
-                // Dolly out
-                switch (m_Camera->proj_data().projection) {
-                    case eProjectionType::PERSPECTIVE: {
-                        m_Scale /= ZOOM_SCALE;
-                        break;
-                    }
-                    case eProjectionType::ORTHOGRAPHIC: {
-                        // TODO(wilbert): complete this part of the impl
-                        break;
-                    }
-                }
-            } else if (m_DollyDelta.y() < 0) {
-                // Dolly in
-                switch (m_Camera->proj_data().projection) {
-                    case eProjectionType::PERSPECTIVE: {
-                        m_Scale *= ZOOM_SCALE;
-                        break;
-                    }
-                    case eProjectionType::ORTHOGRAPHIC: {
-                        // TODO(wilbert): complete this part of the impl
-                        break;
-                    }
-                }
-            }
+            _HandleDolly(m_DollyDelta.y());
 
             m_DollyStart = m_DollyCurrent;
             Update();
@@ -257,4 +236,42 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
     }
 }
 
+auto OrbitCameraController::OnScrollCallback(double xOff, double yOff) -> void {
+    _HandleDolly(-static_cast<float>(yOff));
+}
+
+auto OrbitCameraController::_HandleDolly(float movement) -> void {
+    const auto ZOOM_SCALE = std::pow(0.95F, zoomSpeed);
+    const auto PROJ_TYPE = m_Camera->proj_data().projection;
+    if (movement > 0.0F) {
+        // Dolly out
+        switch (PROJ_TYPE) {
+            case eProjectionType::PERSPECTIVE: {
+                m_Scale /= ZOOM_SCALE;
+                break;
+            }
+            case eProjectionType::ORTHOGRAPHIC: {
+                // TODO(wilbert): complete this part of the impl
+                break;
+            }
+        }
+    } else if (movement < 0.0F) {
+        // Dolly in
+        switch (PROJ_TYPE) {
+            case eProjectionType::PERSPECTIVE: {
+                m_Scale *= ZOOM_SCALE;
+                break;
+            }
+            case eProjectionType::ORTHOGRAPHIC: {
+                // TODO(wilbert): complete this part of the impl
+                break;
+            }
+        }
+    }
+}
+
 }  // namespace renderer
+
+#if defined(__clang__)
+#pragma clang diagnostic pop  // NOLINT
+#endif

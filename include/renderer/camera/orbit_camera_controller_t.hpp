@@ -54,9 +54,13 @@ class OrbitCameraController : public ICameraController {
 
     auto OnMouseMoveCallback(double x, double y) -> void override;
 
-    auto OnScrollCallback(double xOff, double yOff) -> void override {}
+    auto OnScrollCallback(double xOff, double yOff) -> void override;
 
     auto state() const -> eOrbitState { return m_State; }
+
+ private:
+    /// Compute the scale required for zooming in and out
+    auto _HandleDolly(float movement) -> void;
 
  public:
     /// How far can we orbit vertically (lower limit)
