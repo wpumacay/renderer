@@ -143,6 +143,8 @@ auto main() -> int {
                 if (orbit_controller->enablePan) {
                     ImGui::SliderFloat("PanSpeed", &orbit_controller->panSpeed,
                                        0.0F, 2.0F);
+                    ImGui::Checkbox("ScreenSpacePanning",
+                                    &orbit_controller->screenSpacePanning);
                 }
                 ImGui::Spacing();
 

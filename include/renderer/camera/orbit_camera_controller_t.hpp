@@ -101,6 +101,12 @@ class OrbitCameraController : public ICameraController {
     /// The speed at which the autorotate works for this controller
     float autoRotateSpeed = 2.0F;
 
+    /// Controls the panning directions. If true, pans horizontally and
+    /// vertically (following the camera's right and up vectors). If false,
+    /// instead of the up direction, it follows the direction orthogonal to
+    /// the camera's up vector and its right vector
+    bool screenSpacePanning = true;
+
  private:
     /// Current state of this orbit controller
     eOrbitState m_State = eOrbitState::IDLE;

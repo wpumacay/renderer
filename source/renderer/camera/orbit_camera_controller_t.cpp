@@ -202,8 +202,17 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
                     Vec3 diff_horizontal =
                         static_cast<double>(-pan_horizontal_dist) *
                         m_Camera->right();
-                    Vec3 diff_vertical =
-                        static_cast<double>(pan_vertical_dist) * m_Camera->up();
+
+                    Vec3 diff_vertical;
+                    if (screenSpacePanning) {
+                        diff_vertical = static_cast<double>(pan_vertical_dist) *
+                                        m_Camera->up();
+                    } else {
+                        diff_vertical =
+                            static_cast<double>(pan_vertical_dist) *
+                            math::normalize(math::cross(m_Camera->world_up(),
+                                                        m_Camera->right()));
+                    }
 
                     m_PanOffset = m_PanOffset + diff_horizontal + diff_vertical;
                     break;

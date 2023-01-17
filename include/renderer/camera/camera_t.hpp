@@ -120,6 +120,9 @@ class Camera {
     /// Returns the right vector (direction of X+ axis of the camera frame)
     auto right() const -> const Vec3& { return m_Right; }
 
+    /// Returns the reference up direction in world space
+    auto world_up() const -> const Vec3& { return m_WorldUp; }
+
  private:
     /// Position of the camera w.r.t. the world frame
     Vec3 m_Position;
