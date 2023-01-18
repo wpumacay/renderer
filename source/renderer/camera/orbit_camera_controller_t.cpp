@@ -260,7 +260,8 @@ auto OrbitCameraController::_HandleDolly(float movement) -> void {
                 break;
             }
             case eProjectionType::ORTHOGRAPHIC: {
-                // TODO(wilbert): complete this part of the impl
+                m_Camera->SetZoom(std::max(
+                    minZoom, std::min(maxZoom, m_Camera->zoom() * ZOOM_SCALE)));
                 break;
             }
         }
@@ -272,7 +273,8 @@ auto OrbitCameraController::_HandleDolly(float movement) -> void {
                 break;
             }
             case eProjectionType::ORTHOGRAPHIC: {
-                // TODO(wilbert): complete this part of the impl
+                m_Camera->SetZoom(std::max(
+                    minZoom, std::min(maxZoom, m_Camera->zoom() / ZOOM_SCALE)));
                 break;
             }
         }

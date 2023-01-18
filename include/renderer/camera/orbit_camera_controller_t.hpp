@@ -81,6 +81,10 @@ class OrbitCameraController : public ICameraController {
     float panSpeed = 1.0F;
     /// The speed at which we can zoom with the mouse wheel
     float zoomSpeed = 1.0F;
+    /// Minimum value allowed for zomming in or out
+    float minZoom = 1e-3F;
+    /// Maximum value allowed for zooming in or out
+    float maxZoom = std::numeric_limits<float>::infinity();
     /// The location where the object orbits around
     Vec3 target;
 
