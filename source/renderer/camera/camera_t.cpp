@@ -81,23 +81,33 @@ auto Camera::UpdateViewMatrix() -> void {
 }
 
 auto Camera::UpdateProjectionMatrix() -> void {
+    // Make sure zoom is within a valid range [1e-3, +Inf]
+    if (std::abs(m_Zoom) < 1e-3F) {
+        LOG_CORE_WARN(
+            "Camera::UpdateProjectionMatrix >>> zoom={0} value is less "
+            "than minimum accepted value 1e-3. Won't update projection.",
+            m_Zoom);
+        return;
+    }
+
     switch (m_ProjData.projection) {
         case eProjectionType::PERSPECTIVE: {
-            m_ProjMatrix = Mat4::Perspective(m_ProjData.fov, m_ProjData.aspect,
-                                             m_ProjData.near, m_ProjData.far);
+            // Based on ThreeJS implementation [2]
+            auto top = m_ProjData.near *
+                       std::tan((m_ProjData.fov * 0.5F) * PI / 180.0F) / m_Zoom;
+            auto height = 2.0F * top;
+            auto width = m_ProjData.aspect * height;
+            auto left = -0.5F * width;
+
+            m_ProjMatrix =
+                Mat4::Perspective(left, left + width, top, top - height,
+                                  m_ProjData.near, m_ProjData.far);
             break;
         }
         case eProjectionType::ORTHOGRAPHIC: {
-            // Make sure zoom is within a valid range [1e-3, +Inf]
-            if (std::abs(m_Zoom) < 1e-3F) {
-                LOG_CORE_WARN(
-                    "Camera::UpdateProjectionMatrix >>> zoom value is less "
-                    "than minimum accepted value 1e-3");
-            } else {
-                m_ProjMatrix = Mat4::Ortho(m_ProjData.width / m_Zoom,
-                                           m_ProjData.height / m_Zoom,
-                                           m_ProjData.near, m_ProjData.far);
-            }
+            m_ProjMatrix = Mat4::Ortho(m_ProjData.width / m_Zoom,
+                                       m_ProjData.height / m_Zoom,
+                                       m_ProjData.near, m_ProjData.far);
         }
     }
 }
