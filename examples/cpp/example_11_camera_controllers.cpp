@@ -21,6 +21,8 @@
 
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
+constexpr float WINDOW_ASPECT =
+    static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT);
 
 // NOLINTNEXTLINE (avoid warning on cognitive complexity)
 auto main() -> int {
@@ -45,14 +47,31 @@ auto main() -> int {
 
     const Vec3 CAM_POSITION = {5.0F, 5.0F, 5.0F};
     const Vec3 CAM_TARGET = {0.0F, 0.0F, 0.0F};
-    auto camera = std::make_shared<renderer::Camera>(CAM_POSITION, CAM_TARGET);
+    renderer::ProjectionData proj_data;
+    // Parameters related to perspective projection
+    proj_data.fov = 45.0F;
+    proj_data.aspect = WINDOW_ASPECT;
+    proj_data.near = 0.1F;
+    proj_data.far = 1000.0F;
+    // Parameters related to orthographic projection
+    constexpr float FRUSTUM_SIZE = 20.0F;
+    proj_data.width = FRUSTUM_SIZE * WINDOW_ASPECT;
+    proj_data.height = FRUSTUM_SIZE;
+    auto camera = std::make_shared<renderer::Camera>(
+        CAM_POSITION, CAM_TARGET, Vec3(0.0F, 0.0F, 1.0F), proj_data);
     renderer::ICameraController::ptr camera_controller =
         std::make_shared<renderer::OrbitCameraController>(camera, WINDOW_WIDTH,
                                                           WINDOW_HEIGHT);
 
     window.RegisterResizeCallback([&](int width, int height) {
-        camera->SetAspectRatio(static_cast<float>(width) /
-                               static_cast<float>(height));
+        auto aspect_ratio =
+            static_cast<float>(width) / static_cast<float>(height);
+        auto data = camera->proj_data();
+        data.aspect = aspect_ratio;
+        data.width = FRUSTUM_SIZE * aspect_ratio;
+        data.height = FRUSTUM_SIZE;
+        camera->SetProjectionData(data);
+
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {
@@ -124,7 +143,7 @@ auto main() -> int {
                             renderer::ToString(camera->proj_data().projection));
                     });
 
-        renderer::ProjectionData proj_data = camera->proj_data();
+        proj_data = camera->proj_data();
         switch (proj_data.projection) {
             case renderer::eProjectionType::PERSPECTIVE: {
                 float fov = proj_data.fov;
@@ -133,6 +152,9 @@ auto main() -> int {
                 ImGui::SliderFloat("CameraFOV", &fov, 10.0F, 150.0F);
                 ImGui::SliderFloat("CameraNear", &near, 0.1F, 10.0F);
                 ImGui::SliderFloat("CameraFar", &far, near + 1e-3F, 1000.0F);
+                // NOLINTNEXTLINE
+                ImGui::Text("CameraAspectRatio= %.2f",
+                            static_cast<double>(proj_data.aspect));
                 proj_data.fov = fov;
                 proj_data.near = near;
                 proj_data.far = far;
