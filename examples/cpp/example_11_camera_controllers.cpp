@@ -171,6 +171,9 @@ auto main() -> int {
             }
         }
         camera->SetProjectionData(proj_data);
+        auto zoom = camera->zoom();
+        ImGui::SliderFloat("CameraZoom", &zoom, 0.1F, 10.0F);
+        camera->SetZoom(zoom);
 
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(

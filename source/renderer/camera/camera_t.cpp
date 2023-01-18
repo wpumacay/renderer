@@ -1,5 +1,8 @@
 #include <renderer/camera/camera_t.hpp>
 
+#include <cmath>
+#include <utils/logging.hpp>
+
 namespace renderer {
 
 auto ToString(const eProjectionType& proj_type) -> std::string {
@@ -85,8 +88,16 @@ auto Camera::UpdateProjectionMatrix() -> void {
             break;
         }
         case eProjectionType::ORTHOGRAPHIC: {
-            m_ProjMatrix = Mat4::Ortho(m_ProjData.width, m_ProjData.height,
-                                       m_ProjData.near, m_ProjData.far);
+            // Make sure zoom is within a valid range [1e-3, +Inf]
+            if (std::abs(m_Zoom) < 1e-3F) {
+                LOG_CORE_WARN(
+                    "Camera::UpdateProjectionMatrix >>> zoom value is less "
+                    "than minimum accepted value 1e-3");
+            } else {
+                m_ProjMatrix = Mat4::Ortho(m_ProjData.width / m_Zoom,
+                                           m_ProjData.height / m_Zoom,
+                                           m_ProjData.near, m_ProjData.far);
+            }
         }
     }
 }
@@ -157,6 +168,11 @@ auto Camera::SetZNear(float near) -> void {
 
 auto Camera::SetZFar(float far) -> void {
     m_ProjData.far = far;
+    UpdateProjectionMatrix();
+}
+
+auto Camera::SetZoom(float zoom) -> void {
+    m_Zoom = zoom;
     UpdateProjectionMatrix();
 }
 

@@ -86,6 +86,9 @@ class Camera {
     /// Sets the distance to the far plane of the view volume
     auto SetZFar(float far) -> void;
 
+    /// Sets the zoom and updates the internal state of the camera
+    auto SetZoom(float zoom) -> void;
+
     /// Updates the view matrix from the current state of the camera
     auto UpdateViewMatrix() -> void;
 
@@ -107,6 +110,9 @@ class Camera {
 
     /// Returns an unmutable reference to the projection data of this camera
     auto proj_data() const -> const ProjectionData& { return m_ProjData; }
+
+    /// Returns the current zoom value for this camera
+    auto zoom() const -> float { return m_Zoom; }
 
     /// Returns an unmutable const reference to the internal view matrix
     auto view_matrix() const -> const Mat4& { return m_ViewMatrix; }
@@ -137,6 +143,8 @@ class Camera {
     Vec3 m_WorldUp = {0.0, 0.0, 1.0};
     /// Projection data for this camera's configuration
     ProjectionData m_ProjData;
+    /// Value of the zoom used for this camera
+    float m_Zoom = 1.0F;
 
     /// Z-axis of the reference frame of this camera
     Vec3 m_Front;
