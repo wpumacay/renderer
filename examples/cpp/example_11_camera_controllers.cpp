@@ -124,6 +124,32 @@ auto main() -> int {
                             renderer::ToString(camera->proj_data().projection));
                     });
 
+        renderer::ProjectionData proj_data = camera->proj_data();
+        switch (proj_data.projection) {
+            case renderer::eProjectionType::PERSPECTIVE: {
+                float fov = proj_data.fov;
+                float near = proj_data.near;
+                float far = proj_data.far;
+                ImGui::SliderFloat("CameraFOV", &fov, 10.0F, 150.0F);
+                ImGui::SliderFloat("CameraNear", &near, 0.1F, 10.0F);
+                ImGui::SliderFloat("CameraFar", &far, near + 1e-3F, 1000.0F);
+                proj_data.fov = fov;
+                proj_data.near = near;
+                proj_data.far = far;
+                break;
+            }
+            case renderer::eProjectionType::ORTHOGRAPHIC: {
+                float width = proj_data.width;
+                float height = proj_data.height;
+                ImGui::SliderFloat("CameraWidth", &width, 1.0F, 100.0F);
+                ImGui::SliderFloat("CameraHeight", &height, 1.0F, 100.0F);
+                proj_data.width = width;
+                proj_data.height = height;
+                break;
+            }
+        }
+        camera->SetProjectionData(proj_data);
+
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {

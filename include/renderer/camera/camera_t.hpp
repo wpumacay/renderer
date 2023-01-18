@@ -68,7 +68,7 @@ class Camera {
     /// Changes to the given projection type, and updates internal proj. matrix
     auto SetProjectionType(eProjectionType proj_type) -> void;
 
-    /// For perspective cameras, it sets the field of view
+    /// For perspective cameras, it sets the field of view (in degrees)
     auto SetFOV(float fov) -> void;
 
     /// For perspective cameras, it sets the aspect ratio
