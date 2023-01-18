@@ -1,16 +1,12 @@
 #pragma once
 
-// Implementation based on Three.JS OrbitControls
-// mrdoob @ three.js/blob/dev/examples/jsm/controls/OrbitControls.js
+// Implementation based on Three.JS OrbitControls [3]
 
 #include <utility>
 #include <limits>
 #include <string>
 
-#include <renderer/common.hpp>
-#include <utils/common.hpp>
 #include <math/utils/spherical_coordinates.hpp>
-
 #include <renderer/camera/camera_controller_t.hpp>
 
 #if defined(__clang__)
