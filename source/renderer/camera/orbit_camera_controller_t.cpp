@@ -29,7 +29,9 @@ OrbitCameraController::OrbitCameraController(Camera::ptr camera,
                                              float viewportHeight)
     : ICameraController(std::move(camera)),
       m_ViewportWidth(viewportWidth),
-      m_ViewportHeight(viewportHeight) {}
+      m_ViewportHeight(viewportHeight) {
+    m_Type = eCameraController::ORBIT;
+}
 
 auto OrbitCameraController::UpdateViewport(float width, float height) -> void {
     m_ViewportWidth = width;

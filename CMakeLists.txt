@@ -59,6 +59,7 @@ loco_create_target(RendererCpp STATIC
     ${SOURCE_DIR}/camera/camera_t.cpp
     ${SOURCE_DIR}/camera/camera_controller_t.cpp
     ${SOURCE_DIR}/camera/orbit_camera_controller_t.cpp
+    ${SOURCE_DIR}/camera/fps_camera_controller_t.cpp
     ${SOURCE_DIR}/input/input_manager_t.cpp
     ${SOURCE_DIR}/geometry/geometry_t.cpp
     ${SOURCE_DIR}/geometry/geometry_factory.cpp

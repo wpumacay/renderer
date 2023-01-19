@@ -8,6 +8,7 @@
 #include <renderer/camera/camera_t.hpp>
 #include <renderer/camera/camera_controller_t.hpp>
 #include <renderer/camera/orbit_camera_controller_t.hpp>
+#include <renderer/camera/fps_camera_controller_t.hpp>
 #include <renderer/geometry/geometry_t.hpp>
 #include <renderer/geometry/geometry_factory.hpp>
 #include <renderer/light/light_t.hpp>
@@ -19,14 +20,14 @@
 #include <imgui.h>
 #endif  // RENDERER_IMGUI
 
-constexpr int WINDOW_WIDTH = 800;
-constexpr int WINDOW_HEIGHT = 600;
-constexpr float WINDOW_ASPECT =
-    static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT);
-
 // NOLINTNEXTLINE (avoid warning on cognitive complexity)
 auto main() -> int {
-    renderer::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
+    int g_window_width = 800;
+    int g_window_height = 600;
+    float g_window_aspect = static_cast<float>(g_window_width) /
+                            static_cast<float>(g_window_height);
+
+    renderer::Window window(g_window_width, g_window_height);
     renderer::ShaderManager shader_manager;
     renderer::InputManager input_manager;
     window.RegisterKeyboardCallback([&](int key, int action, int) {
@@ -50,35 +51,40 @@ auto main() -> int {
     renderer::ProjectionData proj_data;
     // Parameters related to perspective projection
     proj_data.fov = 45.0F;
-    proj_data.aspect = WINDOW_ASPECT;
+    proj_data.aspect = g_window_aspect;
     proj_data.near = 0.1F;
     proj_data.far = 1000.0F;
     // Parameters related to orthographic projection
     constexpr float FRUSTUM_SIZE = 20.0F;
-    proj_data.width = FRUSTUM_SIZE * WINDOW_ASPECT;
+    proj_data.width = FRUSTUM_SIZE * g_window_aspect;
     proj_data.height = FRUSTUM_SIZE;
     auto camera = std::make_shared<renderer::Camera>(
         CAM_POSITION, CAM_TARGET, Vec3(0.0F, 0.0F, 1.0F), proj_data);
     renderer::ICameraController::ptr camera_controller =
-        std::make_shared<renderer::OrbitCameraController>(camera, WINDOW_WIDTH,
-                                                          WINDOW_HEIGHT);
+        std::make_shared<renderer::OrbitCameraController>(
+            camera, g_window_width, g_window_height);
 
     window.RegisterResizeCallback([&](int width, int height) {
-        auto aspect_ratio =
+        // Bookkeeping the new viewport
+        g_window_width = width;
+        g_window_height = height;
+        auto g_window_aspect =
             static_cast<float>(width) / static_cast<float>(height);
+        glViewport(0, 0, width, height);
+        // Update the camera projection accordingly
         auto data = camera->proj_data();
-        data.aspect = aspect_ratio;
-        data.width = FRUSTUM_SIZE * aspect_ratio;
+        data.aspect = g_window_aspect;
+        data.width = FRUSTUM_SIZE * g_window_aspect;
         data.height = FRUSTUM_SIZE;
         camera->SetProjectionData(data);
 
+        // Notify any controllers of the change of viewport
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {
             orbit_controller->UpdateViewport(static_cast<float>(width),
                                              static_cast<float>(height));
         }
-        glViewport(0, 0, width, height);
     });
     window.RegisterKeyboardCallback([&](int key, int action, int modifier) {
         camera_controller->OnKeyCallback(key, action, modifier);
@@ -175,6 +181,50 @@ auto main() -> int {
         ImGui::SliderFloat("CameraZoom", &zoom, 0.1F, 10.0F);
         camera->SetZoom(zoom);
 
+        std::array<const char*, 3> items_controllers = {"none", "orbit", "fps"};
+        IMGUI_COMBO(
+            items_controllers, "CameraController",
+            [&](size_t combo_index) -> void {
+                switch (combo_index) {
+                    case 0: {  // Dummy controller
+                        camera_controller =
+                            std::make_shared<renderer::DummyCameraController>(
+                                camera);
+                        break;
+                    }
+                    case 1: {  // Orbit controller
+                        camera_controller =
+                            std::make_shared<renderer::OrbitCameraController>(
+                                camera, g_window_width, g_window_height);
+                        break;
+                    }
+                    case 2: {  // Fps controller
+                        camera_controller =
+                            std::make_shared<renderer::FpsCameraController>(
+                                camera);
+                        break;
+                    }
+                }
+                // Attach callbacks for this new controller
+                window.RegisterKeyboardCallback(
+                    [&](int key, int action, int modifier) {
+                        camera_controller->OnKeyCallback(key, action, modifier);
+                    });
+                window.RegisterMouseButtonCallback(
+                    [&](int button, int action, double x, double y) {
+                        camera_controller->OnMouseButtonCallback(button, action,
+                                                                 x, y);
+                    });
+                window.RegisterMouseMoveCallback([&](double x, double y) {
+                    camera_controller->OnMouseMoveCallback(x, y);
+                });
+                window.RegisterScrollCallback([&](double xOff, double yOff) {
+                    camera_controller->OnScrollCallback(xOff, yOff);
+                });
+                LOG_INFO("Using camera-controller: {0}",
+                         renderer::ToString(camera_controller->type()));
+            });
+
         if (auto orbit_controller =
                 std::dynamic_pointer_cast<renderer::OrbitCameraController>(
                     camera_controller)) {
@@ -229,14 +279,29 @@ auto main() -> int {
                         "ZoomSpeed", &orbit_controller->zoomSpeed, 1.0F, 4.0F);
                 }
             }
+        } else if (auto fps_controller =
+                       std::dynamic_pointer_cast<renderer::FpsCameraController>(
+                           camera_controller)) {
+            if (ImGui::CollapsingHeader("Fps Controller Options")) {
+                ImGui::SliderFloat("FpsPointerSpeed",
+                                   &fps_controller->pointerSpeed, 0.0F, 10.0F);
+                ImGui::SliderFloat("FpsMovSpeed", &fps_controller->movSpeed,
+                                   0.0F, 100.0F);
+                // NOLINTNEXTLINE
+                ImGui::Text(
+                    "FpsForwardSpeed: %.2f",
+                    static_cast<double>(fps_controller->forward_speed()));
+                // NOLINTNEXTLINE
+                ImGui::Text(
+                    "FpsSidewaysSpeed: %.2f",
+                    static_cast<double>(fps_controller->sideways_speed()));
+            }
         }
         ImGui::End();
 #endif
 
-        if (auto orbit_controller =
-                std::dynamic_pointer_cast<renderer::OrbitCameraController>(
-                    camera_controller)) {
-            orbit_controller->Update();
+        if (camera_controller != nullptr) {
+            camera_controller->Update();
         }
 
         auto model_matrix = Mat4::Identity();
