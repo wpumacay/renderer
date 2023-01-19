@@ -31,7 +31,7 @@ class FpsCameraController : public ICameraController {
     auto OnCursorReleased() -> void { this->enabled = false; }
 
     /// Update the internal state of the
-    auto Update() -> void override;
+    auto Update(float dt) -> void override;
 
     /// Handle move logic on this callback (moving horizontally or vertically)
     auto OnKeyCallback(int key, int action, int modifier) -> void override;

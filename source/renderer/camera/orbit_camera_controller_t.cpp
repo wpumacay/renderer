@@ -33,7 +33,7 @@ OrbitCameraController::OrbitCameraController(Camera::ptr camera,
     m_Type = eCameraController::ORBIT;
 }
 
-auto OrbitCameraController::Update() -> void {
+auto OrbitCameraController::Update(float dt) -> void {
     constexpr auto TWO_PI = static_cast<float>(math::PI);
 
     auto pos_offset = m_Camera->position() - target;
@@ -171,7 +171,7 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
                 (TWO_PI * m_RotateDelta.y() / m_ViewportHeight);
 
             m_RotateStart = m_RotateCurrent;
-            Update();
+            Update(0.0F);
             break;
         }
         case eOrbitState::PAN: {
@@ -243,7 +243,7 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             }
 
             m_PanStart = m_PanCurrent;
-            Update();
+            Update(0.0F);
             break;
         }
         case eOrbitState::DOLLY: {
@@ -258,7 +258,7 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
             _HandleDolly(m_DollyDelta.y());
 
             m_DollyStart = m_DollyCurrent;
-            Update();
+            Update(0.0F);
             break;
         }
         default:

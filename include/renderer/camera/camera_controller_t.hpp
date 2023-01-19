@@ -41,7 +41,7 @@ class ICameraController {
     virtual ~ICameraController() = default;
 
     /// Updates the current state of the controller
-    virtual auto Update() -> void = 0;
+    virtual auto Update(float dt) -> void = 0;
 
     /// Called when a keyboard event is received
     virtual auto OnKeyCallback(int key, int action, int modifier) -> void = 0;
@@ -89,7 +89,7 @@ class DummyCameraController : public ICameraController {
 
     ~DummyCameraController() override = default;
 
-    auto Update() -> void override {}
+    auto Update(float dt) -> void override {}
 
     auto OnKeyCallback(int key, int action, int modifier) -> void override {}
 

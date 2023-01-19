@@ -17,14 +17,15 @@ FpsCameraController::FpsCameraController(Camera::ptr camera)
     m_Type = eCameraController::FPS;
 }
 
-auto FpsCameraController::Update() -> void {
-    constexpr auto DT = 1.66e-2F;  // TODO(wilbert): use dt given as func. arg.
+auto FpsCameraController::Update(float dt) -> void {
+    constexpr auto MAX_DT = 0.1F;  // Max delta allowed is 100ms
+    dt = std::min(MAX_DT, dt);
     // Move forward (along camera's Z axis)
     auto dfront =
-        m_Camera->front() * (static_cast<double>(DT * m_ForwardSpeed));
+        m_Camera->front() * (static_cast<double>(dt * m_ForwardSpeed));
     // Move sideways (along camera's X axis)
     auto dright =
-        m_Camera->right() * (static_cast<double>(DT * m_SidewaysSpeed));
+        m_Camera->right() * (static_cast<double>(dt * m_SidewaysSpeed));
     auto dtotal = dfront + dright;
 
     m_Camera->SetTargetNoUpdate(m_Camera->target() + dtotal);

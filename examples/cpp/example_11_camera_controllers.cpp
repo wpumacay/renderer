@@ -14,6 +14,7 @@
 #include <renderer/light/light_t.hpp>
 
 #include <utils/logging.hpp>
+#include <utils/timing.hpp>
 #include <example_common_utils.hpp>
 
 #if defined(RENDERER_IMGUI)
@@ -26,6 +27,8 @@ auto main() -> int {
     int g_window_height = 600;
     float g_window_aspect = static_cast<float>(g_window_width) /
                             static_cast<float>(g_window_height);
+
+    utils::Clock::Init();
 
     renderer::Window window(g_window_width, g_window_height);
     renderer::ShaderManager shader_manager;
@@ -104,6 +107,7 @@ auto main() -> int {
     const Vec3 OBJECT_COLOR = {1.0F, 0.5F, 0.31F};
 
     while (window.active()) {
+        utils::Clock::Tick();
         window.Begin();
 
         if (input_manager.IsKeyDown(renderer::keys::KEY_ESCAPE)) {
@@ -298,7 +302,7 @@ auto main() -> int {
 #endif
 
         if (camera_controller != nullptr) {
-            camera_controller->Update();
+            camera_controller->Update(utils::Clock::GetTimeStep());
         }
 
         auto model_matrix = Mat4::Identity();
@@ -331,5 +335,6 @@ auto main() -> int {
         geometry->VAO().Unbind();
         program->Unbind();
         window.End();
+        utils::Clock::Tock();
     }
 }

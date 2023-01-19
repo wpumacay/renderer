@@ -39,7 +39,7 @@ class OrbitCameraController : public ICameraController {
 
     ~OrbitCameraController() override = default;
 
-    auto Update() -> void override;
+    auto Update(float dt) -> void override;
 
     auto OnKeyCallback(int key, int action, int modifier) -> void override {}
 
