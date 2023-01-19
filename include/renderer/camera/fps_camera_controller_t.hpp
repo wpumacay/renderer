@@ -46,6 +46,9 @@ class FpsCameraController : public ICameraController {
     /// This controller doesn't setup nor use any resources during this callback
     auto OnScrollCallback(double xOff, double yOff) -> void override {}
 
+    /// This controller doesn't setup nor use any resources during this callback
+    auto OnResizeCallback(int width, int height) -> void override {}
+
     auto forward_speed() const -> float { return m_ForwardSpeed; }
 
     auto sideways_speed() const -> float { return m_SidewaysSpeed; }

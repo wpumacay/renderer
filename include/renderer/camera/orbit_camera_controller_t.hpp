@@ -39,8 +39,6 @@ class OrbitCameraController : public ICameraController {
 
     ~OrbitCameraController() override = default;
 
-    auto UpdateViewport(float width, float height) -> void;
-
     auto Update() -> void override;
 
     auto OnKeyCallback(int key, int action, int modifier) -> void override {}
@@ -51,6 +49,8 @@ class OrbitCameraController : public ICameraController {
     auto OnMouseMoveCallback(double x, double y) -> void override;
 
     auto OnScrollCallback(double xOff, double yOff) -> void override;
+
+    auto OnResizeCallback(int width, int height) -> void override;
 
     auto state() const -> eOrbitState { return m_State; }
 

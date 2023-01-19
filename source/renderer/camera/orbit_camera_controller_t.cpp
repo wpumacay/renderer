@@ -33,11 +33,6 @@ OrbitCameraController::OrbitCameraController(Camera::ptr camera,
     m_Type = eCameraController::ORBIT;
 }
 
-auto OrbitCameraController::UpdateViewport(float width, float height) -> void {
-    m_ViewportWidth = width;
-    m_ViewportHeight = height;
-}
-
 auto OrbitCameraController::Update() -> void {
     constexpr auto TWO_PI = static_cast<float>(math::PI);
 
@@ -273,6 +268,11 @@ auto OrbitCameraController::OnMouseMoveCallback(double x, double y) -> void {
 
 auto OrbitCameraController::OnScrollCallback(double xOff, double yOff) -> void {
     _HandleDolly(-static_cast<float>(yOff));
+}
+
+auto OrbitCameraController::OnResizeCallback(int width, int height) -> void {
+    m_ViewportWidth = static_cast<float>(width);
+    m_ViewportHeight = static_cast<float>(height);
 }
 
 auto OrbitCameraController::_HandleDolly(float movement) -> void {

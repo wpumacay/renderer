@@ -56,6 +56,9 @@ class ICameraController {
     /// Called when a scroll event is received
     virtual auto OnScrollCallback(double xOff, double yOff) -> void = 0;
 
+    /// Called when a resize event is received
+    virtual auto OnResizeCallback(int width, int height) -> void = 0;
+
     /// Returns the type of this controller
     auto type() const -> eCameraController { return m_Type; }
 
@@ -96,6 +99,8 @@ class DummyCameraController : public ICameraController {
     auto OnMouseMoveCallback(double x, double y) -> void override {}
 
     auto OnScrollCallback(double xOff, double yOff) -> void override {}
+
+    auto OnResizeCallback(int width, int height) -> void override {}
 };
 
 }  // namespace renderer

@@ -78,12 +78,9 @@ auto main() -> int {
         data.height = FRUSTUM_SIZE;
         camera->SetProjectionData(data);
 
-        // Notify any controllers of the change of viewport
-        if (auto orbit_controller =
-                std::dynamic_pointer_cast<renderer::OrbitCameraController>(
-                    camera_controller)) {
-            orbit_controller->UpdateViewport(static_cast<float>(width),
-                                             static_cast<float>(height));
+        // Notify any controller of the change of viewport
+        if (camera_controller != nullptr) {
+            camera_controller->OnResizeCallback(width, height);
         }
     });
     window.RegisterKeyboardCallback([&](int key, int action, int modifier) {
