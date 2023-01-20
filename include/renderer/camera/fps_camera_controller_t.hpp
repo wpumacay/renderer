@@ -49,10 +49,6 @@ class FpsCameraController : public ICameraController {
     /// This controller doesn't setup nor use any resources during this callback
     auto OnResizeCallback(int width, int height) -> void override {}
 
-    auto forward_speed() const -> float { return m_ForwardSpeed; }
-
-    auto sideways_speed() const -> float { return m_SidewaysSpeed; }
-
  public:
     /// The lower limit of the pitch of the camera
     float minPolar = 0.0F;
@@ -60,14 +56,16 @@ class FpsCameraController : public ICameraController {
     float maxPolar = PI;
     /// The speed at which we can pitch
     float pointerSpeed = 1.0F;
-    /// The speed at which we can translate forward and sideways
-    float movSpeed = 10.0F;
 
  private:
-    /// Speed at which we are moving forward
-    float m_ForwardSpeed = 0.0F;
-    /// Speed at which we are moving sideways
-    float m_SidewaysSpeed = 0.0F;
+    /// Whether or not we're moving in the forward direction
+    bool m_MoveForward = false;
+    /// Whether or not we're moving in the backward direction
+    bool m_MoveBackward = false;
+    /// Whether or not we're moving to the right
+    bool m_MoveRight = false;
+    /// Whether or not we're moving to the left
+    bool m_MoveLeft = false;
 };
 
 }  // namespace renderer

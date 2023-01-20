@@ -286,16 +286,6 @@ auto main() -> int {
             if (ImGui::CollapsingHeader("Fps Controller Options")) {
                 ImGui::SliderFloat("FpsPointerSpeed",
                                    &fps_controller->pointerSpeed, 0.0F, 10.0F);
-                ImGui::SliderFloat("FpsMovSpeed", &fps_controller->movSpeed,
-                                   0.0F, 100.0F);
-                // NOLINTNEXTLINE
-                ImGui::Text(
-                    "FpsForwardSpeed: %.2f",
-                    static_cast<double>(fps_controller->forward_speed()));
-                // NOLINTNEXTLINE
-                ImGui::Text(
-                    "FpsSidewaysSpeed: %.2f",
-                    static_cast<double>(fps_controller->sideways_speed()));
             }
         }
         ImGui::End();

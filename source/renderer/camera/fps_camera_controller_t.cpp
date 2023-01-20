@@ -20,12 +20,26 @@ FpsCameraController::FpsCameraController(Camera::ptr camera)
 auto FpsCameraController::Update(float dt) -> void {
     constexpr auto MAX_DT = 0.1F;  // Max delta allowed is 100ms
     dt = std::min(MAX_DT, dt);
-    // Move forward (along camera's Z axis)
-    auto dfront =
-        m_Camera->front() * (static_cast<double>(dt * m_ForwardSpeed));
-    // Move sideways (along camera's X axis)
-    auto dright =
-        m_Camera->right() * (static_cast<double>(dt * m_SidewaysSpeed));
+
+    Vec3 velocity = {0.0F, 0.0F, 0.0F};
+    Vec3 direction = {0.0F, 0.0F, 0.0F};
+
+    velocity.x() -= velocity.x() * 10.0F * dt;
+    velocity.z() -= velocity.z() * 10.0F * dt;
+
+    direction.z() =
+        (m_MoveForward ? 1.0F : 0.0F) - (m_MoveBackward ? 1.0F : 0.0F);
+    direction.x() = (m_MoveRight ? 1.0F : 0.0F) - (m_MoveLeft ? 1.0F : 0.0F);
+
+    if (m_MoveForward || m_MoveBackward) {
+        velocity.z() -= direction.z() * 400.0F * dt;
+    }
+    if (m_MoveLeft || m_MoveRight) {
+        velocity.x() -= direction.x() * 400.0F * dt;
+    }
+
+    auto dfront = m_Camera->front() * static_cast<double>(velocity.z() * dt);
+    auto dright = m_Camera->right() * (static_cast<double>(-velocity.x() * dt));
     auto dtotal = dfront + dright;
 
     m_Camera->SetTargetNoUpdate(m_Camera->target() + dtotal);
@@ -47,43 +61,48 @@ auto FpsCameraController::OnKeyCallback(int key, int action, int modifier)
         switch (key) {
             case keys::KEY_UP:
             case keys::KEY_W: {
-                m_ForwardSpeed = this->movSpeed;
+                m_MoveForward = true;
                 break;
             }
 
             case keys::KEY_DOWN:
             case keys::KEY_S: {
-                m_ForwardSpeed = -this->movSpeed;
+                m_MoveBackward = true;
                 break;
             }
 
             case keys::KEY_LEFT:
             case keys::KEY_A: {
-                m_SidewaysSpeed = -this->movSpeed;
+                m_MoveLeft = true;
                 break;
             }
 
             case keys::KEY_RIGHT:
             case keys::KEY_D: {
-                m_SidewaysSpeed = this->movSpeed;
+                m_MoveRight = true;
                 break;
             }
         }
     } else if (action == key_action::RELEASED) {
         switch (key) {
             case keys::KEY_UP:
-            case keys::KEY_W:
-            case keys::KEY_DOWN:
-            case keys::KEY_S: {
-                m_ForwardSpeed = 0.0F;
+            case keys::KEY_W: {
+                m_MoveForward = false;
                 break;
             }
-
+            case keys::KEY_DOWN:
+            case keys::KEY_S: {
+                m_MoveBackward = false;
+                break;
+            }
             case keys::KEY_LEFT:
-            case keys::KEY_A:
+            case keys::KEY_A: {
+                m_MoveLeft = false;
+                break;
+            }
             case keys::KEY_RIGHT:
             case keys::KEY_D: {
-                m_SidewaysSpeed = 0.0F;
+                m_MoveRight = false;
                 break;
             }
         }
