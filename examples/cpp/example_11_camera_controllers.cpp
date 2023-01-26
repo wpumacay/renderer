@@ -129,6 +129,31 @@ auto main() -> int {
                     static_cast<double>(camera->target().y()),
                     static_cast<double>(camera->target().z()));
 
+        Euler orientation_euler(camera->orientation());
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraEuler: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(orientation_euler.x),
+                    static_cast<double>(orientation_euler.y),
+                    static_cast<double>(orientation_euler.z));
+
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraRight: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(camera->right().x()),
+                    static_cast<double>(camera->right().y()),
+                    static_cast<double>(camera->right().z()));
+
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraUp: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(camera->up().x()),
+                    static_cast<double>(camera->up().y()),
+                    static_cast<double>(camera->up().z()));
+
+        // NOLINTNEXTLINE
+        ImGui::Text("CameraFront: (%.2f, %.2f, %.2f)",
+                    static_cast<double>(camera->front().x()),
+                    static_cast<double>(camera->front().y()),
+                    static_cast<double>(camera->front().z()));
+
         std::array<const char*, 2> items_projections = {"perspective",
                                                         "orthographic"};
         IMGUI_COMBO(items_projections, "CameraProjection",

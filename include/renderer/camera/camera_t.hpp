@@ -53,6 +53,9 @@ class Camera {
     /// Sets the position of the camera in world space, and update the state
     auto SetPosition(const Vec3& pos) -> void;
 
+    /// Sets the orientation of the camera's reference frame in world space
+    auto SetOrientation(const Quat& quat) -> void;
+
     /// Sets the target of the camera in world space, and update the state
     auto SetTarget(const Vec3& target) -> void;
 
@@ -97,6 +100,9 @@ class Camera {
 
     /// Computes the basis vectors from the current camera state
     auto ComputeBasisVectors() -> void;
+
+    /// Computes the basis vectors from the current orientation
+    auto ComputeBasisVectorsFromOrientation() -> void;
 
  public:
     /// Returns an unmutable reference to the position of this camera

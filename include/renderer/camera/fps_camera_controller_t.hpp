@@ -66,6 +66,8 @@ class FpsCameraController : public ICameraController {
     bool m_MoveRight = false;
     /// Whether or not we're moving to the left
     bool m_MoveLeft = false;
+    /// The last position of the cursor
+    Vec2 m_LastCursor;
 };
 
 }  // namespace renderer

@@ -5,6 +5,8 @@
 #include <renderer/input/buttons.hpp>
 #include <renderer/input/keycodes.hpp>
 
+#include <utils/logging.hpp>
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -113,6 +115,20 @@ auto FpsCameraController::OnMouseMoveCallback(double x, double y) -> void {
     if (!enabled) {
         return;
     }
+
+    constexpr float MAX_DX = 50.0F;
+    constexpr float MAX_DY = 50.0F;
+    auto dx = std::min(MAX_DX, static_cast<float>(x) - m_LastCursor.x());
+    auto dy = std::min(MAX_DY, static_cast<float>(y) - m_LastCursor.y());
+    m_LastCursor.x() = static_cast<float>(x);
+    m_LastCursor.y() = static_cast<float>(y);
+
+    Euler euler(m_Camera->orientation());
+
+    euler.x -= dy * 0.002F * this->pointerSpeed;
+    euler.y -= dx * 0.002F * this->pointerSpeed;
+
+    m_Camera->SetOrientation(Quat(euler));
 }
 
 }  // namespace renderer

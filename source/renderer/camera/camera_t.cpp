@@ -49,6 +49,17 @@ auto Camera::ComputeBasisVectors() -> void {
     m_Orientation = Quat::FromRotationMatrix(rotmat);
 }
 
+auto Camera::ComputeBasisVectorsFromOrientation() -> void {
+    auto rot_matrix = Mat3::FromQuaternion(m_Orientation);
+    m_Right = math::normalize(rot_matrix[0]);
+    m_Up = math::normalize(rot_matrix[1]);
+    m_Front = math::normalize(rot_matrix[2]);
+    // Recompute the target point, making sure we are at the same distance we
+    // were previous to this update
+    auto length = math::norm(m_Position - m_Target);
+    m_Target = m_Position - static_cast<double>(length) * m_Front;
+}
+
 auto Camera::UpdateViewMatrix() -> void {
     // The view matrix is the inverse of the camera pose in world space. We
     // could use the inverse directly, but we have the analytical inverse
@@ -110,6 +121,12 @@ auto Camera::UpdateProjectionMatrix() -> void {
                                        m_ProjData.near, m_ProjData.far);
         }
     }
+}
+
+auto Camera::SetOrientation(const Quat& quat) -> void {
+    m_Orientation = quat;
+    ComputeBasisVectorsFromOrientation();
+    UpdateViewMatrix();
 }
 
 auto Camera::SetPosition(const Vec3& pos) -> void {
