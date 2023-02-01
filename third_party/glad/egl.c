@@ -14,6 +14,11 @@
 
 #endif /* GLAD_IMPL_UTIL_C_ */
 
+#ifdef RENDERER_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wstrict-prototypes"
+#endif
+
 
 int GLAD_EGL_VERSION_1_0 = 0;
 int GLAD_EGL_VERSION_1_1 = 0;
@@ -723,7 +728,7 @@ int gladLoadEGL(EGLDisplay display, GLADloadfunc load) {
     return gladLoadEGLUserPtr(display, glad_egl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
 }
 
- 
+
 void gladInstallEGLDebug() {
     glad_debug_eglBindAPI = glad_debug_impl_eglBindAPI;
     glad_debug_eglBindTexImage = glad_debug_impl_eglBindTexImage;
@@ -975,5 +980,9 @@ void gladLoaderUnloadEGL() {
         _egl_handle = NULL;
     }
 }
+
+#ifdef RENDERER_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif
 
 #endif /* GLAD_EGL */

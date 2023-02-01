@@ -18,6 +18,7 @@
 #ifdef RENDERER_COMPILER_CLANG
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdouble-promotion"
+#pragma clang diagnostic ignored "-Wstrict-prototypes"
 #endif
 
 int GLAD_GL_VERSION_1_0 = 0;
