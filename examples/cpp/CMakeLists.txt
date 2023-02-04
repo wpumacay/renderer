@@ -13,7 +13,8 @@ set(RENDERER_EXAMPLES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/example_08_geometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_09_geometry_factory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_10_light_casters.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/example_11_camera_controllers.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/example_11_camera_controllers.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/example_12_debug_drawing.cpp)
 
 foreach(example_filepath IN LISTS RENDERER_EXAMPLES_LIST)
   # cmake-format: off

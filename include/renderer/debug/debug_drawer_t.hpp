@@ -10,6 +10,19 @@
 #include <renderer/shader/program_t.hpp>
 #include <renderer/core/vertex_array_t.hpp>
 
+/// Number of lines that can be drawn per batch
+static constexpr uint32_t LINES_BATCH_SIZE = 1024;
+/// Number of vertex positions stored per line
+static constexpr uint32_t POSITIONS_PER_LINE = 2;
+/// Number of vertex colors stored per line
+static constexpr uint32_t COLORS_PER_LINE = 2;
+/// Number of floats per vertex in each line
+static constexpr uint32_t FLOATS_PER_VERTEX =
+    3 * (POSITIONS_PER_LINE + COLORS_PER_LINE);
+/// The size of the VBO (in bytes) used to store both positions and colors
+static constexpr uint32_t LINES_VBO_SIZE =
+    sizeof(Vec3) * (POSITIONS_PER_LINE + COLORS_PER_LINE) * LINES_BATCH_SIZE;
+
 namespace renderer {
 
 /// Helper class that allows to draw primitives in a immediate-like mode
@@ -20,11 +33,22 @@ class DebugDrawer {
     DEFINE_SMART_POINTERS(DebugDrawer)
 
  public:
-    /// Alias for handling a line (start, end, color)
-    using Line = std::tuple<Vec3, Vec3, Vec3>;
+    /// Struct used to save the information of the stored lines. Notice that the
+    /// color for both vertices of the line is the same for each line
+    struct Line {
+        Vec3 start;
+        Vec3 end;
+        Vec3 color;
 
-    /// Number of lines that can be drawn per batch
-    static constexpr size_t LINES_BATCH_SIZE = 1024;
+        explicit Line(const Vec3& start, const Vec3& end, const Vec3& color)
+            : start(start), end(end), color(color) {}
+    };
+
+    /// Container used for storing line information for render calls (per batch)
+    using LinesBuffer = std::array<float, LINES_VBO_SIZE>;
+
+    /// Container used for storing all lines information given by the user
+    using LinesContainer = std::vector<Line>;
 
     /// All available primitives that this drawer can handle. These can be
     /// rendererd in two modes: solid (draws using instancing), and wireframe
@@ -78,17 +102,36 @@ class DebugDrawer {
 
     /// Requests a primitive to be drawn with the given properties
     /// \param[in] type The type of primitive to be rendered
-    /// \param[in] size The size parameters
+    /// \param[in] size The size parameters for this primitive
+    /// \param[in] position The position of the primitive in world space
+    /// \param[in] orientation The orientation of the primitive in world space
     auto DrawPrimitive(Primitive type, const Vec3& size, const Vec3& position,
                        const Quat& orientation) -> void;
 
-    /// Renders all the primitives currently waiting to be drawn
+    /// Renders all lines and primitives with the given scene state
+    /// \param[in] camera The camera corresponding to the view we want to render
     auto Render(const Camera& camera) -> void;
 
  private:
+    /// Renders all currently stored lines using the given state of the scene
+    /// \param[in] camera The camera corresponding to the view we want to render
     auto _RenderLines(const Camera& camera) -> void;
 
-    auto _RenderLinesBatch(size_t num_lines) -> void;
+    /// Updates a single line in the storage used to connect to the lines VBO
+    /// \param[out] lines_buffer Storage where to updawte the line information
+    /// \param[in] lines_container Vector containing all lines given by the user
+    /// \param[in] batch_index The index in the batch dimension
+    /// \param[in] line_index The index in the per-line dimension
+    auto _UpdateLineInBuffer(LinesBuffer& lines_buffer,
+                             const LinesContainer& lines_container,
+                             uint32_t batch_index, uint32_t line_index) -> void;
+
+    /// Renders a batch of lines of a given size
+    /// \param[out] lines_vao The VAO used for handling GPU data for the lines
+    /// \param[in] lines_number The number of lines to be rendered
+    /// \param[in] lines_data A pointer to the data of the lines to be rendered
+    auto _RenderLinesBatch(VertexArray& lines_vao, uint32_t lines_number,
+                           const float32_t* lines_data) -> void;
 
  private:
     /// Shader used for rendering in wireframe mode (using just lines)
@@ -98,6 +141,6 @@ class DebugDrawer {
     /// VAO used for handling line drawing
     VertexArray::uptr m_LinesVAO = nullptr;
     /// Container for the positions of both points used for lines
-    std::vector<Line> m_Lines;
+    LinesContainer m_Lines;
 };
 }  // namespace renderer
