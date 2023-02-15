@@ -47,6 +47,10 @@ class Application {
     // for dereferencing to work correctly, and we try to keep this contract in
     // the internal implementation of this helper class
 
+    auto window() -> Window& { return *m_Window; }
+
+    auto window() const -> const Window& { return *m_Window; }
+
     auto camera() -> Camera& { return *m_CurrentCamera; }
 
     auto camera() const -> const Camera& { return *m_CurrentCamera; }
