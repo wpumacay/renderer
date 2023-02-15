@@ -46,11 +46,11 @@ auto Camera::ComputeBasisVectors() -> void {
 
     // Get the orientation from the basis vectors (rot-matrix)
     Mat3 rotmat(m_Right, m_Up, m_Front);
-    m_Orientation = Quat::FromRotationMatrix(rotmat);
+    m_Orientation = Quat(rotmat);
 }
 
 auto Camera::ComputeBasisVectorsFromOrientation() -> void {
-    auto rot_matrix = Mat3::FromQuaternion(m_Orientation);
+    auto rot_matrix = Mat3(m_Orientation);
     m_Right = math::normalize(rot_matrix[0]);
     m_Up = math::normalize(rot_matrix[1]);
     m_Front = math::normalize(rot_matrix[2]);
