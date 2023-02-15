@@ -8,6 +8,7 @@
 #include <math/vec2_t.hpp>
 #include <math/vec3_t.hpp>
 #include <math/vec4_t.hpp>
+#include <math/mat3_t.hpp>
 #include <math/mat4_t.hpp>
 #include <math/quat_t.hpp>
 #include <math/euler_t.hpp>
