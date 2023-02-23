@@ -1,6 +1,8 @@
 #include <renderer/application_t.hpp>
 #include <renderer/camera/orbit_camera_controller_t.hpp>
 
+#include <stdexcept>
+
 #include <glad/gl.h>
 
 #include <utils/logging.hpp>
@@ -42,6 +44,10 @@ Application::Application(int window_width, int window_height,
                                            static_cast<float>(yOff));
         }
     });
+
+    m_TextureManager = std::make_shared<TextureManager>();
+    m_ShaderManager = std::make_shared<ShaderManager>();
+    m_DebugDrawer = std::make_shared<DebugDrawer>();
 
     const Vec3 CAM_POSITION = {5.0F, 5.0F, 5.0F};
     const Vec3 CAM_TARGET = {0.0F, 0.0F, 0.0F};
@@ -121,11 +127,137 @@ auto Application::Render() -> void {
 auto Application::End() -> void {
     utils::Clock::Tock();
 
+    if (m_DebugDrawer && m_CurrentCamera) {
+        m_DebugDrawer->Render(*m_CurrentCamera);
+    }
+
     if (!m_Window) {
         return;
     }
 
     m_Window->End();
+}
+
+auto Application::window() -> Window& {
+    if (m_Window == nullptr) {
+        throw std::runtime_error(
+            "Application::window >>> We don't have a valid window to use");
+    }
+    return *m_Window;
+}
+
+auto Application::window() const -> const Window& {
+    if (m_Window == nullptr) {
+        throw std::runtime_error(
+            "Application::window >>> We don't have a valid window to use");
+    }
+    return *m_Window;
+}
+
+auto Application::camera() -> Camera& {
+    if (m_CurrentCamera == nullptr) {
+        throw std::runtime_error(
+            "Application::camera >>> We don't have a valid camera to use");
+    }
+    return *m_CurrentCamera;
+}
+
+auto Application::camera() const -> const Camera& {
+    if (m_CurrentCamera == nullptr) {
+        throw std::runtime_error(
+            "Application::camera >>> We don't have a valid camera to use");
+    }
+    return *m_CurrentCamera;
+}
+
+auto Application::camera_controller() -> ICameraController& {
+    if (m_CameraController == nullptr) {
+        throw std::runtime_error(
+            "Application::camera_controller >>> We don't have a valid camera "
+            "controller to use");
+    }
+    return *m_CameraController;
+}
+
+auto Application::camera_controller() const -> const ICameraController& {
+    if (m_CameraController == nullptr) {
+        throw std::runtime_error(
+            "Application::camera_controller >>> We don't have a valid camera "
+            "controller to use");
+    }
+    return *m_CameraController;
+}
+
+auto Application::input_manager() -> InputManager& {
+    if (m_InputManager == nullptr) {
+        throw std::runtime_error(
+            "Application::input_manager >>> We don't have a valid input "
+            "manager to use");
+    }
+    return *m_InputManager;
+}
+
+auto Application::input_manager() const -> const InputManager& {
+    if (m_InputManager == nullptr) {
+        throw std::runtime_error(
+            "Application::input_manager >>> We don't have a valid input "
+            "manager to use");
+    }
+    return *m_InputManager;
+}
+
+auto Application::texture_manager() -> TextureManager& {
+    if (m_TextureManager == nullptr) {
+        throw std::runtime_error(
+            "Application::texture_manager >>> We don't have a valid texture "
+            "manager to use");
+    }
+    return *m_TextureManager;
+}
+
+auto Application::texture_manager() const -> const TextureManager& {
+    if (m_TextureManager == nullptr) {
+        throw std::runtime_error(
+            "Application::texture_manager >>> We don't have a valid texture "
+            "manager to use");
+    }
+    return *m_TextureManager;
+}
+
+auto Application::shader_manager() -> ShaderManager& {
+    if (m_ShaderManager == nullptr) {
+        throw std::runtime_error(
+            "Application::shader_manager >>> We don't have a valid shader "
+            "manager to use");
+    }
+    return *m_ShaderManager;
+}
+
+auto Application::shader_manager() const -> const ShaderManager& {
+    if (m_ShaderManager == nullptr) {
+        throw std::runtime_error(
+            "Application::shader_manager >>> We don't have a valid shader "
+            "manager to use");
+    }
+    return *m_ShaderManager;
+}
+
+auto Application::debug_drawer() -> DebugDrawer& {
+    if (m_DebugDrawer == nullptr) {
+        throw std::runtime_error(
+            "Application::debug_drawer >>> We don't have a valid debug drawer "
+            "to use");
+    }
+    return *m_DebugDrawer;
+}
+
+auto Application::debug_drawer() const -> const DebugDrawer& {
+    if (m_DebugDrawer == nullptr) {
+        throw std::runtime_error(
+            "Application::debug_drawer >>> We don't have a valid debug drawer "
+            "to use");
+    }
+    return *m_DebugDrawer;
 }
 
 }  // namespace renderer

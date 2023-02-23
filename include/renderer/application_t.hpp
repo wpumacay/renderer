@@ -5,6 +5,9 @@
 #include <renderer/camera/camera_t.hpp>
 #include <renderer/camera/camera_controller_t.hpp>
 #include <renderer/input/input_manager_t.hpp>
+#include <renderer/assets/shader_manager_t.hpp>
+#include <renderer/assets/texture_manager_t.hpp>
+#include <renderer/debug/debug_drawer_t.hpp>
 
 namespace renderer {
 
@@ -47,25 +50,33 @@ class Application {
     // for dereferencing to work correctly, and we try to keep this contract in
     // the internal implementation of this helper class
 
-    auto window() -> Window& { return *m_Window; }
+    auto window() -> Window&;
 
-    auto window() const -> const Window& { return *m_Window; }
+    auto window() const -> const Window&;
 
-    auto camera() -> Camera& { return *m_CurrentCamera; }
+    auto camera() -> Camera&;
 
-    auto camera() const -> const Camera& { return *m_CurrentCamera; }
+    auto camera() const -> const Camera&;
 
-    auto camera_controller() -> ICameraController& {
-        return *m_CameraController;
-    }
+    auto camera_controller() -> ICameraController&;
 
-    auto camera_controller() const -> const ICameraController& {
-        return *m_CameraController;
-    }
+    auto camera_controller() const -> const ICameraController&;
 
-    auto input_manager() -> InputManager& { return *m_InputManager; }
+    auto input_manager() -> InputManager&;
 
-    auto input_manager() const -> InputManager& { return *m_InputManager; }
+    auto input_manager() const -> const InputManager&;
+
+    auto texture_manager() -> TextureManager&;
+
+    auto texture_manager() const -> const TextureManager&;
+
+    auto shader_manager() -> ShaderManager&;
+
+    auto shader_manager() const -> const ShaderManager&;
+
+    auto debug_drawer() -> DebugDrawer&;
+
+    auto debug_drawer() const -> const DebugDrawer&;
 
  protected:
     /// Internal window used for drawing stuff into
@@ -76,6 +87,12 @@ class Application {
     ::renderer::ICameraController::ptr m_CameraController = nullptr;
     /// The input manager used keep track of the state of input events
     ::renderer::InputManager::ptr m_InputManager = nullptr;
+    /// The texture manager used to handle loading and sharing of textures
+    ::renderer::TextureManager::ptr m_TextureManager = nullptr;
+    /// The shader manager used to handle loading and sharing of shader programs
+    ::renderer::ShaderManager::ptr m_ShaderManager = nullptr;
+    /// The debug drawer used to handle drawing lines and other debug primitives
+    ::renderer::DebugDrawer::ptr m_DebugDrawer = nullptr;
 };
 
 }  // namespace renderer
