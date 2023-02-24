@@ -9,6 +9,7 @@
 #include <renderer/camera/camera_t.hpp>
 #include <renderer/shader/program_t.hpp>
 #include <renderer/core/vertex_array_t.hpp>
+#include <renderer/geometry/geometry_factory.hpp>
 
 /// Number of lines that can be drawn per batch
 static constexpr uint32_t LINES_BATCH_SIZE = 1024;
@@ -22,6 +23,8 @@ static constexpr uint32_t FLOATS_PER_VERTEX =
 /// The size of the VBO (in bytes) used to store both positions and colors
 static constexpr uint32_t LINES_VBO_SIZE =
     sizeof(Vec3) * (POSITIONS_PER_LINE + COLORS_PER_LINE) * LINES_BATCH_SIZE;
+/// Number of primitives supported for drawing
+static constexpr uint32_t NUM_PRIMITIVES = 11;
 
 namespace renderer {
 
@@ -50,46 +53,6 @@ class DebugDrawer {
     /// Container used for storing all lines information given by the user
     using LinesContainer = std::vector<Line>;
 
-    /// All available primitives that this drawer can handle. These can be
-    /// rendererd in two modes: solid (draws using instancing), and wireframe
-    /// (draws using line-segments via repeated calls to DrawLine)
-    enum Primitive {
-        /// Box primitive, defined by its width, depth and height
-        BOX = 0,
-        /// Sphere primitive, defined by its radius
-        SPHERE = 1,
-        /// Cylinder primitive, defined by its height and base radius. The axis
-        /// of this object is aligned to the world X-axis
-        CYLINDER_X = 2,
-        /// Cylinder primitive, defined by its height and base radius. The axis
-        /// of this object is aligned to the world Y-axis
-        CYLINDER_Y = 3,
-        /// Cylinder primitive, defined by its height and base radius. The axis
-        /// of this object is aligned to the world Z-axis
-        CYLINDER_Z = 4,
-        /// Capsule primitive, defined by its height and top|bottom caps radius.
-        /// The axis of this object is aligned to the world X-axis
-        CAPSULE_X = 5,
-        /// Capsule primitive, defined by its height and top|bottom caps radius.
-        /// The axis of this object is aligned to the world Z-axis
-        CAPSULE_Y = 6,
-        /// Capsule primitive, defined by its height and top|bottom caps radius.
-        /// The axis of this object is aligned to the world Z-axis
-        CAPSULE_Z = 7,
-        /// Arrow primitive, composed of a cylindre and cone merge accordingly.
-        /// The primitive is defined by its length (till the tip of the cone),
-        /// and its axis is aligned with the world X-axis
-        ARROW_X = 8,
-        /// Arrow primitive, composed of a cylindre and cone merge accordingly.
-        /// The primitive is defined by its length (till the tip of the cone),
-        /// and its axis is aligned with the world Y-axis
-        ARROW_Y = 9,
-        /// Arrow primitive, composed of a cylindre and cone merge accordingly.
-        /// The primitive is defined by its length (till the tip of the cone),
-        /// and its axis is aligned with the world Z-axis
-        ARROW_Z = 10,
-    };
-
     /// Constructs a Debug Drawer and allocates its related resources
     DebugDrawer();
 
@@ -100,13 +63,25 @@ class DebugDrawer {
     auto DrawLine(const Vec3& start, const Vec3& end, const Vec3& color)
         -> void;
 
-    /// Requests a primitive to be drawn with the given properties
-    /// \param[in] type The type of primitive to be rendered
-    /// \param[in] size The size parameters for this primitive
-    /// \param[in] position The position of the primitive in world space
-    /// \param[in] orientation The orientation of the primitive in world space
-    auto DrawPrimitive(Primitive type, const Vec3& size, const Vec3& position,
-                       const Quat& orientation) -> void;
+    /// Requests a box to be drawn using lines
+    /// \param[in] size The width, height and depth of the box packed as a vec3
+    /// \param[in] tf The world transform of the box
+    /// \param[in] color The color of the box
+    auto DrawBox(const Vec3& size, const Mat4& tf, const Vec3& color) -> void;
+
+    /// Requests a sphere to be drawn using lines
+    /// \param[in] radius The radius of the sphere
+    /// \param[in] tf The world transform of the sphere
+    /// \param[in] color The color of of the sphere
+    auto DrawSphere(float radius, const Mat4& tf, const Vec3& color) -> void;
+
+    /// Requests a cylinder to be drawn using lines
+    /// \param[in] radius The radius of the base of the cylinder
+    /// \param[in] height The height of the cylinder
+    /// \param[in] tf The world transform of the cylinder
+    /// \param[in] color The color of the cylinder
+    auto DrawCylinder(float radius, float height, const Mat4& tf,
+                      const Vec3& color) -> void;
 
     /// Renders all lines and primitives with the given scene state
     /// \param[in] camera The camera corresponding to the view we want to render

@@ -61,6 +61,66 @@ auto DebugDrawer::DrawLine(const Vec3& start, const Vec3& end,
     m_Lines.emplace_back(start, end, color);
 }
 
+auto DebugDrawer::DrawBox(const Vec3& size, const Mat4& tf, const Vec3& color)
+    -> void {
+    // List the box vertices in local-space
+    auto half_width = 0.5F * size.x();
+    auto half_height = 0.5F * size.y();
+    auto half_depth = 0.5F * size.z();
+    constexpr size_t NUM_BOX_VERTICES = 8;
+
+    std::array<Vec3, NUM_BOX_VERTICES> vertices = {
+        Vec3(half_width, -half_height, -half_depth),
+        Vec3(half_width, half_height, -half_depth),
+        Vec3(-half_width, half_height, -half_depth),
+        Vec3(-half_width, -half_height, -half_depth),
+        Vec3(half_width, -half_height, half_depth),
+        Vec3(half_width, half_height, half_depth),
+        Vec3(-half_width, half_height, half_depth),
+        Vec3(-half_width, -half_height, half_depth)};
+
+    // TODO(wilbert): there's a warning by the linter here, but is not shown in
+    // sublime
+
+    //  Transform from local-space to world-space using the world transform
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        auto vertex_world = tf * Vec4(vertices.at(i).x(), vertices.at(i).y(),
+                                      vertices.at(i).z(), 1.0F);
+        vertices.at(i) =
+            Vec3(vertex_world.x(), vertex_world.y(), vertex_world.z());
+    }
+
+    DrawLine(vertices[0], vertices[1], color);
+    DrawLine(vertices[1], vertices[2], color);
+    DrawLine(vertices[2], vertices[3], color);
+    DrawLine(vertices[3], vertices[0], color);
+
+    DrawLine(vertices[1], vertices[5], color);
+    DrawLine(vertices[5], vertices[6], color);
+    DrawLine(vertices[6], vertices[2], color);
+    DrawLine(vertices[2], vertices[1], color);
+
+    DrawLine(vertices[5], vertices[6], color);
+    DrawLine(vertices[6], vertices[7], color);
+    DrawLine(vertices[7], vertices[4], color);
+    DrawLine(vertices[4], vertices[5], color);
+
+    DrawLine(vertices[4], vertices[7], color);
+    DrawLine(vertices[7], vertices[3], color);
+    DrawLine(vertices[3], vertices[0], color);
+    DrawLine(vertices[0], vertices[4], color);
+
+    DrawLine(vertices[2], vertices[6], color);
+    DrawLine(vertices[6], vertices[7], color);
+    DrawLine(vertices[7], vertices[3], color);
+    DrawLine(vertices[3], vertices[2], color);
+
+    DrawLine(vertices[1], vertices[5], color);
+    DrawLine(vertices[5], vertices[4], color);
+    DrawLine(vertices[4], vertices[0], color);
+    DrawLine(vertices[0], vertices[1], color);
+}
+
 auto DebugDrawer::Render(const Camera& camera) -> void { _RenderLines(camera); }
 
 auto DebugDrawer::_RenderLines(const Camera& camera) -> void {
