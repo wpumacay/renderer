@@ -13,9 +13,9 @@ auto main() -> int {
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_vert.glsl",
         renderer::EXAMPLES_PATH + "/resources/shaders/basicPhong_frag.glsl");
 
-    constexpr auto BOX_WIDTH = 2.0F;
-    constexpr auto BOX_DEPTH = 2.0F;
-    constexpr auto BOX_HEIGHT = 2.0F;
+    constexpr auto BOX_WIDTH = 1.0F;
+    constexpr auto BOX_DEPTH = 1.0F;
+    constexpr auto BOX_HEIGHT = 1.0F;
     auto geometry = renderer::CreateBox(BOX_WIDTH, BOX_DEPTH, BOX_HEIGHT);
 
     const Vec3 LIGHT_DIRECTION = {-1.0F, -2.0F, -3.0F};
@@ -66,6 +66,12 @@ auto main() -> int {
                                     {0.0F, 1.0F, 0.0F});
         app.debug_drawer().DrawLine({0.0F, 0.0F, 0.0F}, {0.0F, 0.0F, 5.0F},
                                     {0.0F, 0.0F, 1.0F});
+
+        auto tf = Mat4::Identity();
+        tf(0, 3) = 1.0F;
+        tf(1, 3) = 1.0F;
+        tf(2, 3) = 1.0F;
+        app.debug_drawer().DrawBox({1.0F, 1.0F, 1.0F}, tf, {1.0F, 1.0F, 1.0F});
 
         app.End();
     }

@@ -83,11 +83,9 @@ auto DebugDrawer::DrawBox(const Vec3& size, const Mat4& tf, const Vec3& color)
     // sublime
 
     //  Transform from local-space to world-space using the world transform
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        auto vertex_world = tf * Vec4(vertices.at(i).x(), vertices.at(i).y(),
-                                      vertices.at(i).z(), 1.0F);
-        vertices.at(i) =
-            Vec3(vertex_world.x(), vertex_world.y(), vertex_world.z());
+    for (auto& vertex : vertices) {
+        auto vertex_v4 = tf * Vec4(vertex.x(), vertex.y(), vertex.z(), 1.0F);
+        vertex = Vec3(vertex_v4.x(), vertex_v4.y(), vertex_v4.z());
     }
 
     DrawLine(vertices[0], vertices[1], color);
