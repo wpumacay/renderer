@@ -115,6 +115,50 @@ auto DebugDrawer::DrawBox(const Vec3& size, const Mat4& tf, const Vec3& color)
     DrawLine(vertices[0], vertices[1], color);
 }
 
+auto DebugDrawer::DrawSphere(float radius, const Mat4& tf, const Vec3& color)
+    -> void {
+    constexpr size_t NUM_CIRCLE_POINTS = 10;
+    // Create the vertices for the main circles (xy, yz, xz)
+    std::array<Vec3, NUM_CIRCLE_POINTS> circle_pts_xy;
+    std::array<Vec3, NUM_CIRCLE_POINTS> circle_pts_yz;
+    std::array<Vec3, NUM_CIRCLE_POINTS> circle_pts_xz;
+    for (size_t i = 0; i < NUM_CIRCLE_POINTS; ++i) {
+        auto theta = 2.0F * PI * static_cast<float>(i) /
+                     static_cast<float>(NUM_CIRCLE_POINTS);
+        auto r_cos_theta = radius * std::cos(theta);
+        auto r_sin_theta = radius * std::sin(theta);
+        circle_pts_xy.at(i) = {r_cos_theta, r_sin_theta, 0.0F};
+        circle_pts_yz.at(i) = {0.0F, r_cos_theta, r_sin_theta};
+        circle_pts_xz.at(i) = {r_sin_theta, 0.0F, r_cos_theta};
+    }
+
+    // Transform all points into world space
+    for (auto& vertex : circle_pts_xy) {
+        vertex = Vec3(tf * Vec4(vertex));
+    }
+    for (auto& vertex : circle_pts_yz) {
+        vertex = Vec3(tf * Vec4(vertex));
+    }
+    for (auto& vertex : circle_pts_xz) {
+        vertex = Vec3(tf * Vec4(vertex));
+    }
+
+    // Draw each main circle
+    // NOLINTNEXTLINE (can't use range-for-loop for this calculation)
+    for (size_t i = 0; i < circle_pts_xy.size(); ++i) {
+        DrawLine(circle_pts_xy.at(i % circle_pts_xy.size()),
+                 circle_pts_xy.at((i + 1) % circle_pts_xy.size()), color);
+    }
+    for (size_t i = 0; i < circle_pts_yz.size(); ++i) {
+        DrawLine(circle_pts_yz.at(i % circle_pts_yz.size()),
+                 circle_pts_yz.at((i + 1) % circle_pts_yz.size()), color);
+    }
+    for (size_t i = 0; i < circle_pts_xz.size(); ++i) {
+        DrawLine(circle_pts_xz.at(i % circle_pts_xz.size()),
+                 circle_pts_xz.at((i + 1) % circle_pts_xz.size()), color);
+    }
+}
+
 auto DebugDrawer::Render(const Camera& camera) -> void { _RenderLines(camera); }
 
 auto DebugDrawer::_RenderLines(const Camera& camera) -> void {
