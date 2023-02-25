@@ -79,13 +79,9 @@ auto DebugDrawer::DrawBox(const Vec3& size, const Mat4& tf, const Vec3& color)
         Vec3(-half_width, half_height, half_depth),
         Vec3(-half_width, -half_height, half_depth)};
 
-    // TODO(wilbert): there's a warning by the linter here, but is not shown in
-    // sublime
-
     //  Transform from local-space to world-space using the world transform
     for (auto& vertex : vertices) {
-        auto vertex_v4 = tf * Vec4(vertex.x(), vertex.y(), vertex.z(), 1.0F);
-        vertex = Vec3(vertex_v4.x(), vertex_v4.y(), vertex_v4.z());
+        vertex = Vec3(tf * Vec4(vertex));
     }
 
     DrawLine(vertices[0], vertices[1], color);
