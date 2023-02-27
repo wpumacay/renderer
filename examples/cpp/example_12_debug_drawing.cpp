@@ -73,6 +73,7 @@ auto main() -> int {
         tf(2, 3) = 1.0F;
         app.debug_drawer().DrawBox({1.0F, 1.0F, 1.0F}, tf, {1.0F, 1.0F, 1.0F});
         app.debug_drawer().DrawSphere(0.25F, tf, {1.0F, 0.0F, 1.0F});
+        app.debug_drawer().DrawCylinder(0.25F, 0.5F, tf, {1.0F, 1.0F, 0.0F});
 
         app.Render();
         app.End();
