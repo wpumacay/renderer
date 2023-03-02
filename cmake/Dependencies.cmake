@@ -18,6 +18,31 @@ include_guard()
 # ~~~
 
 # -------------------------------------
+set(LOCO_DEP_VERSION_catch2
+    3f0283de7a9c43200033da996ff9093be3ac84dc # Release 3.3.2
+    CACHE STRING "Version of Catch2 to be fetched (used for unittests)")
+
+set(LOCO_DEP_VERSION_spdlog
+    ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36 # Release 1.10.0
+    CACHE STRING
+          "Version of spdlog to be fetched (dependency of loco-utils library)")
+
+set(LOCO_DEP_VERSION_glfw
+    7482de6071d21db77a7236155da44c172a7f6c9e # Release 3.3.8
+    CACHE STRING
+          "Version of GLFW to be fetched (used to create an xplatf. window) ")
+
+set(LOCO_DEP_VERSION_imgui
+    458a1090314a965dd37b02c918d83077a0142ad5 # Release 1.89.3
+    CACHE STRING
+          "Version of Dear-ImGui to be fetched (used for prototyping UI)")
+
+mark_as_advanced(LOCO_DEP_VERSION_catch2)
+mark_as_advanced(LOCO_DEP_VERSION_spdlog)
+mark_as_advanced(LOCO_DEP_VERSION_glfw)
+mark_as_advanced(LOCO_DEP_VERSION_imgui)
+
+# -------------------------------------
 find_package(OpenGL REQUIRED)
 
 if(OpenGL_EGL_FOUND)
@@ -66,7 +91,7 @@ loco_find_or_fetch_dependency(
   PACKAGE_NAME Catch2
   LIBRARY_NAME catch2
   GIT_REPO https://github.com/catchorg/Catch2.git
-  GIT_TAG v2.x
+  GIT_TAG ${LOCO_DEP_VERSION_catch2}
   TARGETS Catch2::Catch2
   BUILD_ARGS
     -DCATCH_INSTALL_DOCS=OFF
@@ -87,7 +112,7 @@ loco_find_or_fetch_dependency(
   PACKAGE_NAME spdlog
   LIBRARY_NAME spdlog
   GIT_REPO https://github.com/gabime/spdlog.git
-  GIT_TAG v1.9.2
+  GIT_TAG ${LOCO_DEP_VERSION_spdlog}
   TARGETS spdlog::spdlog
   BUILD_ARGS
     -DSPDLOG_BUILD_SHARED=OFF
@@ -108,7 +133,7 @@ loco_find_or_fetch_dependency(
   PACKAGE_NAME glfw3
   LIBRARY_NAME glfw3
   GIT_REPO https://github.com/glfw/glfw.git
-  GIT_TAG 3.3.8
+  GIT_TAG ${LOCO_DEP_VERSION_glfw}
   TARGETS glfw
   BUILD_ARGS
     -DGLFW_BUILD_EXAMPLES=OFF
@@ -126,7 +151,7 @@ add_library(glfw::glfw ALIAS glfw)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG master
+  GIT_TAG ${LOCO_DEP_VERSION_imgui}
   GIT_PROGRESS TRUE
   GIT_SHALLOW FALSE
   USES_TERMINAL_DOWNLOAD TRUE)

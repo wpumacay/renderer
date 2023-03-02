@@ -1,5 +1,6 @@
 #include <utils/logging.hpp>
 #include <renderer/window/impl/window_impl_egl.hpp>
+#include <spdlog/fmt/bundled/format.h>
 
 namespace renderer {
 
@@ -64,9 +65,9 @@ WindowImplEgl::WindowImplEgl(WindowProperties properties)
                     "current EGL context");
     LOG_CORE_INFO("WindowImplEgl >>> successfully initialized EGL window");
     LOG_CORE_INFO("OpenGL Info:");
-    LOG_CORE_INFO("\tVendor     : {0}", glGetString(GL_VENDOR));
-    LOG_CORE_INFO("\tRenderer   : {0}", glGetString(GL_RENDERER));
-    LOG_CORE_INFO("\tVersion    : {0}", glGetString(GL_VERSION));
+    LOG_CORE_INFO("\tVendor     : {0}", fmt::ptr(glGetString(GL_VENDOR)));
+    LOG_CORE_INFO("\tRenderer   : {0}", fmt::ptr(glGetString(GL_RENDERER)));
+    LOG_CORE_INFO("\tVersion    : {0}", fmt::ptr(glGetString(GL_VERSION)));
 
     // Setup some general GL options
     glViewport(0, 0, m_Properties.width, m_Properties.height);

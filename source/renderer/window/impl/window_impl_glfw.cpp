@@ -3,6 +3,7 @@
 
 #include <utils/logging.hpp>
 #include <renderer/window/impl/window_impl_glfw.hpp>
+#include <spdlog/fmt/bundled/format.h>
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -48,9 +49,9 @@ WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
                     "WindowImplGlfw >>> failed to load GL using GLAD on the "
                     "current context");
     LOG_CORE_INFO("OpenGL Info:");
-    LOG_CORE_INFO("\tVendor     : {0}", glGetString(GL_VENDOR));
-    LOG_CORE_INFO("\tRenderer   : {0}", glGetString(GL_RENDERER));
-    LOG_CORE_INFO("\tVersion    : {0}", glGetString(GL_VERSION));
+    LOG_CORE_INFO("\tVendor     : {0}", fmt::ptr(glGetString(GL_VENDOR)));
+    LOG_CORE_INFO("\tRenderer   : {0}", fmt::ptr(glGetString(GL_RENDERER)));
+    LOG_CORE_INFO("\tVersion    : {0}", fmt::ptr(glGetString(GL_VERSION)));
 
     glfwSetInputMode(glfw_window, GLFW_STICKY_KEYS, GLFW_TRUE);
     int fbuffer_width = 0;
