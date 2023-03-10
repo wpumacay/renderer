@@ -31,7 +31,7 @@ option(RENDERER_BUILD_DOCS "Build documentation" OFF)
 loco_initialize_project()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-include(Dependencies)
+include(RendererDependencies)
 
 set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/source/renderer)
 
@@ -87,7 +87,7 @@ if (RENDERER_BUILD_IMGUI)
 endif()
 # cmake-format: on
 
-include(Definitions)
+include(RendererDefinitions)
 
 add_library(renderer::renderer ALIAS RendererCpp)
 
@@ -100,7 +100,7 @@ if(RENDERER_BUILD_PYTHON_BINDINGS)
 endif()
 
 if(RENDERER_BUILD_DOCS)
-  include(DocsConfig)
+  include(RendererDocsConfig)
 endif()
 
 loco_print_target_properties(RendererCpp)

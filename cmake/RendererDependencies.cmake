@@ -22,11 +22,6 @@ set(RENDERER_DEP_VERSION_catch2
     3f0283de7a9c43200033da996ff9093be3ac84dc # Release 3.3.2
     CACHE STRING "Version of Catch2 to be fetched (used for unittests)")
 
-set(RENDERER_DEP_VERSION_spdlog
-    ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36 # Release 1.10.0
-    CACHE STRING
-          "Version of spdlog to be fetched (dependency of loco-utils library)")
-
 set(RENDERER_DEP_VERSION_glfw
     7482de6071d21db77a7236155da44c172a7f6c9e # Release 3.3.8
     CACHE STRING
@@ -38,7 +33,6 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
-mark_as_advanced(RENDERER_DEP_VERSION_spdlog)
 mark_as_advanced(RENDERER_DEP_VERSION_glfw)
 mark_as_advanced(RENDERER_DEP_VERSION_imgui)
 
@@ -103,25 +97,6 @@ loco_find_or_fetch_dependency(
 if (catch2_POPULATED)
   list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib")
 endif()
-
-# ------------------------------------------------------------------------------
-# Spdlog is used for the logging functionality (internally uses the fmt lib)
-# ------------------------------------------------------------------------------
-loco_find_or_fetch_dependency(
-  USE_SYSTEM_PACKAGE FALSE
-  PACKAGE_NAME spdlog
-  LIBRARY_NAME spdlog
-  GIT_REPO https://github.com/gabime/spdlog.git
-  GIT_TAG ${RENDERER_DEP_VERSION_spdlog}
-  TARGETS spdlog::spdlog
-  BUILD_ARGS
-    -DSPDLOG_BUILD_SHARED=OFF
-    -DSPDLOG_BUILD_EXAMPLE=OFF
-    -DSPDLOG_BUILD_EXAMPLE_HO=OFF
-    -DSPDLOG_BUILD_TESTS=OFF
-    -DSPDLOG_BUILD_TESTS_HO=OFF
-    -DSPDLOG_BUILD_BENCH=OFF
-  EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
 # Use GLFW from sources (as it might not be installed in the system). We use
