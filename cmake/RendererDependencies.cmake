@@ -32,9 +32,14 @@ set(RENDERER_DEP_VERSION_imgui
     CACHE STRING
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
+set(RENDERER_DEP_VERSION_utils
+    5d20d313cd6d444f41a35bc4a641a7d62a79e231
+    CACHE STRING "Versino of Internal Utilities repo to be fetched")
+
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
 mark_as_advanced(RENDERER_DEP_VERSION_glfw)
 mark_as_advanced(RENDERER_DEP_VERSION_imgui)
+mark_as_advanced(RENDERER_DEP_VERSION_utils)
 
 # -------------------------------------
 find_package(OpenGL REQUIRED)
@@ -144,7 +149,7 @@ loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
   LIBRARY_NAME utils
   GIT_REPO https://github.com/wpumacay/utils.git
-  GIT_TAG dev
+  GIT_TAG ${RENDERER_DEP_VERSION_utils}
   TARGETS utils::utils
   BUILD_ARGS
     -DUTILS_BUILD_PYTHON_BINDINGS=ON
