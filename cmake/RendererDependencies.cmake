@@ -34,12 +34,17 @@ set(RENDERER_DEP_VERSION_imgui
 
 set(RENDERER_DEP_VERSION_utils
     5d20d313cd6d444f41a35bc4a641a7d62a79e231
-    CACHE STRING "Versino of Internal Utilities repo to be fetched")
+    CACHE STRING "Version of internal utilities repo to be fetched")
+
+set(RENDERER_DEP_VERSION_math
+    e6f8e7e6a2b283a156e6081b1f79f2d64a0a5ecb
+    CACHE STRING "Version of internal math repo to be fetched")
 
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
 mark_as_advanced(RENDERER_DEP_VERSION_glfw)
 mark_as_advanced(RENDERER_DEP_VERSION_imgui)
 mark_as_advanced(RENDERER_DEP_VERSION_utils)
+mark_as_advanced(RENDERER_DEP_VERSION_math)
 
 # -------------------------------------
 find_package(OpenGL REQUIRED)
