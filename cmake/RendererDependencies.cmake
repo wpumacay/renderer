@@ -33,11 +33,11 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    5d20d313cd6d444f41a35bc4a641a7d62a79e231
+    5d20d313cd6d444f41a35bc4a641a7d62a79e231 # Version v0.2.0
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    e6f8e7e6a2b283a156e6081b1f79f2d64a0a5ecb
+    e6f8e7e6a2b283a156e6081b1f79f2d64a0a5ecb # Version v0.4.1
     CACHE STRING "Version of internal math repo to be fetched")
 
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
@@ -170,7 +170,7 @@ loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
   LIBRARY_NAME math
   GIT_REPO https://github.com/wpumacay/math.git
-  GIT_TAG dev
+  GIT_TAG ${RENDERER_DEP_VERSION_math}
   TARGETS math::math math::math_py_helpers
   BUILD_ARGS
     -DMATH_BUILD_PYTHON_BINDINGS=ON

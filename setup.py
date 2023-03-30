@@ -173,7 +173,7 @@ if os.path.exists("requirements.txt"):
 
 setup(
     name='renderer',
-    version="0.1.0",
+    version="0.2.2",
     author='Wilbert Santos Pumacay Huallpa',
     author_email='wpumacay@gmail.com',
     description='A minimal renderer for prototyping 3D applications',
