@@ -1,24 +1,13 @@
-.. ZooCpp documentation master file, created by
-   sphinx-quickstart on Mon Jul 25 13:11:46 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Loco-Renderer Documentation
+Renderer Documentation
 ==================================
 
-Loco-Renderer is a 3d rendering library, composed of various primitives the user
-can use in for prototyping 3d applications.
+This project consists of a 3d rendering library for users to rapidly prototype
+3d applications. This library abstracts away the low-level API required for
+interacting with the GPU, and exposes a simple API to create 3d scenes.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Primitives:
+   :maxdepth: 1
+   :hidden:
 
-   primitives/window
-   primitives/shaders
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   User Guide <user/index>
+   API Reference <reference/index>

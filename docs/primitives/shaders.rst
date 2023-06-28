@@ -8,7 +8,7 @@ GPU on pre-defined stages.
 We'll focus on the main two programable stages for now, thus we'll analyze both
 ``Vertex`` and ``Fragment`` shaders.
 
-.. image:: ../../_static/img_docs_shaders_graphics_pipeline.jpg
+.. image:: ../_static/img_docs_shaders_graphics_pipeline.jpg
    :width: 800
    :alt: Graphics Pipeline
 
@@ -93,8 +93,8 @@ Example
 C++ API Reference
 ===================
 
-.. doxygenclass:: loco::renderer::Shader
+.. doxygenclass:: renderer::Shader
    :members:
 
-.. doxygenclass:: loco::renderer::Program
+.. doxygenclass:: renderer::Program
    :members:

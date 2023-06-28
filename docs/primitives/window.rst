@@ -29,5 +29,5 @@ in the snippet below:
 C++ API Reference
 ===================
 
-.. doxygenclass:: loco::renderer::Window
+.. doxygenclass:: renderer::Window
    :members:

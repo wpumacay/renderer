@@ -26,7 +26,7 @@ option(RENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(RENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
-option(RENDERER_BUILD_DOCS "Build documentation" OFF)
+option(RENDERER_BUILD_DOCS "Build documentation" ON)
 
 loco_initialize_project()
 
@@ -99,8 +99,22 @@ if(RENDERER_BUILD_PYTHON_BINDINGS)
   add_subdirectory(python/renderer)
 endif()
 
+# -------------------------------------
+# Build the required documentation accordingly
 if(RENDERER_BUILD_DOCS)
-  # TODO(wilbert): add setup using cmake helper library
+  # cmake-format: off
+  loco_setup_cppdocs(RendererCpp
+    DOXYGEN_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in
+    DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs/Doxygen
+    DOXYGEN_GENERATE_HTML FALSE
+    DOXYGEN_GENERATE_LATEX FALSE
+    DOXYGEN_GENERATE_XML TRUE
+    DOXYGEN_QUIET TRUE
+    SPHINX_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/conf.py.in
+    SPHINX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs/Sphinx
+    SPHINX_BREATHE_PROJECT RendererCpp
+    SPHINX_DOXYGEN_XML_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/docs/Doxygen/xml)
+  # cmake-format: on
 endif()
 
 loco_print_target_properties(RendererCpp)
