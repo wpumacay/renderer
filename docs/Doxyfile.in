@@ -3,8 +3,8 @@
 DOXYFILE_ENCODING       = UTF-8
 RECURSIVE               = YES
 PROJECT_NAME            = @DOXYGEN_PROJECT_NAME@
-INPUT                   = @DOXYGEN_INPUT_DIR@
-OUTPUT_DIRECTORY        = @DOXYGEN_OUTPUT_DIR@
+INPUT                   = "@DOXYGEN_INPUT_DIR@"
+OUTPUT_DIRECTORY        = "@DOXYGEN_OUTPUT_DIR@"
 PREDEFINED              =
 
 GENERATE_HTML           = @DOXYGEN_GENERATE_HTML@
@@ -16,6 +16,8 @@ LATEX_OUTPUT            = latex
 GENERATE_XML            = @DOXYGEN_GENERATE_XML@
 XML_OUTPUT              = xml
 XML_PROGRAMLISTING      = YES
+
+EXCLUDE_PATTERNS        = *_impl.hpp
 
 EXTRACT_ALL             = YES
 EXTRACT_PRIVATE         = YES
