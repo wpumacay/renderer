@@ -8,3 +8,6 @@ cpplint
 pre-commit
 ipython
 ipykernel
+sphinx
+sphinx_rtd_theme
+breathe
