@@ -100,7 +100,7 @@ if(RENDERER_BUILD_PYTHON_BINDINGS)
 endif()
 
 if(RENDERER_BUILD_DOCS)
-  include(RendererDocsConfig)
+  # TODO(wilbert): add setup using cmake helper library
 endif()
 
 loco_print_target_properties(RendererCpp)
