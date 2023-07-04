@@ -86,3 +86,52 @@ Similarly, using Python we can do the same as follows:
 
     # Swaps the FrameBuffer, etc.
     window.End()
+
+Registering Events
+------------------
+
+We can register for listening to events from inputs like the keyboard and mouse,
+as well to other events associated to the window itself using the appropriate
+``RegisterXYZCallback`` methods. We just have to pass the required callback to
+this methods, following the specific function signature_. An example of how to
+register for an event is shown below:
+
+.. _signature: https://github.com/wpumacay/renderer/blob/dev/include/renderer/input/callbacks.hpp
+
+.. code-block:: cpp
+
+  // Register a callback for keyboard events (can just pass a lambda as well)
+  window->RegisterKeyboardCallback([&](int key, int action, int mods) {
+    // Handle this event in some useful way
+    // ...
+  });
+
+  // Register a callback for mouse-button events (can just pass a lambda as well)
+  window->RegisterMouseButtonCallback([&](int button, int action, double xpos, double ypos) {
+    // Handle this event in some useful way
+    // ...
+  });
+
+The Python counterpart is similar to configure:
+
+.. code-block:: python
+
+  # Define the callback to be used for listening to keyboard events
+  def myKeyCallback(key: int, action: int, mods: int) -> None:
+    # Handle this event in some useful way
+    ...
+
+  # Register the callback to start listening to keyboard events
+  window.RegisterKeyboardCallback(myKeyCallback)
+
+
+A Minimal Example
+-----------------
+
+TODO
+
+API Reference
+-------------
+
+.. doxygenclass:: renderer::Window
+   :members:
