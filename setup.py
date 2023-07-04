@@ -14,7 +14,6 @@ from pathlib import Path
 from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
 
-from pdb import set_trace
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
@@ -41,7 +40,6 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
-        set_trace()
         # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
         extdir = ext_fullpath.parent.resolve()
@@ -166,11 +164,6 @@ if os.path.exists("README.md"):
     with open("README.md", "r", encoding="utf-8") as fh:
         long_description = fh.read()
 
-required_packages = []
-if os.path.exists("requirements.txt"):
-    with open("requirements.txt", "r", encoding="utf-8") as fh:
-        required_packages = [line.replace("\n", "") for line in fh.readlines()]
-
 setup(
     name='renderer',
     version="0.2.2",
@@ -187,7 +180,8 @@ setup(
         "Operating System :: POSIX :: Linux"
     ],
     zip_safe=False,
-    install_requires=required_packages,
-    ext_modules=[CMakeExtension('renderer')],
-    cmdclass={"built_ext": CMakeBuild}
+    package_data={},
+    ext_modules=[CMakeExtension("renderer", ".")],
+    cmdclass={"build_ext": CMakeBuild},
+    python_requires=">=3.7",
 )
