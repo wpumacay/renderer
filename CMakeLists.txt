@@ -64,6 +64,7 @@ loco_create_target(RendererCpp STATIC
     ${SOURCE_DIR}/geometry/geometry_t.cpp
     ${SOURCE_DIR}/geometry/geometry_factory.cpp
     ${SOURCE_DIR}/light/light_t.cpp
+    ${SOURCE_DIR}/material/material_t.cpp
     ${SOURCE_DIR}/debug/debug_drawer_t.cpp
     ${SOURCE_DIR}/application_t.cpp
   INCLUDE_DIRECTORIES
