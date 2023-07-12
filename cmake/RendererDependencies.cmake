@@ -40,11 +40,16 @@ set(RENDERER_DEP_VERSION_math
     e6f8e7e6a2b283a156e6081b1f79f2d64a0a5ecb # Version v0.4.1
     CACHE STRING "Version of internal math repo to be fetched")
 
+set(RENDERER_DEP_VERSION_pybind11
+    5b0a6fc2017fcc176545afe3e09c9f9885283242 # Release v2.10.4
+    CACHE STRING "Version of PyBind11 to be fetched (used for python bindings)")
+
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
 mark_as_advanced(RENDERER_DEP_VERSION_glfw)
 mark_as_advanced(RENDERER_DEP_VERSION_imgui)
 mark_as_advanced(RENDERER_DEP_VERSION_utils)
 mark_as_advanced(RENDERER_DEP_VERSION_math)
+mark_as_advanced(RENDERER_DEP_VERSION_pybind11)
 
 # -------------------------------------
 find_package(OpenGL REQUIRED)
@@ -60,30 +65,17 @@ option(FIND_OR_FETCH_USE_SYSTEM_PACKAGE
 # cmake-format: off
 # ------------------------------------------------------------------------------
 # Pybind11 is used for generating Python bindings for this project's C++ API.
-# Notice that we're using a forked version in which usage of unique-ptr is
-# allowed, as we use this functionality in some other parent projects
 # ------------------------------------------------------------------------------
-
-find_package(Git REQUIRED)
 
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
   PACKAGE_NAME pybind11
   LIBRARY_NAME pybind11
-  GIT_REPO https://github.com/RobotLocomotion/pybind11.git
-  GIT_TAG drake
+  GIT_REPO https://github.com/pybind/pybind11.git
+  GIT_TAG ${RENDERER_DEP_VERSION_pybind11}
   TARGETS pybind11::headers
   BUILD_ARGS
     -DPYBIND11_TEST=OFF
-  PATCH_COMMAND
-    "${GIT_EXECUTABLE}"
-    "apply"
-    "-q"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pybind11-fix-vs2022.patch"
-    "||"
-    "${CMAKE_COMMAND}"
-    "-E"
-    "true"
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
