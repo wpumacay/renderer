@@ -126,7 +126,7 @@ void bindings_buffers(py::module& m) {
     {
         using Class = renderer::VertexBuffer;
         constexpr auto* ClassName = "VertexBuffer";  // NOLINT
-        py::class_<Class>(m, ClassName)
+        py::class_<Class, Class::ptr>(m, ClassName)
             // NOLINTNEXTLINE
             .def(py::init([](BufferLayout layout, eBufferUsage usage,
                              uint32_t size, const NumpyFloatArray& data) {
@@ -162,7 +162,7 @@ void bindings_buffers(py::module& m) {
     {
         using Class = renderer::IndexBuffer;
         constexpr auto* ClassName = "IndexBuffer";  // NOLINT
-        py::class_<Class>(m, ClassName)
+        py::class_<Class, Class::ptr>(m, ClassName)
             .def(py::init([](eBufferUsage usage, uint32_t count,  // NOLINT
                              const NumpyUint32Array& data) {
                 return std::make_unique<Class>(
@@ -182,17 +182,13 @@ void bindings_buffers(py::module& m) {
         constexpr auto* ClassName = "VertexArray";  // NOLINT
         py::class_<Class>(m, ClassName)
             .def(py::init<>())
-            .def("addVertexBuffer",
-                 [](Class& self, VertexBuffer::uptr vbo) {
-                     self.AddVertexBuffer(std::move(vbo));
-                 })
-            .def("setIndexBuffer",
-                 [](Class& self, IndexBuffer::uptr ibo) {
-                     self.SetIndexBuffer(std::move(ibo));
-                 })
+            .def("addVertexBuffer", &Class::AddVertexBuffer)
+            .def("setIndexBuffer", &Class::SetIndexBuffer)
             .def("bind", &Class::Bind)
             .def("unbind", &Class::Unbind)
             .def_property_readonly("opengl_id", &Class::opengl_id)
+            .def_property_readonly("num_attribs", &Class::num_attribs)
+            .def_property_readonly("num_buffers", &Class::num_buffers)
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
     }
