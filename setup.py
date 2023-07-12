@@ -166,7 +166,7 @@ if os.path.exists("README.md"):
 
 setup(
     name='renderer',
-    version="0.2.2",
+    version="0.2.3",
     author='Wilbert Santos Pumacay Huallpa',
     author_email='wpumacay@gmail.com',
     description='A minimal renderer for prototyping 3D applications',
