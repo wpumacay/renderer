@@ -18,12 +18,12 @@ extern void bindings_buffers(py::module& py_module);   // NOLINT
 PYBIND11_MODULE(renderer, py_module) {
     renderer::bindings_window(py_module);
     renderer::bindings_keycodes(py_module);
+    renderer::bindings_shader(py_module);
 
     // -------------------------------------------------------------------------
     // TODO(wilbert): replace usage of unique_ptr for shared_ptr, as we'll be
     // changing to PyBind11 from upstream, which doesn't handle that kind of
     // ownership (unlike drake's fork :C)
     //// renderer::bindings_buffers(py_module);
-    //// renderer::bindings_shader(py_module);
     // -------------------------------------------------------------------------
 }

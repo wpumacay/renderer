@@ -6,7 +6,7 @@ set(BINDINGS_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/bindings_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/window_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/keycodes_py.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/shader_py.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shader_py.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/buffers_py.cpp
 )
 
