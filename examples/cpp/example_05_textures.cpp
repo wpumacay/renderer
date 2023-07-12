@@ -86,18 +86,18 @@ auto main() -> int {
         {"position", renderer::eElementType::FLOAT_2, false},
         {"texcoord", renderer::eElementType::FLOAT_2, false}};
 
-    auto vbo = std::make_unique<renderer::VertexBuffer>(
+    auto vbo = std::make_shared<renderer::VertexBuffer>(
         layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
-    auto ibo = std::make_unique<renderer::IndexBuffer>(
+    auto ibo = std::make_shared<renderer::IndexBuffer>(
         renderer::eBufferUsage::STATIC, NUM_VERTICES, buffer_indices);
 
-    auto vao = std::make_unique<renderer::VertexArray>();
-    vao->AddVertexBuffer(std::move(vbo));
-    vao->SetIndexBuffer(std::move(ibo));
+    auto vao = std::make_shared<renderer::VertexArray>();
+    vao->AddVertexBuffer(vbo);
+    vao->SetIndexBuffer(ibo);
 
-    auto texture = std::make_unique<renderer::Texture>(IMAGE_PATH.c_str());
+    auto texture = std::make_shared<renderer::Texture>(IMAGE_PATH.c_str());
 
     while (window->active()) {
         window->Begin();

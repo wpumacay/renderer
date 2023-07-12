@@ -24,11 +24,11 @@ class VertexArray {
     ~VertexArray();
 
     /// Adds the given VBO to the group managed by this VAO
-    auto AddVertexBuffer(VertexBuffer::uptr buffer, bool is_instanced = false)
+    auto AddVertexBuffer(VertexBuffer::ptr buffer, bool is_instanced = false)
         -> void;
 
     /// Sets the given IBO to the group managed by this VAO
-    auto SetIndexBuffer(IndexBuffer::uptr buffer) -> void;
+    auto SetIndexBuffer(IndexBuffer::ptr buffer) -> void;
 
     /// Binds this VAO, setting the OpenGL-FSM to the appropriate state
     auto Bind() const -> void;
@@ -37,10 +37,10 @@ class VertexArray {
     auto Unbind() const -> void;
 
     /// Returns a mutable reference to the container of our buffers
-    auto buffers() -> std::vector<VertexBuffer::uptr>& { return m_Buffers; }
+    auto buffers() -> std::vector<VertexBuffer::ptr>& { return m_Buffers; }
 
     /// Returns an unmutable reference to the container of our buffers
-    auto buffers() const -> const std::vector<VertexBuffer::uptr>& {
+    auto buffers() const -> const std::vector<VertexBuffer::ptr>& {
         return m_Buffers;
     }
 
@@ -56,6 +56,11 @@ class VertexArray {
     ///  Returns the current number of attributes managed by the VAO
     auto num_attribs() const -> uint32_t { return m_NumAttribIndx; }
 
+    /// Returns the number of buffers associated with this VAO
+    auto num_buffers() const -> uint32_t {
+        return static_cast<uint32_t>(m_Buffers.size());
+    }
+
     /// Returns a string representation of this VAO
     auto ToString() const -> std::string;
 
@@ -65,9 +70,9 @@ class VertexArray {
     /// Index of the current slot in the attributePointer list of the VAO
     uint32_t m_NumAttribIndx = 0;
     /// Container for the owned VBOs
-    std::vector<VertexBuffer::uptr> m_Buffers;
+    std::vector<VertexBuffer::ptr> m_Buffers;
     /// Index Buffer associated with this VAO (if applicable)
-    IndexBuffer::uptr m_IndexBuffer;
+    IndexBuffer::ptr m_IndexBuffer;
 };
 
 }  // namespace renderer

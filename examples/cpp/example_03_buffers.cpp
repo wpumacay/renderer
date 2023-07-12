@@ -38,7 +38,7 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 
 auto main() -> int {
     auto window =
-        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+        std::make_unique<::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     window->RegisterKeyboardCallback([&](int key, int, int) {
         if (key == renderer::keys::KEY_ESCAPE) {
@@ -68,12 +68,12 @@ auto main() -> int {
         {"position", renderer::eElementType::FLOAT_2, false},
         {"color", renderer::eElementType::FLOAT_3, false}};
 
-    auto vbo = std::make_unique<renderer::VertexBuffer>(
+    auto vbo = std::make_shared<renderer::VertexBuffer>(
         layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
 
-    auto vao = std::make_unique<renderer::VertexArray>();
-    vao->AddVertexBuffer(std::move(vbo));
+    auto vao = std::make_shared<renderer::VertexArray>();
+    vao->AddVertexBuffer(vbo);
 
     while (window->active()) {
         window->Begin();

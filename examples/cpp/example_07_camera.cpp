@@ -35,11 +35,13 @@ auto main() -> int {
     renderer::BufferLayout layout = {
         {"position", renderer::eElementType::FLOAT_3, false}};
 
-    auto vbo = std::make_unique<renderer::VertexBuffer>(
+    auto vbo = std::make_shared<renderer::VertexBuffer>(
         layout, renderer::eBufferUsage::STATIC,
         static_cast<uint32_t>(sizeof(buffer_data)), buffer_data.data());
+    // TODO(wilbert): change usage from uint32_t to size_t for some methods that
+    // most likely will get a value from sizeof
 
-    auto vao = std::make_unique<renderer::VertexArray>();
+    auto vao = std::make_shared<renderer::VertexArray>();
     vao->AddVertexBuffer(std::move(vbo));
 
     renderer::Camera camera({0.0F, -3.0F, 0.0F}, {0.0F, 0.0F, 0.0F});
