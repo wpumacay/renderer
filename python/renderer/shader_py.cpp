@@ -82,8 +82,17 @@ void bindings_shader(py::module& m) {
                      self.SetVec4(
                          uname, math::nparray_to_vec4<math::float32_t>(uvalue));
                  })
+            .def("SetMat4",
+                 [](Class& self, const char* uname,
+                    const py::array_t<math::float32_t>& umat) {
+                     self.SetMat4(uname,
+                                  math::nparray_to_mat4<math::float32_t>(umat));
+                 })
+            .def_property_readonly("name", &Class::name)
             .def_property_readonly("opengl_id", &Class::opengl_id)
             .def_property_readonly("linked", &Class::linked)
+            .def_property_readonly("num_shaders", &Class::num_shaders)
+            //// TODO(wilbert): add get_shader method or similar
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
                            "Program(name={}, opengl_id={}, linked={}, "
