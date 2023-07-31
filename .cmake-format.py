@@ -2,8 +2,7 @@
 # -----------------------------
 # Options affecting formatting.
 # -----------------------------
-with section("format"):
-
+with section("format"):  # type: ignore  # noqa: F821
     # If a statement is wrapped to more than one line, then dangle the closing
     # parenthesis on its own line.
     dangle_parens = False
@@ -14,8 +13,8 @@ with section("format"):
     # How wide to allow formatted cmake files
     line_width = 80
 
-    # If a positional argument group contains more than this many arguments, then
-    # force it to a vertical layout.
+    # If a positional argument group contains more than this many arguments,
+    # then force it to a vertical layout.
     max_pargs_hwrap = 7
 
     # If true, separate flow control names from their parentheses with a space
@@ -39,8 +38,7 @@ with section("format"):
 # ------------------------------------------------
 # Options affecting comment reflow and formatting.
 # ------------------------------------------------
-with section("markup"):
-
+with section("markup"):  # type: ignore  # noqa: F821
     # What character to use for bulleted lists
     bullet_char = "*"
 
@@ -50,8 +48,7 @@ with section("markup"):
 # ----------------------------
 # Options affecting the linter
 # ----------------------------
-with section("lint"):
-
+with section("lint"):  # type: ignore  # noqa: F821
     # a list of lint codes to disable
     disabled_codes = []
 
@@ -61,12 +58,12 @@ with section("lint"):
     # regular expression pattern describing valid macro names
     macro_pattern = "[0-9a-zA-Z_]+"
 
-    # regular expression pattern describing valid names for variables with global
-    # (cache) scope
+    # regular expression pattern describing valid names for variables with
+    # global (cache) scope
     global_var_pattern = "[A-Z][0-9A-Z_]+"
 
-    # regular expression pattern describing valid names for variables with global
-    # scope (but internal semantic)
+    # regular expression pattern describing valid names for variables with
+    # global scope (but internal semantic)
     internal_var_pattern = "_[A-Z][0-9A-Z_]+"
 
     # regular expression pattern describing valid names for variables with local
@@ -89,8 +86,8 @@ with section("lint"):
     # functions or macros
     keyword_pattern = "[A-Z][0-9A-Z_]+"
 
-    # In the heuristic for C0201, how many conditionals to match within a loop in
-    # before considering the loop a parser.
+    # In the heuristic for C0201, how many conditionals to match within a loop
+    # in before considering the loop a parser.
     max_conditionals_custom_parser = 2
 
     # Require at least this many newlines between statements
@@ -107,14 +104,13 @@ with section("lint"):
 # -------------------------------
 # Options affecting file encoding
 # -------------------------------
-with section("encode"):
-
+with section("encode"):  # type: ignore  # noqa: F821
     # If true, emit the unicode byte-order mark (BOM) at the start of the file
     emit_byteorder_mark = False
 
     # Specify the encoding of the input file. Defaults to utf-8
     input_encoding = "utf-8"
 
-    # Specify the encoding of the output file. Defaults to utf-8. Note that cmake
-    # only claims to support utf-8 so be careful when using anything else
+    # Specify the encoding of the output file. Defaults to utf-8. Note that
+    # cmake only claims to support utf-8 so be careful when using anything else
     output_encoding = "utf-8"
