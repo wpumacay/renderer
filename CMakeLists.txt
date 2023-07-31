@@ -15,7 +15,7 @@ include(${loco_cmake_SOURCE_DIR}/Index.cmake)
 
 project(
   Renderer
-  VERSION 0.2.3
+  VERSION 0.3.0
   DESCRIPTION "A minimal renderer for prototyping 3D applications"
   HOMEPAGE_URL "https://github.com/wpumacay/renderer"
   LANGUAGES C CXX)
