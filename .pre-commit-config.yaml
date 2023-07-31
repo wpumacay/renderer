@@ -1,18 +1,20 @@
 repos:
-# Some generally used hooks for sanity-check
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.2.0
     hooks:
     -   id: check-added-large-files
     -   id: check-case-conflict
     -   id: check-merge-conflict
     -   id: check-symlinks
     -   id: check-yaml
+    -   id: name-tests-test
+    -   id: debug-statements
+    -   id: requirements-txt-fixer
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
     -   id: mixed-line-ending
+        args: [--fix=lf]
 
-# Applies formating and linting to CMake files
 -   repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
@@ -24,13 +26,11 @@ repos:
         types: [file]
         files: (\.cmake|CMakeLists.txt)(.in)?$
 
-# Changes tabs to spaces
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.7
     hooks:
     -   id: remove-tabs
 
-# Applies formatting and static-analysis
 -   repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.4
     hooks:
@@ -38,3 +38,20 @@ repos:
         args: [-i]
     -   id: cpplint
     -   id: clang-tidy
+
+-   repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+    -   id: black
+
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+    -   id: flake8
+
+-   repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+    -   id: isort
+        name: isort (python)
+        args: [--settings-path=pyproject.toml]
