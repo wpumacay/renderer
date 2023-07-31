@@ -15,10 +15,14 @@
 
 #endif /* GLAD_IMPL_UTIL_C_ */
 
-#ifdef RENDERER_COMPILER_CLANG
+#if defined(RENDERER_COMPILER_CLANG)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdouble-promotion"
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
+#elif defined(RENDERER_COMPILER_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
 
 int GLAD_GL_VERSION_1_0 = 0;
@@ -12088,8 +12092,10 @@ void gladLoaderUnloadGL(void) {
     }
 }
 
-#ifdef RENDERER_COMPILER_CLANG
+#if defined(RENDERER_COMPILER_CLANG)
 #pragma clang diagnostic pop
+#elif defined(RENDEREE_COMPILER_GCC)
+#pragma GCC diagnostic pop
 #endif
 
 #endif /* GLAD_GL */

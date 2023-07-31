@@ -1,6 +1,5 @@
 #include <chrono>
 
-#include <bits/chrono.h>
 #include <glad/gl.h>
 
 #include <renderer/window/window_t.hpp>
