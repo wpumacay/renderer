@@ -25,6 +25,7 @@ jobs:
       run: |
           sudo apt update
           sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+          sudo apt install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
 
     - name: Update CMake
       uses: jwlawson/actions-setup-cmake@v1.10
