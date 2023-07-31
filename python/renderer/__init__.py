@@ -1,21 +1,20 @@
 from renderer_bindings import (  # type: ignore
-    WindowBackend,
-    WindowProperties,
-    Window,
-    KeyAction,
-    Keys,
-    ShaderType,
-    Shader,
-    Program,
-    ElementType,
     BufferElement,
     BufferLayout,
     BufferUsage,
-    VertexBuffer,
+    ElementType,
     IndexBuffer,
+    KeyAction,
+    Keys,
+    Program,
+    Shader,
+    ShaderType,
     VertexArray,
+    VertexBuffer,
+    Window,
+    WindowBackend,
+    WindowProperties,
 )
-
 
 __all__ = [
     "WindowBackend",

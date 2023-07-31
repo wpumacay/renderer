@@ -30,8 +30,11 @@ FRAG_SHADER_SRC = r"""
     }
 """
 
+
 def main():
-    window = rdr.Window(WINDOW_WIDTH, WINDOW_HEIGHT, rdr.WindowBackend.TYPE_GLFW)
+    window = rdr.Window(
+        WINDOW_WIDTH, WINDOW_HEIGHT, rdr.WindowBackend.TYPE_GLFW
+    )
     program = rdr.Program("basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC)
 
     if program.linked:
@@ -43,5 +46,5 @@ def main():
         window.End()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

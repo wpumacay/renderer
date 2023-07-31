@@ -5,6 +5,7 @@ import renderer as rdr
 DEFAULT_WIDTH = 1024
 DEFAULT_HEIGHT = 768
 
+
 def main():
     properties = rdr.WindowProperties()
     properties.backend = rdr.WindowBackend.TYPE_GLFW
@@ -13,6 +14,7 @@ def main():
     properties.title = "Example 01 - Window"
 
     window = rdr.Window(properties)
+
     def keycallback(key, action, mods):
         print("key: {}, action: {}. mods: {}".format(key, action, mods))
         if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.PRESSED:
@@ -25,5 +27,6 @@ def main():
         # opengl-stuff can go here :)
         window.End()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
