@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Setup script used to build and install this package.
 
@@ -11,9 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from setuptools import find_packages, setup, Extension
+from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
@@ -24,30 +22,29 @@ PLAT_TO_CMAKE = {
 }
 
 
+# A CMakeExtension needs a sourcedir instead of a file list.
+# The name must be the _single_ output extension from the CMake build.
+# If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    """
-    An extended Extension-Class for CMake. We need this as we have to
-    pass a source dir instead of a file_list to get the source-code to build
-
-    The name must be _single_ output extension from the CMake build. If you need
-    multiple extensions, see scikit-build
-    """
-
     def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
+        self.sourcedir = os.fspath(Path(sourcedir).resolve())
 
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
-        # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
+        # Must be like this due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
         extdir = ext_fullpath.parent.resolve()
 
         # Using this requires trailing slash for auto-detection & inclusion of
         # auxiliary "native" libs
 
-        debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
+        debug = (
+            int(os.environ.get("DEBUG", 0))
+            if self.debug is None
+            else self.debug
+        )
         cfg = "Debug" if debug else "Release"
 
         # CMake lets you override the generator - we need to check this.
@@ -55,6 +52,8 @@ class CMakeBuild(build_ext):
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
+        # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
+        # from Python.
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
@@ -65,11 +64,12 @@ class CMakeBuild(build_ext):
             "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF",
         ]
         build_args = []
-
         # Adding CMake arguments set as environment variable (needed e.g. to
         # build for ARM OSx on conda-forge). Notice they are space separated
         if "CMAKE_ARGS" in os.environ:
-            cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
+            cmake_args += [
+                item for item in os.environ["CMAKE_ARGS"].split(" ") if item
+            ]
 
         # Add additional CMake arguments required for setting up this project
         cmake_args += [
@@ -79,13 +79,8 @@ class CMakeBuild(build_ext):
             "-DRENDERER_BUILD_PYTHON_BINDINGS=ON",
             "-DRENDERER_BUILD_EXAMPLES=OFF",
             "-DRENDERER_BUILD_TESTS=OFF",
-            "-DRENDERER_BUILD_DOCS=OFF"
+            "-DRENDERER_BUILD_DOCS=OFF",
         ]
-
-        ## # By default, place every generated artifact into the same install path
-        ## library_outdir = extdir
-        ## archive_outdir = extdir
-        ## runtime_outdir = extdir
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -93,27 +88,23 @@ class CMakeBuild(build_ext):
             # exported for Ninja to pick it up, which is a little tricky to do.
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
-            if not cmake_generator:
+            if not cmake_generator or cmake_generator == "Ninja":
                 try:
+                    # pylint: disable=import-outside-toplevel, unused-import
                     import ninja
 
-                    ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
+                    ninja_exec_path = Path(ninja.BIN_DIR) / "ninja"
                     cmake_args += [
                         "-GNinja",
-                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}"
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_exec_path}",
                     ]
                 except ImportError:
                     pass
-
-            ## # Send all generated artifacts to the same install location
-            ## cmake_args += [
-            ##     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={library_outdir}",
-            ##     f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={archive_outdir}",
-            ##     f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={runtime_outdir}",
-            ## ]
         else:
             # Single config generators are handled "normally"
-            single_config = any(x in cmake_generator for x in ["NMake", "Ninja"])
+            single_config = any(
+                x in cmake_generator for x in ["NMake", "Ninja"]
+            )
 
             # CMake allows an arch-in-generator style for backward compatibility
             contains_arch = any(x in cmake_generator for x in ["ARM", "Win64"])
@@ -129,7 +120,7 @@ class CMakeBuild(build_ext):
                 cmake_args += [
                     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
                     f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
-                    f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
+                    f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
                 ]
                 build_args += ["--config", cfg]
 
@@ -137,7 +128,9 @@ class CMakeBuild(build_ext):
             # Cross-compile support for macOS - respect ARCHFLAGS if set
             archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
             if archs:
-                cmake_args += ["-DCMAKE_OSX_ARCHITECTURE={}".format(";".join(archs))]
+                cmake_args += [
+                    "-DCMAKE_OSX_ARCHITECTURE={}".format(";".join(archs))
+                ]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
@@ -159,29 +152,8 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
 
-long_description = ""
-if os.path.exists("README.md"):
-    with open("README.md", "r", encoding="utf-8") as fh:
-        long_description = fh.read()
 
 setup(
-    name='renderer',
-    version="0.2.3",
-    author='Wilbert Santos Pumacay Huallpa',
-    author_email='wpumacay@gmail.com',
-    description='A minimal renderer for prototyping 3D applications',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    license='MIT License',
-    url='https://github.com/wpumacay/loco_renderer',
-    keywords='graphics opengl',
-    classifiers=[
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: POSIX :: Linux"
-    ],
-    zip_safe=False,
-    package_data={},
-    ext_modules=[CMakeExtension("renderer", ".")],
+    ext_modules=[CMakeExtension("renderer_bindings", ".")],
     cmdclass={"build_ext": CMakeBuild},
-    python_requires=">=3.7",
 )
