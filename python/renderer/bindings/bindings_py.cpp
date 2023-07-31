@@ -15,7 +15,7 @@ extern void bindings_buffers(py::module& py_module);   // NOLINT
 }  // namespace renderer
 
 // NOLINTNEXTLINE
-PYBIND11_MODULE(renderer, py_module) {
+PYBIND11_MODULE(renderer_bindings, py_module) {
     renderer::bindings_window(py_module);
     renderer::bindings_keycodes(py_module);
     renderer::bindings_shader(py_module);

@@ -97,7 +97,7 @@ if(RENDERER_BUILD_EXAMPLES)
 endif()
 
 if(RENDERER_BUILD_PYTHON_BINDINGS)
-  add_subdirectory(python/renderer)
+  add_subdirectory(python/renderer/bindings)
 endif()
 
 # -------------------------------------
