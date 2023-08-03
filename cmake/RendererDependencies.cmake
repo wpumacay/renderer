@@ -33,11 +33,11 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    3b93e80597ebf86013b76b1252f136c4a8771516 # Version v0.2.1
+    58623f20534cbe4cc3f20cdeac46a27ca4f21790 # Version v0.2.2
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    e63f2a1b86c49d689479bbdeef723b6555983b99 # Version v0.5.0
+    7f863e0dbf9f0e9ba0d35b38ab912baf7431053f # Version v0.5.1
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
@@ -73,6 +73,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME pybind11
   GIT_REPO https://github.com/pybind/pybind11.git
   GIT_TAG ${RENDERER_DEP_VERSION_pybind11}
+  GIT_PROGRESS FALSE
   TARGETS pybind11::headers
   BUILD_ARGS
     -DPYBIND11_TEST=OFF
@@ -88,6 +89,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME catch2
   GIT_REPO https://github.com/catchorg/Catch2.git
   GIT_TAG ${RENDERER_DEP_VERSION_catch2}
+  GIT_PROGRESS FALSE
   TARGETS Catch2::Catch2
   BUILD_ARGS
     -DCATCH_INSTALL_DOCS=OFF
@@ -111,6 +113,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME glfw3
   GIT_REPO https://github.com/glfw/glfw.git
   GIT_TAG ${RENDERER_DEP_VERSION_glfw}
+  GIT_PROGRESS FALSE
   TARGETS glfw
   BUILD_ARGS
     -DGLFW_BUILD_EXAMPLES=OFF
@@ -129,7 +132,7 @@ FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG ${RENDERER_DEP_VERSION_imgui}
-  GIT_PROGRESS TRUE
+  GIT_PROGRESS FALSE
   GIT_SHALLOW FALSE
   USES_TERMINAL_DOWNLOAD TRUE)
 FetchContent_GetProperties(imgui)
@@ -147,6 +150,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME utils
   GIT_REPO https://github.com/wpumacay/utils.git
   GIT_TAG ${RENDERER_DEP_VERSION_utils}
+  GIT_PROGRESS FALSE
   TARGETS utils::utils
   BUILD_ARGS
     -DUTILS_BUILD_PYTHON_BINDINGS=ON
@@ -163,6 +167,7 @@ loco_find_or_fetch_dependency(
   LIBRARY_NAME math
   GIT_REPO https://github.com/wpumacay/math.git
   GIT_TAG ${RENDERER_DEP_VERSION_math}
+  GIT_PROGRESS FALSE
   TARGETS math::math math::math_py_helpers
   BUILD_ARGS
     -DMATH_BUILD_PYTHON_BINDINGS=ON
