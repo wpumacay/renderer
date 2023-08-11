@@ -69,17 +69,14 @@ void bindings_window(py::module& m) {
             .def("RegisterMouseMoveCallback", &Class::RegisterMouseMoveCallback)
             .def("RegisterScrollCallback", &Class::RegisterScrollCallback)
             .def("RegisterResizeCallback", &Class::RegisterResizeCallback)
-            .def_property(
-                "clearColor",
-                [](const Class& self) -> py::array_t<math::float32_t> {
-                    return math::vec4_to_nparray<math::float32_t>(
-                        self.clear_color());
-                },
-                [](Class& self,
-                   const py::array_t<math::float32_t>& array_np) -> void {
-                    self.clear_color() =
-                        math::nparray_to_vec4<math::float32_t>(array_np);
-                })
+            .def("SetClearColor",
+                 [](Class& self,
+                    const py::array_t<::math::float32_t>& array_np) -> void {
+                     self.SetClearColor(
+                         ::math::nparray_to_vec4<::math::float32_t>(array_np));
+                 })
+            .def_property_readonly("active", &Class::active)
+            .def_property_readonly("clear_color", &Class::clear_color)
             .def_property_readonly("width", &Class::width)
             .def_property_readonly("height", &Class::height)
             .def_property_readonly("active", &Class::active)
@@ -88,14 +85,16 @@ void bindings_window(py::module& m) {
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
                            "<Window\n"
-                           "  title: {}\n"
+                           "  active: {}\n"
+                           "  clear_color: {}\n"
                            "  width: {}\n"
                            "  height: {}\n"
-                           "  active: {}\n"
+                           "  title: {}\n"
                            "  backend: {}\n"
                            ">")
-                    .format(self.title(), self.width(), self.height(),
-                            self.active(), ToString(self.backend()));
+                    .format(self.active(), self.clear_color().toString(),
+                            self.width(), self.height(), self.title(),
+                            ToString(self.backend()));
             });
     }
 }

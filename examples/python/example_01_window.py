@@ -7,13 +7,13 @@ DEFAULT_HEIGHT = 768
 
 
 def main():
-    properties = rdr.WindowProperties()
-    properties.backend = rdr.WindowBackend.TYPE_GLFW
-    properties.width = DEFAULT_WIDTH
-    properties.height = DEFAULT_HEIGHT
-    properties.title = "Example 01 - Window"
+    config = rdr.WindowConfig()
+    config.backend = rdr.WindowBackend.TYPE_GLFW
+    config.width = DEFAULT_WIDTH
+    config.height = DEFAULT_HEIGHT
+    config.title = "Example 01 - Window"
 
-    window = rdr.Window(properties)
+    window = rdr.Window(config)
 
     def keycallback(key, action, mods):
         print("key: {}, action: {}. mods: {}".format(key, action, mods))

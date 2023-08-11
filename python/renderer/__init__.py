@@ -13,12 +13,12 @@ from renderer_bindings import (  # type: ignore
     VertexBuffer,
     Window,
     WindowBackend,
-    WindowProperties,
+    WindowConfig,
 )
 
 __all__ = [
     "WindowBackend",
-    "WindowProperties",
+    "WindowConfig",
     "Window",
     "KeyAction",
     "Keys",
