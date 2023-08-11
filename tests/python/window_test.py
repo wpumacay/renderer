@@ -42,3 +42,20 @@ def test_window_config_setters_getters() -> None:
     )
     assert config.gl_version_major == 4
     assert config.gl_version_minor == 3
+
+
+def test_window_constructor_from_config() -> None:
+    config = rdr.WindowConfig()
+    config.backend = rdr.WindowBackend.TYPE_GLFW
+    config.width = 800
+    config.height = 600
+    config.title = "Test Window Constructors - from config"
+    config.gl_version_major = 3
+    config.gl_version_minor = 3
+
+    window = rdr.Window(config)
+    assert window.active is True
+    assert window.backend == rdr.WindowBackend.TYPE_GLFW
+    assert window.width == 800 and window.height == 600
+    assert window.title == "Test Window Constructors - from config"
+    assert np.allclose(config.clear_color, window.clear_color)
