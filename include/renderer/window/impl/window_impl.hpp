@@ -5,7 +5,7 @@
 #include <utils/common.hpp>
 #include <renderer/common.hpp>
 #include <renderer/input/callbacks.hpp>
-#include <renderer/window/window_properties.hpp>
+#include <renderer/window/window_config_t.hpp>
 
 namespace renderer {
 
@@ -17,8 +17,7 @@ class IWindowImpl {
     DEFINE_SMART_POINTERS(IWindowImpl);
 
  public:
-    explicit IWindowImpl(WindowProperties properties)
-        : m_Properties(std::move(properties)) {}
+    explicit IWindowImpl(WindowConfig config) : m_Config(std::move(config)) {}
 
     virtual ~IWindowImpl() = default;
 
@@ -47,8 +46,10 @@ class IWindowImpl {
 
     virtual auto RequestClose() -> void = 0;
 
+    virtual auto SetClearColor(const Vec4& color) -> void = 0;
+
  protected:
-    WindowProperties m_Properties;
+    WindowConfig m_Config;
 };
 
 }  // namespace renderer

@@ -20,7 +20,7 @@ class WindowImplEgl : public IWindowImpl {
     DEFINE_SMART_POINTERS(WindowImplEgl)
 
  public:
-    explicit WindowImplEgl(WindowProperties properties);
+    explicit WindowImplEgl(WindowConfig config);
 
     ~WindowImplEgl() override;
 
@@ -52,13 +52,15 @@ class WindowImplEgl : public IWindowImpl {
 
     auto End() -> void override;
 
-    auto RequestClose() -> void override;
+    auto RequestClose() -> void override{/* Do nothing here */};
+
+    auto SetClearColor(const Vec4& color) -> void override;
 
  private:
-    EGLConfig m_Config = nullptr;
-    EGLDisplay m_Display = nullptr;
-    EGLSurface m_Surface = nullptr;
-    EGLContext m_Context = nullptr;
+    EGLConfig m_EglConfig = nullptr;
+    EGLDisplay m_EglDisplay = nullptr;
+    EGLSurface m_EglSurface = nullptr;
+    EGLContext m_EglContext = nullptr;
 };
 
 }  // namespace renderer

@@ -1,5 +1,5 @@
 #include <cassert>
-#include <renderer/window/window_properties.hpp>
+#include <renderer/window/window_config_t.hpp>
 
 namespace renderer {
 

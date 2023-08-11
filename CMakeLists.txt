@@ -43,7 +43,7 @@ add_subdirectory(third_party)
 loco_create_target(RendererCpp STATIC
   SOURCES
     ${SOURCE_DIR}/window/window_t.cpp
-    ${SOURCE_DIR}/window/window_properties.cpp
+    ${SOURCE_DIR}/window/window_config_t.cpp
     ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
     ${SOURCE_DIR}/window/impl/window_impl_egl.cpp
     ${SOURCE_DIR}/shader/shader_t.cpp

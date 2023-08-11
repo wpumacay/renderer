@@ -20,15 +20,15 @@ auto GLFWwindowDeleter::operator()(GLFWwindow* ptr) const -> void {
     }
 }
 
-WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
-    : IWindowImpl(std::move(properties)) {
+WindowImplGlfw::WindowImplGlfw(WindowConfig config)
+    : IWindowImpl(std::move(config)) {
     if (glfwInit() != GLFW_TRUE) {
         LOG_CORE_ERROR("There was an issue while initializing GLFW");
         return;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_Properties.gl_version_major);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_Properties.gl_version_minor);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_Config.gl_version_major);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_Config.gl_version_minor);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -36,8 +36,8 @@ WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     auto* glfw_window =
-        glfwCreateWindow(m_Properties.width, m_Properties.height,
-                         m_Properties.title.c_str(), nullptr, nullptr);
+        glfwCreateWindow(m_Config.width, m_Config.height,
+                         m_Config.title.c_str(), nullptr, nullptr);
     if (glfw_window == nullptr) {
         LOG_CORE_ERROR("WindowImplGlfw >>> coudn't initialize GLFW window");
         glfwTerminate();
@@ -60,8 +60,8 @@ WindowImplGlfw::WindowImplGlfw(WindowProperties properties)
 
     glViewport(0, 0, fbuffer_width, fbuffer_height);
     glEnable(GL_DEPTH_TEST);
-    glClearColor(m_Properties.clear_color.x(), m_Properties.clear_color.y(),
-                 m_Properties.clear_color.z(), m_Properties.clear_color.w());
+    glClearColor(m_Config.clear_color.x(), m_Config.clear_color.y(),
+                 m_Config.clear_color.z(), m_Config.clear_color.w());
 
     glfwSetWindowUserPointer(glfw_window, this);
 
@@ -208,8 +208,8 @@ auto WindowImplGlfw::DisableCursor() -> void {
 }
 
 auto WindowImplGlfw::Begin() -> void {
-    glClearColor(m_Properties.clear_color.x(), m_Properties.clear_color.y(),
-                 m_Properties.clear_color.z(), m_Properties.clear_color.w());
+    glClearColor(m_Config.clear_color.x(), m_Config.clear_color.y(),
+                 m_Config.clear_color.z(), m_Config.clear_color.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glfwPollEvents();
 
@@ -238,6 +238,12 @@ auto WindowImplGlfw::RequestClose() -> void {
     if (m_GlfwWindow != nullptr) {
         glfwSetWindowShouldClose(m_GlfwWindow.get(), GLFW_TRUE);
     }
+}
+
+auto WindowImplGlfw::SetClearColor(const Vec4& color) -> void {
+    m_Config.clear_color = color;
+    glClearColor(m_Config.clear_color.x(), m_Config.clear_color.y(),
+                 m_Config.clear_color.z(), m_Config.clear_color.w());
 }
 
 }  // namespace renderer

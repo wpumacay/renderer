@@ -22,7 +22,7 @@ class WindowImplGlfw : public IWindowImpl {
     DEFINE_SMART_POINTERS(WindowImplGlfw)
 
  public:
-    explicit WindowImplGlfw(WindowProperties properties);
+    explicit WindowImplGlfw(WindowConfig config);
 
     ~WindowImplGlfw() override;
 
@@ -50,6 +50,8 @@ class WindowImplGlfw : public IWindowImpl {
     auto End() -> void override;
 
     auto RequestClose() -> void override;
+
+    auto SetClearColor(const Vec4& color) -> void override;
 
  private:
     std::unique_ptr<GLFWwindow, GLFWwindowDeleter> m_GlfwWindow = nullptr;

@@ -5,30 +5,30 @@
 
 namespace renderer {
 
-Window::Window(WindowProperties properties)
-    : m_Properties(std::move(properties)) {
+Window::Window(WindowConfig config) : m_Config(std::move(config)) {
     _CreateImpl();
 }
 
-Window::Window(int width, int height, const eWindowBackend& backend) {
-    m_Properties.width = width;
-    m_Properties.height = height;
-    m_Properties.backend = backend;
+Window::Window(int width, int height, eWindowBackend backend) {
+    m_Config.width = width;
+    m_Config.height = height;
+    m_Config.backend = backend;
     _CreateImpl();
 }
 
 auto Window::_CreateImpl() -> void {
-    switch (m_Properties.backend) {
+    switch (m_Config.backend) {
         case eWindowBackend::TYPE_GLFW:
-            m_Impl = std::make_unique<WindowImplGlfw>(m_Properties);
+            m_Impl = std::make_unique<WindowImplGlfw>(m_Config);
             break;
         case eWindowBackend::TYPE_EGL:
-            m_Impl = std::make_unique<WindowImplEgl>(m_Properties);
+            m_Impl = std::make_unique<WindowImplEgl>(m_Config);
             break;
         default:
             // TODO(wilbert): use WindowImplNone here
             break;
     }
+    m_Active = true;
 }
 
 auto Window::EnableCursor() -> void {
@@ -59,7 +59,14 @@ auto Window::RequestClose() -> void {
     if (m_Impl) {
         m_Impl->RequestClose();
     }
-    m_Properties.active = false;
+    m_Active = false;
+}
+
+auto Window::SetClearColor(const Vec4& color) -> void {
+    if (m_Impl) {
+        m_Impl->SetClearColor(color);
+    }
+    m_Config.clear_color = color;
 }
 
 auto Window::RegisterKeyboardCallback(const KeyboardCallback& callback)

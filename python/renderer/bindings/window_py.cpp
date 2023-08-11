@@ -23,33 +23,28 @@ void bindings_window(py::module& m) {
     }
 
     {
-        using Class = renderer::WindowProperties;
-        py::class_<Class>(m, "WindowProperties")
+        using Class = renderer::WindowConfig;
+        constexpr auto ClassName = "WindowConfig";  // NOLINT
+        py::class_<Class>(m, ClassName)
             .def(py::init<>())
-            .def_property(
-                "clearColor",
-                [](const Class& self) -> py::array_t<math::float32_t> {
-                    return math::vec4_to_nparray<math::float32_t>(
-                        self.clear_color);
-                },
-                [](Class& self,
-                   const py::array_t<math::float32_t>& array_np) -> void {
-                    self.clear_color =
-                        math::nparray_to_vec4<math::float32_t>(array_np);
-                })
+            .def_readwrite("clear_color", &Class::clear_color)
             .def_readwrite("backend", &Class::backend)
             .def_readwrite("width", &Class::width)
             .def_readwrite("height", &Class::height)
-            .def_readwrite("active", &Class::active)
             .def_readwrite("title", &Class::title)
             .def_readwrite("gl_version_major", &Class::gl_version_major)
             .def_readwrite("gl_version_minor", &Class::gl_version_minor)
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
-                           "WindowProperties(title={}, width={}, height={}, "
-                           "active={}, backend={}, gl_version_major={}, "
-                           "gl_version_minor={}")
-                    .format(self.title, self.width, self.height, self.active,
+                           "<WindowConfig\n"
+                           "  title: {}\n"
+                           "  width: {}\n"
+                           "  height: {}"
+                           "  backend: {}\n"
+                           "  gl_version_major: {}\n"
+                           "  gl_version_minor: {}\n"
+                           ">")
+                    .format(self.title, self.width, self.height,
                             ToString(self.backend), self.gl_version_major,
                             self.gl_version_minor);
             });
@@ -57,10 +52,12 @@ void bindings_window(py::module& m) {
 
     {
         using Class = renderer::Window;
-        py::class_<Class, Class::ptr>(m, "Window")
-            .def(py::init<const WindowProperties&>())
-            .def(py::init<int, int, const eWindowBackend&>(), py::arg("width"),
-                 py::arg("height"), py::arg("backend"))
+        constexpr auto ClassName = "Window";  // NOLINT
+        py::class_<Class, Class::ptr>(m, ClassName)
+            .def(py::init<WindowConfig>())
+            .def(py::init<int, int, eWindowBackend>(), py::arg("width"),
+                 py::arg("height"),
+                 py::arg("backend") = ::renderer::eWindowBackend::TYPE_GLFW)
             .def("EnableCursor", &Class::EnableCursor)
             .def("DisableCursor", &Class::DisableCursor)
             .def("Begin", &Class::Begin)
@@ -88,14 +85,15 @@ void bindings_window(py::module& m) {
             .def_property_readonly("active", &Class::active)
             .def_property_readonly("title", &Class::title)
             .def_property_readonly("backend", &Class::backend)
-            .def("properties",
-                 [](const Class& self) -> WindowProperties {
-                     return self.properties();
-                 })
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
-                           "Window(title={}, width={}, height={}, active={}, "
-                           "backend={})")
+                           "<Window\n"
+                           "  title: {}\n"
+                           "  width: {}\n"
+                           "  height: {}\n"
+                           "  active: {}\n"
+                           "  backend: {}\n"
+                           ">")
                     .format(self.title(), self.width(), self.height(),
                             self.active(), ToString(self.backend()));
             });

@@ -6,13 +6,13 @@ constexpr int DEFAULT_WIDTH = 1024;
 constexpr int DEFAULT_HEIGHT = 768;
 
 auto main() -> int {
-    renderer::WindowProperties properties;
-    properties.backend = renderer::eWindowBackend::TYPE_GLFW;
-    properties.width = DEFAULT_WIDTH;
-    properties.height = DEFAULT_HEIGHT;
-    properties.title = "Example 01 - Window";
+    renderer::WindowConfig win_config;
+    win_config.backend = renderer::eWindowBackend::TYPE_GLFW;
+    win_config.width = DEFAULT_WIDTH;
+    win_config.height = DEFAULT_HEIGHT;
+    win_config.title = "Example 01 - Window";
 
-    auto window = std::make_unique<renderer::Window>(properties);
+    auto window = std::make_unique<renderer::Window>(win_config);
     window->RegisterKeyboardCallback([&](int key, int action, int mods) {
         LOG_TRACE("key: {0}, action: {1}, mods: {2}", key, action, mods);
         if ((mods & renderer::MOD_SHIFT) != 0) {

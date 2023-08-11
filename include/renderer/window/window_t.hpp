@@ -7,7 +7,7 @@
 #include <renderer/common.hpp>
 #include <renderer/input/callbacks.hpp>
 #include <renderer/input/keycodes.hpp>
-#include <renderer/window/window_properties.hpp>
+#include <renderer/window/window_config_t.hpp>
 #include <renderer/window/impl/window_impl.hpp>
 
 namespace renderer {
@@ -26,12 +26,12 @@ class Window {
     DEFINE_SMART_POINTERS(Window)
 
  public:
-    /// Creates a window from a given set of properties
-    explicit Window(WindowProperties properties);
+    /// Creates a window from a given set of configuration options
+    explicit Window(WindowConfig config);
 
     /// Creates a window given its width, height, and (optionally) backend
     explicit Window(int width, int height,
-                    const eWindowBackend& backend = eWindowBackend::TYPE_GLFW);
+                    eWindowBackend backend = eWindowBackend::TYPE_GLFW);
 
     ~Window() = default;
 
@@ -50,6 +50,9 @@ class Window {
     /// Requests (if applicable) the window to close itself in the next frame
     auto RequestClose() -> void;
 
+    /// Sets the background color of the window
+    auto SetClearColor(const Vec4& color) -> void;
+
     /// Registers (if applicable) a callback to be called on keyboard events
     auto RegisterKeyboardCallback(const KeyboardCallback& callback) -> void;
 
@@ -67,35 +70,35 @@ class Window {
     /// events
     auto RegisterResizeCallback(const ResizeCallback& callback) -> void;
 
-    /// Returns an unmutable reference to the clear-color property
-    auto clear_color() const -> const Vec4& { return m_Properties.clear_color; }
+    /// Returns whether or not this window is still active
+    auto active() const -> bool { return m_Active; }
 
-    /// Returns a mutable reference to the clear-color property
-    auto clear_color() -> Vec4& { return m_Properties.clear_color; }
+    /// Returns an unmutable reference to the clear-color property
+    auto clear_color() const -> Vec4 { return m_Config.clear_color; }
 
     /// Returns the current width (in pixels) of this window
-    auto width() const -> int { return m_Properties.width; }
+    auto width() const -> int { return m_Config.width; }
 
     /// Returns the current height (in pixels) of this window
-    auto height() const -> int { return m_Properties.height; }
-
-    /// Returns whether or not this window is still active
-    auto active() const -> bool { return m_Properties.active; }
+    auto height() const -> int { return m_Config.height; }
 
     /// Returns the title of this window
-    auto title() const -> std::string { return m_Properties.title; }
+    auto title() const -> std::string { return m_Config.title; }
 
     /// Returns the identifier of the windowing-backend used for this window
-    auto backend() const -> eWindowBackend { return m_Properties.backend; }
+    auto backend() const -> eWindowBackend { return m_Config.backend; }
 
-    /// Returns an unmutable reference to the properties of this window
-    auto properties() const -> const WindowProperties& { return m_Properties; }
+    /// Returns an unmutable reference to the config of this window
+    auto config() const -> const WindowConfig& { return m_Config; }
 
  private:
     auto _CreateImpl() -> void;
 
  private:
-    WindowProperties m_Properties;
+    /// The configuration used for creating this window
+    WindowConfig m_Config;
+    /// Whether or not the window is still active
+    bool m_Active = false;
     /// Backend-specific implementation of the window API
     IWindowImpl::uptr m_Impl = nullptr;
 };
