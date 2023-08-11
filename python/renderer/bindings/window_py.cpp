@@ -39,14 +39,15 @@ void bindings_window(py::module& m) {
                            "<WindowConfig\n"
                            "  title: {}\n"
                            "  width: {}\n"
-                           "  height: {}"
+                           "  height: {}\n"
                            "  backend: {}\n"
+                           "  clear_color: {}\n"
                            "  gl_version_major: {}\n"
                            "  gl_version_minor: {}\n"
                            ">")
                     .format(self.title, self.width, self.height,
-                            ToString(self.backend), self.gl_version_major,
-                            self.gl_version_minor);
+                            ToString(self.backend), self.clear_color.toString(),
+                            self.gl_version_major, self.gl_version_minor);
             });
     }
 
@@ -79,22 +80,21 @@ void bindings_window(py::module& m) {
             .def_property_readonly("clear_color", &Class::clear_color)
             .def_property_readonly("width", &Class::width)
             .def_property_readonly("height", &Class::height)
-            .def_property_readonly("active", &Class::active)
             .def_property_readonly("title", &Class::title)
             .def_property_readonly("backend", &Class::backend)
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
                            "<Window\n"
-                           "  active: {}\n"
-                           "  clear_color: {}\n"
-                           "  width: {}\n"
-                           "  height: {}\n"
                            "  title: {}\n"
                            "  backend: {}\n"
+                           "  active: {}\n"
+                           "  width: {}\n"
+                           "  height: {}\n"
+                           "  clear_color: {}\n"
                            ">")
-                    .format(self.active(), self.clear_color().toString(),
-                            self.width(), self.height(), self.title(),
-                            ToString(self.backend()));
+                    .format(self.title(), ToString(self.backend()),
+                            self.active(), self.width(), self.height(),
+                            self.clear_color().toString());
             });
     }
 }
