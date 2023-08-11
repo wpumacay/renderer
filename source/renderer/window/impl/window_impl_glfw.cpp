@@ -1,6 +1,7 @@
 
 #include <glad/gl.h>
 
+#include <string>
 #include <utils/logging.hpp>
 #include <renderer/window/impl/window_impl_glfw.hpp>
 #include <spdlog/fmt/bundled/format.h>
@@ -49,9 +50,17 @@ WindowImplGlfw::WindowImplGlfw(WindowConfig config)
                     "WindowImplGlfw >>> failed to load GL using GLAD on the "
                     "current context");
     LOG_CORE_INFO("OpenGL Info:");
-    LOG_CORE_INFO("\tVendor     : {0}", fmt::ptr(glGetString(GL_VENDOR)));
-    LOG_CORE_INFO("\tRenderer   : {0}", fmt::ptr(glGetString(GL_RENDERER)));
-    LOG_CORE_INFO("\tVersion    : {0}", fmt::ptr(glGetString(GL_VERSION)));
+
+    const std::string STR_VENDOR =
+        reinterpret_cast<const char*>(glGetString(GL_VENDOR));  // NOLINT
+    const std::string STR_RENDERER =
+        reinterpret_cast<const char*>(glGetString(GL_RENDERER));  // NOLINT
+    const std::string STR_VERSION =
+        reinterpret_cast<const char*>(glGetString(GL_VERSION));  // NOLINT
+
+    LOG_CORE_INFO("\tVendor     : {0}", STR_VENDOR);
+    LOG_CORE_INFO("\tRenderer   : {0}", STR_RENDERER);
+    LOG_CORE_INFO("\tVersion    : {0}", STR_VERSION);
 
     glfwSetInputMode(glfw_window, GLFW_STICKY_KEYS, GLFW_TRUE);
     int fbuffer_width = 0;
