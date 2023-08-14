@@ -63,6 +63,8 @@ auto Shader::_CompileShader(const char* source) -> void {
             "Shader::_CompileShader >>> coudln't compile shader: name={0}, "
             "type={1},\nerror={2}",
             m_Name, ToString(m_Type), error_buffer.data());
+        // TODO(wilbert): here we should throw a custom exception. For now an
+        // error flag exposed through shader->compiled() should do the trick
         m_Compiled = false;
         m_OpenGLId = 0;
         return;

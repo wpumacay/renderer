@@ -20,7 +20,8 @@ add_executable(
   RendererCppTests
   ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_window_config.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/test_window.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_window.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_shader.cpp)
 
 target_link_libraries(RendererCppTests PRIVATE renderer::renderer
                                                Catch2::Catch2)
