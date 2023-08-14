@@ -37,7 +37,7 @@ void bindings_window(py::module& m) {
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
                            "<WindowConfig\n"
-                           "  title: {}\n"
+                           "  title: \"{}\"\n"
                            "  width: {}\n"
                            "  height: {}\n"
                            "  backend: {}\n"
@@ -85,16 +85,16 @@ void bindings_window(py::module& m) {
             .def("__repr__", [](const Class& self) -> py::str {
                 return py::str(
                            "<Window\n"
-                           "  title: {}\n"
-                           "  backend: {}\n"
+                           "  title: \"{}\"\n"
                            "  active: {}\n"
                            "  width: {}\n"
                            "  height: {}\n"
                            "  clear_color: {}\n"
+                           "  backend: {}\n"
                            ">")
-                    .format(self.title(), ToString(self.backend()),
-                            self.active(), self.width(), self.height(),
-                            self.clear_color().toString());
+                    .format(self.title(), self.active(), self.width(),
+                            self.height(), self.clear_color().toString(),
+                            ToString(self.backend()));
             });
     }
 }
