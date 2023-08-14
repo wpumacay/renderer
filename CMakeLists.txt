@@ -25,8 +25,8 @@ option(RENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(RENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
-option(RENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
-option(RENDERER_BUILD_DOCS "Build documentation" ON)
+option(RENDERER_BUILD_TESTS "Build C++ unit-tests" ON)
+option(RENDERER_BUILD_DOCS "Build documentation" OFF)
 
 loco_initialize_project()
 
@@ -94,6 +94,10 @@ add_library(renderer::renderer ALIAS RendererCpp)
 
 if(RENDERER_BUILD_EXAMPLES)
   add_subdirectory(examples/cpp)
+endif()
+
+if(RENDERER_BUILD_TESTS)
+  add_subdirectory(tests/cpp)
 endif()
 
 if(RENDERER_BUILD_PYTHON_BINDINGS)
