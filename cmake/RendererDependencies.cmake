@@ -19,7 +19,7 @@ include_guard()
 
 # -------------------------------------
 set(RENDERER_DEP_VERSION_catch2
-    3f0283de7a9c43200033da996ff9093be3ac84dc # Release 3.3.2
+    182c910b4b63ff587a3440e08f84f70497e49a81 # Release 2.13.10
     CACHE STRING "Version of Catch2 to be fetched (used for unittests)")
 
 set(RENDERER_DEP_VERSION_glfw
