@@ -28,11 +28,8 @@ void bindings_shader(py::module& m) {
 
     {
         using Class = renderer::Shader;
-        py::class_<Class, Class::uptr>(m, "Shader")
-            //// Won't expose constructor, as we're just gonna expose the
-            //// program_t because we can't use unique_ptr when binding in
-            //// pybind11 upstream yet
-            //// .def(py::init<const char*, const eShaderType&, const char*>())
+        py::class_<Class, Class::ptr>(m, "Shader")
+            .def(py::init<const char*, const eShaderType&, const char*>())
             .def_property_readonly("name", &Class::name)
             .def_property_readonly("type", &Class::type)
             .def_property_readonly("source", &Class::source)
