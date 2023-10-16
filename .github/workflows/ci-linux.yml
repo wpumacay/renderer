@@ -5,7 +5,6 @@ on:
   pull_request:
     branches:
       - main
-      - dev
 
 jobs:
   build:
@@ -28,7 +27,9 @@ jobs:
           sudo apt install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
 
     - name: Update CMake
-      uses: jwlawson/actions-setup-cmake@v1.10
+      uses: jwlawson/actions-setup-cmake@v1.14.1
+      with:
+        github-api-token: ${{ secrets.GITHUB_TOKEN }}
 
     - if: ${{ matrix.compiler == 'gcc' }}
       name: Configure GNU/GCC as C/C++ compiler
