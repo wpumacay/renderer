@@ -33,11 +33,11 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    58623f20534cbe4cc3f20cdeac46a27ca4f21790 # Version v0.2.2
+    192116eaae76fb1c878a4d0bd8617e95e618604a # Version v0.2.5
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    7f863e0dbf9f0e9ba0d35b38ab912baf7431053f # Version v0.5.1
+    1e5dd4bac79d62d7eebfcd8a87360c2f4e1a550c # Version v0.6.1
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
@@ -74,6 +74,7 @@ loco_find_or_fetch_dependency(
   GIT_REPO https://github.com/pybind/pybind11.git
   GIT_TAG ${RENDERER_DEP_VERSION_pybind11}
   GIT_PROGRESS FALSE
+  GIT_SHALLOW TRUE
   TARGETS pybind11::headers
   BUILD_ARGS
     -DPYBIND11_TEST=OFF
@@ -90,6 +91,7 @@ loco_find_or_fetch_dependency(
   GIT_REPO https://github.com/catchorg/Catch2.git
   GIT_TAG ${RENDERER_DEP_VERSION_catch2}
   GIT_PROGRESS FALSE
+  GIT_SHALLOW TRUE
   TARGETS Catch2::Catch2
   BUILD_ARGS
     -DCATCH_INSTALL_DOCS=OFF
@@ -114,6 +116,7 @@ loco_find_or_fetch_dependency(
   GIT_REPO https://github.com/glfw/glfw.git
   GIT_TAG ${RENDERER_DEP_VERSION_glfw}
   GIT_PROGRESS FALSE
+  GIT_SHALLOW TRUE
   TARGETS glfw
   BUILD_ARGS
     -DGLFW_BUILD_EXAMPLES=OFF
@@ -141,23 +144,6 @@ if (NOT imgui_POPULATED)
   FetchContent_Populate(imgui)
 endif()
 
-
-# ------------------------------------------------------------------------------
-# "Utils" exposes some utilities that we'll use (like logs, profiling, etc.)
-# ------------------------------------------------------------------------------
-loco_find_or_fetch_dependency(
-  USE_SYSTEM_PACKAGE FALSE
-  LIBRARY_NAME utils
-  GIT_REPO https://github.com/wpumacay/utils.git
-  GIT_TAG ${RENDERER_DEP_VERSION_utils}
-  GIT_PROGRESS FALSE
-  TARGETS utils::utils
-  BUILD_ARGS
-    -DUTILS_BUILD_PYTHON_BINDINGS=ON
-    -DUTILS_BUILD_EXAMPLES=OFF
-    -DUTILS_BUILD_DOCS=OFF
-  EXCLUDE_FROM_ALL)
-
 # ------------------------------------------------------------------------------
 # "Math" is used as math library (defines vectors, matrices, and operations
 # that could be used on these types). The API is similar to Eigen's
@@ -168,12 +154,31 @@ loco_find_or_fetch_dependency(
   GIT_REPO https://github.com/wpumacay/math.git
   GIT_TAG ${RENDERER_DEP_VERSION_math}
   GIT_PROGRESS FALSE
+  GIT_SHALLOW TRUE
   TARGETS math::math math::math_py_helpers
   BUILD_ARGS
     -DMATH_BUILD_PYTHON_BINDINGS=ON
     -DMATH_BUILD_EXAMPLES=OFF
     -DMATH_BUILD_TESTS=OFF
     -DMATH_BUILD_DOCS=OFF
+  EXCLUDE_FROM_ALL)
+
+
+# ------------------------------------------------------------------------------
+# "Utils" exposes some utilities that we'll use (like logs, profiling, etc.)
+# ------------------------------------------------------------------------------
+loco_find_or_fetch_dependency(
+  USE_SYSTEM_PACKAGE FALSE
+  LIBRARY_NAME utils
+  GIT_REPO https://github.com/wpumacay/utils.git
+  GIT_TAG ${RENDERER_DEP_VERSION_utils}
+  GIT_PROGRESS FALSE
+  GIT_SHALLOW TRUE
+  TARGETS utils::utils
+  BUILD_ARGS
+    -DUTILS_BUILD_PYTHON_BINDINGS=ON
+    -DUTILS_BUILD_EXAMPLES=OFF
+    -DUTILS_BUILD_DOCS=OFF
   EXCLUDE_FROM_ALL)
 
 # cmake-format: on
