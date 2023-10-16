@@ -10,12 +10,20 @@ import subprocess
 
 DOCKERFILE_FMT = """\
 FROM {base}
+
+RUN :\
+    && yum install -y \
+        libXinerama-devel \
+        libXrandr-devel \
+        libXcursor-devel \
+        libXi-devel \
+    && :
 """
 
 PROG = """\
 {py_bin}/pip wheel --index {index} --no-build-isolation \
     --wheel-dir /work wp-renderer=={version} && \
-auditwheel repair --wheel-dir /dist /work/*.whl
+auditwheel repair --exclude libOpenGL.so.0 --wheel-dir /dist /work/*.whl
 """
 
 
