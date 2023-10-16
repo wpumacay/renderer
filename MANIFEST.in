@@ -1,0 +1,15 @@
+include *.py
+include *.txt
+recursive-include cmake *.cmake
+recursive-include include *.hpp
+recursive-include source *.cpp
+recursive-include third_party *.c
+recursive-include third_party *.h
+recursive-include third_party *.txt
+recursive-include python *.cpp
+recursive-include python *.hpp
+recursive-include python *.txt
+recursive-include tests *.cpp
+recursive-include tests *.hpp
+recursive-include tests *.py
+recursive-include tests *.txt
