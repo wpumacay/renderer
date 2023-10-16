@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15..3.19)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # -------------------------------------
 # Get loco_cmake to help us configure our CMake based project
