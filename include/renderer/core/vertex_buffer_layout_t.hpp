@@ -80,6 +80,19 @@ class BufferLayout {
     /// Creates a buffer layout from elements in a std::vector
     explicit BufferLayout(std::vector<BufferElement> elements);
 
+    /// \brief Adds the given element to this layout
+    auto AddElement(BufferElement element) -> void;
+
+    /// \brief Returns a mutable reference to an element given its index
+    auto GetElementByIndex(size_t index) -> BufferElement&;
+
+    /// \brief Returns an unmutable reference to an element given its index
+    auto GetElementByIndex(size_t index) const -> const BufferElement&;
+
+    /// \brief Returns the number of elements stored by this buffer layout
+    auto num_elements() const -> size_t;
+
+    /// \brief Returns the resulting computed stried for this layout
     auto stride() const -> uint32_t { return m_Stride; }
 
     /// Returns a mutable reference to the elements in the layout

@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <glad/gl.h>
 
 #include <renderer/core/vertex_buffer_layout_t.hpp>
@@ -110,6 +112,37 @@ BufferLayout::BufferLayout(std::vector<BufferElement> elements)
         element.offset = m_Stride;
         m_Stride += element.size;
     }
+}
+
+auto BufferLayout::AddElement(BufferElement element) -> void {
+    element.offset = m_Stride;
+    m_Stride += element.size;
+    m_BufferElements.push_back(std::move(element));
+}
+
+auto BufferLayout::GetElementByIndex(size_t index) -> BufferElement& {
+    if (index >= m_BufferElements.size()) {
+        throw std::runtime_error(
+            fmt::format("BufferLayout::GetElementByIndex >> index {0} out of "
+                        "range [0-{1})",
+                        index, m_BufferElements.size()));
+    }
+    return m_BufferElements[index];
+}
+
+auto BufferLayout::GetElementByIndex(size_t index) const
+    -> const BufferElement& {
+    if (index >= m_BufferElements.size()) {
+        throw std::runtime_error(
+            fmt::format("BufferLayout::GetElementByIndex >> index {0} out of "
+                        "range [0-{1})",
+                        index, m_BufferElements.size()));
+    }
+    return m_BufferElements[index];
+}
+
+auto BufferLayout::num_elements() const -> size_t {
+    return m_BufferElements.size();
 }
 
 auto BufferLayout::ToString() const -> std::string {

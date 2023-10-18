@@ -11,6 +11,7 @@
 #include <renderer/core/vertex_array_t.hpp>
 
 #include <conversions_py.hpp>
+#include "renderer/core/vertex_buffer_layout_t.hpp"
 #include <spdlog/fmt/bundled/format.h>
 
 #if defined(__clang__)
@@ -100,7 +101,17 @@ void bindings_buffers(py::module& m) {
 
                 return std::make_unique<BufferLayout>(buffer_elements);
             }))
-            .def("stride", &Class::stride)
+            .def("AddElement", &Class::AddElement)
+            .def("GetElementByIndex",
+                 [](Class& self, size_t index) -> BufferElement& {
+                     return self.GetElementByIndex(index);
+                 })
+            .def_property_readonly("num_elements", &Class::num_elements)
+            .def_property_readonly("stride", &Class::stride)
+            .def("__getitem__",
+                 [](Class& self, size_t index) -> BufferElement& {
+                     return self.GetElementByIndex(index);
+                 })
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
     }
