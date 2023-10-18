@@ -183,7 +183,8 @@ void bindings_buffers(py::module& m) {
         constexpr auto* ClassName = "VertexArray";  // NOLINT
         py::class_<Class>(m, ClassName)
             .def(py::init<>())
-            .def("AddVertexBuffer", &Class::AddVertexBuffer)
+            .def("AddVertexBuffer", &Class::AddVertexBuffer, py::arg("buffer"),
+                 py::arg("is_instanced") = false)
             .def("SetIndexBuffer", &Class::SetIndexBuffer)
             .def("Bind", &Class::Bind)
             .def("Unbind", &Class::Unbind)

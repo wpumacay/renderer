@@ -76,7 +76,7 @@ def main() -> int:
     )
 
     vao = rdr.VertexArray()
-    vao.AddVertexBuffer(vbo, False)
+    vao.AddVertexBuffer(vbo)
 
     while window.active:
         window.Begin()
