@@ -144,14 +144,14 @@ void bindings_buffers(py::module& m) {
                     layout, usage, size,
                     static_cast<const float32_t*>(data.request().ptr));
             }))
-            .def("resize", &Class::Resize)
-            .def("updateData",
+            .def("Resize", &Class::Resize)
+            .def("UpdateData",
                  [](Class& self, uint32_t size, const NumpyFloatArray& data) {
                      self.UpdateData(size, static_cast<const float32_t*>(
                                                data.request().ptr));
                  })
-            .def("bind", &Class::Bind)
-            .def("unbind", &Class::Unbind)
+            .def("Bind", &Class::Bind)
+            .def("Unbind", &Class::Unbind)
             .def_property_readonly("layout", &Class::layout)
             .def_property_readonly("size", &Class::size)
             .def_property_readonly("usage", &Class::usage)
@@ -170,8 +170,8 @@ void bindings_buffers(py::module& m) {
                     usage, count,
                     static_cast<const uint32_t*>(data.request().ptr));
             }))
-            .def("bind", &Class::Bind)
-            .def("unbind", &Class::Unbind)
+            .def("Bind", &Class::Bind)
+            .def("Unbind", &Class::Unbind)
             .def_property_readonly("count", &Class::count)
             .def_property_readonly("opengl_id", &Class::opengl_id)
             .def("__repr__",
@@ -183,10 +183,10 @@ void bindings_buffers(py::module& m) {
         constexpr auto* ClassName = "VertexArray";  // NOLINT
         py::class_<Class>(m, ClassName)
             .def(py::init<>())
-            .def("addVertexBuffer", &Class::AddVertexBuffer)
-            .def("setIndexBuffer", &Class::SetIndexBuffer)
-            .def("bind", &Class::Bind)
-            .def("unbind", &Class::Unbind)
+            .def("AddVertexBuffer", &Class::AddVertexBuffer)
+            .def("SetIndexBuffer", &Class::SetIndexBuffer)
+            .def("Bind", &Class::Bind)
+            .def("Unbind", &Class::Unbind)
             .def_property_readonly("opengl_id", &Class::opengl_id)
             .def_property_readonly("num_attribs", &Class::num_attribs)
             .def_property_readonly("num_buffers", &Class::num_buffers)
