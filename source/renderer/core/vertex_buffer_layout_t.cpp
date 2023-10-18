@@ -1,6 +1,3 @@
-#include <iostream>
-#include <cstdint>
-
 #include <glad/gl.h>
 
 #include <renderer/core/vertex_buffer_layout_t.hpp>
@@ -86,13 +83,18 @@ auto GetElementCount(const eElementType& etype) -> uint32_t {
     }
 }
 
-BufferElement::BufferElement(const char* name, const eElementType& etype,
-                             bool normalize)
-    : name(name),
-      type(etype),
-      count(GetElementCount(etype)),
-      size(GetElementSize(etype)),
-      normalized(normalize) {}
+auto BufferElement::ToString() const -> std::string {
+    return fmt::format(
+        "<BufferElement\n"
+        "  name: {0}\n"
+        "  type: {1}\n"
+        "  count: {2}\n"
+        "  size: {3}\n"
+        "  offset: {4}\n"
+        "  normalized: {5}\n"
+        ">\n",
+        name, ::renderer::ToString(type), count, size, offset, normalized);
+}
 
 BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
     : m_BufferElements(elements) {
@@ -113,18 +115,17 @@ BufferLayout::BufferLayout(std::vector<BufferElement> elements)
 auto BufferLayout::ToString() const -> std::string {
     uint32_t index = 0;
     auto last_index = static_cast<uint32_t>(m_BufferElements.size() - 1);
-    std::string str_repr{"BufferLayout({"};
+    std::string str_repr{"<BufferLayout({\n"};
     for (const auto& element : m_BufferElements) {
         str_repr += fmt::format(
-            "{0}[name=\"{1}\", type={2}, count={3}, size={4}, offset={5}, "
-            "normalized={6}]",
-            (index != 0 ? "              " : ""), element.name,
-            renderer::ToString(element.type), element.count, element.size,
-            element.offset, (element.normalized ? "true" : "false"));
+            "  [name={0}, type={1}, count={2}, size={3}, offset={4}, "
+            "normalized={5}]\n",
+            element.name, renderer::ToString(element.type), element.count,
+            element.size, element.offset, element.normalized);
         str_repr += (index != last_index ? "\n" : "");
         index++;
     }
-    str_repr += "})";
+    str_repr += "})>\n";
     return str_repr;
 }
 

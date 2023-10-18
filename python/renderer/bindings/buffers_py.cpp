@@ -53,13 +53,8 @@ void bindings_buffers(py::module& m) {
             .def_readwrite("size", &Class::size)
             .def_readwrite("offset", &Class::offset)
             .def_readwrite("normalized", &Class::normalized)
-            .def("__repr__", [](const Class& self) -> py::str {
-                return py::str(
-                           "BufferElement(name={}, type={}, count={}, size={}, "
-                           "offset={}, normalized={})")
-                    .format(self.name, ToString(self.type), self.count,
-                            self.size, self.offset, self.normalized);
-            });
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
     }
 
     {
@@ -105,12 +100,7 @@ void bindings_buffers(py::module& m) {
 
                 return std::make_unique<BufferLayout>(buffer_elements);
             }))
-            .def_property_readonly("stride", &Class::stride)
-            .def_property_readonly(
-                "elements",
-                [](const Class& self) -> std::vector<BufferElement> {
-                    return self.elements();
-                })
+            .def("stride", &Class::stride)
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
     }

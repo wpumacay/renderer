@@ -39,7 +39,7 @@ auto GetElementCount(const eElementType& etype) -> uint32_t;
 /// Struct describing a given element in a Vertex Buffer
 struct BufferElement {
     /// Name of the element in the buffer, mainly for debugging (e.g. position)
-    std::string name{};
+    std::string name{"none"};
     /// The type of this element
     eElementType type = eElementType::FLOAT_3;
     /// Number of single-components of the element
@@ -52,11 +52,19 @@ struct BufferElement {
     bool normalized = false;
 
     /// Creates a default vertex Buffer Element
-    BufferElement()
-        : name("none"), type(eElementType::FLOAT_1), count(0), size(0) {}
+    BufferElement() = default;
 
     /// Creates a buffer element with the given description
-    BufferElement(const char* name, const eElementType& etype, bool normalize);
+    BufferElement(const char* e_name, const eElementType& e_type,
+                  bool e_normalized)
+        : name(e_name),
+          type(e_type),
+          count(GetElementCount(e_type)),
+          size(GetElementSize(e_type)),
+          normalized(e_normalized) {}
+
+    /// \brief Returns a string representation of this elements
+    auto ToString() const -> std::string;
 };
 
 /// Object describing the layout of all (or part) of the data in a vertex buffer
