@@ -46,15 +46,9 @@ def test_buffer_element_ctor_args() -> None:
     assert elm_texcoord.normalized is False
 
 
-def test_buffer_layout_ctor_default() -> None:
-    layout = rdr.BufferLayout()
-
-    assert layout.num_elements == 0
-    assert layout.stride == 0
-
-
-def test_buffer_layout_ctor_args() -> None:
-    layout = rdr.BufferLayout(
+@pytest.fixture
+def layout():
+    return rdr.BufferLayout(
         [
             ["position", rdr.ElementType.FLOAT_2, False],
             ["color", rdr.ElementType.FLOAT_3, False],
@@ -62,29 +56,17 @@ def test_buffer_layout_ctor_args() -> None:
         ]
     )
 
+
+def test_buffer_layout_ctor_default() -> None:
+    layout = rdr.BufferLayout()
+
+    assert layout.num_elements == 0
+    assert layout.stride == 0
+
+
+def test_buffer_layout_ctor_args(layout: rdr.BufferLayout) -> None:
     assert layout.num_elements == 3
     assert layout.stride == (2 * 4 + 3 * 4 + 2 * 4)
-
-    assert layout[0].name == "position"
-    assert layout[0].type == rdr.ElementType.FLOAT_2
-    assert layout[0].count == 2
-    assert layout[0].size == 2 * 4
-    assert layout[0].offset == 0
-    assert layout[0].normalized is False
-
-    assert layout[1].name == "color"
-    assert layout[1].type == rdr.ElementType.FLOAT_3
-    assert layout[1].count == 3
-    assert layout[1].size == 3 * 4
-    assert layout[1].offset == layout[0].size
-    assert layout[1].normalized is False
-
-    assert layout[2].name == "texcoord"
-    assert layout[2].type == rdr.ElementType.FLOAT_2
-    assert layout[2].count == 2
-    assert layout[2].size == 2 * 4
-    assert layout[2].offset == layout[0].size + layout[1].size
-    assert layout[2].normalized is False
 
 
 def test_buffer_layout_add_element_method() -> None:
@@ -103,19 +85,52 @@ def test_buffer_layout_add_element_method() -> None:
     assert layout.num_elements == 3
     assert layout.stride == (3 * 4 + 3 * 4 + 2 * 4)
 
+
+def test_buffer_layout_get_element_method(layout: rdr.BufferLayout) -> None:
+    assert type(layout.GetElementByIndex(0)) is rdr.BufferElement
+    assert type(layout.GetElementByIndex(1)) is rdr.BufferElement
+    assert type(layout.GetElementByIndex(2)) is rdr.BufferElement
+
+    assert layout.GetElementByIndex(0).name == "position"
+    assert layout.GetElementByIndex(0).type == rdr.ElementType.FLOAT_2
+    assert layout.GetElementByIndex(0).count == 2
+    assert layout.GetElementByIndex(0).size == 2 * 4
+    assert layout.GetElementByIndex(0).offset == 0
+    assert layout.GetElementByIndex(0).normalized is False
+
+    assert layout.GetElementByIndex(1).name == "color"
+    assert layout.GetElementByIndex(1).type == rdr.ElementType.FLOAT_3
+    assert layout.GetElementByIndex(1).count == 3
+    assert layout.GetElementByIndex(1).size == 3 * 4
+    assert layout.GetElementByIndex(1).offset == layout[0].size
+    assert layout.GetElementByIndex(1).normalized is False
+
+    assert layout.GetElementByIndex(2).name == "texcoord"
+    assert layout.GetElementByIndex(2).type == rdr.ElementType.FLOAT_2
+    assert layout.GetElementByIndex(2).count == 2
+    assert layout.GetElementByIndex(2).size == 2 * 4
+    assert layout.GetElementByIndex(2).offset == layout[0].size + layout[1].size
+    assert layout.GetElementByIndex(2).normalized is False
+
+
+def test_buffer_layout_getitem_operator(layout: rdr.BufferLayout) -> None:
+    assert type(layout[0]) is rdr.BufferElement
+    assert type(layout[1]) is rdr.BufferElement
+    assert type(layout[2]) is rdr.BufferElement
+
     assert layout[0].name == "position"
-    assert layout[0].type == rdr.ElementType.FLOAT_3
-    assert layout[0].count == 3
-    assert layout[0].size == 3 * 4
+    assert layout[0].type == rdr.ElementType.FLOAT_2
+    assert layout[0].count == 2
+    assert layout[0].size == 2 * 4
     assert layout[0].offset == 0
     assert layout[0].normalized is False
 
-    assert layout[1].name == "normal"
+    assert layout[1].name == "color"
     assert layout[1].type == rdr.ElementType.FLOAT_3
     assert layout[1].count == 3
     assert layout[1].size == 3 * 4
     assert layout[1].offset == layout[0].size
-    assert layout[1].normalized is True
+    assert layout[1].normalized is False
 
     assert layout[2].name == "texcoord"
     assert layout[2].type == rdr.ElementType.FLOAT_2
