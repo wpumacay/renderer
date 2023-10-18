@@ -1,4 +1,4 @@
-if(NOT TARGET renderer::renderer)
+if(NOT TARGET RendererCpp)
   return()
 endif()
 
@@ -20,7 +20,7 @@ foreach(example_filepath IN LISTS RENDERER_EXAMPLES_LIST)
   # cmake-format: off
   loco_setup_single_file_example(
       ${example_filepath}
-      TARGET_DEPENDENCIES renderer::renderer
+      TARGET_DEPENDENCIES RendererCpp
       INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
   # cmake-format: on
 endforeach()
