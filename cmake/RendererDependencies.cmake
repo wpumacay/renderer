@@ -33,7 +33,7 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    192116eaae76fb1c878a4d0bd8617e95e618604a # Version v0.2.5
+    cf00a4b66e10b35d89a6862b70dc3da2d1ec3c0e # Version v0.2.6
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
