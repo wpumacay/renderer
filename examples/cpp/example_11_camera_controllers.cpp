@@ -71,13 +71,13 @@ auto main() -> int {
         // Bookkeeping the new viewport
         g_window_width = width;
         g_window_height = height;
-        auto g_window_aspect =
+        auto window_aspect =
             static_cast<float>(width) / static_cast<float>(height);
         glViewport(0, 0, width, height);
         // Update the camera projection accordingly
         auto data = camera->proj_data();
-        data.aspect = g_window_aspect;
-        data.width = FRUSTUM_SIZE * g_window_aspect;
+        data.aspect = window_aspect;
+        data.width = FRUSTUM_SIZE * window_aspect;
         data.height = FRUSTUM_SIZE;
         camera->SetProjectionData(data);
 

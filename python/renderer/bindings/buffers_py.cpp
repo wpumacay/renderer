@@ -17,6 +17,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 
 namespace py = pybind11;
@@ -200,4 +203,6 @@ void bindings_buffers(py::module& m) {
 
 #if defined(__clang__)
 #pragma clang diagnostic pop  // NOLINT
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif

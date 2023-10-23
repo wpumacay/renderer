@@ -198,6 +198,8 @@ auto get_wrapping_mode_idx(const renderer::eTextureWrap& tex_wrap) -> uint32_t {
             return 2;
         case renderer::eTextureWrap::CLAMP_TO_BORDER:
             return 3;
+        default:
+            return 0;
     }
 }
 
