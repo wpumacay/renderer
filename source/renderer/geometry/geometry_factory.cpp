@@ -785,6 +785,7 @@ auto _RotateToMatchUpAxis(const Vec3& vec, const eAxis& axis) -> Vec3 {
         case eAxis::AXIS_Z:
             return Vec3(vec.x(), vec.y(), vec.z());
     }
+    return Vec3(vec.x(), vec.y(), vec.z());
 }
 
 }  // namespace renderer

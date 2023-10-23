@@ -12,6 +12,7 @@ auto ToString(const eProjectionType& proj_type) -> std::string {
         case eProjectionType::ORTHOGRAPHIC:
             return "orthographic";
     }
+    return "undefined";
 }
 
 Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& world_up,

@@ -11,42 +11,45 @@ auto ToString(const eLightType& light_type) -> std::string {
         case eLightType::SPOT:
             return "spot";
     }
+
+    return "undefined";
 }
 
-DirectionalLight::DirectionalLight(const Vec3& direction, const Vec3& color,
-                                   float intensity) {
-    this->type = eLightType::DIRECTIONAL;
-    this->direction = direction;
-    this->color = color;
-    this->intensity = intensity;
+DirectionalLight::DirectionalLight(const Vec3& p_direction, const Vec3& p_color,
+                                   float p_intensity) {
+    type = eLightType::DIRECTIONAL;
+    direction = p_direction;
+    color = p_color;
+    intensity = p_intensity;
 }
 
-PointLight::PointLight(const Vec3& position, const Vec3& color, float intensity,
-                       float attn_constant, float attn_linear,
-                       float attn_quadratic) {
-    this->type = eLightType::POINT;
-    this->position = position;
-    this->color = color;
-    this->intensity = intensity;
-    this->attnConstant = attn_constant;
-    this->attnLinear = attn_linear;
-    this->attnQuadratic = attn_quadratic;
+PointLight::PointLight(const Vec3& p_position, const Vec3& p_color,
+                       float p_intensity, float p_attn_constant,
+                       float p_attn_linear, float p_attn_quadratic) {
+    type = eLightType::POINT;
+    position = p_position;
+    color = p_color;
+    intensity = p_intensity;
+    attnConstant = p_attn_constant;
+    attnLinear = p_attn_linear;
+    attnQuadratic = p_attn_quadratic;
 }
 
-SpotLight::SpotLight(const Vec3& position, const Vec3& direction,
-                     float inner_angle, float outer_angle, const Vec3& color,
-                     float intensity, float attn_constant, float attn_linear,
-                     float attn_quadratic) {
-    this->type = eLightType::SPOT;
-    this->position = position;
-    this->direction = direction;
-    this->innerCutoffAngle = inner_angle;
-    this->outerCutoffAngle = outer_angle;
-    this->color = color;
-    this->intensity = intensity;
-    this->attnConstant = attn_constant;
-    this->attnLinear = attn_linear;
-    this->attnQuadratic = attn_quadratic;
+SpotLight::SpotLight(const Vec3& p_position, const Vec3& p_direction,
+                     float p_inner_angle, float p_outer_angle,
+                     const Vec3& p_color, float p_intensity,
+                     float p_attn_constant, float p_attn_linear,
+                     float p_attn_quadratic) {
+    type = eLightType::SPOT;
+    position = p_position;
+    direction = p_direction;
+    innerCutoffAngle = p_inner_angle;
+    outerCutoffAngle = p_outer_angle;
+    color = p_color;
+    intensity = p_intensity;
+    attnConstant = p_attn_constant;
+    attnLinear = p_attn_linear;
+    attnQuadratic = p_attn_quadratic;
 }
 
 }  // namespace renderer

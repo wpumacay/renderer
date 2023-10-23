@@ -13,6 +13,8 @@ auto ToString(const eMaterialType& mat_type) -> std::string {
         case eMaterialType::PBR:
             return "Pbr";
     }
+
+    return "Undefined";
 }
 
 auto Material::toString() const -> std::string { return ""; }

@@ -6,9 +6,12 @@
 #include <renderer/input/callbacks.hpp>
 #include <renderer/window/impl/window_impl.hpp>
 
-#ifdef __clang__
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
 namespace renderer {
@@ -65,6 +68,8 @@ class WindowImplEgl : public IWindowImpl {
 
 }  // namespace renderer
 
-#ifdef __clang__
+#if defined(__clang__)
 #pragma clang diagnostic pop  // NOLINT
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif

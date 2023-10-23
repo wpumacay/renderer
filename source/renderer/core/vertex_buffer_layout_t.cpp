@@ -25,6 +25,8 @@ auto ToString(const eElementType& etype) -> std::string {
             return "Int3";
         case eElementType::INT_4:
             return "Int4";
+        default:
+            return "undefined";
     }
 }
 
@@ -40,6 +42,8 @@ auto ToOpenGLEnum(const eElementType& etype) -> uint32_t {
         case eElementType::INT_3:
         case eElementType::INT_4:
             return GL_INT;
+        default:
+            return GL_FLOAT;
     }
 }
 
@@ -61,6 +65,8 @@ auto GetElementSize(const eElementType& etype) -> uint32_t {
             return 4 * 3;
         case eElementType::INT_4:
             return 4 * 4;
+        default:
+            return 4;
     }
 }
 
@@ -82,6 +88,8 @@ auto GetElementCount(const eElementType& etype) -> uint32_t {
             return 3;
         case eElementType::INT_4:
             return 4;
+        default:
+            return 1;
     }
 }
 

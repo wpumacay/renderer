@@ -65,7 +65,7 @@ class Texture {
     // cppcheck-suppress unknownMacro
     DEFINE_SMART_POINTERS(Texture)
 
-    NO_COPY_NO_MOVE_NO_ASSIGN(Texture);
+    NO_COPY_NO_MOVE_NO_ASSIGN(Texture)
 
  public:
     /// Creates a texture object from a given image

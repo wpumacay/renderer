@@ -65,14 +65,14 @@ class DirectionalLight : public Light {
     /// \param[in] direction The direction of the light beams from the source
     /// \param[in] color The color of the light emmited by the light source
     /// \param[in] intensity The intensity of the light source
-    explicit DirectionalLight(const Vec3& direction,
-                              const Vec3& color = {1.0F, 1.0F, 1.0F},
-                              float intensity = 1.0F);
+    explicit DirectionalLight(const Vec3& p_direction,
+                              const Vec3& p_color = {1.0F, 1.0F, 1.0F},
+                              float p_intensity = 1.0F);
 };
 
 /// Representation of a point light source
 class PointLight : public Light {
-    DEFINE_SMART_POINTERS(PointLight);
+    DEFINE_SMART_POINTERS(PointLight)
 
  public:
     /// Creates a point light source
@@ -82,15 +82,16 @@ class PointLight : public Light {
     /// \param[in] attn_constant The attenuation constant factor
     /// \param[in] attn_linear The attenuation linear factor
     /// \param[in] attn_quadratic The attenuation quadratic factor
-    explicit PointLight(const Vec3& position,
-                        const Vec3& color = {1.0F, 1.0F, 1.0F},
-                        float intensity = 1.0F, float attn_constant = 1.0F,
-                        float attn_linear = 0.0F, float attn_quadratic = 0.0F);
+    explicit PointLight(const Vec3& p_position,
+                        const Vec3& p_color = {1.0F, 1.0F, 1.0F},
+                        float p_intensity = 1.0F, float p_attn_constant = 1.0F,
+                        float p_attn_linear = 0.0F,
+                        float p_attn_quadratic = 0.0F);
 };
 
 /// Representation of a spot light source
 class SpotLight : public Light {
-    DEFINE_SMART_POINTERS(SpotLight);
+    DEFINE_SMART_POINTERS(SpotLight)
 
  public:
     /// Creates a spot light source
@@ -103,11 +104,13 @@ class SpotLight : public Light {
     /// \param[in] attn_constant The attenuation constant factor
     /// \param[in] attn_linear The attenuation linear factor
     /// \param[in] attn_quadratic The attenuation quadratic factor
-    explicit SpotLight(const Vec3& position, const Vec3& direction,
-                       float inner_angle = PI / 4, float outer_angle = PI / 3,
-                       const Vec3& color = {1.0F, 1.0F, 1.0F},
-                       float intensity = 1.0F, float attn_constant = 1.0F,
-                       float attn_linear = 0.0F, float attn_quadratic = 0.0F);
+    explicit SpotLight(const Vec3& p_position, const Vec3& p_direction,
+                       float p_inner_angle = PI / 4,
+                       float p_outer_angle = PI / 3,
+                       const Vec3& p_color = {1.0F, 1.0F, 1.0F},
+                       float p_intensity = 1.0F, float p_attn_constant = 1.0F,
+                       float p_attn_linear = 0.0F,
+                       float p_attn_quadratic = 0.0F);
 };
 
 }  // namespace renderer

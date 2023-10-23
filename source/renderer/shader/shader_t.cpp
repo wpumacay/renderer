@@ -21,6 +21,8 @@ auto ToString(const eShaderType& type) -> std::string {
             return "tessellation_control";
         case eShaderType::TESSELLATION_EVALUATION:
             return "tessellation evaluation";
+        default:
+            return "vertex";
     }
 }
 
@@ -38,6 +40,8 @@ auto ToOpenGLEnum(const eShaderType& type) -> uint32_t {
             return GL_TESS_CONTROL_SHADER;
         case eShaderType::TESSELLATION_EVALUATION:
             return GL_TESS_EVALUATION_SHADER;
+        default:
+            return GL_VERTEX_SHADER;
     }
 }
 

@@ -40,7 +40,7 @@ class TextureData {
     // cppcheck-suppress unknownMacro
     DEFINE_SMART_POINTERS(TextureData)
 
-    NO_COPY_NO_MOVE_NO_ASSIGN(TextureData);
+    NO_COPY_NO_MOVE_NO_ASSIGN(TextureData)
 
  public:
     /// Creates a texture-data object from a given image

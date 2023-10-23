@@ -43,8 +43,9 @@ class DebugDrawer {
         Vec3 end;
         Vec3 color;
 
-        explicit Line(const Vec3& start, const Vec3& end, const Vec3& color)
-            : start(start), end(end), color(color) {}
+        explicit Line(const Vec3& p_start, const Vec3& p_end,
+                      const Vec3& p_color)
+            : start(p_start), end(p_end), color(p_color) {}
     };
 
     /// Container used for storing line information for render calls (per batch)

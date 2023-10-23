@@ -23,7 +23,7 @@ class VertexBuffer {
     // cppcheck-suppress unknownMacro
     DEFINE_SMART_POINTERS(VertexBuffer)
 
-    NO_COPY_NO_MOVE_NO_ASSIGN(VertexBuffer);
+    NO_COPY_NO_MOVE_NO_ASSIGN(VertexBuffer)
 
  public:
     explicit VertexBuffer(BufferLayout layout, const eBufferUsage& usage,

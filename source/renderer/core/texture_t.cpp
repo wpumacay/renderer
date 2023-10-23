@@ -19,6 +19,8 @@ auto ToString(const eTextureWrap& tex_wrap) -> std::string {
             return "clamp_to_edge";
         case eTextureWrap::CLAMP_TO_BORDER:
             return "clamp_to_border";
+        default:
+            return "undefined";
     }
 }
 
@@ -32,6 +34,8 @@ auto ToOpenGLEnum(const eTextureWrap& tex_wrap) -> int32_t {
             return GL_CLAMP_TO_EDGE;
         case eTextureWrap::CLAMP_TO_BORDER:
             return GL_CLAMP_TO_BORDER;
+        default:
+            return GL_REPEAT;
     }
 }
 
@@ -49,6 +53,8 @@ auto ToString(const eTextureFilter& tex_filter) -> std::string {
             return "nearest_mipmap_linear";
         case eTextureFilter::LINEAR_MIPMAP_LINEAR:
             return "linear_mipmap_linear";
+        default:
+            return "undefined";
     }
 }
 
@@ -66,6 +72,8 @@ auto ToOpenGLEnum(const eTextureFilter& tex_filter) -> int32_t {
             return GL_NEAREST_MIPMAP_LINEAR;
         case eTextureFilter::LINEAR_MIPMAP_LINEAR:
             return GL_LINEAR_MIPMAP_LINEAR;
+        default:
+            return GL_NEAREST;
     }
 }
 
@@ -83,6 +91,8 @@ auto ToString(const eTextureIntFormat& tex_iformat) -> std::string {
             return "i_depth";
         case eTextureIntFormat::DEPTH_STENCIL:
             return "i_stencil";
+        default:
+            return "undefined";
     }
 }
 
@@ -100,6 +110,8 @@ auto ToOpenGLEnum(const eTextureIntFormat& tex_iformat) -> int32_t {
             return GL_DEPTH_COMPONENT;
         case eTextureIntFormat::DEPTH_STENCIL:
             return GL_DEPTH_STENCIL;
+        default:
+            return GL_RGB;
     }
 }
 

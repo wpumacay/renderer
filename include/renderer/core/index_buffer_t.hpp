@@ -12,7 +12,7 @@ class IndexBuffer {
     // cppcheck-suppress unknownMacro
     DEFINE_SMART_POINTERS(IndexBuffer)
 
-    NO_COPY_NO_MOVE_NO_ASSIGN(IndexBuffer);
+    NO_COPY_NO_MOVE_NO_ASSIGN(IndexBuffer)
 
  public:
     /// Creates  an Index Buffer  given some indices data

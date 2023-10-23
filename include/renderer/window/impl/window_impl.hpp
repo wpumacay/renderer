@@ -12,9 +12,9 @@ namespace renderer {
 class Window;
 
 class IWindowImpl {
-    NO_COPY_NO_MOVE_NO_ASSIGN(IWindowImpl);
+    NO_COPY_NO_MOVE_NO_ASSIGN(IWindowImpl)
 
-    DEFINE_SMART_POINTERS(IWindowImpl);
+    DEFINE_SMART_POINTERS(IWindowImpl)
 
  public:
     explicit IWindowImpl(WindowConfig config) : m_Config(std::move(config)) {}

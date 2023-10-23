@@ -11,6 +11,7 @@ auto ToString(const eCameraController& controller_type) -> std::string {
         case eCameraController::FPS:
             return "fps";
     }
+    return "undefined";
 }
 
 }  // namespace renderer

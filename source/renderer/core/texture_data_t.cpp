@@ -22,6 +22,8 @@ auto ToString(const eTextureFormat& format) -> std::string {
             return "depth";
         case eTextureFormat::STENCIL:
             return "stencil";
+        default:
+            return "undefined";
     }
 }
 
@@ -37,6 +39,8 @@ auto ToOpenGLEnum(const eTextureFormat& format) -> uint32_t {
             return GL_DEPTH_COMPONENT;
         case eTextureFormat::STENCIL:
             return GL_STENCIL_INDEX;
+        default:
+            return GL_RGB;
     }
 }
 
@@ -48,6 +52,8 @@ auto ToString(const eStorageType& dtype) -> std::string {
             return "uint_32";
         case eStorageType::FLOAT_32:
             return "float_32";
+        default:
+            return "undefined";
     }
 }
 
@@ -59,6 +65,8 @@ auto ToOpenGLEnum(const eStorageType& dtype) -> uint32_t {
             return GL_UNSIGNED_INT;
         case eStorageType::FLOAT_32:
             return GL_FLOAT;
+        default:
+            return GL_UNSIGNED_BYTE;
     }
 }
 

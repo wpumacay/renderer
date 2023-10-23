@@ -11,6 +11,8 @@ auto ToString(const eBufferUsage& usage) -> std::string {
             return "Static";
         case eBufferUsage::DYNAMIC:
             return "Dynamic";
+        default:
+            return "undefined";
     }
 }
 
@@ -20,6 +22,8 @@ auto ToOpenGLEnum(const eBufferUsage& usage) -> uint32_t {
             return GL_STATIC_DRAW;
         case eBufferUsage::DYNAMIC:
             return GL_DYNAMIC_DRAW;
+        default:
+            return GL_STATIC_DRAW;
     }
 }
 
