@@ -28,7 +28,7 @@ set(RENDERER_DEP_VERSION_glfw
           "Version of GLFW to be fetched (used to create an xplatf. window) ")
 
 set(RENDERER_DEP_VERSION_imgui
-    458a1090314a965dd37b02c918d83077a0142ad5 # Release 1.89.3
+    c6e0284ac58b3f205c95365478888f7b53b077e2 # Release 1.89.9
     CACHE STRING
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
