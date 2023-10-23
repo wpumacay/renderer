@@ -137,7 +137,16 @@ FetchContent_Declare(
   GIT_TAG ${RENDERER_DEP_VERSION_imgui}
   GIT_PROGRESS FALSE
   GIT_SHALLOW FALSE
-  USES_TERMINAL_DOWNLOAD TRUE)
+  USES_TERMINAL_DOWNLOAD TRUE
+  PATCH_COMMAND
+    "${GIT_EXECUTABLE}"
+    "apply"
+    "-q"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui-gcc-warns.patch"
+    "||"
+    "${CMAKE_COMMAND}"
+    "-E"
+    "true")
 FetchContent_GetProperties(imgui)
 
 if (NOT imgui_POPULATED)
