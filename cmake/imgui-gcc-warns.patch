@@ -1,8 +1,8 @@
 diff --git a/backends/imgui_impl_glfw.cpp b/backends/imgui_impl_glfw.cpp
-index ad798ae7..02aefd76 100644
+index ad798ae7..30405a7a 100644
 --- a/backends/imgui_impl_glfw.cpp
 +++ b/backends/imgui_impl_glfw.cpp
-@@ -73,6 +73,10 @@
+@@ -73,6 +73,12 @@
  #pragma clang diagnostic push
  #pragma clang diagnostic ignored "-Wold-style-cast"     // warning: use of old-style cast
  #pragma clang diagnostic ignored "-Wsign-conversion"    // warning: implicit conversion changes signedness
@@ -10,10 +10,12 @@ index ad798ae7..02aefd76 100644
 +#pragma GCC diagnostic ignored "-Wold-style-cast"
 +#pragma GCC diagnostic ignored "-Wnull-dereference"
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
++#pragma GCC diagnostic ignored "-Wdouble-promotion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  // GLFW
-@@ -792,6 +796,8 @@ void ImGui_ImplGlfw_NewFrame()
+@@ -792,6 +798,8 @@ void ImGui_ImplGlfw_NewFrame()
 
  #if defined(__clang__)
  #pragma clang diagnostic pop
@@ -23,21 +25,22 @@ index ad798ae7..02aefd76 100644
 
  #endif // #ifndef IMGUI_DISABLE
 diff --git a/backends/imgui_impl_opengl3.cpp b/backends/imgui_impl_opengl3.cpp
-index e511cf81..b6b78751 100644
+index e511cf81..86385092 100644
 --- a/backends/imgui_impl_opengl3.cpp
 +++ b/backends/imgui_impl_opengl3.cpp
-@@ -126,6 +126,9 @@
+@@ -126,6 +126,10 @@
  #pragma GCC diagnostic ignored "-Wpragmas"                  // warning: unknown option after '#pragma GCC diagnostic' kind
  #pragma GCC diagnostic ignored "-Wunknown-warning-option"   // warning: unknown warning group 'xxx'
  #pragma GCC diagnostic ignored "-Wcast-function-type"       // warning: cast between incompatible function types (for loader)
 +#pragma GCC diagnostic ignored "-Wold-style-cast"
 +#pragma GCC diagnostic ignored "-Wnull-dereference"
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  // GL includes
 diff --git a/imgui.cpp b/imgui.cpp
-index 07e4ad5a..d83e0de1 100644
+index 07e4ad5a..86e15a90 100644
 --- a/imgui.cpp
 +++ b/imgui.cpp
 @@ -1010,6 +1010,12 @@ CODE
@@ -49,15 +52,21 @@ index 07e4ad5a..d83e0de1 100644
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
 +#pragma GCC diagnostic ignored "-Wdouble-promotion"
 +#pragma GCC diagnostic ignored "-Wconversion"
-+
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  // Debug options
 diff --git a/imgui.h b/imgui.h
-index c7f53448..e1cd1159 100644
+index c7f53448..cb4e037b 100644
 --- a/imgui.h
 +++ b/imgui.h
-@@ -129,6 +129,11 @@ Index of this file:
+@@ -125,10 +125,17 @@ Index of this file:
+ #pragma clang diagnostic ignored "-Wold-style-cast"
+ #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+ #pragma clang diagnostic ignored "-Wreserved-identifier"            // warning: identifier '_Xxx' is reserved because it starts with '_' followed by a capital letter
+-#elif defined(__GNUC__)
++#endif
++#if defined(__GNUC__)
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wpragmas"          // warning: unknown option after '#pragma GCC diagnostic' kind
  #pragma GCC diagnostic ignored "-Wclass-memaccess"  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
@@ -66,27 +75,84 @@ index c7f53448..e1cd1159 100644
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
 +#pragma GCC diagnostic ignored "-Wdouble-promotion"
 +#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  //-----------------------------------------------------------------------------
+diff --git a/imgui_demo.cpp b/imgui_demo.cpp
+index ab529e37..693624b3 100644
+--- a/imgui_demo.cpp
++++ b/imgui_demo.cpp
+@@ -137,6 +137,13 @@ Index of this file:
+ #pragma GCC diagnostic ignored "-Wdouble-promotion"         // warning: implicit conversion from 'float' to 'double' when passing argument to function
+ #pragma GCC diagnostic ignored "-Wconversion"               // warning: conversion to 'xxxx' from 'xxxx' may alter its value
+ #pragma GCC diagnostic ignored "-Wmisleading-indentation"   // [__GNUC__ >= 6] warning: this 'if' clause does not guard this statement      // GCC 6.0+ only. See #883 on GitHub.
++#pragma GCC diagnostic ignored "-Wold-style-cast"
++#pragma GCC diagnostic ignored "-Wnull-dereference"
++#pragma GCC diagnostic ignored "-Wuseless-cast"
++#pragma GCC diagnostic ignored "-Wdouble-promotion"
++#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
++
+ #endif
+
+ // Play it nice with Windows users (Update: May 2018, Notepad now supports Unix-style carriage returns!)
+diff --git a/imgui_draw.cpp b/imgui_draw.cpp
+index 205ce76f..b29803ab 100644
+--- a/imgui_draw.cpp
++++ b/imgui_draw.cpp
+@@ -71,6 +71,12 @@ Index of this file:
+ #pragma GCC diagnostic ignored "-Wconversion"               // warning: conversion to 'xxxx' from 'xxxx' may alter its value
+ #pragma GCC diagnostic ignored "-Wstack-protector"          // warning: stack protector not protecting local variables: variable length buffer
+ #pragma GCC diagnostic ignored "-Wclass-memaccess"          // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
++#pragma GCC diagnostic ignored "-Wold-style-cast"
++#pragma GCC diagnostic ignored "-Wnull-dereference"
++#pragma GCC diagnostic ignored "-Wuseless-cast"
++#pragma GCC diagnostic ignored "-Wdouble-promotion"
++#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
+ #endif
+
+ //-------------------------------------------------------------------------
 diff --git a/imgui_internal.h b/imgui_internal.h
-index 70a62334..b9f31a4c 100644
+index 70a62334..3f530b4d 100644
 --- a/imgui_internal.h
 +++ b/imgui_internal.h
-@@ -93,6 +93,8 @@ Index of this file:
+@@ -93,6 +93,12 @@ Index of this file:
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wpragmas"              // warning: unknown option after '#pragma GCC diagnostic' kind
  #pragma GCC diagnostic ignored "-Wclass-memaccess"      // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
++#pragma GCC diagnostic ignored "-Wold-style-cast"
++#pragma GCC diagnostic ignored "-Wnull-dereference"
++#pragma GCC diagnostic ignored "-Wuseless-cast"
 +#pragma GCC diagnostic ignored "-Wdouble-promotion"
 +#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  // In 1.89.4, we moved the implementation of "courtesy maths operators" from imgui_internal.h in imgui.h
+diff --git a/imgui_tables.cpp b/imgui_tables.cpp
+index 8fdcbcf8..abdfe5a5 100644
+--- a/imgui_tables.cpp
++++ b/imgui_tables.cpp
+@@ -230,6 +230,12 @@ Index of this file:
+ #pragma GCC diagnostic ignored "-Wpragmas"                          // warning: unknown option after '#pragma GCC diagnostic' kind
+ #pragma GCC diagnostic ignored "-Wformat-nonliteral"                // warning: format not a string literal, format string not checked
+ #pragma GCC diagnostic ignored "-Wclass-memaccess"                  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
++#pragma GCC diagnostic ignored "-Wold-style-cast"
++#pragma GCC diagnostic ignored "-Wnull-dereference"
++#pragma GCC diagnostic ignored "-Wuseless-cast"
++#pragma GCC diagnostic ignored "-Wdouble-promotion"
++#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
+ #endif
+
+ //-----------------------------------------------------------------------------
 diff --git a/imgui_widgets.cpp b/imgui_widgets.cpp
-index ec3eca36..5b6cc57d 100644
+index ec3eca36..0e42ccd6 100644
 --- a/imgui_widgets.cpp
 +++ b/imgui_widgets.cpp
-@@ -78,6 +78,11 @@ Index of this file:
+@@ -78,6 +78,12 @@ Index of this file:
  #pragma GCC diagnostic ignored "-Wformat-nonliteral"                // warning: format not a string literal, format string not checked
  #pragma GCC diagnostic ignored "-Wclass-memaccess"                  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
  #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"  // warning: bitwise operation between different enumeration types ('XXXFlags_' and 'XXXFlagsPrivate_') is deprecated
@@ -95,6 +161,7 @@ index ec3eca36..5b6cc57d 100644
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
 +#pragma GCC diagnostic ignored "-Wdouble-promotion"
 +#pragma GCC diagnostic ignored "-Wconversion"
++#pragma GCC diagnostic ignored "-Wsign-conversion"
  #endif
 
  //-------------------------------------------------------------------------

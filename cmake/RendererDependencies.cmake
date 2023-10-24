@@ -141,7 +141,6 @@ FetchContent_Declare(
   PATCH_COMMAND
     "${GIT_EXECUTABLE}"
     "apply"
-    "-q"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui-gcc-warns.patch"
     "||"
     "${CMAKE_COMMAND}"
