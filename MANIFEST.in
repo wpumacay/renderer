@@ -1,6 +1,7 @@
 include *.py
 include *.txt
 recursive-include cmake *.cmake
+recursive-include cmake *.patch
 recursive-include include *.hpp
 recursive-include source *.cpp
 recursive-include third_party *.c
