@@ -11,7 +11,6 @@
 #include <renderer/core/vertex_array_t.hpp>
 
 #include <conversions_py.hpp>
-#include "renderer/core/vertex_buffer_layout_t.hpp"
 #include <spdlog/fmt/bundled/format.h>
 
 #if defined(__clang__)
@@ -111,6 +110,9 @@ void bindings_buffers(py::module& m) {
                  })
             .def_property_readonly("num_elements", &Class::num_elements)
             .def_property_readonly("stride", &Class::stride)
+            .def(
+                "__len__",
+                [](const Class& self) -> size_t { return self.num_elements(); })
             .def("__getitem__",
                  [](Class& self, size_t index) -> BufferElement& {
                      return self.GetElementByIndex(index);
@@ -133,18 +135,11 @@ void bindings_buffers(py::module& m) {
         py::class_<Class, Class::ptr>(m, ClassName)
             // NOLINTNEXTLINE
             .def(py::init([](BufferLayout layout, eBufferUsage usage,
-                             uint32_t size, const NumpyFloatArray& data) {
-                if (size !=
-                    (static_cast<size_t>(data.size()) * sizeof(float32_t))) {
-                    throw std::runtime_error(
-                        fmt::format("VertexBuffer >>> given size must match "
-                                    "the size of the given numpy-array. Given "
-                                    "size={0}, np-array size={1}",
-                                    size, data.size()));
-                }
-
+                             const NumpyFloatArray& data) {
                 return std::make_unique<VertexBuffer>(
-                    layout, usage, size,
+                    layout, usage,
+                    static_cast<uint32_t>(static_cast<size_t>(data.size()) *
+                                          sizeof(float32_t)),
                     static_cast<const float32_t*>(data.request().ptr));
             }))
             .def("Resize", &Class::Resize)
