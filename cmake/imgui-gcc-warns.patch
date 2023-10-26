@@ -1,12 +1,14 @@
 diff --git a/backends/imgui_impl_glfw.cpp b/backends/imgui_impl_glfw.cpp
-index ad798ae7..30405a7a 100644
+index ad798ae7..26628990 100644
 --- a/backends/imgui_impl_glfw.cpp
 +++ b/backends/imgui_impl_glfw.cpp
-@@ -73,6 +73,12 @@
+@@ -73,6 +73,14 @@
  #pragma clang diagnostic push
  #pragma clang diagnostic ignored "-Wold-style-cast"     // warning: use of old-style cast
  #pragma clang diagnostic ignored "-Wsign-conversion"    // warning: implicit conversion changes signedness
++#pragma clang diagnostic ignored "-Wdouble-promotion"
 +#elif defined(__GNUC__)
++#pragma GCC diagnostic push
 +#pragma GCC diagnostic ignored "-Wold-style-cast"
 +#pragma GCC diagnostic ignored "-Wnull-dereference"
 +#pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -15,7 +17,7 @@ index ad798ae7..30405a7a 100644
  #endif
 
  // GLFW
-@@ -792,6 +798,8 @@ void ImGui_ImplGlfw_NewFrame()
+@@ -792,6 +800,8 @@ void ImGui_ImplGlfw_NewFrame()
 
  #if defined(__clang__)
  #pragma clang diagnostic pop
