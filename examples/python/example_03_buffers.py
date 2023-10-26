@@ -71,7 +71,6 @@ def main() -> int:
     vbo = rdr.VertexBuffer(
         layout,
         rdr.BufferUsage.STATIC,
-        buffer_data.size * buffer_data.itemsize,
         buffer_data,
     )
 
