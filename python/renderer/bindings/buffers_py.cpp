@@ -162,10 +162,10 @@ void bindings_buffers(py::module& m) {
         using Class = renderer::IndexBuffer;
         constexpr auto* ClassName = "IndexBuffer";  // NOLINT
         py::class_<Class, Class::ptr>(m, ClassName)
-            .def(py::init([](eBufferUsage usage, uint32_t count,  // NOLINT
-                             const NumpyUint32Array& data) {
+            .def(py::init([](eBufferUsage usage,
+                             const NumpyUint32Array& data) -> Class::uptr {
                 return std::make_unique<Class>(
-                    usage, count,
+                    usage, static_cast<uint32_t>(data.size()),
                     static_cast<const uint32_t*>(data.request().ptr));
             }))
             .def("Bind", &Class::Bind)
