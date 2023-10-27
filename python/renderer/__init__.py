@@ -9,6 +9,9 @@ from renderer_bindings import (  # type: ignore
     Program,
     Shader,
     ShaderType,
+    StorageType,
+    TextureData,
+    TextureFormat,
     VertexArray,
     VertexBuffer,
     Window,
@@ -32,4 +35,7 @@ __all__ = [
     "VertexBuffer",
     "IndexBuffer",
     "VertexArray",
+    "TextureFormat",
+    "StorageType",
+    "TextureData",
 ]
