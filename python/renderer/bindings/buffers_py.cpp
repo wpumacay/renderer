@@ -142,14 +142,17 @@ void bindings_buffers(py::module& m) {
                                           sizeof(float32_t)),
                     static_cast<const float32_t*>(data.request().ptr));
             }))
-            .def("Resize", &Class::Resize)
-            .def("UpdateData",
-                 [](Class& self, uint32_t size, const NumpyFloatArray& data) {
-                     self.UpdateData(size, static_cast<const float32_t*>(
-                                               data.request().ptr));
-                 })
             .def("Bind", &Class::Bind)
             .def("Unbind", &Class::Unbind)
+            .def("Resize", &Class::Resize, py::arg("buffer_size"))
+            .def(
+                "UpdateData",
+                [](Class& self, const NumpyFloatArray& data) {
+                    self.UpdateData(
+                        static_cast<uint32_t>(static_cast<size_t>(data.size()) *
+                                              sizeof(float32_t)),
+                        static_cast<const float32_t*>(data.request().ptr));
+                })
             .def_property_readonly("layout", &Class::layout)
             .def_property_readonly("size", &Class::size)
             .def_property_readonly("usage", &Class::usage)

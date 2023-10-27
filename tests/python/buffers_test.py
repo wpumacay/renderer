@@ -107,3 +107,44 @@ def test_vertex_buffer_bind_methods(
     assert GL.glGetIntegerv(GL.GL_ARRAY_BUFFER_BINDING) == vbo_2.opengl_id
     vbo_2.Unbind()
     assert GL.glGetIntegerv(GL.GL_ARRAY_BUFFER_BINDING) == 0
+
+
+def test_vertex_buffer_resize_method(
+    window: rdr.Window, layout_1: rdr.BufferLayout, data_1: np.ndarray
+) -> None:
+    vbo = rdr.VertexBuffer(layout_1, rdr.BufferUsage.DYNAMIC, data_1)
+
+    vbo.Bind()
+    EXPECTED_SIZE = data_1.size * data_1.itemsize
+    GPU_SIZE = GL.glGetBufferParameteriv(GL.GL_ARRAY_BUFFER, GL.GL_BUFFER_SIZE)
+    assert EXPECTED_SIZE == GPU_SIZE
+    vbo.Unbind()
+
+    NEW_SIZE = 200
+    vbo.Resize(NEW_SIZE)
+    vbo.Bind()
+    NEW_GPU_SIZE = GL.glGetBufferParameteriv(
+        GL.GL_ARRAY_BUFFER, GL.GL_BUFFER_SIZE
+    )
+    assert NEW_SIZE == NEW_GPU_SIZE
+    vbo.Unbind()
+
+
+def test_vertex_buffer_update_method(
+    window: rdr.Window, layout_1: rdr.BufferLayout, data_1: np.ndarray
+) -> None:
+    vbo = rdr.VertexBuffer(layout_1, rdr.BufferUsage.DYNAMIC, data_1)
+
+    # fmt: off
+    new_buffer_data = np.array([
+        # |    pos    |    color    |#
+           -0.5, -0.5, 1.0, 0.0, 0.0,  # noqa: E131
+            0.5, -0.5, 0.0, 1.0, 0.0,  # noqa: E131
+            0.5,  0.5, 0.0, 0.0, 1.0,  # noqa: E131
+           -0.5, -0.5, 1.0, 0.0, 0.0,  # noqa: E131
+            0.5,  0.5, 0.0, 0.0, 1.0,  # noqa: E131
+           -0.5,  0.5, 1.0, 1.0, 1.0,  # noqa: E131
+    ], dtype=np.float32)
+    # fmt: on
+
+    vbo.UpdateData(new_buffer_data)
