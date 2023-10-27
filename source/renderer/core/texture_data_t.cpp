@@ -91,11 +91,17 @@ TextureData::TextureData(const char* image_path) : m_ImagePath(image_path) {
 }
 
 auto TextureData::ToString() const -> std::string {
-    std::string str_repr = "TextureData";
-    str_repr += fmt::format("(format={0}, width={1}, height={2}, channels={3})",
-                            renderer::ToString(m_Format), m_Width, m_Height,
-                            m_Channels);
-    return str_repr;
+    return fmt::format(
+        "<TextureData\n"
+        "  width: {0}\n"
+        "  height: {1}\n"
+        "  channels: {2}\n"
+        "  format: {3}\n"
+        "  storage: {4}\n"
+        "  image_path: {5}\n"
+        ">\n",
+        m_Width, m_Height, m_Channels, ::renderer::ToString(m_Format),
+        ::renderer::ToString(m_Storage), m_ImagePath);
 }
 
 }  // namespace renderer
