@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <glad/gl.h>
 
 #include <spdlog/fmt/bundled/format.h>
@@ -88,6 +90,21 @@ TextureData::TextureData(const char* image_path) : m_ImagePath(image_path) {
 
     m_Data.reset(
         stbi_load(m_ImagePath.c_str(), &m_Width, &m_Height, &m_Channels, 0));
+}
+
+TextureData::TextureData(int32_t width, int32_t height, int32_t channels,
+                         const uint8_t* data)
+    : m_Width(width), m_Height(height), m_Channels(channels) {
+    if (channels == 3) {
+        m_Format = eTextureFormat::RGB;
+    } else if (channels == 4) {
+        m_Format = eTextureFormat::RGBA;
+    }
+
+    auto buffer_size =
+        static_cast<size_t>(width * height * channels) * sizeof(uint8_t);
+    m_Data = std::make_unique<uint8_t[]>(buffer_size);  // NOLINT
+    memcpy(m_Data.get(), data, buffer_size);
 }
 
 auto TextureData::ToString() const -> std::string {

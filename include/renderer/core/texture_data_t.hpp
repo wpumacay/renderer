@@ -46,6 +46,10 @@ class TextureData {
     /// Creates a texture-data object from a given image
     explicit TextureData(const char* image_path);
 
+    /// Creates a texture data object from given size and data
+    explicit TextureData(int32_t width, int32_t height, int32_t channels,
+                         const uint8_t* data);
+
     /// Releases all allocated resources
     ~TextureData() = default;
 

@@ -1,3 +1,4 @@
+#include <memory>
 #include <stdexcept>
 
 #include <pybind11/pybind11.h>
@@ -37,6 +38,23 @@ auto bindings_texture(py::module& m) -> void {
         constexpr auto* ClassName = "TextureData";  // NOLINT
         py::class_<Class, Class::ptr>(m, ClassName)
             .def(py::init<const char*>())
+            .def(py::init([](const py::array_t<uint8_t>& np_data)
+                              -> Class::ptr {
+                auto info = np_data.request();
+                if (info.ndim < 3) {
+                    throw std::runtime_error(
+                        "TextureData > numpy constructor only supports RGB and "
+                        "RGBA images for now");
+                }
+
+                auto width = info.shape[1];
+                auto height = info.shape[0];
+                auto channels = info.shape[2];
+
+                return std::make_shared<::renderer::TextureData>(
+                    width, height, channels,
+                    static_cast<const uint8_t*>(info.ptr));
+            }))
             .def_property_readonly("width", &Class::width)
             .def_property_readonly("height", &Class::height)
             .def_property_readonly("channels", &Class::channels)
