@@ -1,3 +1,6 @@
+# Git history
+.git/
+
 # File-exclusions
 *.o
 *.pyc
@@ -17,20 +20,12 @@
 
 # Folder-exclusions
 build/
-build-*/
 dist/
 tmp/
+venv/
+venv-*/
 Testing/
 .cache/
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Exclude settings from editors|IDEs
 .vscode
