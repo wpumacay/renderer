@@ -43,7 +43,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    img = "renderer-build"
+    img = "renderer-manylinux-build"
     base = "quay.io/pypa/manylinux2014_x86_64"
     dockerfile = DOCKERFILE_FMT.format(base=base).encode()
 
