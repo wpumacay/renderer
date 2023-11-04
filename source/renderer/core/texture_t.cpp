@@ -1,5 +1,7 @@
 #include <glad/gl.h>
 
+#include <spdlog/fmt/bundled/format.h>
+
 #include <utils/logging.hpp>
 #include <renderer/core/texture_t.hpp>
 
@@ -116,7 +118,7 @@ auto ToOpenGLEnum(const eTextureIntFormat& tex_iformat) -> int32_t {
 }
 
 Texture::Texture(const char* image_path) {
-    m_TextureData = std::make_unique<TextureData>(image_path);
+    m_TextureData = std::make_shared<TextureData>(image_path);
 
     if (m_TextureData->data() == nullptr) {
         LOG_CORE_ERROR(
@@ -129,7 +131,7 @@ Texture::Texture(const char* image_path) {
     _InitializeTexture();
 }
 
-Texture::Texture(TextureData::uptr tex_data) {
+Texture::Texture(TextureData::ptr tex_data) {
     if (tex_data->data() == nullptr) {
         LOG_CORE_ERROR(
             "Texture >>> There was an issue with the given texture.");
@@ -199,6 +201,27 @@ auto Texture::Unbind() const -> void {
     // This unbind method assumes we're only dealing with a single texture unit
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+auto Texture::ToString() const -> std::string {
+    return fmt::format(
+        "<Texture\n"
+        "  width: {0}\n"
+        "  height: {1}\n"
+        "  channels: {2}\n"
+        "  borderColor: {3}\n"
+        "  minFilter: {4}\n"
+        "  magFilter: {5}\n"
+        "  wrapModeU: {6}\n"
+        "  wrapModeV: {7}\n"
+        "  openGLid: {8}\n"
+        ">\n",
+        (m_TextureData != nullptr ? m_TextureData->width() : 0),
+        (m_TextureData != nullptr ? m_TextureData->height() : 0),
+        (m_TextureData != nullptr ? m_TextureData->channels() : 0),
+        m_BorderColor.toString(), ::renderer::ToString(m_MinFilter),
+        ::renderer::ToString(m_MagFilter), ::renderer::ToString(m_WrapU),
+        ::renderer::ToString(m_WrapV), m_OpenGLId);
 }
 
 auto Texture::SetBorderColor(const Vec4& color) -> void {

@@ -72,16 +72,19 @@ class Texture {
     explicit Texture(const char* image_path);
 
     /// Creates a texture object from given texture data
-    explicit Texture(TextureData::uptr tex_data);
+    explicit Texture(TextureData::ptr tex_data);
 
     /// Releases all resources allocated by this texture
     ~Texture();
 
-    // Binds the current texture
+    /// \brief Binds the current texture
     auto Bind() const -> void;
 
-    // Unbinds the current texture
+    /// \brief Unbinds the current texture
     auto Unbind() const -> void;
+
+    /// \brief Returns a string representation for this texture
+    auto ToString() const -> std::string;
 
     auto SetBorderColor(const Vec4& color) -> void;
 
@@ -107,7 +110,7 @@ class Texture {
 
     auto wrap_mode_v() const -> eTextureWrap { return m_WrapV; }
 
-    auto texture_data() -> TextureData::uptr& { return m_TextureData; }
+    auto texture_data() -> TextureData::ptr { return m_TextureData; }
 
  private:
     /// Initializes the texture
@@ -129,7 +132,7 @@ class Texture {
     /// Wrapping mode (V|vertical coordinate)
     eTextureWrap m_WrapV = eTextureWrap::REPEAT;
     /// Texture data (contains the image data)
-    TextureData::uptr m_TextureData = nullptr;
+    TextureData::ptr m_TextureData = nullptr;
 };
 
 }  // namespace renderer
