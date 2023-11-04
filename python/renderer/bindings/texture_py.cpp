@@ -85,6 +85,68 @@ auto bindings_texture(py::module& m) -> void {
                   LOG_CORE_INFO("stride-({0}) = {1}", i, info.strides[i]);
               }
           });
+
+    {
+        using Enum = ::renderer::eTextureWrap;
+        constexpr auto* EnumName = "TextureWrap";  // NOLINT
+        py::enum_<Enum>(m, EnumName)
+            .value("REPEAT", Enum::REPEAT)
+            .value("REPEAT_MIRROR", Enum::REPEAT_MIRROR)
+            .value("CLAMP_TO_EDGE", Enum::CLAMP_TO_EDGE)
+            .value("CLAMP_TO_BORDER", Enum::CLAMP_TO_BORDER);
+    }
+
+    {
+        using Enum = ::renderer::eTextureFilter;
+        constexpr auto* EnumName = "TextureFilter";  // NOLINT
+        py::enum_<Enum>(m, EnumName)
+            .value("NEAREST", Enum::NEAREST)
+            .value("LINEAR", Enum::LINEAR)
+            .value("NEAREST_MIPMAP_NEAREST", Enum::NEAREST_MIPMAP_NEAREST)
+            .value("LINEAR_MIPMAP_NEAREST", Enum::LINEAR_MIPMAP_NEAREST)
+            .value("NEAREST_MIPMAP_LINEAR", Enum::NEAREST_MIPMAP_LINEAR)
+            .value("LINEAR_MIPMAP_LINEAR", Enum::LINEAR_MIPMAP_LINEAR);
+    }
+
+    {
+        using Enum = ::renderer::eTextureIntFormat;
+        constexpr auto* EnumName = "TextureIntFormat";  // NOLINT
+        py::enum_<Enum>(m, EnumName)
+            .value("RED", Enum::RED)
+            .value("RG", Enum::RG)
+            .value("RGB", Enum::RGB)
+            .value("RGBA", Enum::RGBA)
+            .value("DEPTH", Enum::DEPTH)
+            .value("DEPTH_STENCIL", Enum::DEPTH_STENCIL);
+    }
+
+    {
+        using Class = ::renderer::Texture;
+        constexpr auto* ClassName = "Texture";  // NOLINT
+        py::class_<Class, Class::ptr>(m, ClassName)
+            .def(py::init([](const char* tex_filepath) -> Class::ptr {
+                return std::make_shared<Class>(tex_filepath);
+            }))
+            .def(py::init([](TextureData::ptr tex_data) -> Class::ptr {
+                return std::make_shared<Class>(std::move(tex_data));
+            }))
+            .def("Bind", &Class::Bind)
+            .def("Unbind", &Class::Unbind)
+            .def_property("border_color", &Class::border_color,
+                          &Class::SetBorderColor)
+            .def_property("min_filter", &Class::min_filter,
+                          &Class::SetMinFilter)
+            .def_property("mag_filter", &Class::mag_filter,
+                          &Class::SetMagFilter)
+            .def_property("wrap_mode_u", &Class::wrap_mode_u,
+                          &Class::SetWrapModeU)
+            .def_property("wrap_mode_v", &Class::wrap_mode_v,
+                          &Class::SetWrapModeV)
+            .def_property_readonly("internal_format", &Class::internal_format)
+            .def("texture_data", &Class::texture_data)
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
 }
 
 }  // namespace renderer
