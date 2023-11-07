@@ -1,3 +1,5 @@
+#include <spdlog/fmt/bundled/format.h>
+
 #include <renderer/input/input_manager_t.hpp>
 
 namespace renderer {
@@ -41,6 +43,25 @@ auto InputManager::IsMouseDown(int button) const -> bool {
 
     return m_Buttons.at(static_cast<size_t>(button)) ==
            button_action::BUTTON_PRESSED;
+}
+
+auto InputManager::ToString() const -> std::string {
+    auto str_repr = fmt::format(
+        "<InputManager\n"
+        "  cursor: {0}\n"
+        "  scrollOff: {1}\n"
+        "  scrollAccum: {2}\n",
+        m_Cursor.toString(), m_ScrollOff.toString(), m_ScrollAccum.toString());
+    str_repr += "  keysDown: ";
+    for (int key = 0; key < MAX_KEYS; ++key) {
+        if (IsKeyDown(key)) {
+            str_repr += std::to_string(key) + " - ";
+        }
+    }
+    str_repr += "\n";
+    str_repr += ">\n";
+
+    return str_repr;
 }
 
 }  // namespace renderer

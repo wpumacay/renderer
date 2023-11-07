@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 #include <renderer/common.hpp>
 #include <renderer/input/keycodes.hpp>
@@ -42,6 +43,9 @@ class InputManager {
     auto GetScrollAccumX() const -> float { return m_ScrollAccum.x(); }
     /// Returns the acccumulated scroll for the corresponding y-axis of your dev
     auto GetScrollAccumY() const -> float { return m_ScrollAccum.y(); }
+
+    /// Returns the string representation of the input manager
+    auto ToString() const -> std::string;
 
  private:
     /// Buffer to keep which keys are pressed and which are not
