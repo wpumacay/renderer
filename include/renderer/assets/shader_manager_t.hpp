@@ -28,7 +28,7 @@ class ShaderManager {
                      const std::string& frag_filepath) -> Program::ptr;
 
     /// Caches the given shader program by taking ownership of the resource
-    auto CacheProgram(Program::uptr program) -> void;
+    auto CacheProgram(Program::ptr program) -> void;
 
     /// Returns a shader program with the given name (if not, returns  nullptr)
     auto GetProgram(const std::string& name) -> Program::ptr;
@@ -41,6 +41,9 @@ class ShaderManager {
 
     /// Returns the current number of shader programs being managed
     auto GetNumPrograms() const -> uint32_t { return m_NumPrograms; }
+
+    /// \brief Returns the string representation of thie shader manager
+    auto ToString() const -> std::string;
 
  private:
     /// Storage for our shader programs

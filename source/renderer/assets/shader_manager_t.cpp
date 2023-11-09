@@ -1,7 +1,9 @@
 #include <memory>
 
-#include <utils/common.hpp>
+#include <spdlog/fmt/bundled/format.h>
+
 #include <utils/logging.hpp>
+
 #include <renderer/assets/shader_manager_t.hpp>
 
 namespace renderer {
@@ -28,7 +30,7 @@ auto ShaderManager::LoadProgram(const std::string& name,
     return program;
 }
 
-auto ShaderManager::CacheProgram(Program::uptr program) -> void {
+auto ShaderManager::CacheProgram(Program::ptr program) -> void {
     if (program == nullptr) {
         LOG_WARN("ShaderManager::CacheProgram >>> can't cache nullptr :/");
         return;
@@ -87,6 +89,22 @@ auto ShaderManager::GetProgramByIndex(uint32_t prog_index) -> Program::ptr {
     }
 
     return m_Programs.at(prog_index);
+}
+
+auto ShaderManager::ToString() const -> std::string {
+    auto str_repr = fmt::format(
+        "<ShaderManager\n"
+        "  num_programs: {0}\n"
+        "  programs: \n",
+        m_NumPrograms);
+    for (size_t i = 0; i < m_NumPrograms; ++i) {
+        str_repr +=
+            fmt::format("    name: {0}, opengl_id: {1}, ok: {2}\n",
+                        m_Programs.at(i)->name(), m_Programs.at(i)->opengl_id(),
+                        (m_Programs.at(i)->linked()) ? "true" : "false");
+    }
+    str_repr += ">\n";
+    return str_repr;
 }
 
 }  // namespace renderer
