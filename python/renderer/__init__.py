@@ -11,6 +11,7 @@ from renderer_bindings import (  # type: ignore
     Mouse,
     Program,
     Shader,
+    ShaderManager,
     ShaderType,
     StorageType,
     Texture,
@@ -52,4 +53,5 @@ __all__ = [
     "ButtonAction",
     "Mouse",
     "InputManager",
+    "ShaderManager",
 ]

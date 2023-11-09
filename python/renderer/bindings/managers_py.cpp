@@ -3,6 +3,7 @@
 #include <pybind11/pybind11.h>
 
 #include <renderer/input/input_manager_t.hpp>
+#include <renderer/assets/shader_manager_t.hpp>
 
 namespace py = pybind11;
 
@@ -28,6 +29,33 @@ auto bindings_managers(py::module& m) -> void {
             .def("GetScrollOffY", &Class::GetScrollOffY)
             .def("GetScrollAccumX", &Class::GetScrollAccumX)
             .def("GetScrollAccumY", &Class::GetScrollAccumY)
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
+
+    {
+        using Class = ::renderer::ShaderManager;
+        constexpr auto* ClassName = "ShaderManager";  // NOLINT
+        py::class_<Class, Class::ptr>(m, ClassName)
+            .def(py::init<>())
+            .def("LoadProgram", &Class::LoadProgram)
+            .def("CacheProgram", &Class::CacheProgram)
+            .def("GetProgram", &Class::GetProgram)
+            .def("DeleteProgram", &Class::DeleteProgram)
+            .def("GetProgramByIndex", &Class::GetProgramByIndex)
+            .def("GetNumPrograms", &Class::GetNumPrograms)
+            .def("__getitem__",
+                 [](Class& self, const std::string& prog_name) -> Program::ptr {
+                     return self.GetProgram(prog_name);
+                 })
+            .def("__getitem__",
+                 [](Class& self, uint32_t prog_idx) -> Program::ptr {
+                     return self.GetProgramByIndex(prog_idx);
+                 })
+            .def("__len__",
+                 [](const Class& self) -> uint32_t {
+                     return self.GetNumPrograms();
+                 })
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
     }
