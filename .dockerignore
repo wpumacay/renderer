@@ -20,6 +20,7 @@
 
 # Folder-exclusions
 build/
+build-*/
 dist/
 tmp/
 venv/

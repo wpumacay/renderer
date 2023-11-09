@@ -46,3 +46,7 @@ compile_commands.json
 # Exclude Sublime configuration files
 *.sublime-workspace
 *.sublime-project
+
+# Arch linux related files and intermediate artifacts
+PKGBUILD
+*.tar.zst
