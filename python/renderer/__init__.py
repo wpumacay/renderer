@@ -19,6 +19,7 @@ from renderer_bindings import (  # type: ignore
     TextureFilter,
     TextureFormat,
     TextureIntFormat,
+    TextureManager,
     TextureWrap,
     VertexArray,
     VertexBuffer,
@@ -54,4 +55,5 @@ __all__ = [
     "Mouse",
     "InputManager",
     "ShaderManager",
+    "TextureManager",
 ]

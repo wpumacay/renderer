@@ -4,6 +4,7 @@
 
 #include <renderer/input/input_manager_t.hpp>
 #include <renderer/assets/shader_manager_t.hpp>
+#include <renderer/assets/texture_manager_t.hpp>
 
 namespace py = pybind11;
 
@@ -55,6 +56,33 @@ auto bindings_managers(py::module& m) -> void {
             .def("__len__",
                  [](const Class& self) -> uint32_t {
                      return self.GetNumPrograms();
+                 })
+            .def("__repr__",
+                 [](const Class& self) -> py::str { return self.ToString(); });
+    }
+
+    {
+        using Class = ::renderer::TextureManager;
+        constexpr auto* ClassName = "TextureManager";  // NOLINT
+        py::class_<Class, Class::ptr>(m, ClassName)
+            .def(py::init<>())
+            .def("LoadTexture", &Class::LoadTexture)
+            .def("CacheTexture", &Class::CacheTexture)
+            .def("GetTexture", &Class::GetTexture)
+            .def("DeleteTexture", &Class::DeleteTexture)
+            .def("GetTextureByIndex", &Class::GetTextureByIndex)
+            .def("GetNumTextures", &Class::GetNumTextures)
+            .def("__getitem__",
+                 [](Class& self, const std::string& tex_name) -> Texture::ptr {
+                     return self.GetTexture(tex_name);
+                 })
+            .def("__getitem__",
+                 [](Class& self, uint32_t tex_idx) -> Texture::ptr {
+                     return self.GetTextureByIndex(tex_idx);
+                 })
+            .def("__len__",
+                 [](const Class& self) -> uint32_t {
+                     return self.GetNumTextures();
                  })
             .def("__repr__",
                  [](const Class& self) -> py::str { return self.ToString(); });
