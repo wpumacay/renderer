@@ -1,6 +1,9 @@
 #include <memory>
 
+#include <spdlog/fmt/bundled/format.h>
+
 #include <utils/logging.hpp>
+
 #include <renderer/assets/texture_manager_t.hpp>
 
 namespace renderer {
@@ -86,6 +89,26 @@ auto TextureManager::GetTextureByIndex(uint32_t tex_index) -> Texture::ptr {
     }
 
     return m_Textures.at(tex_index);
+}
+
+auto TextureManager::ToString() const -> std::string {
+    auto str_repr = fmt::format(
+        "<TextureManager\n"
+        "  num_textures: {0}\n"
+        "  textures: \n",
+        m_NumTextures);
+    for (const auto& entry : m_Name2Id) {
+        str_repr += fmt::format(
+            "    name: {0}, width: {1}, height: {2}, channels: {3}, GLid: "
+            "{4}\n",
+            entry.first, m_Textures.at(entry.second)->texture_data()->width(),
+            m_Textures.at(entry.second)->texture_data()->height(),
+            m_Textures.at(entry.second)->texture_data()->channels(),
+            m_Textures.at(entry.second)->opengl_id());
+    }
+
+    str_repr += ">\n";
+    return str_repr;
 }
 
 }  // namespace renderer
