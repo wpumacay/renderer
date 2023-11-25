@@ -6,7 +6,7 @@ include(FetchContent)
 FetchContent_Declare(
   loco_cmake
   GIT_REPOSITORY https://github.com/wpumacay/loco_cmake.git
-  GIT_TAG 2a1148ebe5381874c043dd2d5ff6885a1b0d7071 # Version v0.1.3
+  GIT_TAG d1ba4734dcf29bbc7318deea16213452a80b3f2a # Version v0.1.4
   GIT_PROGRESS FALSE
   GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(loco_cmake)
@@ -28,7 +28,12 @@ option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(RENDERER_BUILD_TESTS "Build C++ unit-tests" ON)
 option(RENDERER_BUILD_DOCS "Build documentation" OFF)
 
-loco_initialize_project()
+# cmake-format: off
+set(RENDERER_BUILD_CXX_STANDARD 17 CACHE STRING "The C++ standard to be used")
+set_property(CACHE RENDERER_BUILD_CXX_STANDARD PROPERTY STRINGS 11 14 17 20)
+# cmake-format: on
+
+loco_initialize_project(CXX_STANDARD ${RENDERER_BUILD_CXX_STANDARD})
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(RendererDependencies)
@@ -71,6 +76,8 @@ loco_create_target(RendererCpp STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES
     OpenGL::OpenGL glfw::glfw math::math utils::utils stb glad
+  CXX_STANDARD
+    ${RENDERER_BUILD_CXX_STANDARD}
   WARNINGS_AS_ERRORS
     FALSE)
 

@@ -33,11 +33,11 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    f13fbd4cd2973f469223353a62d27da0ba2310a5 # Version v0.2.7
+    ec5db3e6165fbbdf0360a1818043f35c791c9572 # Version v0.2.8
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    28274859b39e5798972b660ae947f030825c3502 # Version v0.6.2
+    c5bfd8383f802d90a0db658b6405f23a6cebabd9 # Version v0.6.6
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
