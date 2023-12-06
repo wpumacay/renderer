@@ -1,0 +1,101 @@
+name: Build and Publish Python 🐍 manylinux wheels 📦 to PyPI and TestPyPI
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build-manylinux-wheel:
+    strategy:
+      fail-fast: false
+      matrix:
+        py-version: [cp38-cp38, cp39-cp39, cp310-cp310, cp311-cp311, cp312-cp312]
+
+    name: Build manylinux wheel 📦 for python 🐍 version • ${{ matrix.py-version }}
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64:latest
+      volumes:
+        - ${{ github.workspace }}:/src
+
+    steps:
+      - name: Install GLFW dependencies
+        run: |
+          yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
+
+      - name: Checkout our repo
+        uses: actions/checkout@v4
+
+      - name: Build bdist wheel
+        run: |
+          cd /src
+          /opt/python/${{ matrix.py-version }}/bin/python setup.py bdist_wheel
+          auditwheel repair --exclude libOpenGL.so.0 dist/*.whl
+
+      - name: Store the generated wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-${{ matrix.py-version }}-manylinux-wheel
+          path: /src/wheelhouse/
+
+  publish-to-testpypi:
+    strategy:
+      fail-fast: false
+      matrix:
+        py-version: [cp38-cp38, cp39-cp39, cp310-cp310, cp311-cp311, cp312-cp312]
+
+    name: Publish Python 🐍 manylinux wheel 📦 to TestPyPI • ${{ matrix.py-version }}
+    if: startsWith(github.ref, 'refs/tags/') # only publish to TestPyPI on tag pushes
+    needs:
+      - build-manylinux-wheel
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/wp-renderer
+
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download the manylinux wheel
+        uses: actions/download-artifact@v3
+        with:
+          name: python-${{ matrix.py-version }}-manylinux-wheel
+          path: dist/
+
+      - name: Publish manylinux wheel to TestPYPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+
+  publish-to-pypi:
+    strategy:
+      fail-fast: false
+      matrix:
+        py-version: [cp38-cp38, cp39-cp39, cp310-cp310, cp311-cp311, cp312-cp312]
+
+    name: Publish Python 🐍 manylinux wheel 📦 to PyPI • ${{ matrix.py-version }}
+    if: startsWith(github.ref, 'refs/tags/') # only publish to TestPyPI on tag pushes
+    needs:
+      - build-manylinux-wheel
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/wp-renderer
+
+    permissions:
+      id-token: write
+
+    steps:
+      - name:  Download the manylinux wheel
+        uses: actions/download-artifact@v3
+        with:
+          name: python-${{ matrix.py-version }}-manylinux-wheel
+          path: dist/
+
+      - name: Publish manylinux wheel to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
