@@ -4,12 +4,12 @@ include_guard()
 # CMake configuration for third-party dependencies.
 #
 # Dependencies:
-# * pybind11
 # * catch2
 # * glfw
-# * assimp
+# * imgui
 # * utils
 # * math
+# * pybind11
 #
 # - Based on the superbuild script by jeffamstutz for ospray
 #   https://github.com/jeffamstutz/superbuild_ospray/blob/main/macros.cmake
@@ -33,15 +33,15 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    ec5db3e6165fbbdf0360a1818043f35c791c9572 # Version v0.2.8
+    687d4dea4b55afd13405d00b7aef6993e056b36d # Version v0.2.9
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    c5bfd8383f802d90a0db658b6405f23a6cebabd9 # Version v0.6.6
+    a31f55fb57983286ad8e30c8915b3461d9ce8557 # Version v0.6.7
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
-    5b0a6fc2017fcc176545afe3e09c9f9885283242 # Release v2.10.4
+    8a099e44b3d5f85b20f05828d919d2332a8de841 # Release v2.11.1
     CACHE STRING "Version of PyBind11 to be fetched (used for python bindings)")
 
 mark_as_advanced(RENDERER_DEP_VERSION_catch2)
@@ -67,6 +67,8 @@ option(FIND_OR_FETCH_USE_SYSTEM_PACKAGE
 # Pybind11 is used for generating Python bindings for this project's C++ API.
 # ------------------------------------------------------------------------------
 
+set(PYBIND11_TEST OFF CACHE BOOL "" FORCE)
+
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
   PACKAGE_NAME pybind11
@@ -76,14 +78,17 @@ loco_find_or_fetch_dependency(
   GIT_PROGRESS FALSE
   GIT_SHALLOW TRUE
   TARGETS pybind11::headers
-  BUILD_ARGS
-    -DPYBIND11_TEST=OFF
   EXCLUDE_FROM_ALL)
 
 # ------------------------------------------------------------------------------
 # Catch2 is used for making unit-tests in C++ land. It's API is simple yet quite
 # powerfull (e.g. we can make use of template-parametrized tests-cases)
 # ------------------------------------------------------------------------------
+
+set(CATCH_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
+set(CATCH_INSTALL_EXTRAS OFF CACHE BOOL "" FORCE)
+set(CATCH_DEVELOPMENT_BUILD OFF CACHE BOOL "" FORCE)
+
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
   PACKAGE_NAME Catch2
@@ -93,10 +98,6 @@ loco_find_or_fetch_dependency(
   GIT_PROGRESS FALSE
   GIT_SHALLOW TRUE
   TARGETS Catch2::Catch2
-  BUILD_ARGS
-    -DCATCH_INSTALL_DOCS=OFF
-    -DCATCH_INSTALL_EXTRAS=OFF
-    -DCATCH_DEVELOPMENT_BUILD=OFF
   EXCLUDE_FROM_ALL)
 
 # Add custom scripts for test-case registration to the module path
@@ -109,6 +110,12 @@ endif()
 # GLFW in order to create a window with a proper GL context in many platforms.
 # Recall that this might not be the only backend for window creation (e.g. Qt)
 # ------------------------------------------------------------------------------
+
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE ${FIND_OR_FETCH_USE_SYSTEM_PACKAGE}
   PACKAGE_NAME glfw3
@@ -118,11 +125,6 @@ loco_find_or_fetch_dependency(
   GIT_PROGRESS FALSE
   GIT_SHALLOW TRUE
   TARGETS glfw
-  BUILD_ARGS
-    -DGLFW_BUILD_EXAMPLES=OFF
-    -DGLFW_BUILD_TESTS=OFF
-    -DGLFW_BUILD_DOCS=OFF
-    -DGLFW_INSTALL=OFF
   EXCLUDE_FROM_ALL)
 # Make an alias (sorry, kind of an OCD thingy xD)
 add_library(glfw::glfw ALIAS glfw)
@@ -153,40 +155,41 @@ if (NOT imgui_POPULATED)
 endif()
 
 # ------------------------------------------------------------------------------
-# "Math" is used as math library (defines vectors, matrices, and operations
+# Math3d is used as math library (defines vectors, matrices, and operations
 # that could be used on these types). The API is similar to Eigen's
 # ------------------------------------------------------------------------------
+
+set(MATH_BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
+set(MATH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(MATH_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MATH_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
   LIBRARY_NAME math
   GIT_REPO https://github.com/wpumacay/math.git
   GIT_TAG ${RENDERER_DEP_VERSION_math}
   GIT_PROGRESS FALSE
-  GIT_SHALLOW TRUE
-  TARGETS math::math math::math_py_helpers
-  BUILD_ARGS
-    -DMATH_BUILD_PYTHON_BINDINGS=ON
-    -DMATH_BUILD_EXAMPLES=OFF
-    -DMATH_BUILD_TESTS=OFF
-    -DMATH_BUILD_DOCS=OFF
+  GIT_SHALLOW FALSE
+  TARGETS math::math
   EXCLUDE_FROM_ALL)
-
 
 # ------------------------------------------------------------------------------
 # "Utils" exposes some utilities that we'll use (like logs, profiling, etc.)
 # ------------------------------------------------------------------------------
+
+set(UTILS_BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
+set(UTILS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(UTILS_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+
 loco_find_or_fetch_dependency(
   USE_SYSTEM_PACKAGE FALSE
   LIBRARY_NAME utils
   GIT_REPO https://github.com/wpumacay/utils.git
   GIT_TAG ${RENDERER_DEP_VERSION_utils}
   GIT_PROGRESS FALSE
-  GIT_SHALLOW TRUE
+  GIT_SHALLOW FALSE
   TARGETS utils::utils
-  BUILD_ARGS
-    -DUTILS_BUILD_PYTHON_BINDINGS=ON
-    -DUTILS_BUILD_EXAMPLES=OFF
-    -DUTILS_BUILD_DOCS=OFF
   EXCLUDE_FROM_ALL)
 
 # cmake-format: on

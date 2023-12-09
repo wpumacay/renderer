@@ -16,5 +16,5 @@ set(BINDINGS_SOURCES
 # cmake-format: on
 
 pybind11_add_module(renderer_bindings MODULE ${BINDINGS_SOURCES})
-target_link_libraries(renderer_bindings PUBLIC renderer::renderer
-                                               math::math_py_helpers)
+target_link_libraries(renderer_bindings PRIVATE renderer::renderer)
+target_include_directories(renderer_bindings PRIVATE)
