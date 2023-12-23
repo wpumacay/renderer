@@ -15,7 +15,7 @@ include(${loco_cmake_SOURCE_DIR}/Index.cmake)
 
 project(
   Renderer
-  VERSION 0.3.9
+  VERSION 0.3.10
   DESCRIPTION "A minimal renderer for prototyping 3D applications"
   HOMEPAGE_URL "https://github.com/wpumacay/renderer"
   LANGUAGES C CXX)
@@ -45,7 +45,7 @@ add_subdirectory(third_party)
 
 # cmake-format: off
 # -------------------------------------
-loco_create_target(RendererCpp STATIC
+loco_create_target(RendererCpp SHARED
   SOURCES
     ${SOURCE_DIR}/window/window_t.cpp
     ${SOURCE_DIR}/window/window_config_t.cpp

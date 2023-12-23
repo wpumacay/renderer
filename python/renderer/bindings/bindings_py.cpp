@@ -17,6 +17,7 @@ extern auto bindings_buttons(py::module& py_module) -> void;   // NOLINT
 extern auto bindings_buffers(py::module& py_module) -> void;   // NOLINT
 extern auto bindings_texture(py::module& py_module) -> void;   // NOLINT
 extern auto bindings_managers(py::module& py_module) -> void;  // NOLINT
+extern auto bindings_camera(py::module& py_module) -> void;    // NOLINT
 
 }  // namespace renderer
 
@@ -38,4 +39,5 @@ PYBIND11_MODULE(renderer_bindings, py_module) {
     ::renderer::bindings_buffers(py_module);
     ::renderer::bindings_texture(py_module);
     ::renderer::bindings_managers(py_module);
+    ::renderer::bindings_camera(py_module);
 }

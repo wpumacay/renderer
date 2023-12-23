@@ -33,11 +33,11 @@ set(RENDERER_DEP_VERSION_imgui
           "Version of Dear-ImGui to be fetched (used for prototyping UI)")
 
 set(RENDERER_DEP_VERSION_utils
-    687d4dea4b55afd13405d00b7aef6993e056b36d # Version v0.2.9
+    efff9de7c158850f9f7cbad1cc66dda5fa867e6e # Version v0.2.10
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    a31f55fb57983286ad8e30c8915b3461d9ce8557 # Version v0.6.7
+    34cb09bc70b8484a66a1734c4964635cb8f1a22b # Version v0.6.9
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
@@ -111,6 +111,7 @@ endif()
 # Recall that this might not be the only backend for window creation (e.g. Qt)
 # ------------------------------------------------------------------------------
 
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)

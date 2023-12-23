@@ -1,7 +1,9 @@
-#include <renderer/camera/camera_t.hpp>
-
 #include <cmath>
+
+#include <spdlog/fmt/bundled/format.h>
 #include <utils/logging.hpp>
+
+#include <renderer/camera/camera_t.hpp>
 
 namespace renderer {
 
@@ -13,6 +15,21 @@ auto ToString(const eProjectionType& proj_type) -> std::string {
             return "orthographic";
     }
     return "undefined";
+}
+
+auto ProjectionData::ToString() const -> std::string {
+    return fmt::format(
+        "<ProjectionData\n"
+        "  projection={0}\n"
+        "  fov={1}\n"
+        "  aspect={2}\n"
+        "  width={3}\n"
+        "  height={4}\n"
+        "  near={5}\n"
+        "  far={6}\n"
+        ">\n",
+        ::renderer::ToString(projection), fov, aspect, width, height, near,
+        far);
 }
 
 Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& world_up,
@@ -202,6 +219,21 @@ auto Camera::SetZFar(float far) -> void {
 auto Camera::SetZoom(float zoom) -> void {
     m_Zoom = zoom;
     UpdateProjectionMatrix();
+}
+
+auto Camera::ToString() const -> std::string {
+    return fmt::format(
+        "<Camera\n"
+        "  position={0}\n"
+        "  orientation={1}\n"
+        "  target={2}\n"
+        "  zoom={3}\n"
+        "  front={4}\n"
+        "  right={5}\n"
+        "  up={6}\n"
+        ">\n",
+        m_Position.toString(), m_Orientation.toString(), m_Target.toString(),
+        m_Zoom, m_Front.toString(), m_Right.toString(), m_Up.toString());
 }
 
 }  // namespace renderer

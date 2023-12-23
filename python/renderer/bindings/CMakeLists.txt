@@ -12,6 +12,7 @@ set(BINDINGS_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/buffers_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/texture_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/managers_py.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/camera_py.cpp
 )
 # cmake-format: on
 

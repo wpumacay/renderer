@@ -32,6 +32,9 @@ struct ProjectionData {
     float near = 0.1F;
     /// Distance to the furthest plane of the view-volume
     float far = 1000.0F;
+
+    /// Returns the string representation of this projection data
+    [[nodiscard]] auto ToString() const -> std::string;
 };
 
 /// Camera type
@@ -105,38 +108,49 @@ class Camera {
     auto ComputeBasisVectorsFromOrientation() -> void;
 
  public:
+    /// \brief Returns the string representation of this camera
+    [[nodiscard]] auto ToString() const -> std::string;
+
     /// Returns an unmutable reference to the position of this camera
-    auto position() const -> const Vec3& { return m_Position; }
+    [[nodiscard]] auto position() const -> const Vec3& { return m_Position; }
 
     /// Returns an unmutable reference to the orientation of this camera
-    auto orientation() const -> const Quat& { return m_Orientation; }
+    [[nodiscard]] auto orientation() const -> const Quat& {
+        return m_Orientation;
+    }
 
     /// Returns an unmutable reference to the target of this camera
-    auto target() const -> const Vec3& { return m_Target; }
+    [[nodiscard]] auto target() const -> const Vec3& { return m_Target; }
 
     /// Returns an unmutable reference to the projection data of this camera
-    auto proj_data() const -> const ProjectionData& { return m_ProjData; }
+    [[nodiscard]] auto proj_data() const -> const ProjectionData& {
+        return m_ProjData;
+    }
 
     /// Returns the current zoom value for this camera
-    auto zoom() const -> float { return m_Zoom; }
+    [[nodiscard]] auto zoom() const -> float { return m_Zoom; }
 
     /// Returns an unmutable const reference to the internal view matrix
-    auto view_matrix() const -> const Mat4& { return m_ViewMatrix; }
+    [[nodiscard]] auto view_matrix() const -> const Mat4& {
+        return m_ViewMatrix;
+    }
 
     /// Returns an unmutable const reference to the internal projection matrix
-    auto proj_matrix() const -> const Mat4& { return m_ProjMatrix; }
+    [[nodiscard]] auto proj_matrix() const -> const Mat4& {
+        return m_ProjMatrix;
+    }
 
     /// Returns the front vector (direction of Z+-axis of the camera frame)
-    auto front() const -> const Vec3& { return m_Front; }
+    [[nodiscard]] auto front() const -> const Vec3& { return m_Front; }
 
     /// Returns the up vector (direction of Y+ axis of the camera frame)
-    auto up() const -> const Vec3& { return m_Up; }
+    [[nodiscard]] auto up() const -> const Vec3& { return m_Up; }
 
     /// Returns the right vector (direction of X+ axis of the camera frame)
-    auto right() const -> const Vec3& { return m_Right; }
+    [[nodiscard]] auto right() const -> const Vec3& { return m_Right; }
 
     /// Returns the reference up direction in world space
-    auto world_up() const -> const Vec3& { return m_WorldUp; }
+    [[nodiscard]] auto world_up() const -> const Vec3& { return m_WorldUp; }
 
  private:
     /// Position of the camera w.r.t. the world frame
