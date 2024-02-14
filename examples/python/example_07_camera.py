@@ -17,12 +17,6 @@ def main() -> int:
         WINDOW_WIDTH, WINDOW_HEIGHT, rdr.WindowBackend.TYPE_GLFW
     )
 
-    def keyboard_callback(key, action, mods) -> None:
-        if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.RELEASED:
-            window.RequestClose()
-
-    window.RegisterKeyboardCallback(keyboard_callback)
-
     shader_manager = rdr.ShaderManager()
 
     program = shader_manager.LoadProgram(
@@ -49,6 +43,37 @@ def main() -> int:
 
     camera = rdr.Camera([0.0, -3.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0])
     color = np.array([0.1, 0.2, 0.7], dtype=np.float32)
+
+    def keyboard_callback(key, action, mods) -> None:
+        if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.RELEASED:
+            window.RequestClose()
+        if action == rdr.KeyAction.PRESSED:
+            if key == rdr.Keys.KEY_W:
+                camera.SetPosition(
+                    camera.position().x,
+                    camera.position().y - 0.1,
+                    camera.position().z,
+                )
+            elif key == rdr.Keys.KEY_S:
+                camera.SetPosition(
+                    camera.position().x,
+                    camera.position().y + 0.1,
+                    camera.position().z,
+                )
+            elif key == rdr.Keys.KEY_A:
+                camera.SetPosition(
+                    camera.position().x + 0.1,
+                    camera.position().y,
+                    camera.position().z,
+                )
+            elif key == rdr.Keys.KEY_D:
+                camera.SetPosition(
+                    camera.position().x - 0.1,
+                    camera.position().y,
+                    camera.position().z,
+                )
+
+    window.RegisterKeyboardCallback(keyboard_callback)
 
     while window.active:
         window.Begin()

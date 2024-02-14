@@ -59,6 +59,10 @@ auto bindings_camera(py::module& m) -> void {
                         ::math::nparray_to_vec3<float32_t>(np_position));
                 },
                 py::arg("np_position"))
+            .def("SetPosition",
+                 [](Class& self, float32_t x, float32_t y, float32_t z) {
+                     self.SetPosition(Vec3(x, y, z));
+                 })
             .def("SetOrientation", &Class::SetOrientation,
                  py::arg("quaternion"))
             .def(
