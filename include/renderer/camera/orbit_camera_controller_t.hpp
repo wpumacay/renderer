@@ -2,7 +2,6 @@
 
 // Implementation based on Three.JS OrbitControls [3]
 
-#include <utility>
 #include <limits>
 #include <string>
 

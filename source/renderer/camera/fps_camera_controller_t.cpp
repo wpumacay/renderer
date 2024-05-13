@@ -1,4 +1,3 @@
-#include <cmath>
 #include <algorithm>
 
 #include <renderer/camera/fps_camera_controller_t.hpp>

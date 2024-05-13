@@ -2,8 +2,6 @@
 
 // Implementation based on ThreeJS PointerLockControls [4]
 
-#include <string>
-
 #include <renderer/camera/camera_controller_t.hpp>
 
 #if defined(__clang__)
