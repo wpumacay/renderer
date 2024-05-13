@@ -231,22 +231,6 @@ auto main() -> int {
                         break;
                     }
                 }
-                // Attach callbacks for this new controller
-                window.RegisterKeyboardCallback(
-                    [&](int key, int action, int modifier) {
-                        camera_controller->OnKeyCallback(key, action, modifier);
-                    });
-                window.RegisterMouseButtonCallback(
-                    [&](int button, int action, double x, double y) {
-                        camera_controller->OnMouseButtonCallback(button, action,
-                                                                 x, y);
-                    });
-                window.RegisterMouseMoveCallback([&](double x, double y) {
-                    camera_controller->OnMouseMoveCallback(x, y);
-                });
-                window.RegisterScrollCallback([&](double xOff, double yOff) {
-                    camera_controller->OnScrollCallback(xOff, yOff);
-                });
                 LOG_INFO("Using camera-controller: {0}",
                          renderer::ToString(camera_controller->type()));
             });
