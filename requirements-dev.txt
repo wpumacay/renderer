@@ -8,7 +8,6 @@ numpy
 pre-commit
 pylint
 PyOpenGL
-PyOpenGL_accelerate
 pytest
 setuptools
 sphinx
