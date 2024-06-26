@@ -37,7 +37,7 @@ set(RENDERER_DEP_VERSION_utils
     CACHE STRING "Version of internal utilities repo to be fetched")
 
 set(RENDERER_DEP_VERSION_math
-    465647cac069bb1268bccc8adc33157e982f473b # Version v0.6.10
+    d0a29407901b35f39b9cf94b1e4dfea604e6c2a7 # Version v0.6.11
     CACHE STRING "Version of internal math repo to be fetched")
 
 set(RENDERER_DEP_VERSION_pybind11
