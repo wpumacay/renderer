@@ -125,7 +125,10 @@ auto FpsCameraController::OnMouseMoveCallback(double x, double y) -> void {
     m_LastCursor.x() = static_cast<float>(x);
     m_LastCursor.y() = static_cast<float>(y);
 
-    Euler euler(m_Camera->orientation());
+    Euler euler;
+    euler.order = ::math::euler::Order::ZXY;
+    euler.convention = ::math::euler::Convention::INTRINSIC;
+    euler.setFromQuaternion(m_Camera->orientation());
 
     euler.x -= dy * 0.002F * this->pointerSpeed;
     euler.y -= dx * 0.002F * this->pointerSpeed;
