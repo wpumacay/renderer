@@ -3,7 +3,7 @@
 
 #include <renderer/geometry/geometry_factory.hpp>
 #include <renderer/light/light_t.hpp>
-#include <renderer/application_t.hpp>
+#include <renderer/engine/application_t.hpp>
 
 auto main() -> int {
     ::renderer::Application app;
