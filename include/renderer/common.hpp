@@ -12,6 +12,7 @@
 #include <math/mat4_t.hpp>
 #include <math/quat_t.hpp>
 #include <math/euler_t.hpp>
+#include <math/pose3d_t.hpp>
 
 using Vec2 = math::Vector2<float>;
 using Vec3 = math::Vector3<float>;
@@ -20,6 +21,7 @@ using Mat3 = math::Matrix3<float>;
 using Mat4 = math::Matrix4<float>;
 using Quat = math::Quaternion<float>;
 using Euler = math::Euler<float>;
+using Pose = math::Pose3d<float>;
 
 using float32_t = math::float32_t;
 using float64_t = math::float64_t;
