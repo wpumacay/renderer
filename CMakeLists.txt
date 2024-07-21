@@ -72,6 +72,7 @@ loco_create_target(RendererCpp SHARED
     ${SOURCE_DIR}/material/material_t.cpp
     ${SOURCE_DIR}/debug/debug_drawer_t.cpp
     ${SOURCE_DIR}/engine/object_t.cpp
+    ${SOURCE_DIR}/engine/scene_t.cpp
     ${SOURCE_DIR}/engine/application_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include

@@ -1,10 +1,23 @@
+#include <renderer/engine/object_t.hpp>
+#include <renderer/engine/scene_t.hpp>
+
 #include <spdlog/fmt/bundled/format.h>
 
-#include <renderer/engine/object_t.hpp>
-
+#include <utility>
 #include <utils/logging.hpp>
 
 namespace renderer {
+
+auto ToString(ObjectType type) -> std::string {
+    switch (type) {
+        case ObjectType::BASE:
+            return "Base";
+        case ObjectType::MESH:
+            return "Mesh";
+        default:
+            return "Base";
+    }
+}
 
 Object3D::Object3D(std::string name) : m_Name(std::move(name)) {}
 
@@ -14,8 +27,12 @@ Object3D::Object3D(std::string name, Pose init_pose)
 Object3D::Object3D(std::string name, Vec3 init_pos, Quat init_quat)
     : m_Name(std::move(name)), m_WorldPose(Pose(init_pos, init_quat)) {}
 
+auto Object3D::SetScene(std::weak_ptr<Scene> scene_handle) -> void {
+    m_Scene = std::move(scene_handle);
+}
+
 auto Object3D::SetName(std::string new_name) -> void {
-    if (m_InScene) {
+    if (!m_Scene.expired()) {
         LOG_CORE_WARN(
             "Object3D::SetName >>> Be careful that {0} already belongs to a "
             "scene, where it might be stored by its name as key",
@@ -23,8 +40,6 @@ auto Object3D::SetName(std::string new_name) -> void {
     }
     m_Name = std::move(new_name);
 }
-
-auto Object3D::SetInScene(bool is_in_scene) -> void { m_InScene = is_in_scene; }
 
 auto Object3D::SetPose(Pose new_pose) -> void { m_WorldPose = new_pose; }
 

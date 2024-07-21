@@ -8,6 +8,19 @@
 
 namespace renderer {
 
+class Scene;
+
+/// All valid object types in the engine
+enum class ObjectType : uint8_t {
+    BASE = 0,  /// Base object type, used as dummy
+    MESH = 1,  /// 3d Mesh object type
+};
+
+/// Returns a string representation of the given object type enum
+/// \param[in] type The type of the object
+auto ToString(ObjectType type) -> std::string;
+
+/// Base interface for all objects supported by the engine
 class Object3D {
     DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Object3D)
 
@@ -37,13 +50,13 @@ class Object3D {
     /// Deallocates the resources used by this object
     virtual ~Object3D() = default;
 
+    /// Callback used when this object is assigned to a scene
+    /// \param[in] scene_handle A non-owning reference to the scene
+    auto SetScene(std::weak_ptr<Scene> scene_handle) -> void;
+
     /// Sets the name of this object
     /// \param[in]  new_name The new name to use for this object
     auto SetName(std::string new_name) -> void;
-
-    /// Sets whether or not this object belongs to a scene
-
-    auto SetInScene(bool is_in_scene) -> void;
 
     /// Sets the pose of this object in world space
     /// \param[in] new_pose The new pose of this object in world space
@@ -69,14 +82,19 @@ class Object3D {
     /// \param[in] orientation The local orientation of this object
     virtual auto SetLocalOrientation(Quat orientation) -> void;
 
+    /// Returns the type of this object
+    [[nodiscard]] auto type() const -> ObjectType { return m_Type; }
+
     /// Returns the pose in world space of this object
-    [[nodiscard]] auto pose() const -> Pose;
+    [[nodiscard]] auto pose() const -> Pose { return m_WorldPose; }
 
     /// Returns the position in world space of this object
-    [[nodiscard]] auto position() const -> Vec3;
+    [[nodiscard]] auto position() const -> Vec3 { return m_WorldPose.position; }
 
     /// Returns the orientation in world space of this object
-    [[nodiscard]] auto orientation() const -> Quat;
+    [[nodiscard]] auto orientation() const -> Quat {
+        return m_WorldPose.orientation;
+    }
 
     /// Returns the local pose of this object with respect to its parent
     [[nodiscard]] auto local_pose() const -> Pose { return m_LocalPose; }
@@ -101,8 +119,11 @@ class Object3D {
     /// The name of this object
     std::string m_Name;
 
-    /// Flag indicating whether or not this object belongs to a scene
-    bool m_InScene = false;
+    /// The type of this object
+    ObjectType m_Type = ObjectType::BASE;
+
+    /// Non-owning reference to the scene if we are part of one
+    std::weak_ptr<Scene> m_Scene;
 
     /// The 3d pose of this object respect to world space
     Pose m_WorldPose;
