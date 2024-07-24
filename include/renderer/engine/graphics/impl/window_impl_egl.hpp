@@ -3,8 +3,8 @@
 #include <glad/gl.h>
 #include <glad/egl.h>
 
-#include <renderer/input/callbacks.hpp>
-#include <renderer/window/impl/window_impl.hpp>
+#include <renderer/engine/callbacks.hpp>
+#include <renderer/engine/graphics/impl/window_impl.hpp>
 
 #if defined(__clang__)
 #pragma clang diagnostic push

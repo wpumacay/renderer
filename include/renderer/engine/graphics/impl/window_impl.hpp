@@ -4,8 +4,8 @@
 
 #include <utils/common.hpp>
 #include <renderer/common.hpp>
-#include <renderer/input/callbacks.hpp>
-#include <renderer/window/window_config_t.hpp>
+#include <renderer/engine/callbacks.hpp>
+#include <renderer/engine/graphics/window_config_t.hpp>
 
 namespace renderer {
 

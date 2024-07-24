@@ -1,10 +1,11 @@
+#include <string>
 
 #include <glad/gl.h>
 
-#include <string>
-#include <utils/logging.hpp>
-#include <renderer/window/impl/window_impl_glfw.hpp>
 #include <spdlog/fmt/bundled/format.h>
+#include <utils/logging.hpp>
+
+#include <renderer/engine/graphics/impl/window_impl_glfw.hpp>
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>

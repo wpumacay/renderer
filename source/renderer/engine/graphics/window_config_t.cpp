@@ -1,5 +1,4 @@
-#include <cassert>
-#include <renderer/window/window_config_t.hpp>
+#include <renderer/engine/graphics/window_config_t.hpp>
 
 namespace renderer {
 
@@ -12,7 +11,6 @@ auto ToString(const eWindowBackend& type) -> std::string {
         case eWindowBackend::TYPE_EGL:
             return "egl";
         default:
-            assert(false);
             return "ERROR";
     }
 }

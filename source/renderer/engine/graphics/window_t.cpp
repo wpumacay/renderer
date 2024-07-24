@@ -1,7 +1,7 @@
 
-#include <renderer/window/window_t.hpp>
-#include <renderer/window/impl/window_impl_egl.hpp>
-#include <renderer/window/impl/window_impl_glfw.hpp>
+#include <renderer/engine/graphics/window_t.hpp>
+#include <renderer/engine/graphics/impl/window_impl_egl.hpp>
+#include <renderer/engine/graphics/impl/window_impl_glfw.hpp>
 
 namespace renderer {
 

@@ -20,12 +20,12 @@ project(
   HOMEPAGE_URL "https://github.com/wpumacay/renderer"
   LANGUAGES C CXX)
 
-option(RENDERER_BUILD_IMGUI "Build with support 4 Ocornut's Dear ImGui" ON)
+option(RENDERER_BUILD_IMGUI "Build with support for Ocornut's Dear ImGui" ON)
 option(RENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(RENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
-option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
-option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
-option(RENDERER_BUILD_TESTS "Build C++ unit-tests" ON)
+option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
+option(RENDERER_BUILD_EXAMPLES "Build C++ examples" OFF)
+option(RENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
 option(RENDERER_BUILD_DOCS "Build documentation" OFF)
 
 # cmake-format: off
@@ -47,33 +47,33 @@ add_subdirectory(third_party)
 # -------------------------------------
 loco_create_target(RendererCpp SHARED
   SOURCES
-    ${SOURCE_DIR}/window/window_t.cpp
-    ${SOURCE_DIR}/window/window_config_t.cpp
-    ${SOURCE_DIR}/window/impl/window_impl_glfw.cpp
-    ${SOURCE_DIR}/window/impl/window_impl_egl.cpp
-    ${SOURCE_DIR}/shader/shader_t.cpp
-    ${SOURCE_DIR}/shader/program_t.cpp
-    ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
-    ${SOURCE_DIR}/core/vertex_buffer_t.cpp
-    ${SOURCE_DIR}/core/vertex_array_t.cpp
-    ${SOURCE_DIR}/core/index_buffer_t.cpp
-    ${SOURCE_DIR}/core/texture_data_t.cpp
-    ${SOURCE_DIR}/core/texture_t.cpp
-    ${SOURCE_DIR}/assets/shader_manager_t.cpp
-    ${SOURCE_DIR}/assets/texture_manager_t.cpp
-    ${SOURCE_DIR}/camera/camera_t.cpp
-    ${SOURCE_DIR}/camera/camera_controller_t.cpp
-    ${SOURCE_DIR}/camera/orbit_camera_controller_t.cpp
-    ${SOURCE_DIR}/camera/fps_camera_controller_t.cpp
-    ${SOURCE_DIR}/input/input_manager_t.cpp
-    ${SOURCE_DIR}/geometry/geometry_t.cpp
-    ${SOURCE_DIR}/geometry/geometry_factory.cpp
-    ${SOURCE_DIR}/light/light_t.cpp
-    ${SOURCE_DIR}/material/material_t.cpp
-    ${SOURCE_DIR}/debug/debug_drawer_t.cpp
-    ${SOURCE_DIR}/engine/object_t.cpp
-    ${SOURCE_DIR}/engine/scene_t.cpp
-    ${SOURCE_DIR}/engine/application_t.cpp
+    ${SOURCE_DIR}/engine/graphics/window_t.cpp
+    ${SOURCE_DIR}/engine/graphics/window_config_t.cpp
+    ${SOURCE_DIR}/engine/graphics/impl/window_impl_glfw.cpp
+    ${SOURCE_DIR}/engine/graphics/impl/window_impl_egl.cpp
+    # ${SOURCE_DIR}/shader/shader_t.cpp
+    # ${SOURCE_DIR}/shader/program_t.cpp
+    # ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
+    # ${SOURCE_DIR}/core/vertex_buffer_t.cpp
+    # ${SOURCE_DIR}/core/vertex_array_t.cpp
+    # ${SOURCE_DIR}/core/index_buffer_t.cpp
+    # ${SOURCE_DIR}/core/texture_data_t.cpp
+    # ${SOURCE_DIR}/core/texture_t.cpp
+    # ${SOURCE_DIR}/assets/shader_manager_t.cpp
+    # ${SOURCE_DIR}/assets/texture_manager_t.cpp
+    # ${SOURCE_DIR}/camera/camera_t.cpp
+    # ${SOURCE_DIR}/camera/camera_controller_t.cpp
+    # ${SOURCE_DIR}/camera/orbit_camera_controller_t.cpp
+    # ${SOURCE_DIR}/camera/fps_camera_controller_t.cpp
+    # ${SOURCE_DIR}/input/input_manager_t.cpp
+    # ${SOURCE_DIR}/geometry/geometry_t.cpp
+    # ${SOURCE_DIR}/geometry/geometry_factory.cpp
+    # ${SOURCE_DIR}/light/light_t.cpp
+    # ${SOURCE_DIR}/material/material_t.cpp
+    # ${SOURCE_DIR}/debug/debug_drawer_t.cpp
+    # ${SOURCE_DIR}/engine/object_t.cpp
+    # ${SOURCE_DIR}/engine/scene_t.cpp
+    # ${SOURCE_DIR}/engine/application_t.cpp
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   TARGET_DEPENDENCIES

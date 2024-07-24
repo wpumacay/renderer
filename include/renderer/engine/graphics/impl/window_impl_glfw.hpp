@@ -6,8 +6,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include <renderer/input/callbacks.hpp>
-#include <renderer/window/impl/window_impl.hpp>
+#include <renderer/engine/callbacks.hpp>
+#include <renderer/engine/graphics/impl/window_impl.hpp>
 
 namespace renderer {
 

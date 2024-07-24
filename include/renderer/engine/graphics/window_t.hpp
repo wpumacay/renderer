@@ -4,10 +4,10 @@
 #include <utils/common.hpp>
 
 #include <renderer/common.hpp>
-#include <renderer/input/callbacks.hpp>
-#include <renderer/input/keycodes.hpp>
-#include <renderer/window/window_config_t.hpp>
-#include <renderer/window/impl/window_impl.hpp>
+#include <renderer/engine/callbacks.hpp>
+#include <renderer/engine/keycodes.hpp>
+#include <renderer/engine/graphics/window_config_t.hpp>
+#include <renderer/engine/graphics/impl/window_impl.hpp>
 
 namespace renderer {
 
