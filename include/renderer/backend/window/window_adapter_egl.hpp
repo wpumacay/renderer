@@ -1,10 +1,9 @@
 #pragma once
 
-#include <glad/gl.h>
 #include <glad/egl.h>
 
 #include <renderer/engine/callbacks.hpp>
-#include <renderer/engine/graphics/impl/window_impl.hpp>
+#include <renderer/engine/graphics/window_adapter_t.hpp>
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -16,34 +15,29 @@
 
 namespace renderer {
 
-class WindowImplEgl : public IWindowImpl {
+class RENDERER_API WindowAdapterEGL : public IWindowAdapter {
     // cppcheck-suppress unknownMacro
-    NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplEgl)
+    NO_COPY_NO_MOVE_NO_ASSIGN(WindowAdapterEGL)
 
-    DEFINE_SMART_POINTERS(WindowImplEgl)
+    DEFINE_SMART_POINTERS(WindowAdapterEGL)
 
  public:
-    explicit WindowImplEgl(WindowConfig config);
+    explicit WindowAdapterEGL(WindowConfig config);
 
-    ~WindowImplEgl() override;
+    ~WindowAdapterEGL() override;
 
-    // NOLINTNEXTLINE
     auto RegisterKeyboardCallback(const KeyboardCallback& callback)
         -> void override{/* Do nothing here */};
 
-    // NOLINTNEXTLINE
     auto RegisterMouseButtonCallback(const MouseButtonCallback& callback)
         -> void override{/* Do nothing here */};
 
-    // NOLINTNEXTLINE
     auto RegisterMouseMoveCallback(const MouseMoveCallback& callback)
         -> void override{/* Do nothing here */};
 
-    // NOLINTNEXTLINE
     auto RegisterScrollCallback(const ScrollCallback& callback)
         -> void override{/* Do nothing here */};
 
-    // NOLINTNEXTLINE
     auto RegisterResizeCallback(const ResizeCallback& callback)
         -> void override{/* Do nothing here */};
 

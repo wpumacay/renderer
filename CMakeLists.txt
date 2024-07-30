@@ -24,7 +24,7 @@ option(RENDERER_BUILD_IMGUI "Build with support for Ocornut's Dear ImGui" ON)
 option(RENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(RENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
 option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
-option(RENDERER_BUILD_EXAMPLES "Build C++ examples" OFF)
+option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(RENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
 option(RENDERER_BUILD_DOCS "Build documentation" OFF)
 
@@ -34,6 +34,8 @@ set_property(CACHE RENDERER_BUILD_CXX_STANDARD PROPERTY STRINGS 11 14 17 20)
 # cmake-format: on
 
 loco_initialize_project(CXX_STANDARD ${RENDERER_BUILD_CXX_STANDARD})
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(RendererDependencies)
@@ -49,8 +51,8 @@ loco_create_target(RendererCpp SHARED
   SOURCES
     ${SOURCE_DIR}/engine/graphics/window_t.cpp
     ${SOURCE_DIR}/engine/graphics/window_config_t.cpp
-    ${SOURCE_DIR}/engine/graphics/impl/window_impl_glfw.cpp
-    ${SOURCE_DIR}/engine/graphics/impl/window_impl_egl.cpp
+    ${SOURCE_DIR}/backend/window/window_adapter_glfw.cpp
+    ${SOURCE_DIR}/backend/window/window_adapter_egl.cpp
     # ${SOURCE_DIR}/shader/shader_t.cpp
     # ${SOURCE_DIR}/shader/program_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
@@ -96,6 +98,26 @@ if (RENDERER_BUILD_IMGUI)
   target_compile_definitions(RendererCpp PUBLIC -DRENDERER_IMGUI)
 endif()
 # cmake-format: on
+
+if(CMAKE_CXX_STANDARD EQUAL 20)
+  target_compile_definitions(RendererCpp PUBLIC -DRENDERER_FORCE_CXX20)
+elseif(CMAKE_CXX_STANDARD EQUAL 17)
+  target_compile_definitions(RendererCpp PUBLIC -DRENDERER_FORCE_CXX17)
+elseif(CMAKE_CXX_STANDARD EQUAL 14)
+  target_compile_definitions(RendererCpp PUBLIC -DRENDERER_FORCE_CXX14)
+elseif(CMAKE_CXX_STANDARD EQUAL 11)
+  target_compile_definitions(RendererCpp PUBLIC -DRENDERER_FORCE_CXX11)
+else()
+  message(
+    WARNING "Renderer >>> should setup which standard to use. Using autodetect")
+endif()
+
+# -------------------------------------
+# Handle symbol visibility
+set_target_properties(RendererCpp PROPERTIES C_VISIBILITY_PRESET hidden)
+set_target_properties(RendererCpp PROPERTIES CXX_VISIBILITY_PRESET hidden)
+set_target_properties(RendererCpp PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+target_compile_definitions(RendererCpp PRIVATE -DRENDERER_DLL_EXPORTS)
 
 include(RendererDefinitions)
 

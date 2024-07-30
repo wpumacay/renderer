@@ -1,32 +1,34 @@
-#include <spdlog/fmt/bundled/format.h>
+#include <glad/gl.h>
 
+#include <spdlog/fmt/bundled/format.h>
 #include <utils/logging.hpp>
 
-#include <renderer/engine/graphics/impl/window_impl_egl.hpp>
+#include <renderer/backend/window/window_adapter_egl.hpp>
 
 namespace renderer {
 
-WindowImplEgl::WindowImplEgl(WindowConfig config)
-    : IWindowImpl(std::move(config)) {
+WindowAdapterEGL::WindowAdapterEGL(WindowConfig config)
+    : IWindowAdapter(std::move(config)) {
     auto egl_version = gladLoaderLoadEGL(nullptr);
-    LOG_CORE_ASSERT(egl_version,
-                    "WindowImplEgl >>> something went wrong during first load "
-                    "of EGL functions using GLAD");
+    LOG_CORE_ASSERT(
+        egl_version,
+        "WindowAdapterEGL >>> something went wrong during first load "
+        "of EGL functions using GLAD");
 
     m_EglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);  // NOLINT
     EGLint gl_major{};
     EGLint gl_minor{};
     LOG_CORE_ASSERT(eglInitialize(m_EglDisplay, &gl_major, &gl_minor),
-                    "WindowImplEgl >>> unable to initialize EGL");
+                    "WindowAdapterEGL >>> unable to initialize EGL");
     LOG_CORE_TRACE(
-        "WindowImplEgl >>> initialized EGL display, major: {0}, minor: {1}",
+        "WindowAdapterEGL >>> initialized EGL display, major: {0}, minor: {1}",
         gl_major, gl_minor);
 
     egl_version = gladLoaderLoadEGL(m_EglDisplay);
-    LOG_CORE_ASSERT(
-        egl_version,
-        "WindowImplEgl >>> something went wrong while loading EGL using GLAD");
-    LOG_CORE_TRACE("WindowImplEgl >>> initialized EGL version: {0}",
+    LOG_CORE_ASSERT(egl_version,
+                    "WindowAdapterEGL >>> something went wrong while loading "
+                    "EGL using GLAD");
+    LOG_CORE_TRACE("WindowAdapterEGL >>> initialized EGL version: {0}",
                    egl_version);
 
     EGLint num_config{};
@@ -64,9 +66,9 @@ WindowImplEgl::WindowImplEgl(WindowConfig config)
 
     // Load gl-functions using glad
     LOG_CORE_ASSERT(gladLoadGL(eglGetProcAddress),
-                    "WindowImplEgl >>> failed to load GL using GLAD on the "
+                    "WindowAdapterEGL >>> failed to load GL using GLAD on the "
                     "current EGL context");
-    LOG_CORE_INFO("WindowImplEgl >>> successfully initialized EGL window");
+    LOG_CORE_INFO("WindowAdapterEGL >>> successfully initialized EGL window");
     LOG_CORE_INFO("OpenGL Info:");
     LOG_CORE_INFO("\tVendor     : {0}", fmt::ptr(glGetString(GL_VENDOR)));
     LOG_CORE_INFO("\tRenderer   : {0}", fmt::ptr(glGetString(GL_RENDERER)));
@@ -79,7 +81,7 @@ WindowImplEgl::WindowImplEgl(WindowConfig config)
                  m_Config.clear_color.z(), m_Config.clear_color.w());
 }
 
-WindowImplEgl::~WindowImplEgl() {
+WindowAdapterEGL::~WindowAdapterEGL() {
     if (m_EglDisplay != nullptr) {
         if (m_EglContext != nullptr) {
             eglDestroyContext(m_EglDisplay, m_EglContext);
@@ -95,17 +97,17 @@ WindowImplEgl::~WindowImplEgl() {
     gladLoaderUnloadEGL();
 }
 
-auto WindowImplEgl::Begin() -> void {
+auto WindowAdapterEGL::Begin() -> void {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-auto WindowImplEgl::End() -> void {
+auto WindowAdapterEGL::End() -> void {
     if (m_EglDisplay != nullptr && m_EglSurface != nullptr) {
         eglSwapBuffers(m_EglDisplay, m_EglSurface);
     }
 }
 
-auto WindowImplEgl::SetClearColor(const Vec4& color) -> void {
+auto WindowAdapterEGL::SetClearColor(const Vec4& color) -> void {
     glClearColor(color.x(), color.y(), color.z(), color.w());
 }
 

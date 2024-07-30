@@ -28,6 +28,89 @@ using float64_t = math::float64_t;
 
 static constexpr float PI = static_cast<float>(math::PI);
 
+// -----------------------------------------------------------------------------
+// Language detection adapted from https://github.com/g-truc/glm
+
+#define RENDERER_LANG_CXX98_FLAG (1 << 1)
+#define RENDERER_LANG_CXX03_FLAG (1 << 2)
+#define RENDERER_LANG_CXX0X_FLAG (1 << 3)
+#define RENDERER_LANG_CXX11_FLAG (1 << 4)
+#define RENDERER_LANG_CXX14_FLAG (1 << 5)
+#define RENDERER_LANG_CXX17_FLAG (1 << 6)
+#define RENDERER_LANG_CXX20_FLAG (1 << 7)
+
+#define RENDERER_LANG_CXX98 RENDERER_LANG_CXX98_FLAG
+#define RENDERER_LANG_CXX03 (RENDERER_LANG_CXX98 | RENDERER_LANG_CXX03_FLAG)
+#define RENDERER_LANG_CXX0X (RENDERER_LANG_CXX03 | RENDERER_LANG_CXX0X_FLAG)
+#define RENDERER_LANG_CXX11 (RENDERER_LANG_CXX0X | RENDERER_LANG_CXX11_FLAG)
+#define RENDERER_LANG_CXX14 (RENDERER_LANG_CXX11 | RENDERER_LANG_CXX14_FLAG)
+#define RENDERER_LANG_CXX17 (RENDERER_LANG_CXX14 | RENDERER_LANG_CXX17_FLAG)
+#define RENDERER_LANG_CXX20 (RENDERER_LANG_CXX17 | RENDERER_LANG_CXX20_FLAG)
+
+// clang-format off
+#if defined(RENDERER_FORCE_CXX20)
+    #define RENDERER_LANG RENDERER_LANG_CXX20
+#elif defined(RENDERER_FORCE_CXX17)
+    #define RENDERER_LANG RENDERER_LANG_CXX17
+#elif defined(RENDERER_FORCE_CXX14)
+    #define RENDERER_LANG RENDERER_LANG_CXX14
+#elif defined(RENDERER_FORCE_CXX11)
+    #define RENDERER_LANG RENDERER_LANG_CXX11
+#else
+    #if __cplusplus > 201703L
+        #define RENDERER_LANG RENDERER_LANG_CXX20
+    #elif __cplusplus == 201703L
+        #define RENDERER_LANG RENDERER_LANG_CXX17
+    #elif __cplusplus == 201402L
+        #define RENDERER_LANG RENDERER_LANG_CXX14
+    #elif __cplusplus == 201103L
+        #define RENDERER_LANG RENDERER_LANG_CXX11
+    #else
+        #error "C++ standard must be one of 11, 14, 17, and 20"
+    #endif
+#endif
+
+// [[nodiscard]]
+#if RENDERER_LANG & RENDERER_LANG_CXX17_FLAG
+    #define RENDERER_NODISCARD [[nodiscard]]
+#else
+    #define RENDERER_NODISCARD
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
+    #define RENDERER_DLL_EXPORT __declspec(dllexport)
+    #define RENDERER_DLL_IMPORT __declspec(dllimport)
+    #define RENDERER_DLL_LOCAL
+#else
+    #if __GNUC__ >= 4
+        #define RENDERER_DLL_EXPORT __attribute__ ((visibility ("default")))
+        #define RENDERER_DLL_IMPORT __attribute__ ((visibility ("default")))
+        #define RENDERER_DLL_LOCAL __attribute__ ((visibility ("hidden")))
+    #else
+        #define RENDERER_DLL_EXPORT
+        #define RENDERER_DLL_IMPORT
+        #define RENDERER_DLL_LOCAL
+    #endif
+#endif
+
+
+#define RENDERER_DECL RENDERER_NODISCARD
+
+#ifdef RENDERER_STATIC
+    #define RENDERER_API
+    #define RENDERER_LOCAL
+#else
+    #ifdef RENDERER_DLL_EXPORTS
+        #define RENDERER_API RENDERER_DLL_EXPORT
+    #else
+        #define RENDERER_API RENDERER_DLL_IMPORT
+    #endif
+    #define RENDERER_LOCAL RENDERER_DLL_LOCAL
+#endif
+// clang-format on
+
+// -----------------------------------------------------------------------------
+
 namespace renderer {
 
 #if defined(RENDERER_RESOURCES_PATH)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include <renderer/common.hpp>
 
 namespace renderer {

@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include <renderer/engine/callbacks.hpp>
-#include <renderer/engine/graphics/impl/window_impl.hpp>
+#include <renderer/engine/graphics/window_adapter_t.hpp>
 
 namespace renderer {
 
@@ -15,16 +15,16 @@ struct GLFWwindowDeleter {
     auto operator()(GLFWwindow* ptr) const -> void;
 };
 
-class WindowImplGlfw : public IWindowImpl {
+class RENDERER_API WindowAdapterGLFW : public IWindowAdapter {
     // cppcheck-suppress unknownMacro
-    NO_COPY_NO_MOVE_NO_ASSIGN(WindowImplGlfw)
+    NO_COPY_NO_MOVE_NO_ASSIGN(WindowAdapterGLFW)
 
-    DEFINE_SMART_POINTERS(WindowImplGlfw)
+    DEFINE_SMART_POINTERS(WindowAdapterGLFW)
 
  public:
-    explicit WindowImplGlfw(WindowConfig config);
+    explicit WindowAdapterGLFW(WindowConfig config);
 
-    ~WindowImplGlfw() override;
+    ~WindowAdapterGLFW() override;
 
     auto RegisterKeyboardCallback(const KeyboardCallback& callback)
         -> void override;

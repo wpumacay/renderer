@@ -1,5 +1,5 @@
 
-#include <renderer/window/window_t.hpp>
+#include <renderer/engine/graphics/window_t.hpp>
 #include <utils/logging.hpp>
 
 constexpr int DEFAULT_WIDTH = 1024;

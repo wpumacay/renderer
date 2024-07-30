@@ -1,11 +1,9 @@
-#include <string>
-
 #include <glad/gl.h>
 
 #include <spdlog/fmt/bundled/format.h>
 #include <utils/logging.hpp>
 
-#include <renderer/engine/graphics/impl/window_impl_glfw.hpp>
+#include <renderer/backend/window/window_adapter_glfw.hpp>
 
 #if defined(RENDERER_IMGUI)
 #include <imgui.h>
@@ -22,8 +20,8 @@ auto GLFWwindowDeleter::operator()(GLFWwindow* ptr) const -> void {
     }
 }
 
-WindowImplGlfw::WindowImplGlfw(WindowConfig config)
-    : IWindowImpl(std::move(config)) {
+WindowAdapterGLFW::WindowAdapterGLFW(WindowConfig config)
+    : IWindowAdapter(std::move(config)) {
     if (glfwInit() != GLFW_TRUE) {
         LOG_CORE_ERROR("There was an issue while initializing GLFW");
         return;
@@ -41,14 +39,14 @@ WindowImplGlfw::WindowImplGlfw(WindowConfig config)
         glfwCreateWindow(m_Config.width, m_Config.height,
                          m_Config.title.c_str(), nullptr, nullptr);
     if (glfw_window == nullptr) {
-        LOG_CORE_ERROR("WindowImplGlfw >>> coudn't initialize GLFW window");
+        LOG_CORE_ERROR("WindowAdapterGLFW >>> coudn't initialize GLFW window");
         glfwTerminate();
         return;
     }
 
     glfwMakeContextCurrent(glfw_window);
     LOG_CORE_ASSERT(gladLoadGL(glfwGetProcAddress),
-                    "WindowImplGlfw >>> failed to load GL using GLAD on the "
+                    "WindowAdapterGLFW >>> failed to load GL using GLAD on the "
                     "current context");
     LOG_CORE_INFO("OpenGL Info:");
 
@@ -83,71 +81,71 @@ WindowImplGlfw::WindowImplGlfw(WindowConfig config)
             return;  // Let ImGui take control over
         }
 #endif  // RENDERER_IMGUI
-        auto* impl =
-            static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrKeyboardCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrKeyboardCallbacks;
+        auto* adapter = static_cast<WindowAdapterGLFW*>(
+            glfwGetWindowUserPointer(window_ptr));
+        size_t num_callbacks = adapter->m_ArrKeyboardCallbacksCount;
+        auto& arr_callbacks = adapter->m_ArrKeyboardCallbacks;
         for (size_t i = 0; i < num_callbacks; i++) {
             arr_callbacks.at(i)(key, action, mods);
         }
     });
 
-    glfwSetMouseButtonCallback(glfw_window, [](GLFWwindow* window_ptr, int btn,
-                                               int act, int) {
+    glfwSetMouseButtonCallback(
+        glfw_window, [](GLFWwindow* window_ptr, int btn, int act, int) {
 #if defined(RENDERER_IMGUI)
-        ImGuiIO& imgui_io = ImGui::GetIO();
-        if (imgui_io.WantCaptureMouse) {
-            return;  // Let ImGui takes control over
-        }
+            ImGuiIO& imgui_io = ImGui::GetIO();
+            if (imgui_io.WantCaptureMouse) {
+                return;  // Let ImGui takes control over
+            }
 #endif  // RENDERER_IMGUI
-        auto* impl =
-            static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrMouseButtonCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrMouseButtonCallbacks;
+            auto* adapter = static_cast<WindowAdapterGLFW*>(
+                glfwGetWindowUserPointer(window_ptr));
+            size_t num_callbacks = adapter->m_ArrMouseButtonCallbacksCount;
+            auto& arr_callbacks = adapter->m_ArrMouseButtonCallbacks;
 
-        double x_cursor = 0;
-        double y_cursor = 0;
-        glfwGetCursorPos(window_ptr, &x_cursor, &y_cursor);
-        for (size_t i = 0; i < num_callbacks; i++) {
-            arr_callbacks.at(i)(btn, act, x_cursor, y_cursor);
-        }
-    });
+            double x_cursor = 0;
+            double y_cursor = 0;
+            glfwGetCursorPos(window_ptr, &x_cursor, &y_cursor);
+            for (size_t i = 0; i < num_callbacks; i++) {
+                arr_callbacks.at(i)(btn, act, x_cursor, y_cursor);
+            }
+        });
 
-    glfwSetCursorPosCallback(glfw_window, [](GLFWwindow* window_ptr,
-                                             double xpos, double ypos) {
-        auto* impl =
-            static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrMouseMoveCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrMouseMoveCallbacks;
+    glfwSetCursorPosCallback(
+        glfw_window, [](GLFWwindow* window_ptr, double xpos, double ypos) {
+            auto* adapter = static_cast<WindowAdapterGLFW*>(
+                glfwGetWindowUserPointer(window_ptr));
+            size_t num_callbacks = adapter->m_ArrMouseMoveCallbacksCount;
+            auto& arr_callbacks = adapter->m_ArrMouseMoveCallbacks;
 
-        for (size_t i = 0; i < num_callbacks; i++) {
-            arr_callbacks.at(i)(xpos, ypos);
-        }
-    });
+            for (size_t i = 0; i < num_callbacks; i++) {
+                arr_callbacks.at(i)(xpos, ypos);
+            }
+        });
 
-    glfwSetScrollCallback(glfw_window, [](GLFWwindow* window_ptr, double x_off,
-                                          double y_off) {
-        auto* impl =
-            static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrScrollCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrScrollCallbacks;
+    glfwSetScrollCallback(
+        glfw_window, [](GLFWwindow* window_ptr, double x_off, double y_off) {
+            auto* adapter = static_cast<WindowAdapterGLFW*>(
+                glfwGetWindowUserPointer(window_ptr));
+            size_t num_callbacks = adapter->m_ArrScrollCallbacksCount;
+            auto& arr_callbacks = adapter->m_ArrScrollCallbacks;
 
-        for (size_t i = 0; i < num_callbacks; i++) {
-            arr_callbacks.at(i)(x_off, y_off);
-        }
-    });
+            for (size_t i = 0; i < num_callbacks; i++) {
+                arr_callbacks.at(i)(x_off, y_off);
+            }
+        });
 
-    glfwSetFramebufferSizeCallback(glfw_window, [](GLFWwindow* window_ptr,
-                                                   int width, int height) {
-        auto* impl =
-            static_cast<WindowImplGlfw*>(glfwGetWindowUserPointer(window_ptr));
-        size_t num_callbacks = impl->m_ArrResizeCallbacksCount;
-        auto& arr_callbacks = impl->m_ArrResizeCallbacks;
+    glfwSetFramebufferSizeCallback(
+        glfw_window, [](GLFWwindow* window_ptr, int width, int height) {
+            auto* adapter = static_cast<WindowAdapterGLFW*>(
+                glfwGetWindowUserPointer(window_ptr));
+            size_t num_callbacks = adapter->m_ArrResizeCallbacksCount;
+            auto& arr_callbacks = adapter->m_ArrResizeCallbacks;
 
-        for (size_t i = 0; i < num_callbacks; i++) {
-            arr_callbacks.at(i)(width, height);
-        }
-    });
+            for (size_t i = 0; i < num_callbacks; i++) {
+                arr_callbacks.at(i)(width, height);
+            }
+        });
 
 #if defined(RENDERER_IMGUI)
     // --------------------------------
@@ -171,7 +169,7 @@ WindowImplGlfw::WindowImplGlfw(WindowConfig config)
     m_GlfwWindow = std::unique_ptr<GLFWwindow, GLFWwindowDeleter>(glfw_window);
 }
 
-WindowImplGlfw::~WindowImplGlfw() {
+WindowAdapterGLFW::~WindowAdapterGLFW() {
     m_GlfwWindow = nullptr;
 #if defined(RENDERER_IMGUI)
     ImGui_ImplOpenGL3_Shutdown();
@@ -180,44 +178,44 @@ WindowImplGlfw::~WindowImplGlfw() {
 #endif  // RENDERER_IMGUI
 }
 
-auto WindowImplGlfw::RegisterKeyboardCallback(const KeyboardCallback& callback)
-    -> void {
+auto WindowAdapterGLFW::RegisterKeyboardCallback(
+    const KeyboardCallback& callback) -> void {
     m_ArrKeyboardCallbacks.at(m_ArrKeyboardCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::RegisterMouseButtonCallback(
+auto WindowAdapterGLFW::RegisterMouseButtonCallback(
     const MouseButtonCallback& callback) -> void {
     m_ArrMouseButtonCallbacks.at(m_ArrMouseButtonCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::RegisterMouseMoveCallback(
+auto WindowAdapterGLFW::RegisterMouseMoveCallback(
     const MouseMoveCallback& callback) -> void {
     m_ArrMouseMoveCallbacks.at(m_ArrMouseMoveCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::RegisterScrollCallback(const ScrollCallback& callback)
+auto WindowAdapterGLFW::RegisterScrollCallback(const ScrollCallback& callback)
     -> void {
     m_ArrScrollCallbacks.at(m_ArrScrollCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::RegisterResizeCallback(const ResizeCallback& callback)
+auto WindowAdapterGLFW::RegisterResizeCallback(const ResizeCallback& callback)
     -> void {
     m_ArrResizeCallbacks.at(m_ArrResizeCallbacksCount++) = callback;
 }
 
-auto WindowImplGlfw::EnableCursor() -> void {
+auto WindowAdapterGLFW::EnableCursor() -> void {
     if (m_GlfwWindow != nullptr) {
         glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
 
-auto WindowImplGlfw::DisableCursor() -> void {
+auto WindowAdapterGLFW::DisableCursor() -> void {
     if (m_GlfwWindow != nullptr) {
         glfwSetInputMode(m_GlfwWindow.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }
 
-auto WindowImplGlfw::Begin() -> void {
+auto WindowAdapterGLFW::Begin() -> void {
     glClearColor(m_Config.clear_color.x(), m_Config.clear_color.y(),
                  m_Config.clear_color.z(), m_Config.clear_color.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -232,7 +230,7 @@ auto WindowImplGlfw::Begin() -> void {
 #endif  // RENDERER_IMGUI
 }
 
-auto WindowImplGlfw::End() -> void {
+auto WindowAdapterGLFW::End() -> void {
     if (m_GlfwWindow != nullptr) {
 #if defined(RENDERER_IMGUI)
         // Draw all data generated by ImGui calls
@@ -244,13 +242,13 @@ auto WindowImplGlfw::End() -> void {
     }
 }
 
-auto WindowImplGlfw::RequestClose() -> void {
+auto WindowAdapterGLFW::RequestClose() -> void {
     if (m_GlfwWindow != nullptr) {
         glfwSetWindowShouldClose(m_GlfwWindow.get(), GLFW_TRUE);
     }
 }
 
-auto WindowImplGlfw::SetClearColor(const Vec4& color) -> void {
+auto WindowAdapterGLFW::SetClearColor(const Vec4& color) -> void {
     m_Config.clear_color = color;
     glClearColor(m_Config.clear_color.x(), m_Config.clear_color.y(),
                  m_Config.clear_color.z(), m_Config.clear_color.w());
