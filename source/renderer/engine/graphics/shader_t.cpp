@@ -1,88 +1,50 @@
-#include <array>
+#include <renderer/engine/graphics/shader_t.hpp>
 
-#include <glad/gl.h>
-
-#include <utils/logging.hpp>
-#include <renderer/shader/shader_t.hpp>
+#include <renderer/engine/graphics/shader_adapter_t.hpp>
+#include <renderer/backend/graphics/opengl/shader_adapter_opengl.hpp>
 
 namespace renderer {
 
-auto ToString(const eShaderType& type) -> std::string {
-    switch (type) {
-        case eShaderType::VERTEX:
-            return "vertex";
-        case eShaderType::FRAGMENT:
-            return "fragment";
-        case eShaderType::GEOMETRY:
-            return "geometry";
-        case eShaderType::COMPUTE:
-            return "compute";
-        case eShaderType::TESSELLATION_CONTROL:
-            return "tessellation_control";
-        case eShaderType::TESSELLATION_EVALUATION:
-            return "tessellation evaluation";
+Shader::Shader(eShaderType type, const char* source, eGraphicsAPI api)
+    : m_API(api), m_Type(type), m_Source(source) {}
+
+auto Shader::CreateShader(eShaderType type, const char* source,
+                          eGraphicsAPI api) -> std::shared_ptr<Shader> {
+    auto shader = std::make_shared<Shader>(type, source, api);
+    shader->Initialize();
+    return shader;
+}
+
+auto Shader::Initialize() -> void {
+    _InitializeBackend();
+}
+
+auto Shader::_InitializeBackend() -> void {
+    switch (m_API) {
+        case eGraphicsAPI::OPENGL: {
+            m_BackendAdapter = std::make_unique<opengl::OpenGLShaderAdapter>();
+            break;
+        }
         default:
-            return "vertex";
+            break;
+    }
+
+    if (m_BackendAdapter) {
+        m_BackendAdapter->SetShaderHandle(shared_from_this());
     }
 }
 
-auto ToOpenGLEnum(const eShaderType& type) -> uint32_t {
-    switch (type) {
-        case eShaderType::VERTEX:
-            return GL_VERTEX_SHADER;
-        case eShaderType::FRAGMENT:
-            return GL_FRAGMENT_SHADER;
-        case eShaderType::GEOMETRY:
-            return GL_GEOMETRY_SHADER;
-        case eShaderType::COMPUTE:
-            return GL_COMPUTE_SHADER;
-        case eShaderType::TESSELLATION_CONTROL:
-            return GL_TESS_CONTROL_SHADER;
-        case eShaderType::TESSELLATION_EVALUATION:
-            return GL_TESS_EVALUATION_SHADER;
-        default:
-            return GL_VERTEX_SHADER;
+auto Shader::Compile() -> void {
+    if (m_BackendAdapter) {
+        m_BackendAdapter->Compile();
     }
 }
 
-Shader::Shader(const char* name, const eShaderType& type, const char* source)
-    : m_Name(name), m_Type(type), m_Source(source) {
-    _CompileShader(source);
-}
-
-auto Shader::_CompileShader(const char* source) -> void {
-    m_OpenGLId = glCreateShader(ToOpenGLEnum(m_Type));
-    glShaderSource(m_OpenGLId, 1, &source, nullptr);
-    glCompileShader(m_OpenGLId);
-
-    int32_t compilation_success = 0;
-    glGetShaderiv(m_OpenGLId, GL_COMPILE_STATUS, &compilation_success);
-    if (compilation_success != GL_TRUE) {
-        constexpr uint32_t ERROR_BUFFER_SIZE = 1024;
-        std::array<GLchar, ERROR_BUFFER_SIZE> error_buffer{};
-        glGetShaderInfoLog(m_OpenGLId, ERROR_BUFFER_SIZE, nullptr,
-                           error_buffer.data());
-        glDeleteShader(m_OpenGLId);
-        LOG_CORE_ERROR(
-            "Shader::_CompileShader >>> coudln't compile shader: name={0}, "
-            "type={1},\nerror={2}",
-            m_Name, ToString(m_Type), error_buffer.data());
-        // TODO(wilbert): here we should throw a custom exception. For now an
-        // error flag exposed through shader->compiled() should do the trick
-        m_Compiled = false;
-        m_OpenGLId = 0;
-        return;
+auto Shader::IsValid() const -> bool {
+    if (m_BackendAdapter) {
+        return m_BackendAdapter->IsValid();
     }
-    m_Compiled = true;
-}
-
-Shader::~Shader() { Release(); }
-
-auto Shader::Release() -> void {
-    if (m_OpenGLId != 0) {
-        glDeleteShader(m_OpenGLId);
-        m_OpenGLId = 0;
-    }
+    return false;
 }
 
 }  // namespace renderer

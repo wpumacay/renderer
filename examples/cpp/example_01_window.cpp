@@ -12,7 +12,7 @@ auto main() -> int {
     win_config.height = DEFAULT_HEIGHT;
     win_config.title = "Example 01 - Window";
 
-    auto window = std::make_unique<renderer::Window>(win_config);
+    auto window = ::renderer::Window::CreateWindow(win_config);
     window->RegisterKeyboardCallback([&](int key, int action, int mods) {
         LOG_TRACE("key: {0}, action: {1}, mods: {2}", key, action, mods);
         if ((mods & renderer::MOD_SHIFT) != 0) {

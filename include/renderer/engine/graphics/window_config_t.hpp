@@ -3,21 +3,9 @@
 #include <string>
 
 #include <renderer/common.hpp>
+#include <renderer/engine/graphics/enums.hpp>
 
 namespace renderer {
-
-/// Available windowing backends
-enum class eWindowBackend {
-    /// None or dummy backend (for testing purposes only)
-    TYPE_NONE,
-    /// GLFW backend (used for creating a window for OpenGL in any platform)
-    TYPE_GLFW,
-    /// EGL backend (used for headless rendering mode)
-    TYPE_EGL,
-};
-
-/// Returns the string representation of the given backend type
-auto ToString(const eWindowBackend& type) -> std::string;
 
 /// Default windowing backend
 constexpr auto DEFAULT_WINDOWING_BACKEND = eWindowBackend::TYPE_NONE;

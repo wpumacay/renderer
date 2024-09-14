@@ -15,6 +15,7 @@ Checks: >
         -cppcoreguidelines-avoid-magic-numbers,
         -readability-magic-numbers,
         -readability-identifier-length,
+        -modernize-concat-nested-namespaces,
 
 WarningsAsErrors: ''
 FormatStyle: none

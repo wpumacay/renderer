@@ -50,10 +50,11 @@ add_subdirectory(third_party)
 loco_create_target(RendererCpp SHARED
   SOURCES
     ${SOURCE_DIR}/engine/graphics/window_t.cpp
-    ${SOURCE_DIR}/engine/graphics/window_config_t.cpp
     ${SOURCE_DIR}/backend/window/window_adapter_glfw.cpp
     ${SOURCE_DIR}/backend/window/window_adapter_egl.cpp
-    # ${SOURCE_DIR}/shader/shader_t.cpp
+    ${SOURCE_DIR}/engine/graphics/enums.cpp
+    ${SOURCE_DIR}/engine/graphics/shader_t.cpp
+    ${SOURCE_DIR}/backend/graphics/opengl/shader_adapter_opengl.cpp
     # ${SOURCE_DIR}/shader/program_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_t.cpp

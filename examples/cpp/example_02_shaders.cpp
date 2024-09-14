@@ -1,11 +1,8 @@
 
-#include <renderer/window/window_t.hpp>
-#include <renderer/shader/shader_t.hpp>
-#include <renderer/shader/program_t.hpp>
-#include <utils/logging.hpp>
+#include <renderer/engine/graphics/window_t.hpp>
+#include <renderer/engine/graphics/shader_t.hpp>
 
-constexpr int WINDOW_WIDTH = 1024;
-constexpr int WINDOW_HEIGHT = 768;
+#include <utils/logging.hpp>
 
 constexpr const char* VERT_SHADER_SRC = R"(
     #version 330 core
@@ -33,36 +30,32 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 )";
 
 auto main() -> int {
-    auto window =
-        std::make_unique<renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+    constexpr int WINDOW_WIDTH = 1024;
+    constexpr int WINDOW_HEIGHT = 768;
 
-    auto vert_shader = std::make_unique<renderer::Shader>(
-        "basic_2d_vert", renderer::eShaderType::VERTEX, VERT_SHADER_SRC);
+    auto window_api = ::renderer::eWindowBackend::TYPE_GLFW;
+    auto graphics_api = ::renderer::eGraphicsAPI::OPENGL;
 
-    auto frag_shader = std::make_unique<renderer::Shader>(
-        "basic_2d_frag", renderer::eShaderType::FRAGMENT, FRAG_SHADER_SRC);
+    auto window = ::renderer::Window::CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+                                                   window_api);
 
-    if (vert_shader->compiled()) {
+    auto vert_shader = ::renderer::Shader::CreateShader(
+        ::renderer::eShaderType::VERTEX, VERT_SHADER_SRC, graphics_api);
+    auto frag_shader = ::renderer::Shader::CreateShader(
+        ::renderer::eShaderType::FRAGMENT, FRAG_SHADER_SRC, graphics_api);
+
+    vert_shader->Compile();
+    if (vert_shader->IsValid()) {
         LOG_INFO("Vertex shader successfully compiled");
+    } else {
+        LOG_ERROR("Vertex shader could not be compiled");
     }
 
-    if (frag_shader->compiled()) {
+    frag_shader->Compile();
+    if (frag_shader->IsValid()) {
         LOG_INFO("Fragment shader successfully compiled");
-    }
-
-    auto program = std::make_unique<renderer::Program>("basic_2d");
-    program->AddShader(std::move(vert_shader));
-    program->AddShader(std::move(frag_shader));
-    program->LinkProgram();
-
-    if (program->linked()) {
-        LOG_INFO("Shader Program successfully linked");
-    }
-
-    while (window->active()) {
-        window->Begin();
-
-        window->End();
+    } else {
+        LOG_ERROR("Fragment shader could not be compiled");
     }
 
     return 0;

@@ -12,7 +12,7 @@
 namespace renderer {
 
 /// Abstraction of a window supporting multiple windowing backends
-class RENDERER_API Window {
+class RENDERER_API Window : public std::enable_shared_from_this<Window> {
     // cppcheck-suppress unknownMacro
     NO_COPY_NO_MOVE_NO_ASSIGN(Window)
 
@@ -27,6 +27,16 @@ class RENDERER_API Window {
                     eWindowBackend backend = eWindowBackend::TYPE_GLFW);
 
     ~Window() = default;
+
+    /// Creates a window from some options
+    static auto CreateWindow(int width, int height, eWindowBackend backend)
+        -> std::shared_ptr<Window>;
+
+    /// Creates a window from a given set of configuration options
+    static auto CreateWindow(WindowConfig win_cfg) -> std::shared_ptr<Window>;
+
+    /// Initializes the window and backend-related resources
+    auto Initialize() -> void;
 
     /// Requests (if applicable) enabling the cursor on this window
     auto EnableCursor() -> void;

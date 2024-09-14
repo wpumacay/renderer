@@ -5,14 +5,28 @@
 
 namespace renderer {
 
-Window::Window(WindowConfig config) : m_Config(std::move(config)) {
-    _InitializeBackend();
-}
+Window::Window(WindowConfig config) : m_Config(std::move(config)) {}
 
 Window::Window(int width, int height, eWindowBackend backend) {
     m_Config.width = width;
     m_Config.height = height;
     m_Config.backend = backend;
+}
+
+auto Window::CreateWindow(int width, int height, eWindowBackend backend)
+    -> std::shared_ptr<Window> {
+    auto window = std::make_shared<Window>(width, height, backend);
+    window->Initialize();
+    return window;
+}
+
+auto Window::CreateWindow(WindowConfig win_cfg) -> std::shared_ptr<Window> {
+    auto window = std::make_shared<Window>(win_cfg);
+    window->Initialize();
+    return window;
+}
+
+auto Window::Initialize() -> void {
     _InitializeBackend();
 }
 
@@ -29,6 +43,10 @@ auto Window::_InitializeBackend() -> void {
             break;
     }
     m_Active = true;
+
+    if (m_BackendAdapter) {
+        m_BackendAdapter->SetWindowHandle(shared_from_this());
+    }
 }
 
 auto Window::EnableCursor() -> void {
