@@ -50,3 +50,6 @@ compile_commands.json
 # Arch linux related files and intermediate artifacts
 PKGBUILD
 *.tar.zst
+
+# Exclude temporary folder tmp/ for backups and temporary files
+tmp/

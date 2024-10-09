@@ -1,6 +1,6 @@
 
 #include <renderer/engine/graphics/window_t.hpp>
-#include <renderer/engine/graphics/shader_t.hpp>
+#include <renderer/engine/graphics/program_t.hpp>
 
 #include <utils/logging.hpp>
 
@@ -39,23 +39,14 @@ auto main() -> int {
     auto window = ::renderer::Window::CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
                                                    window_api);
 
-    auto vert_shader = ::renderer::Shader::CreateShader(
-        ::renderer::eShaderType::VERTEX, VERT_SHADER_SRC, graphics_api);
-    auto frag_shader = ::renderer::Shader::CreateShader(
-        ::renderer::eShaderType::FRAGMENT, FRAG_SHADER_SRC, graphics_api);
-
-    vert_shader->Compile();
-    if (vert_shader->IsValid()) {
-        LOG_INFO("Vertex shader successfully compiled");
-    } else {
-        LOG_ERROR("Vertex shader could not be compiled");
+    auto program = ::renderer::Program::CreateProgram(
+        VERT_SHADER_SRC, FRAG_SHADER_SRC, graphics_api);
+    program->Build();
+    if (program->IsValid()) {
+        LOG_INFO("GPU Program successfully built and ready for action");
     }
-
-    frag_shader->Compile();
-    if (frag_shader->IsValid()) {
-        LOG_INFO("Fragment shader successfully compiled");
-    } else {
-        LOG_ERROR("Fragment shader could not be compiled");
+    else {
+        LOG_ERROR("GPU Program couldn't be built");
     }
 
     return 0;

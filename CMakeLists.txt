@@ -55,6 +55,8 @@ loco_create_target(RendererCpp SHARED
     ${SOURCE_DIR}/engine/graphics/enums.cpp
     ${SOURCE_DIR}/engine/graphics/shader_t.cpp
     ${SOURCE_DIR}/backend/graphics/opengl/shader_adapter_opengl.cpp
+    ${SOURCE_DIR}/engine/graphics/program_t.cpp
+    ${SOURCE_DIR}/backend/graphics/opengl/program_adapter_opengl.cpp
     # ${SOURCE_DIR}/shader/program_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_t.cpp
