@@ -1,13 +1,13 @@
 #include <pybind11/pybind11.h>
 
-#include <renderer/input/keycodes.hpp>
+#include <renderer/engine/keycodes.hpp>
 
 namespace py = pybind11;
 
 namespace renderer {
 
 // NOLINTNEXTLINE
-void bindings_keycodes(py::module& m) {
+void bindings_keycodes(py::module m) {
     {
         using Enum = renderer::key_action::KeyAction;
         py::enum_<Enum>(m, "KeyAction")

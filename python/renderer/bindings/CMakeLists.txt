@@ -5,14 +5,15 @@ endif()
 # cmake-format: off
 set(BINDINGS_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/bindings_py.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/enums_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/window_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/keycodes_py.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/buttons_py.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/shader_py.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/buffers_py.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/texture_py.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/managers_py.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/camera_py.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/shader_py.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/buffers_py.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/texture_py.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/managers_py.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/camera_py.cpp
 )
 # cmake-format: on
 

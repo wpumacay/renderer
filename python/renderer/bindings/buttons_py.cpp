@@ -1,13 +1,13 @@
 #include <pybind11/pybind11.h>
 
-#include <renderer/input/buttons.hpp>
+#include <renderer/engine/buttons.hpp>
 
 namespace py = pybind11;
 
 namespace renderer {
 
 // NOLINTNEXTLINE
-auto bindings_buttons(py::module& m) -> void {
+auto bindings_buttons(py::module m) -> void {
     {
         using Enum = ::renderer::button_action::ButtonAction;
         py::enum_<Enum>(m, "ButtonAction")

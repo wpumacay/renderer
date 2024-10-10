@@ -23,7 +23,7 @@ project(
 option(RENDERER_BUILD_IMGUI "Build with support for Ocornut's Dear ImGui" ON)
 option(RENDERER_BUILD_LOGS "Build with logs enabled" ON)
 option(RENDERER_BUILD_PROFILING "Build with profiling tools enabled" OFF)
-option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
+option(RENDERER_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(RENDERER_BUILD_EXAMPLES "Build C++ examples" ON)
 option(RENDERER_BUILD_TESTS "Build C++ unit-tests" OFF)
 option(RENDERER_BUILD_DOCS "Build documentation" OFF)

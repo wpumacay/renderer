@@ -13,7 +13,7 @@ def main():
     config.height = DEFAULT_HEIGHT
     config.title = "Example 01 - Window"
 
-    window = rdr.Window(config)
+    window = rdr.Window.CreateWindow(config)
 
     def keycallback(key, action, mods):
         print("key: {}, action: {}. mods: {}".format(key, action, mods))
