@@ -10,7 +10,7 @@ namespace renderer {
 namespace opengl {
 
 /// Returns the respective OpenGL enum for the given shader type
-auto ToOpenGLEnumProg(eShaderType type) -> uint32_t;
+auto ToOpenGLEnum(eShaderType type) -> uint32_t;
 
 /// Compiles a shader given its source and shader type
 auto CompileShader(const char* source, eShaderType type) -> uint32_t;
@@ -44,11 +44,11 @@ class OpenGLProgramAdapter : public IProgramAdapter {
 
     auto SetMat4(const char* uname, const Mat4& uvalue) -> void override;
 
-   private:
+ private:
     /// Caches and returns the requested uniform location
     auto _GetUniformLocation(const char* uname) -> int32_t;
 
-   private:
+ private:
     // THe OpenGL ID associated to this program
     uint32_t m_OpenGLId = 0;
 

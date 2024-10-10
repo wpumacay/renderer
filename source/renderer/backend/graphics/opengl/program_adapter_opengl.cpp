@@ -8,14 +8,14 @@
 namespace renderer {
 namespace opengl {
 
-auto ToOpenGLEnumProg(eShaderType type) -> uint32_t {
+auto ToOpenGLEnum(eShaderType type) -> uint32_t {
     switch (type) {
         case eShaderType::VERTEX:
             return GL_VERTEX_SHADER;
         case eShaderType::FRAGMENT:
-          return GL_FRAGMENT_SHADER;
+            return GL_FRAGMENT_SHADER;
         case eShaderType::GEOMETRY:
-          return GL_GEOMETRY_SHADER;
+            return GL_GEOMETRY_SHADER;
         case eShaderType::COMPUTE:
             return GL_COMPUTE_SHADER;
         default:
@@ -23,8 +23,8 @@ auto ToOpenGLEnumProg(eShaderType type) -> uint32_t {
     }
 }
 
-auto CompileShader(const char *source, eShaderType type) -> uint32_t {
-    auto shader_opengl_id = glCreateShader(ToOpenGLEnumProg(type));
+auto CompileShader(const char* source, eShaderType type) -> uint32_t {
+    auto shader_opengl_id = glCreateShader(ToOpenGLEnum(type));
     glShaderSource(shader_opengl_id, 1, &source, nullptr);
     glCompileShader(shader_opengl_id);
 
@@ -43,7 +43,6 @@ auto CompileShader(const char *source, eShaderType type) -> uint32_t {
             "Program::CompileShader > coudln't compile shader: type={0},\n"
             "error={1}",
             ::renderer::ToString(type), error_buffer.data());
-        
     }
     return shader_opengl_id;
 }
@@ -69,7 +68,7 @@ auto OpenGLProgramAdapter::Build() -> void {
             return;
         }
 
-        auto frag_opengl_id = 
+        auto frag_opengl_id =
             CompileShader(shader_frag_src, eShaderType::FRAGMENT);
         if (frag_opengl_id == 0) {
             return;
@@ -95,9 +94,8 @@ auto OpenGLProgramAdapter::Build() -> void {
             glGetProgramInfoLog(m_OpenGLId, ERROR_BUFFER_SIZE, nullptr,
                                 error_buffer.data());
             glDeleteProgram(m_OpenGLId);
-            LOG_CORE_ERROR(
-                "Program::Build> couldn't link program: \nerror{0}",
-                error_buffer.data());
+            LOG_CORE_ERROR("Program::Build> couldn't link program: \nerror{0}",
+                           error_buffer.data());
             m_OpenGLId = 0;
             return;
         }
@@ -111,13 +109,12 @@ auto OpenGLProgramAdapter::Bind() const -> void {
     }
 }
 
-auto OpenGLProgramAdapter::Unbind() const -> void {
-    glUseProgram(0);
-}
+auto OpenGLProgramAdapter::Unbind() const -> void { glUseProgram(0); }
 
 auto OpenGLProgramAdapter::_GetUniformLocation(const char* uname) -> int32_t {
     if (m_UniformLocationsCache.find(uname) == m_UniformLocationsCache.end()) {
-        m_UniformLocationsCache[uname] = glGetUniformLocation(m_OpenGLId, uname);
+        m_UniformLocationsCache[uname] =
+            glGetUniformLocation(m_OpenGLId, uname);
     }
 
     if (m_UniformLocationsCache[uname] == -1) {
@@ -137,19 +134,23 @@ auto OpenGLProgramAdapter::SetFloat(const char* uname, float uvalue) -> void {
     glUniform1f(_GetUniformLocation(uname), uvalue);
 }
 
-auto OpenGLProgramAdapter::SetVec2(const char* uname, const Vec2& uvalue) -> void {
+auto OpenGLProgramAdapter::SetVec2(const char* uname, const Vec2& uvalue)
+    -> void {
     glUniform2fv(_GetUniformLocation(uname), 1, uvalue.data());
 }
 
-auto OpenGLProgramAdapter::SetVec3(const char* uname, const Vec3& uvalue) -> void {
+auto OpenGLProgramAdapter::SetVec3(const char* uname, const Vec3& uvalue)
+    -> void {
     glUniform3fv(_GetUniformLocation(uname), 1, uvalue.data());
 }
 
-auto OpenGLProgramAdapter::SetVec4(const char* uname, const Vec4& uvalue) -> void {
+auto OpenGLProgramAdapter::SetVec4(const char* uname, const Vec4& uvalue)
+    -> void {
     glUniform4fv(_GetUniformLocation(uname), 1, uvalue.data());
 }
 
-auto OpenGLProgramAdapter::SetMat4(const char* uname, const Mat4& uvalue) -> void {
+auto OpenGLProgramAdapter::SetMat4(const char* uname, const Mat4& uvalue)
+    -> void {
     glUniformMatrix4fv(_GetUniformLocation(uname), 1, GL_FALSE, uvalue.data());
 }
 
