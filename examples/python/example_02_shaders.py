@@ -2,9 +2,6 @@
 
 import renderer as rdr
 
-WINDOW_WIDTH = 1024
-WINDOW_HEIGHT = 768
-
 VERT_SHADER_SRC = r"""
     #version 330 core
 
@@ -31,20 +28,27 @@ FRAG_SHADER_SRC = r"""
 """
 
 
-def main():
-    window = rdr.Window(
-        WINDOW_WIDTH, WINDOW_HEIGHT, rdr.WindowBackend.TYPE_GLFW
+def main() -> int:
+    WINDOW_WIDTH = 1024
+    WINDOW_HEIGHT = 768
+
+    WINDOW_API = rdr.WindowBackend.TYPE_GLFW
+    GRAPHICS_API = rdr.GraphicsAPI.OPENGL
+
+    _ = rdr.Window.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_API)
+    program = rdr.Program.CreateProgram(
+        VERT_SHADER_SRC, FRAG_SHADER_SRC, GRAPHICS_API
     )
-    program = rdr.Program("basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC)
 
-    if program.linked:
-        print("Shader Program successfully linked")
+    program.Build()
 
-    while window.active:
-        window.Begin()
+    if program.valid:
+        print("Shader Program successfully built")
+    else:
+        print("Shader Program got an error during building")
 
-        window.End()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

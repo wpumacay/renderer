@@ -10,6 +10,7 @@ from renderer_bindings import (  # type: ignore
     ShaderType,
     WindowConfig,
     Window,
+    Program,
 )
 
 __all__ = [
@@ -22,5 +23,6 @@ __all__ = [
     "ShaderType",
     "WindowConfig",
     "Window",
+    "Program",
 ]
 # fmt: on

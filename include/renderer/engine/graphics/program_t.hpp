@@ -19,9 +19,6 @@ class RENDERER_API Program : public std::enable_shared_from_this<Program> {
     DEFINE_SMART_POINTERS(Program)
 
  public:
-    /// Creates a shader program object with default settings
-    explicit Program(eGraphicsAPI api);
-
     /// Creates a shader-program object with given name and source code
     /// \param[in] vert_src Source code of the vertex-shader
     /// \param[in] frag_src Source code of the fragment-shader
@@ -69,17 +66,17 @@ class RENDERER_API Program : public std::enable_shared_from_this<Program> {
     /// Sets a mat-4 unbiform given its name and desired value
     auto SetMat4(const char* uname, const Mat4& uvalue) -> void;
 
-   /// Returns whether or not this shader is valid
+    /// Returns whether or not this shader is valid
     RENDERER_NODISCARD auto IsValid() const -> bool;
 
     /// Returns the code used for the vertex shader stage
     RENDERER_NODISCARD auto vertex_source() const -> std::string {
-      return m_VertSource;
+        return m_VertSource;
     }
 
     /// Returns the code used for the fragment shader stage
     RENDERER_NODISCARD auto fragment_source() const -> std::string {
-      return m_FragSource;
+        return m_FragSource;
     }
 
  private:

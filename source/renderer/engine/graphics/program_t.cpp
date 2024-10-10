@@ -1,11 +1,11 @@
+#include <memory>
+
 #include <renderer/engine/graphics/program_t.hpp>
 
 #include <renderer/engine/graphics/program_adapter_t.hpp>
 #include <renderer/backend/graphics/opengl/program_adapter_opengl.hpp>
 
 namespace renderer {
-
-Program::Program(eGraphicsAPI api) : m_API(api) {}
 
 Program::Program(const char* vert_src, const char* frag_src, eGraphicsAPI api)
     : m_API(api), m_VertSource(vert_src), m_FragSource(frag_src) {}
@@ -17,9 +17,7 @@ auto Program::CreateProgram(const char* vert_src, const char* frag_src,
     return program;
 }
 
-auto Program::Initialize() -> void {
-    _InitializeBackend();
-}
+auto Program::Initialize() -> void { _InitializeBackend(); }
 
 auto Program::_InitializeBackend() -> void {
     switch (m_API) {
@@ -28,7 +26,7 @@ auto Program::_InitializeBackend() -> void {
             break;
         }
         default:
-          break;
+            break;
     }
 
     if (m_BackendAdapter) {
