@@ -1,15 +1,10 @@
-#include <array>
-#include <memory>
+#include <renderer/engine/graphics/window_t.hpp>
+#include <renderer/engine/graphics/program_t.hpp>
+#include <renderer/engine/graphics/vertex_buffer_layout_t.hpp>
 
 #include <glad/gl.h>
 
-#include <renderer/window/window_t.hpp>
-#include <renderer/shader/program_t.hpp>
-#include <renderer/core/vertex_buffer_t.hpp>
-#include <renderer/core/vertex_array_t.hpp>
-
-constexpr int WINDOW_WIDTH = 1024;
-constexpr int WINDOW_HEIGHT = 768;
+#include <utils/logging.hpp>
 
 constexpr const char* VERT_SHADER_SRC = R"(
     #version 330 core
@@ -37,17 +32,29 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 )";
 
 auto main() -> int {
-    auto window =
-        std::make_unique<::renderer::Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
+    LOG_INFO("Vertex Buffer example -----------------------------------\n");
 
+    constexpr int WINDOW_WIDTH = 1024;
+    constexpr int WINDOW_HEIGHT = 768;
+
+    constexpr auto WINDOW_API = ::renderer::eWindowBackend::TYPE_GLFW;
+    constexpr auto GRAPHICS_API = ::renderer::eGraphicsAPI::OPENGL;
+
+    auto window = ::renderer::Window::CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+                                                   WINDOW_API);
     window->RegisterKeyboardCallback([&](int key, int, int) {
         if (key == renderer::keys::KEY_ESCAPE) {
             window->RequestClose();
         }
     });
 
-    auto program = std::make_unique<renderer::Program>(
-        "basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC);
+    auto program = ::renderer::Program::CreateProgram(
+        VERT_SHADER_SRC, FRAG_SHADER_SRC, GRAPHICS_API);
+    program->Build();
+    if (!program->IsValid()) {
+        LOG_CORE_ERROR("There was an error building the shader program");
+        return 1;
+    }
 
     // clang-format off
     // NOLINTNEXTLINE
@@ -64,25 +71,18 @@ auto main() -> int {
     // clang-format on
     constexpr int NUM_VERTICES = 6;
 
-    renderer::BufferLayout layout = {
-        {"position", renderer::eElementType::FLOAT_2, false},
-        {"color", renderer::eElementType::FLOAT_3, false}};
+    ::renderer::BufferLayout layout = {
+        {"position", ::renderer::eElementType::FLOAT_2, false},
+        {"color", ::renderer::eElementType::FLOAT_3, false}};
 
-    auto vbo = std::make_shared<renderer::VertexBuffer>(
-        layout, renderer::eBufferUsage::STATIC,
-        static_cast<uint32_t>(sizeof(buffer_data)), buffer_data);
-
-    auto vao = std::make_shared<renderer::VertexArray>();
-    vao->AddVertexBuffer(vbo);
+    LOG_TRACE("Vertex Buffer Layout: \n{0}\n", layout.ToString());
 
     while (window->active()) {
         window->Begin();
         program->Bind();
-        vao->Bind();
 
-        glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+        // glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
 
-        vao->Unbind();
         program->Unbind();
         window->End();
     }

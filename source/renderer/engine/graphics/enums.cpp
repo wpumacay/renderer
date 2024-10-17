@@ -1,3 +1,4 @@
+#include <string>
 
 #include <renderer/engine/graphics/enums.hpp>
 
@@ -43,6 +44,75 @@ auto ToString(eShaderType type) -> std::string {
             return "compute";
         default:
             return "vertex";
+    }
+}
+
+auto ToString(eElementType etype) -> std::string {
+    switch (etype) {
+        case eElementType::FLOAT_1:
+            return "Float1";
+        case eElementType::FLOAT_2:
+            return "Float2";
+        case eElementType::FLOAT_3:
+            return "Float3";
+        case eElementType::FLOAT_4:
+            return "Float4";
+        case eElementType::INT_1:
+            return "Int1";
+        case eElementType::INT_2:
+            return "Int2";
+        case eElementType::INT_3:
+            return "Int3";
+        case eElementType::INT_4:
+            return "Int4";
+        default:
+            return "undefined";
+    }
+}
+
+auto GetElementSize(eElementType etype) -> uint32_t {
+    switch (etype) {
+        case eElementType::FLOAT_1:
+            return 4 * 1;
+        case eElementType::FLOAT_2:
+            return 4 * 2;
+        case eElementType::FLOAT_3:
+            return 4 * 3;
+        case eElementType::FLOAT_4:
+            return 4 * 4;
+        case eElementType::INT_1:
+            return 4 * 1;
+        case eElementType::INT_2:
+            return 4 * 2;
+        case eElementType::INT_3:
+            return 4 * 3;
+        case eElementType::INT_4:
+            return 4 * 4;
+        default:
+            return 4;
+    }
+}
+
+auto GetElementCount(eElementType etype) -> uint32_t {
+    switch (etype) {
+        case eElementType::FLOAT_1:
+            return 1;
+        case eElementType::FLOAT_2:
+            return 2;
+        case eElementType::FLOAT_3:
+            return 3;
+        case eElementType::FLOAT_4:
+            return 4;
+        case eElementType::INT_1:
+            return 1;
+        case eElementType::INT_2:
+            return 2;
+        case eElementType::INT_3:
+            return 3;
+        case eElementType::INT_4:
+            return 4;
+        default:
+            return 1;
     }
 }
 

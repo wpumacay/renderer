@@ -40,4 +40,25 @@ enum class RENDERER_API eShaderType {
 /// Returns the string representation of the given shader type
 RENDERER_API auto ToString(eShaderType type) -> std::string;
 
+/// Type of element used for part (or all) elements in a GPU vertex buffer
+enum class eElementType {
+    FLOAT_1,  ///< Single float, size 4-bytes
+    FLOAT_2,  ///< Two float compound (vec2), size 8-bytes
+    FLOAT_3,  ///< Three float compound (vec3), size 12-bytes
+    FLOAT_4,  ///< Four float compound (vec4), size 16-bytes
+    INT_1,    ///< Single integer, size 4-bytes (=int32)
+    INT_2,    ///< Two integer compound (int2), size 8-bytes
+    INT_3,    ///< Three integer compound (int3), size 12-bytes
+    INT_4,    ///< Four integer compound (int4), size 16-bytes
+};
+
+/// Returns the string representation of the given element-type enum
+RENDERER_API auto ToString(eElementType etype) -> std::string;
+
+/// Returns the size (in bytes) of the given buffer element type
+RENDERER_API auto GetElementSize(eElementType etype) -> uint32_t;
+
+/// Returns the number of single components in a given buffer element type
+RENDERER_API auto GetElementCount(eElementType etype) -> uint32_t;
+
 }  // namespace renderer
