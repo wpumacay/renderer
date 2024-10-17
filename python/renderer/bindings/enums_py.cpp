@@ -33,6 +33,19 @@ auto bindings_enums(py::module m) {
             .value("GEOMETRY", Enum::GEOMETRY)
             .value("COMPUTE", Enum::COMPUTE);
     }
+
+    {
+        using Enum = ::renderer::eElementType;
+        py::enum_<Enum>(m, "ElementType")
+            .value("FLOAT_1", Enum::FLOAT_1)
+            .value("FLOAT_2", Enum::FLOAT_2)
+            .value("FLOAT_3", Enum::FLOAT_3)
+            .value("FLOAT_4", Enum::FLOAT_4)
+            .value("INT_1", Enum::INT_1)
+            .value("INT_2", Enum::INT_2)
+            .value("INT_3", Enum::INT_3)
+            .value("INT_4", Enum::INT_4);
+    }
 }
 
 }  // namespace renderer
