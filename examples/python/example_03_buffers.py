@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
 import numpy as np
-from OpenGL import GL
+from OpenGL.GL import *  # type: ignore
 
 import renderer as rdr
-
-WINDOW_WIDTH = 1024
-WINDOW_HEIGHT = 768
-
 
 VERT_SHADER_SRC = r"""
     #version 330 core
@@ -36,9 +32,13 @@ FRAG_SHADER_SRC = r"""
 
 
 def main() -> int:
-    window = rdr.Window(
-        WINDOW_WIDTH, WINDOW_HEIGHT, rdr.WindowBackend.TYPE_GLFW
-    )
+    WINDOW_WIDTH = 1024
+    WINDOW_HEIGHT = 768
+
+    WINDOW_API = rdr.WindowBackend.TYPE_GLFW
+    GRAPHICS_API = rdr.GraphicsAPI.OPENGL
+
+    window = rdr.Window.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_API)
 
     def key_callback(key: int, action: int, _: int) -> None:
         if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.RELEASED:
@@ -46,7 +46,13 @@ def main() -> int:
 
     window.RegisterKeyboardCallback(key_callback)
 
-    program = rdr.Program("basic_2d", VERT_SHADER_SRC, FRAG_SHADER_SRC)
+    program = rdr.Program.CreateProgram(
+        VERT_SHADER_SRC, FRAG_SHADER_SRC, GRAPHICS_API
+    )
+    program.Build()
+    if not program.valid:
+        print("There was an error building the shader program")
+        return 1
 
     # fmt: off
     buffer_data = np.array([
@@ -61,30 +67,21 @@ def main() -> int:
     # fmt: on
     NUM_VERTICES = 6
 
-    layout = rdr.BufferLayout(
-        [
-            ["position", rdr.ElementType.FLOAT_2, False],
-            ["color", rdr.ElementType.FLOAT_3, False],
-        ]
+    # TODO(wilbert): Add constructor for bufferlayout that uses list of elements
+    layout = rdr.BufferLayout()
+    layout.AddElement(
+        rdr.BufferElement("position", rdr.ElementType.FLOAT_2, False)
     )
-
-    vbo = rdr.VertexBuffer(
-        layout,
-        rdr.BufferUsage.STATIC,
-        buffer_data,
+    layout.AddElement(
+        rdr.BufferElement("color", rdr.ElementType.FLOAT_3, False)
     )
-
-    vao = rdr.VertexArray()
-    vao.AddVertexBuffer(vbo)
 
     while window.active:
         window.Begin()
         program.Bind()
-        vao.Bind()
 
-        GL.glDrawArrays(GL.GL_TRIANGLES, 0, NUM_VERTICES)
+        # glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES)
 
-        vao.Unbind()
         program.Unbind()
         window.End()
 
@@ -92,4 +89,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    SystemExit(main())
+    raise SystemExit(main())
