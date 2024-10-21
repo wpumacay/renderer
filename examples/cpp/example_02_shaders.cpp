@@ -1,6 +1,9 @@
+#include <chrono>
 
 #include <renderer/engine/graphics/window_t.hpp>
-#include <renderer/engine/graphics/program_t.hpp>
+#include <renderer/backend/graphics/opengl/program_opengl_t.hpp>
+
+#include <glad/gl.h>
 
 #include <utils/logging.hpp>
 
@@ -32,21 +35,30 @@ constexpr const char* FRAG_SHADER_SRC = R"(
 auto main() -> int {
     constexpr int WINDOW_WIDTH = 1024;
     constexpr int WINDOW_HEIGHT = 768;
-
-    auto window_api = ::renderer::eWindowBackend::TYPE_GLFW;
-    auto graphics_api = ::renderer::eGraphicsAPI::OPENGL;
+    constexpr auto WINDOW_API = ::renderer::eWindowBackend::TYPE_GLFW;
 
     auto window = ::renderer::Window::CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
-                                                   window_api);
+                                                   WINDOW_API);
+    window->RegisterKeyboardCallback([&](int key, int, int) {
+        if (key == ::renderer::keys::KEY_ESCAPE) {
+            window->RequestClose();
+        }
+    });
 
-    auto program = ::renderer::Program::CreateProgram(
-        VERT_SHADER_SRC, FRAG_SHADER_SRC, graphics_api);
+    auto program = std::make_shared<::renderer::opengl::OpenGLProgram>(
+        VERT_SHADER_SRC, FRAG_SHADER_SRC);
     program->Build();
+
     if (program->IsValid()) {
-        LOG_INFO("GPU Program successfully built and ready for action");
+        LOG_INFO("Shader Program successfully built and ready for action");
+    } else {
+        LOG_ERROR("Shader Program couldn't be built");
     }
-    else {
-        LOG_ERROR("GPU Program couldn't be built");
+
+    while (window->active()) {
+        window->Begin();
+
+        window->End();
     }
 
     return 0;
