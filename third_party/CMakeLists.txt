@@ -6,7 +6,7 @@ loco_create_target(stb INTERFACE
   INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR})
 
-loco_create_target(glad INTERFACE
+loco_create_target(glad SHARED
   SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/glad/gl.c
     ${CMAKE_CURRENT_SOURCE_DIR}/glad/egl.c
