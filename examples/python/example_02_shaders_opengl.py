@@ -7,6 +7,7 @@ import numpy as np
 from OpenGL.GL import *  # type: ignore
 
 import renderer as rdr
+from renderer.opengl import Program
 
 VERT_SHADER_SRC = r"""
     #version 330 core
@@ -34,15 +35,25 @@ FRAG_SHADER_SRC = r"""
 def main() -> int:
     WINDOW_WIDTH = 1024
     WINDOW_HEIGHT = 768
-
     WINDOW_API = rdr.WindowBackend.TYPE_GLFW
-    GRAPHICS_API = rdr.GraphicsAPI.OPENGL
+
+    win_config = rdr.WindowConfig()
+    win_config.backend = WINDOW_API
+    win_config.width = WINDOW_WIDTH
+    win_config.height = WINDOW_HEIGHT
+    win_config.title = "Example 02 - OpenGL Program"
+    win_config.gl_version_major = 3
+    win_config.gl_version_minor = 3
 
     window = rdr.Window.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_API)
-    program = rdr.Program.CreateProgram(
-        VERT_SHADER_SRC, FRAG_SHADER_SRC, GRAPHICS_API
-    )
 
+    def keycallback(key, action, mods):
+        if key == rdr.Keys.KEY_ESCAPE:
+            window.RequestClose()
+
+    window.RegisterKeyboardCallback(keycallback)
+
+    program = Program(VERT_SHADER_SRC, FRAG_SHADER_SRC)
     program.Build()
 
     if program.valid:
@@ -97,6 +108,7 @@ def main() -> int:
 
         window.End()
 
+    glDeleteVertexArrays(1, vao)
     glDeleteBuffers(1, vbo)
 
     return 0
