@@ -8,9 +8,10 @@
 #include <renderer/engine/graphics/enums.hpp>
 
 namespace renderer {
+namespace opengl {
 
 /// Struct describing a given element in a Vertex Buffer
-struct RENDERER_API BufferElement {
+struct RENDERER_API OpenGLBufferElement {
     /// Name of the element in the buffer, mainly for debugging (e.g. position)
     std::string name{"none"};
     /// The type of this element
@@ -25,10 +26,11 @@ struct RENDERER_API BufferElement {
     bool normalized = false;
 
     /// Creates a default Vertex Buffer Element
-    BufferElement() = default;
+    OpenGLBufferElement() = default;
 
     /// Creates a Vertex Buffer Element with the given description
-    BufferElement(const char* e_name, eElementType e_type, bool e_normalized)
+    OpenGLBufferElement(const char* e_name, eElementType e_type,
+                        bool e_normalized)
         : name(e_name),
           type(e_type),
           count(GetElementCount(e_type)),
@@ -40,23 +42,24 @@ struct RENDERER_API BufferElement {
 };
 
 /// Object describing the layout of all (or part) of the data in a Vertex Buffer
-class RENDERER_API BufferLayout {
+class RENDERER_API OpenGLBufferLayout {
  public:
     /// Constructs an empty buffer layout
-    BufferLayout() = default;
+    OpenGLBufferLayout() = default;
 
     // cppcheck-suppress noExplicitConstructor
     /// Creates a buffer layout from elements in a initializer list
-    BufferLayout(const std::initializer_list<BufferElement>& elements);
+    OpenGLBufferLayout(
+        const std::initializer_list<OpenGLBufferElement>& elements);
 
     /// Creates a buffer layout from elements in a std::vector
-    explicit BufferLayout(std::vector<BufferElement> elements);
+    explicit OpenGLBufferLayout(std::vector<OpenGLBufferElement> elements);
 
     /// Adds the given element to this layout
-    auto AddElement(BufferElement element) -> void;
+    auto AddElement(OpenGLBufferElement element) -> void;
 
     /// Returns a copy of the buffer element at the requested index
-    auto operator[](size_t index) const -> BufferElement;
+    auto operator[](size_t index) const -> OpenGLBufferElement;
 
     /// Returns the number of elements stored by this buffer layout
     RENDERER_NODISCARD auto size() const -> size_t {
@@ -74,7 +77,9 @@ class RENDERER_API BufferLayout {
     uint32_t m_Stride = 0;
 
     /// Container of the elements description stored in this layout
-    std::vector<BufferElement> m_BufferElements;
+    std::vector<OpenGLBufferElement> m_BufferElements;
 };
+
+}  // namespace opengl
 
 }  // namespace renderer

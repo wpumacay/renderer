@@ -1,16 +1,18 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <spdlog/fmt/bundled/format.h>
 
-#include <renderer/engine/graphics/vertex_buffer_layout_t.hpp>
+#include <renderer/backend/graphics/opengl/vertex_buffer_layout_opengl_t.hpp>
 
 namespace renderer {
+namespace opengl {
 
-auto BufferElement::ToString() const -> std::string {
+auto OpenGLBufferElement::ToString() const -> std::string {
     return fmt::format(
-        "<BufferElement\n"
+        "<OpenGLBufferElement\n"
         "  name: {0}\n"
         "  type: {1}\n"
         "  count: {2}\n"
@@ -21,7 +23,8 @@ auto BufferElement::ToString() const -> std::string {
         name, ::renderer::ToString(type), count, nbytes, offset, normalized);
 }
 
-BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
+OpenGLBufferLayout::OpenGLBufferLayout(
+    const std::initializer_list<OpenGLBufferElement>& elements)
     : m_BufferElements(elements) {
     for (auto& element : m_BufferElements) {
         element.offset = m_Stride;
@@ -29,7 +32,8 @@ BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
     }
 }
 
-BufferLayout::BufferLayout(std::vector<BufferElement> elements)
+OpenGLBufferLayout::OpenGLBufferLayout(
+    std::vector<OpenGLBufferElement> elements)
     : m_BufferElements(std::move(elements)) {
     for (auto& element : m_BufferElements) {
         element.offset = m_Stride;
@@ -37,24 +41,24 @@ BufferLayout::BufferLayout(std::vector<BufferElement> elements)
     }
 }
 
-auto BufferLayout::AddElement(BufferElement element) -> void {
+auto OpenGLBufferLayout::AddElement(OpenGLBufferElement element) -> void {
     element.offset = m_Stride;
     m_Stride += element.nbytes;
     m_BufferElements.push_back(std::move(element));
 }
 
-auto BufferLayout::operator[](size_t index) const -> BufferElement {
+auto OpenGLBufferLayout::operator[](size_t index) const -> OpenGLBufferElement {
     if (index >= m_BufferElements.size()) {
         throw std::runtime_error(
-            fmt::format("BufferLayout> index {0} out of range [0-{1})", index,
-                        m_BufferElements.size()));
+            fmt::format("OpenGLBufferLayout> index {0} out of range [0-{1})",
+                        index, m_BufferElements.size()));
     }
     return m_BufferElements[index];
 }
 
-auto BufferLayout::ToString() const -> std::string {
+auto OpenGLBufferLayout::ToString() const -> std::string {
     uint32_t index = 0;
-    std::string str_repr{"<BufferLayout({\n"};
+    std::string str_repr{"<OpenGLBufferLayout({\n"};
     for (const auto& element : m_BufferElements) {
         str_repr += fmt::format(
             "  [name={0}, type={1}, count={2}, nbytes={3}, offset={4}, "
@@ -66,5 +70,7 @@ auto BufferLayout::ToString() const -> std::string {
     str_repr += "})>\n";
     return str_repr;
 }
+
+}  // namespace opengl
 
 }  // namespace renderer

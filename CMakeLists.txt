@@ -54,7 +54,7 @@ loco_create_target(RendererCpp SHARED
     ${SOURCE_DIR}/backend/window/window_adapter_egl.cpp
     ${SOURCE_DIR}/engine/graphics/enums.cpp
     ${SOURCE_DIR}/backend/graphics/opengl/program_opengl_t.cpp
-    # ${SOURCE_DIR}/engine/graphics/vertex_buffer_layout_t.cpp
+    ${SOURCE_DIR}/backend/graphics/opengl/vertex_buffer_layout_opengl_t.cpp
     # ${SOURCE_DIR}/engine/graphics/vertex_buffer_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_layout_t.cpp
     # ${SOURCE_DIR}/core/vertex_buffer_t.cpp
