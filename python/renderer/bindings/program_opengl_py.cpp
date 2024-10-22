@@ -2,23 +2,21 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/numpy.h>
 
-#include <renderer/engine/graphics/program_t.hpp>
+#include <renderer/backend/graphics/opengl/program_opengl_t.hpp>
 
 #include <conversions_py.hpp>
 
 namespace py = pybind11;
 
 namespace renderer {
+namespace opengl {
 
 // NOLINTNEXTLINE
 void bindings_program(py::module m) {
     {
-        using Class = renderer::Program;
+        using Class = ::renderer::opengl::OpenGLProgram;
         py::class_<Class, Class::ptr>(m, "Program")  // NOLINT
-            .def_static("CreateProgram",
-                        static_cast<Class::ptr (*)(const char*, const char*,
-                                                   eGraphicsAPI)>(
-                            ::renderer::Program::CreateProgram))
+            .def(py::init<const char*, const char*>())
             .def("Build", &Class::Build)
             .def("Bind", &Class::Bind)
             .def("Unbind", &Class::Unbind)
@@ -51,15 +49,9 @@ void bindings_program(py::module m) {
             .def_property_readonly("valid", &Class::IsValid)
             .def_property_readonly("vertex_source", &Class::vertex_source)
             .def_property_readonly("fragment_source", &Class::fragment_source)
-            //// TODO(wilbert): add get_shader method or similar
-            .def("__repr__", [](const Class& self) -> py::str {
-                return py::str(
-                           "<Program\n"
-                           "  valid: {}\n"
-                           ">")
-                    .format(self.IsValid());
-            });
+            .def("__repr__", &Class::ToString);
     }
 }
 
+}  // namespace opengl
 }  // namespace renderer

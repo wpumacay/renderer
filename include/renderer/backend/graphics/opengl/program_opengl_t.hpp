@@ -60,6 +60,9 @@ class RENDERER_API OpenGLProgram {
     /// Sets a mat-4 unbiform given its name and desired value
     auto SetMat4(const char* uname, const Mat4& uvalue) -> void;
 
+    /// Returns the string representation
+    RENDERER_NODISCARD auto ToString() const -> std::string;
+
     /// Returns whether or not this shader is valid
     RENDERER_NODISCARD auto IsValid() const -> bool { return m_IsValid; }
 

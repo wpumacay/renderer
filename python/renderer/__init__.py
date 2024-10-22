@@ -10,10 +10,6 @@ from renderer_bindings import (  # type: ignore
     ShaderType,
     WindowConfig,
     Window,
-    Program,
-    ElementType,
-    BufferElement,
-    BufferLayout,
 )
 
 __all__ = [
@@ -26,9 +22,5 @@ __all__ = [
     "ShaderType",
     "WindowConfig",
     "Window",
-    "Program",
-    "ElementType",
-    "BufferElement",
-    "BufferLayout",
 ]
 # fmt: on

@@ -11,8 +11,10 @@ extern auto bindings_enums(py::module m) -> void;
 extern auto bindings_window(py::module m) -> void;
 extern auto bindings_keycodes(py::module m) -> void;
 extern auto bindings_buttons(py::module m) -> void;
-//// extern auto bindings_program(py::module m) -> void;
-//// extern auto bindings_buffers(py::module m) -> void;
+
+namespace opengl {
+extern auto bindings_program(py::module m) -> void;
+}
 
 }  // namespace renderer
 
@@ -31,6 +33,7 @@ PYBIND11_MODULE(renderer_bindings, m) {
     ::renderer::bindings_window(m);
     ::renderer::bindings_keycodes(m);
     ::renderer::bindings_buttons(m);
-    //// ::renderer::bindings_program(m);
-    //// ::renderer::bindings_buffers(m);
+
+    auto m_opengl = m.def_submodule("opengl");
+    ::renderer::opengl::bindings_program(m_opengl);
 }

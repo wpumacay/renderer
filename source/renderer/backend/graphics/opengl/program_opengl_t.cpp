@@ -1,6 +1,7 @@
 #include <glad/gl.h>
 
 #include <utils/logging.hpp>
+#include <spdlog/fmt/bundled/format.h>
 
 #include <renderer/backend/graphics/opengl/program_opengl_t.hpp>
 
@@ -141,6 +142,15 @@ auto OpenGLProgram::SetVec4(const char* uname, const Vec4& uvalue) -> void {
 
 auto OpenGLProgram::SetMat4(const char* uname, const Mat4& uvalue) -> void {
     glUniformMatrix4fv(_GetUniformLocation(uname), 1, GL_FALSE, uvalue.data());
+}
+
+auto OpenGLProgram::ToString() const -> std::string {
+    return fmt::format(
+        "<OpenGLProgram\n"
+        "  valid: {1} \n"
+        "  opengl-id: {0}\n"
+        ">\n",
+        m_IsValid, m_OpenGLId);
 }
 
 }  // namespace opengl
