@@ -15,7 +15,7 @@ namespace opengl {
 void bindings_program(py::module m) {
     {
         using Class = ::renderer::opengl::OpenGLProgram;
-        py::class_<Class, Class::ptr>(m, "Program")  // NOLINT
+        py::class_<Class, Class::ptr>(m, "OpenGLProgram")  // NOLINT
             .def(py::init<const char*, const char*>())
             .def("Build", &Class::Build)
             .def("Bind", &Class::Bind)

@@ -46,6 +46,13 @@ auto bindings_enums(py::module m) {
             .value("INT_3", Enum::INT_3)
             .value("INT_4", Enum::INT_4);
     }
+
+    {
+        using Enum = ::renderer::eBufferUsage;
+        py::enum_<Enum>(m, "BufferUsage")
+            .value("STATIC", Enum::STATIC)
+            .value("DYNAMIC", Enum::DYNAMIC);
+    }
 }
 
 }  // namespace renderer
