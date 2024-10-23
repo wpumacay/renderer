@@ -116,4 +116,15 @@ auto GetElementCount(eElementType etype) -> uint32_t {
     }
 }
 
+auto ToString(eBufferUsage usage) -> std::string {
+    switch (usage) {
+        case eBufferUsage::STATIC:
+            return "Static";
+        case eBufferUsage::DYNAMIC:
+            return "Dynamic";
+        default:
+            return "undefined";
+    }
+}
+
 }  // namespace renderer

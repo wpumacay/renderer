@@ -41,7 +41,7 @@ enum class RENDERER_API eShaderType {
 RENDERER_API auto ToString(eShaderType type) -> std::string;
 
 /// Type of element used for part (or all) elements in a GPU vertex buffer
-enum class eElementType {
+enum class RENDERER_API eElementType {
     FLOAT_1,  ///< Single float, size 4-bytes
     FLOAT_2,  ///< Two float compound (vec2), size 8-bytes
     FLOAT_3,  ///< Three float compound (vec3), size 12-bytes
@@ -60,5 +60,14 @@ RENDERER_API auto GetElementSize(eElementType etype) -> uint32_t;
 
 /// Returns the number of single components in a given buffer element type
 RENDERER_API auto GetElementCount(eElementType etype) -> uint32_t;
+
+/// Available modes in which a VBO can be used
+enum class RENDERER_API eBufferUsage {
+    STATIC,  //< A chunk of GPU memory that won't change during execution
+    DYNAMIC  //< A chunk of GPU memory that could change during execution
+};
+
+/// Returns the string representation of the given buffer usage
+RENDERER_API auto ToString(eBufferUsage usage) -> std::string;
 
 }  // namespace renderer
