@@ -1,4 +1,5 @@
 #include <memory>
+#include <utility>
 
 #include <glad/gl.h>
 
@@ -7,7 +8,7 @@
 #include <renderer/engine/graphics/window_t.hpp>
 #include <renderer/backend/graphics/opengl/program_opengl_t.hpp>
 #include <renderer/backend/graphics/opengl/vertex_buffer_opengl_t.hpp>
-#include "renderer/engine/graphics/enums.hpp"
+#include <renderer/backend/graphics/opengl/vertex_array_opengl_t.hpp>
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -92,40 +93,19 @@ auto main() -> int {
 
     LOG_TRACE("Vertex Buffer Layout: \n{0}\n", layout.ToString());
 
-    // Prepare the layout for our data -----------------------------------------
-    GLuint vao = 0;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
+    auto vao = std::make_unique<::renderer::opengl::OpenGLVertexArray>();
     auto vbo = std::make_unique<::renderer::opengl::OpenGLVertexBuffer>(
         layout, ::renderer::eBufferUsage::STATIC, sizeof(buffer_data),
         buffer_data);
-
-    vbo->Bind();
-    const uint32_t STRIDE = 5 * sizeof(float);
-
-    const uint32_t OFFSET_POS_ATTRIB = 0;
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, STRIDE,
-                          (const void*)(intptr_t)OFFSET_POS_ATTRIB);  // NOLINT
-    glEnableVertexAttribArray(0);
-
-    const uint32_t OFFSET_COLOR_ATTRIB = 2 * sizeof(float);
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, STRIDE,
-        (const void*)(intptr_t)OFFSET_COLOR_ATTRIB);  // NOLINT
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
-    vbo->Unbind();
-    // -------------------------------------------------------------------------
+    vao->AddVertexBuffer(std::move(vbo));
 
     while (window->active()) {
         window->Begin();
         program->Bind();
 
-        glBindVertexArray(vao);
+        vao->Bind();
         glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
-        glBindVertexArray(0);
+        vao->Unbind();
 
         program->Unbind();
         window->End();
