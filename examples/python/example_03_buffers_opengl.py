@@ -4,6 +4,13 @@ import numpy as np
 from OpenGL.GL import *  # type: ignore
 
 import renderer as rdr
+from renderer.opengl import (
+    OpenGLBufferElement,
+    OpenGLBufferLayout,
+    OpenGLProgram,
+    OpenGLVertexArray,
+    OpenGLVertexBuffer,
+)
 
 VERT_SHADER_SRC = r"""
     #version 330 core
@@ -34,24 +41,31 @@ FRAG_SHADER_SRC = r"""
 def main() -> int:
     WINDOW_WIDTH = 1024
     WINDOW_HEIGHT = 768
-
     WINDOW_API = rdr.WindowBackend.TYPE_GLFW
-    GRAPHICS_API = rdr.GraphicsAPI.OPENGL
+
+    win_config = rdr.WindowConfig()
+    win_config.backend = WINDOW_API
+    win_config.width = WINDOW_WIDTH
+    win_config.height = WINDOW_HEIGHT
+    win_config.title = "Example 03 - OpenGL Buffers"
+    win_config.gl_version_major = 3
+    win_config.gl_version_minor = 3
 
     window = rdr.Window.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_API)
 
-    def key_callback(key: int, action: int, _: int) -> None:
-        if key == rdr.Keys.KEY_ESCAPE and action == rdr.KeyAction.RELEASED:
+    def keycallback(key, action, mods):
+        if key == rdr.Keys.KEY_ESCAPE:
             window.RequestClose()
 
-    window.RegisterKeyboardCallback(key_callback)
+    window.RegisterKeyboardCallback(keycallback)
 
-    program = rdr.Program.CreateProgram(
-        VERT_SHADER_SRC, FRAG_SHADER_SRC, GRAPHICS_API
-    )
+    program = OpenGLProgram(VERT_SHADER_SRC, FRAG_SHADER_SRC)
     program.Build()
-    if not program.valid:
-        print("There was an error building the shader program")
+
+    if program.valid:
+        print("Shader Program successfully built")
+    else:
+        print("Shader Program got an error during building")
         return 1
 
     # fmt: off
@@ -67,20 +81,25 @@ def main() -> int:
     # fmt: on
     NUM_VERTICES = 6
 
-    # TODO(wilbert): Add constructor for bufferlayout that uses list of elements
-    layout = rdr.BufferLayout()
+    layout = OpenGLBufferLayout()
     layout.AddElement(
-        rdr.BufferElement("position", rdr.ElementType.FLOAT_2, False)
+        OpenGLBufferElement("position", rdr.ElementType.FLOAT_2, False)
     )
     layout.AddElement(
-        rdr.BufferElement("color", rdr.ElementType.FLOAT_3, False)
+        OpenGLBufferElement("color", rdr.ElementType.FLOAT_3, False)
     )
+
+    vao = OpenGLVertexArray()
+    vbo = OpenGLVertexBuffer(layout, rdr.BufferUsage.STATIC, buffer_data)
+    vao.AddVertexBuffer(vbo)
 
     while window.active:
         window.Begin()
         program.Bind()
 
-        # glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES)
+        vao.Bind()
+        glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES)
+        vao.Unbind()
 
         program.Unbind()
         window.End()
