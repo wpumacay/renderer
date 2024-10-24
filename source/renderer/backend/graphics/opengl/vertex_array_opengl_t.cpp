@@ -74,6 +74,15 @@ auto OpenGLVertexArray::AddVertexBuffer(OpenGLVertexBuffer::ptr buffer)
     m_Buffers.push_back(std::move(buffer));
 }
 
+auto OpenGLVertexArray::SetIndexBuffer(OpenGLIndexBuffer::ptr ibuffer) -> void {
+    glBindVertexArray(m_OpenGLId);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer->opengl_id());
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    m_IndexBuffer = std::move(ibuffer);
+}
+
 auto OpenGLVertexArray::Bind() const -> void { glBindVertexArray(m_OpenGLId); }
 
 // NOLINTNEXTLINE

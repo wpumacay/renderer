@@ -6,6 +6,7 @@
 
 #include <renderer/common.hpp>
 #include <renderer/backend/graphics/opengl/vertex_buffer_opengl_t.hpp>
+#include <renderer/backend/graphics/opengl/index_buffer_opengl_t.hpp>
 
 namespace renderer {
 namespace opengl {
@@ -30,6 +31,9 @@ class RENDERER_API OpenGLVertexArray {
     /// Adds the given VBO to the group managed by this VAO
     auto AddVertexBuffer(OpenGLVertexBuffer::ptr buffer) -> void;
 
+    /// Adds the given IBO to the group managed by this VAO
+    auto SetIndexBuffer(OpenGLIndexBuffer::ptr ibuffer) -> void;
+
     /// Binds this VAO, setting the OpenGL-FSM to the appropriate state
     auto Bind() const -> void;
 
@@ -50,10 +54,15 @@ class RENDERER_API OpenGLVertexArray {
  private:
     /// Id of the OpenGL resource allocated on the GPU
     uint32_t m_OpenGLId{0};
+
     /// Index of the current slot in the attributePointer list of the VAO
     uint32_t m_NumAttribIndx{0};
+
     /// Container for the owned VBOs
     std::vector<OpenGLVertexBuffer::ptr> m_Buffers;
+
+    /// IBO associated with this VAO (if applicable)
+    OpenGLIndexBuffer::ptr m_IndexBuffer{nullptr};
 };
 
 }  // namespace opengl
