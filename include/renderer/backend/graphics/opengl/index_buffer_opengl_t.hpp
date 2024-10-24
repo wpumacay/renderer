@@ -29,6 +29,9 @@ class RENDERER_API OpenGLIndexBuffer {
     /// Unbinds this buffer from the graphics pipeline
     auto Unbind() const -> void;
 
+    /// Returns the usage of this IBO
+    RENDERER_NODISCARD auto usage() const -> eBufferUsage { return m_Usage; }
+
     /// Returns the number of indices contained in this buffer
     RENDERER_NODISCARD auto count() const -> uint32_t { return m_Count; }
 

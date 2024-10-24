@@ -9,6 +9,7 @@
 
 #include <renderer/backend/graphics/opengl/vertex_buffer_layout_opengl_t.hpp>
 #include <renderer/backend/graphics/opengl/vertex_buffer_opengl_t.hpp>
+#include <renderer/backend/graphics/opengl/index_buffer_opengl_t.hpp>
 #include <renderer/backend/graphics/opengl/vertex_array_opengl_t.hpp>
 
 #include <conversions_py.hpp>
@@ -34,6 +35,7 @@ namespace opengl {
 // NOLINTNEXTLINE
 void bindings_buffers(py::module m) {
     using NumpyFloatArray = py::array_t<float32_t>;
+    using NumpyUint32Array = py::array_t<uint32_t>;
 
     {
         using Class = ::renderer::opengl::OpenGLBufferElement;
@@ -74,7 +76,8 @@ void bindings_buffers(py::module m) {
             .def(py::init([](OpenGLBufferLayout layout, eBufferUsage usage,
                              const NumpyFloatArray& np_data) {
                 return std::make_unique<OpenGLVertexBuffer>(
-                    layout, usage, np_data.size() * sizeof(float32_t),
+                    std::move(layout), usage,
+                    np_data.size() * sizeof(float32_t),
                     static_cast<const float32_t*>(np_data.request().ptr));
             }))
             .def("Bind", &Class::Bind)
@@ -94,11 +97,30 @@ void bindings_buffers(py::module m) {
     }
 
     {
+        using Class = ::renderer::opengl::OpenGLIndexBuffer;
+        constexpr auto* ClassName = "OpenGLIndexBuffer";  // NOLINT
+        py::class_<Class, Class::ptr>(m, ClassName)
+            .def(py::init(
+                [](eBufferUsage usage, const NumpyUint32Array& np_data) {
+                    return std::make_unique<Class>(
+                        usage, np_data.size(),
+                        static_cast<const uint32_t*>(np_data.request().ptr));
+                }))
+            .def("Bind", &Class::Bind)
+            .def("Unbind", &Class::Unbind)
+            .def_property_readonly("usage", &Class::usage)
+            .def_property_readonly("count", &Class::count)
+            .def_property_readonly("opengl_id", &Class::opengl_id)
+            .def("__repr__", &Class::ToString);
+    }
+
+    {
         using Class = ::renderer::opengl::OpenGLVertexArray;
         constexpr auto* ClassName = "OpenGLVertexArray";  // NOLINT
         py::class_<Class, Class::ptr>(m, ClassName)
             .def(py::init<>())
             .def("AddVertexBuffer", &Class::AddVertexBuffer)
+            .def("SetIndexBuffer", &Class::SetIndexBuffer)
             .def("Bind", &Class::Bind)
             .def("Unbind", &Class::Unbind)
             .def_property_readonly("opengl_id", &Class::opengl_id)

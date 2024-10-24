@@ -6,6 +6,7 @@ from renderer_bindings.opengl import (  # type: ignore
     OpenGLBufferLayout,
     OpenGLVertexBuffer,
     OpenGLVertexArray,
+    OpenGLIndexBuffer,
 )
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "OpenGLBufferLayout",
     "OpenGLVertexBuffer",
     "OpenGLVertexArray",
+    "OpenGLIndexBuffer",
 ]
 # fmt: on
